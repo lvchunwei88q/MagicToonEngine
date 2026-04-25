@@ -1,9 +1,14 @@
 #include <Core.h>
 
-Core::Core()
+namespace Core
 {
-}
 
-Core::~Core()
-{
+	Core::Core()
+	{
+	}
+
+	Core::~Core()
+	{
+	}
+
 }

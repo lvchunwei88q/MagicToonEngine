@@ -1,0 +1,55 @@
+#include <Subsystem/Subsystem.h>
+#include <Subsystem/SubsystemContext.h>
+#include <Subsystem/SubsystemContextImpl.h>
+
+#include <cassert> // For assert
+#include <algorithm>
+namespace Core
+{
+	SubsystemContextImpl::SubsystemContextImpl()
+	{
+		// initialize
+	}
+
+	SubsystemContext* GetSubsystemContext()
+	{
+		return &SubsystemContextImpl::Get();
+	}
+
+	void SubsystemContextImpl::RegisterSubsystem(SubsystemContext::Context context) {
+		// Register the subsystem in the system manager
+		Context ctx;
+		ctx.name = std::string(context.name);
+		ctx.subsystem = (Subsystem*)context.subsystem;
+		ctx.priority = context.priority;
+		Derived.push_back(std::move(ctx));
+		
+	}
+	bool SubsystemContextImpl::Init()
+	{
+		std::sort(Derived.begin(), Derived.end(),
+			[](const Context& a, const Context& b) {
+				return a.priority > b.priority;  // 优先级高的先初始化
+			});
+
+		for (size_t i = 0; i < Derived.size(); i++)
+		{
+			auto& it = Derived[i];
+			if (!it.subsystem)
+				assert(it.subsystem && "Subsystem is null during Init!");
+			if (!it.subsystem->Init())
+				return false;
+		}
+		return true;
+	}
+	void SubsystemContextImpl::Uninstall()
+	{
+		for (size_t i = Derived.size(); i-- > 0; )
+		{
+			auto& it = Derived[i];
+			if (!it.subsystem)
+				assert(it.subsystem && "Subsystem is null during uninstall!");
+			it.subsystem->Uninstall();
+		}
+	}
+}
