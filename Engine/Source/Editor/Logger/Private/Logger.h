@@ -12,7 +12,7 @@
 
 namespace LOG {
 
-    class Logger : public SubsystemTemplate<Logger, Core::SubsystemContext::Priority::High>, public Logs {
+    class Logger : public SubsystemTemplate<Logger, Core::SubsystemContext::Priority::High>, public LogInterface {
     public:
         //Logger() = default;
 

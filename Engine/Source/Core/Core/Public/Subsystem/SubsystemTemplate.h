@@ -2,6 +2,7 @@
 #include <Subsystem/Subsystem.h>
 #include <Common/Singleton.h>
 
+// the subsystems template Cannot be used as an export API!!!
 template<typename T, Core::SubsystemContext::Priority Priority>
 class SubsystemTemplate : public Core::Subsystem, public Singleton<T>
 {

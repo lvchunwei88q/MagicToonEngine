@@ -26,15 +26,15 @@ namespace LOG {
 		Error
 	};
 
-	class LOG_API Logs
+	class LOG_API LogInterface
 	{
 	public:
-		Logs() = default;
+		LogInterface() = default;
 		// 获取流对象
 		virtual void Log(LogLevel level, const char* file, int line, const std::string& message) = 0;
 	};
 
-	LOG_API Logs* GetLogInstance();
+	LOG_API LogInterface* GetLogInstance();
 }
 
 #undef IN_SPECIAL_NAMESPACE

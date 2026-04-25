@@ -9,7 +9,7 @@
 namespace LOG {
     AUTO_REGISTER(Logger)
 
-    Logs* LOG::GetLogInstance()
+    LogInterface* LOG::GetLogInstance()
     {
         return &Singleton<LOG::Logger>::Get();
     }

@@ -7,7 +7,7 @@ namespace Core
 {
 	CORE_API SubsystemContext* GetSubsystemContext();
 
-	// Subsystem base class - subsystems Cannot be used as an export API!!!
+	// Subsystem base class
 	class CORE_API Subsystem
 	{
 	public:

@@ -4,6 +4,13 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+if(MSVC)
+    # 关闭警告 C4819: 无效的字符。避免中文注释被警告
+    add_compile_options(
+        "/wd4819"
+    )
+endif()
+
 # 设置输出目录为项目根目录下的 out/Binary
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/Binary)
 
