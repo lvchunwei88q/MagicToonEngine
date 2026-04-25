@@ -2,20 +2,19 @@
 #include <Subsystem/Subsystem.h>
 #include <Common/Singleton.h>
 
-template<typename T>
+template<typename T, Core::SubsystemContext::Priority Priority>
 class SubsystemTemplate : public Core::Subsystem, public Singleton<T>
 {
 public:
     static void RegisterStatic() {
-        const char* name = typeid(T).name();
-        SubsystemTemplate::Get().template Register<T>();
+        SubsystemTemplate::Get().template Register<T,Priority>();
     }
 };
 
 #define CAT(a, b) a##b
 #define AUTO_REGISTER(T) \
-    static bool CAT(T, _registered) = []() { \
+    inline static bool CAT(T, _registered) = []() { \
         T::RegisterStatic(); \
         return true; \
     }(); \
-    bool CAT(T, _dummy) = CAT(T, _registered)
+    inline bool CAT(T, _dummy) = CAT(T, _registered);

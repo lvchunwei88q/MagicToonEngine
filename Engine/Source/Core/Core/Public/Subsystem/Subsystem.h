@@ -1,5 +1,5 @@
 #pragma once
-#include <Common/api.h>
+#include <Common/Core_API.h>
 
 #include <Subsystem/SubsystemContext.h>
 
@@ -7,6 +7,7 @@ namespace Core
 {
 	CORE_API SubsystemContext* GetSubsystemContext();
 
+	// Subsystem base class - subsystems Cannot be used as an export API!!!
 	class CORE_API Subsystem
 	{
 	public:
@@ -16,7 +17,7 @@ namespace Core
 		virtual bool Init() = 0;
 		virtual void Uninstall() = 0;
 
-		template<typename Derived>
+		template<typename Derived, SubsystemContext::Priority Priority>
 		void Register() {
 			// Register the subsystem in the system manager
 			const char* name = typeid(Derived).name();
@@ -24,7 +25,7 @@ namespace Core
 			SubsystemContext::Context context;
 			context.name = name;
 			context.subsystem = this;
-			context.priority = SubsystemContext::Priority::Normal; // Default priority, can be customized
+			context.priority = Priority; // Default priority, can be customized
 
 			SubsystemContext* Subsystemcontext = GetSubsystemContext();
 			Subsystemcontext->RegisterSubsystem(context);

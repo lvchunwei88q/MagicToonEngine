@@ -1,14 +1,14 @@
 include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 
-add_module_sources(CORE)
+add_module_sources(IO)
 
 # 添加库
-add_library(Core SHARED
-    ${CORE_SOURCES}
-    ${CORE_HEADERS}
+add_library(IO SHARED
+    ${IO_SOURCES}
+    ${IO_HEADERS}
 )
 
-target_include_directories(Core
+target_include_directories(IO
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/Public # 别的项目也可以访问
 
@@ -16,4 +16,6 @@ target_include_directories(Core
         ${CMAKE_CURRENT_SOURCE_DIR}/Private # 别的项目不可以访问
 )
 
-target_compile_definitions(Core PRIVATE CORE_EXPORTS)
+target_compile_definitions(IO PRIVATE IO_EXPORTS)
+
+target_link_libraries(IO PRIVATE Core)

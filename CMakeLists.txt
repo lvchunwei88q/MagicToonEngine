@@ -9,6 +9,8 @@ project ("MagicToonEngine")
 
 # 包含子项目。
 EngineModule(Core/Core)
+EngineModule(Editor/IO)
+EngineModule(Editor/Logger)
 EngineModule(Launcher)
 
 # 设置启动项目为 Launcher

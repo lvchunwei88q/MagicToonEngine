@@ -1,5 +1,5 @@
 #pragma once
-#include <Common/api.h>
+#include <Common/Core_API.h>
 
 namespace Core
 {

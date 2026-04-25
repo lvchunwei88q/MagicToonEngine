@@ -1,9 +1,11 @@
 #include <Core.h>
 #include <Subsystem/Subsystem.h>
 #include <Subsystem/SubsystemTemplate.h>
+
+#include <Log.h>
 #include <iostream>
 
-class MyClass : public SubsystemTemplate<MyClass>
+class MyClass : public SubsystemTemplate<MyClass, Core::SubsystemContext::Priority::Normal>
 { 
 public:
 	virtual bool Init() {
@@ -16,7 +18,7 @@ public:
 private:
 
 };
-AUTO_REGISTER(MyClass);
+AUTO_REGISTER(MyClass)
 
 int main()
 {
@@ -24,6 +26,9 @@ int main()
 	std::cout << "Core version: " << Core::Core::GetVersion() << std::endl;
 
 	Core::SubsystemControl::Init();
+
+	LOG_INFO("This is an info log.");
+
 	Core::SubsystemControl::Uninstall();
 
 	std::cin.get();

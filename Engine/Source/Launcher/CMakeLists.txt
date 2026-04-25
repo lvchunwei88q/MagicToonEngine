@@ -1,15 +1,6 @@
-file(GLOB_RECURSE LAUNCHER_SOURCES 
-    CONFIGURE_DEPENDS
-    "*.cpp"
-    "*.cc"
-    "*.cxx"
-)
+include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 
-file(GLOB_RECURSE LAUNCHER_HEADERS 
-    CONFIGURE_DEPENDS
-    "*.h"
-    "*.hpp"
-)
+add_module_sources(LAUNCHER)
 
 # 添加库
 add_executable(Launcher
@@ -18,3 +9,4 @@ add_executable(Launcher
 )
 
 target_link_libraries(Launcher PRIVATE Core)
+target_link_libraries(Launcher PRIVATE Logger)
