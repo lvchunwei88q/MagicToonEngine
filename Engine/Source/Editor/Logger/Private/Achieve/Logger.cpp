@@ -126,11 +126,4 @@ namespace LOG {
         buffer_.clear();
     }
 
-    #include <Windows.h>       // OutputDebugString
-    void Logger::WriteToDebugOutput(const std::string& text) {
-        // 在 Windows 上输出到调试器
-        OutputDebugStringA(text.c_str());
-        OutputDebugStringA("\n");
-    }
-
 }

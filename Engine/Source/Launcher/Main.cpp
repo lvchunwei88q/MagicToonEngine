@@ -23,7 +23,7 @@ AUTO_REGISTER(MyClass)
 int main()
 {
 	Core::Core core;
-	std::cout << "Core version: " << Core::Core::GetVersion() << std::endl;
+	std::cout << "version: " << Core::Core::GetVersion() << std::endl;
 
 	Core::SubsystemControl::Init();
 
