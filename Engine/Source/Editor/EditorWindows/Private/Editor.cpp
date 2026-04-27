@@ -4,13 +4,7 @@
 namespace EditorWindows
 {
 
-	struct AutoRegister
-	{
-		AutoRegister() {
-			Editor::Get().Register<Editor, Core::SubsystemContext::Priority::Normal>();
-		}
-	};
-	static AutoRegister s_AutoRegister;
+	AUTO_REGISTER_SINGLETON(Editor, Normal)
 
 	Editor::Editor()
 	{

@@ -3,6 +3,8 @@
 #include <Subsystem/Subsystem.h>
 #include <Common/Singleton.h>
 
+#include <Subsystem/SubsystemTemplate.h>
+
 namespace EditorWindows
 {
 	class EDITORWINDOWS_API Editor : public Core::Subsystem, public Singleton<Editor>
@@ -18,6 +20,5 @@ namespace EditorWindows
 
 	};
 
-	struct AutoRegister;
-	extern AutoRegister s_AutoRegister;
+	AUTO_REGISTER_SINGLETON_INCLUDE(Editor)
 }
