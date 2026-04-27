@@ -9,4 +9,4 @@ add_executable(Launcher
 )
 
 target_link_libraries(Launcher PRIVATE Core)
-target_link_libraries(Launcher PRIVATE Logger)
+target_link_libraries(Launcher PRIVATE EditorWindows)

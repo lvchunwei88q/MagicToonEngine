@@ -37,6 +37,8 @@ namespace LOG {
     void Logger::Uninstall()
     {
         running_ = false;
+
+		cv_.notify_all(); // 通知线程退出
         if (workerThread_ && workerThread_->joinable()) {
             workerThread_->join();
         }
@@ -104,7 +106,12 @@ namespace LOG {
 
     void Logger::BackgroundWorker() {
         while (running_) {
-            std::this_thread::sleep_for(std::chrono::seconds(checkIntervalSec_));
+            std::unique_lock<std::mutex> lock(fileMutex_);
+            // 等待指定时间或被唤醒
+            cv_.wait_for(lock, std::chrono::seconds(checkIntervalSec_),
+                [this] { return !running_; });
+
+            if (!running_) break;
             FlushToFile();
         }
     }

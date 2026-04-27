@@ -2,11 +2,11 @@
 #include <Subsystem/Subsystem.h>
 #include <Subsystem/SubsystemTemplate.h>
 
-#include <Log.h>
 #include <iostream>
+#include <Editor.h>
 
 class MyClass : public SubsystemTemplate<MyClass, Core::SubsystemContext::Priority::Normal>
-{ 
+{
 public:
 	virtual bool Init() {
 		std::cout << "MyClass Init" << std::endl;
@@ -27,7 +27,7 @@ int main()
 
 	Core::SubsystemControl::Init();
 
-	LOG_INFO("This is an info log.");
+	EditorWindows::Editor::Get().CreateWindow(); // Example usage of the Editor subsystem
 
 	Core::SubsystemControl::Uninstall();
 

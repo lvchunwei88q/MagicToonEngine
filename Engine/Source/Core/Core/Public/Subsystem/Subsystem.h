@@ -3,6 +3,8 @@
 
 #include <Subsystem/SubsystemContext.h>
 
+#include <typeinfo> 
+
 namespace Core
 {
 	CORE_API SubsystemContext* GetSubsystemContext();

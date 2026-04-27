@@ -9,6 +9,7 @@
 #include <atomic>
 #include <mutex>
 #include <vector>
+#include <condition_variable>
 
 namespace LOG {
 
@@ -40,6 +41,8 @@ namespace LOG {
         std::atomic<bool> running_{ true };
         std::unique_ptr<std::thread> workerThread_;
         std::mutex fileMutex_;          // 保护文件写入和滚动操作
+
+        std::condition_variable cv_; // 通知
 
         std::vector<std::string> buffer_;  // 缓存日志行
     };

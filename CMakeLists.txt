@@ -11,6 +11,7 @@ project ("MagicToonEngine")
 EngineModule(Core/Core)
 EngineModule(Editor/IO)
 EngineModule(Editor/Logger)
+EngineModule(Editor/EditorWindows)
 EngineModule(Launcher)
 
 # 设置启动项目为 Launcher
