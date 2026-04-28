@@ -23,7 +23,7 @@ namespace LOG {
 
         // 确保日志目录存在
         if (!IO::FileManager::Exists(logDir_)) {
-            IO::FileManager::CreateDirectory(logDir_);
+            IO::FileManager::MakeDirectory(logDir_);
         }
 
         // 生成当前日志文件名（精确到秒）
@@ -117,7 +117,7 @@ namespace LOG {
     }
 
     void Logger::FlushToFile() {
-        std::lock_guard<std::mutex> lock(fileMutex_);
+        //std::lock_guard<std::mutex> lock(fileMutex_); 不持有锁
         if (buffer_.empty()) return;
 
         // 将所有缓存行合并为一个字符串（每个行后加换行）

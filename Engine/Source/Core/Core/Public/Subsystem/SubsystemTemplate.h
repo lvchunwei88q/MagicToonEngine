@@ -36,4 +36,4 @@ static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);
 
 #define AUTO_REGISTER_SINGLETON_INCLUDE(T)                        \
 struct CAT(T, _AutoRegister);                                     \
-extern CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);
+extern CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);           

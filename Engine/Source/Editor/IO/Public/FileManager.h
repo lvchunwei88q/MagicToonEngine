@@ -32,13 +32,13 @@ namespace IO {
         static bool DeleteFile(const std::wstring& path);
 
         // 创建空文件（如果文件已存在则更新其时间戳）
-        static bool CreateFile(const std::wstring& path);
+        static bool MakeFile(const std::wstring& path);
 
         // 移动/重命名文件或目录
         static bool MoveFile(const std::wstring& src, const std::wstring& dst);
 
         // 创建目录（包括父目录）
-        static bool CreateDirectory(const std::wstring& path);
+        static bool MakeDirectory(const std::wstring& path);
 
         // 检查文件或目录是否存在
         static bool Exists(const std::wstring& path);

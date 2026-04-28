@@ -8,5 +8,7 @@ add_executable(Launcher
     ${LAUNCHER_HEADERS}
 )
 
-target_link_libraries(Launcher PRIVATE Core)
-target_link_libraries(Launcher PRIVATE EditorWindows)
+target_link_libraries(Launcher PRIVATE 
+    Core
+    Editor
+)

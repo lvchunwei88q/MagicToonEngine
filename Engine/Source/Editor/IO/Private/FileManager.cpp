@@ -74,7 +74,7 @@ namespace IO {
         return false;
     }
 
-    bool FileManager::CreateFile(const std::wstring& path) {
+    bool FileManager::MakeFile(const std::wstring& path) {
         fs::path p(path);
         if (fs::exists(p)) {
             // 更新最后修改时间
@@ -104,7 +104,7 @@ namespace IO {
         }
     }
 
-    bool FileManager::CreateDirectory(const std::wstring& path) {
+    bool FileManager::MakeDirectory(const std::wstring& path) {
         fs::path p(path);
         if (fs::exists(p)) {
             return fs::is_directory(p);

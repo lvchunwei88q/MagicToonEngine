@@ -8,7 +8,7 @@ namespace Core
 	public:
 		Core();
 		~Core();
-		static const char* GetVersion() { return "0.0.0.1"; };
+		static const char* GetVersion();
 	private:
 
 	};
