@@ -4,6 +4,7 @@
 
 #include <Subsystem/Subsystem.h>
 #include <Common/Singleton.h>
+#include <functional>
 
 #include <Subsystem/SubsystemTemplate.h>
 
@@ -20,10 +21,14 @@ namespace EditorWindows
 	public:
 		EditorWindows();
 
+		using WindowUpdateRenderingFunc = std::function<void()>;
+
 		virtual bool Init();
 		virtual void Uninstall();
 
 		WindowsContext* GetWindowsContext() { return &WindowsContext::Get(); };
+		void RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func);
+		WindowUpdateRenderingFunc GetWindowUpdateRenderFunction();
 
 	private:
 		void CreateWindows();
@@ -32,6 +37,9 @@ namespace EditorWindows
 
 	public: // 这个函数需要在窗口销毁时调用，以确保D3D设备被正确清理
 		void CleanupDeviceD3D();
+
+	private:
+		WindowUpdateRenderingFunc WUR;
 	};
 
 	AUTO_REGISTER_SINGLETON_INCLUDE(EditorWindows)

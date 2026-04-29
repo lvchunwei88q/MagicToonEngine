@@ -31,6 +31,10 @@ namespace Editor
 
         EditorRender::Get().Init(); // 渲染初始化
 
+        EditorWindows::EditorWindows::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {
+            if (state == EngineState::Run) Tick(); // 每帧更新逻辑
+        });
+
         // 游戏循环 + 消息处理
         while (state == EngineState::Run)
         {

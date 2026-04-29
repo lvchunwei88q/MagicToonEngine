@@ -40,4 +40,12 @@ namespace EditorWindows
 		CleanupWindows();
 
 	}
+
+	void EditorWindows::RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func) {
+		this->WUR = func;
+	}
+	EditorWindows::WindowUpdateRenderingFunc EditorWindows::GetWindowUpdateRenderFunction()
+	{
+		return this->WUR;
+	}
 }

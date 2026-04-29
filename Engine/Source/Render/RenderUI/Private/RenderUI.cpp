@@ -60,6 +60,7 @@ namespace RenderUI {
         ImGui::NewFrame();
 
 		BasicLayout();
+		ExampleWindow();
 
         // Rendering
         ImGui::Render();

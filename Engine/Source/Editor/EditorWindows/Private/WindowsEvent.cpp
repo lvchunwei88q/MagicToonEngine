@@ -47,6 +47,24 @@ namespace EditorWindows {
             EditorWindows::Get().CleanupDeviceD3D(); // 确保在窗口销毁时清理D3D设备
 			PostQuitMessage(0);
 			break;
+
+            // WndProc 里
+        case WM_ENTERSIZEMOVE:
+            SetTimer(hWnd, 1, 16, nullptr);  // 每 16ms 触发一次
+            return 0;
+
+        case WM_EXITSIZEMOVE:
+            KillTimer(hWnd, 1);
+            return 0;
+
+        case WM_TIMER:
+            if (wParam == 1) {
+                // 处理一帧
+                if (EditorWindows::Get().GetWindowUpdateRenderFunction()) {
+                    EditorWindows::Get().GetWindowUpdateRenderFunction()();
+                }
+            }
+            return 0;
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 		}
