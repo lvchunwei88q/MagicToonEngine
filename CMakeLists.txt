@@ -20,7 +20,6 @@ EngineModule(Render/RenderRT)
 EngineModule(Render/RenderUI)
 EngineModule(Editor/IO)
 EngineModule(Editor/Logger)
-EngineModule(Editor/EditorWindows)
 EngineModule(Editor/Editor)
 EngineModule(Launcher)
 

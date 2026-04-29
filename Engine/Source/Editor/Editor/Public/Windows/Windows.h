@@ -1,5 +1,5 @@
 #pragma once 
-#include <Common/EDITORWINDOWS_API.h>
+#include <Common/EDITOR_API.h>
 #include <Windows.h>
 
 #include <Subsystem/Subsystem.h>
@@ -8,7 +8,7 @@
 
 #include <Subsystem/SubsystemTemplate.h>
 
-namespace EditorWindows
+namespace Editor
 {
 	class WindowsContext : public Singleton<WindowsContext>
 	{
@@ -16,10 +16,10 @@ namespace EditorWindows
 		HWND hWnd = nullptr; // windows id
 	};
 
-	class EDITORWINDOWS_API EditorWindows : public Core::Subsystem, public Singleton<EditorWindows>
+	class EDITOR_API Windows : public Core::Subsystem, public Singleton<Windows>
 	{
 	public:
-		EditorWindows();
+		Windows();
 
 		using WindowUpdateRenderingFunc = std::function<void()>;
 
@@ -42,5 +42,5 @@ namespace EditorWindows
 		WindowUpdateRenderingFunc WUR;
 	};
 
-	AUTO_REGISTER_SINGLETON_INCLUDE(EditorWindows)
+	AUTO_REGISTER_SINGLETON_INCLUDE(Windows)
 }

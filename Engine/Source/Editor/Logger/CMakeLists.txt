@@ -3,7 +3,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 add_module_sources(LOGGER)
 
 # 添加库
-add_library(Logger SHARED
+add_engine_library(Logger SHARED
     ${LOGGER_SOURCES}
     ${LOGGER_HEADERS}
 )

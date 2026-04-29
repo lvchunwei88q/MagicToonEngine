@@ -3,7 +3,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 add_module_sources(RenderUI)
 
 # 添加库
-add_library(RenderUI SHARED
+add_engine_library(RenderUI SHARED
     ${RenderUI_SOURCES}
     ${RenderUI_HEADERS}
 )

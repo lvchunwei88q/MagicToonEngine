@@ -20,3 +20,11 @@ file(GLOB_RECURSE ${ModuleName}_HEADERS
     "*.hpp"
 )
 endmacro()
+
+# 给模块的前缀
+function(add_engine_library name)
+    add_library(${name} ${ARGN})
+    set_target_properties(${name} PROPERTIES 
+        PREFIX "Magic-"
+    )
+endfunction()

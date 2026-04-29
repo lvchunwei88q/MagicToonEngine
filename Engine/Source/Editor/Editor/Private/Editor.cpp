@@ -26,12 +26,12 @@ namespace Editor
 
 	void Editor::Run()
 	{
-		HWND Hwnd = EditorWindows::EditorWindows::Get().GetWindowsContext()->hWnd; // 确保窗口上下文已创建
+		HWND Hwnd = Windows::Get().GetWindowsContext()->hWnd; // 确保窗口上下文已创建
 		ShowWindow(Hwnd, SW_SHOW);
 
         EditorRender::Get().Init(); // 渲染初始化
 
-        EditorWindows::EditorWindows::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {
+        Windows::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {
             if (state == EngineState::Run) Tick(); // 每帧更新逻辑
         });
 
@@ -58,7 +58,7 @@ namespace Editor
 
     void EditorRender::Init()
     {
-        renderui.Init(EditorWindows::EditorWindows::Get().GetWindowsContext()->hWnd); // 初始化UI系统
+        renderui.Init(Windows::Get().GetWindowsContext()->hWnd); // 初始化UI系统
     }
     void EditorRender::End()
     {

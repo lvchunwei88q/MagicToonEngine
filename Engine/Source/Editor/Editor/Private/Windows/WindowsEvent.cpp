@@ -1,12 +1,12 @@
 #include <WindowsConfig.h>
+#include <Windows/Windows.h>
 
-#include <EditorWindows.h>
+// DX11相关
 #include <RenderUI.h>
-#include <RenderInterface.h>
 #include <RenderRTInterface.h>
 #include <BufferManagerInterface.h>
 
-namespace EditorWindows {
+namespace Editor {
 	LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         if (RenderUI::RenderUI_Windows_Event(hWnd, msg, wParam, lParam))
             return true;
@@ -44,7 +44,7 @@ namespace EditorWindows {
             break;
         }
 		case WM_DESTROY:
-            EditorWindows::Get().CleanupDeviceD3D(); // 确保在窗口销毁时清理D3D设备
+            Windows::Get().CleanupDeviceD3D(); // 确保在窗口销毁时清理D3D设备
 			PostQuitMessage(0);
 			break;
 
@@ -60,8 +60,8 @@ namespace EditorWindows {
         case WM_TIMER:
             if (wParam == 1) {
                 // 处理一帧
-                if (EditorWindows::Get().GetWindowUpdateRenderFunction()) {
-                    EditorWindows::Get().GetWindowUpdateRenderFunction()();
+                if (Windows::Get().GetWindowUpdateRenderFunction()) {
+                    Windows::Get().GetWindowUpdateRenderFunction()();
                 }
             }
             return 0;

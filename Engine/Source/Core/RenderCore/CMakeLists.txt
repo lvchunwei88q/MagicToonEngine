@@ -3,7 +3,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 add_module_sources(RENDERCORE)
 
 # 添加库
-add_library(RenderCore SHARED
+add_engine_library(RenderCore SHARED
     ${RENDERCORE_SOURCES}
     ${RENDERCORE_HEADERS}
 )

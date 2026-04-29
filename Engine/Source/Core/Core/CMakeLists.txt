@@ -3,7 +3,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 add_module_sources(CORE)
 
 # 添加库
-add_library(Core SHARED
+add_engine_library(Core SHARED
     ${CORE_SOURCES}
     ${CORE_HEADERS}
 )

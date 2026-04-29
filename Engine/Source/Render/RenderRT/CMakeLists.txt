@@ -3,7 +3,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 add_module_sources(RenderRT)
 
 # 添加库
-add_library(RenderRT SHARED
+add_engine_library(RenderRT SHARED
     ${RenderRT_SOURCES}
     ${RenderRT_HEADERS}
 )

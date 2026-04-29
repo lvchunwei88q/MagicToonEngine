@@ -6,7 +6,7 @@
 #include <cereal/archives/binary.hpp>    // 二进制
 //#include <cereal/types/string.hpp>     // std::string
 
-namespace EditorWindows {
+namespace Editor {
 	// Forward declaration of the window procedure
 	LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

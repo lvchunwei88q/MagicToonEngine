@@ -1,20 +1,20 @@
-#include <EditorWindows.h>
+#include <Windows/Windows.h>
 #include <WindowsConfig.h>
 #include <Log.h>
 
 #include <BufferManagerInterface.h> // 初始化管理器
 
-namespace EditorWindows
+namespace Editor
 {
 
-	AUTO_REGISTER_SINGLETON(EditorWindows, Normal)
+	AUTO_REGISTER_SINGLETON(Windows, Normal)
 
-	EditorWindows::EditorWindows()
+	Windows::Windows()
 	{
 		// not
 	}
 
-	bool EditorWindows::Init()
+	bool Windows::Init()
 	{
 		LOG_INFO("Editor subsystem created.");
 
@@ -35,16 +35,17 @@ namespace EditorWindows
 		return true;
 	}
 
-	void EditorWindows::Uninstall()
+	void Windows::Uninstall()
 	{
 		CleanupWindows();
 
 	}
 
-	void EditorWindows::RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func) {
+	// 注册窗口改变时渲染回调函数
+	void Windows::RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func) {
 		this->WUR = func;
 	}
-	EditorWindows::WindowUpdateRenderingFunc EditorWindows::GetWindowUpdateRenderFunction()
+	Windows::WindowUpdateRenderingFunc Windows::GetWindowUpdateRenderFunction()
 	{
 		return this->WUR;
 	}
