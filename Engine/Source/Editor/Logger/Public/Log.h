@@ -1,5 +1,6 @@
+#pragma once
+
 #include <Common/LOG_API.h>
-#include <Common/Singleton.h>
 
 #include <string>
 

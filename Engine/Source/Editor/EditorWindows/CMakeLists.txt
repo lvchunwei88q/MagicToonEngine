@@ -24,5 +24,7 @@ target_link_libraries(EditorWindows PRIVATE IO)
 target_link_libraries(EditorWindows PRIVATE Logger)
 
 target_link_libraries(EditorWindows PRIVATE RenderCore)
+target_link_libraries(EditorWindows PRIVATE RenderRT)
+target_link_libraries(EditorWindows PRIVATE RenderUI)
 
 target_link_libraries(EditorWindows PRIVATE dwmapi.lib)

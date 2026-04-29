@@ -2,6 +2,10 @@ macro(EngineModule)
     add_subdirectory("Engine/Source/${ARGV}")
 endmacro()
 
+macro(ThirdPartyModule)
+    add_subdirectory("Engine/ThirdParty/${ARGV}")
+endmacro()
+
 macro(add_module_sources ModuleName)
 file(GLOB_RECURSE ${ModuleName}_SOURCES 
     CONFIGURE_DEPENDS

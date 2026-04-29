@@ -18,6 +18,6 @@ target_include_directories(RenderCore
 
 target_compile_definitions(RenderCore PRIVATE RENDERCORE_EXPORTS)
 
-target_link_libraries(RenderCore PRIVATE Core)
+target_link_libraries(RenderCore PUBLIC Core)
 target_link_libraries(RenderCore PRIVATE d3d11)
 target_link_libraries(RenderCore PRIVATE dxgi)

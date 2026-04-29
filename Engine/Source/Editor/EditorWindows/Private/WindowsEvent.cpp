@@ -1,9 +1,16 @@
 #include <WindowsConfig.h>
 
 #include <EditorWindows.h>
+#include <RenderUI.h>
+#include <RenderInterface.h>
+#include <RenderRTInterface.h>
+#include <BufferManagerInterface.h>
 
 namespace EditorWindows {
 	LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        if (RenderUI::RenderUI_Windows_Event(hWnd, msg, wParam, lParam))
+            return true;
+
 		switch (msg) {
         case WM_SIZE:
         {
@@ -16,6 +23,12 @@ namespace EditorWindows {
             {
                 WindowsConfig::Get().width = newWidth;
                 WindowsConfig::Get().height = newHeight;
+
+                RenderCore::ViewContext context;
+                context.ScreenSize.x = newWidth;
+                context.ScreenSize.y = newHeight;
+                RenderCore::GetBufferManagerAdminInterface()->UpdateBuffers(context);
+                RenderRT::GetRenderRTInterface()->UpdateRenderTargetView(newWidth, newHeight);
             }
             break;
         }

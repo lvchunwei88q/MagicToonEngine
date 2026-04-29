@@ -20,7 +20,7 @@ namespace EditorWindows
 		// init windows
 		WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_CLASSDC, WindowsProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
 			L"MagicEditorClass", nullptr };
-		wc.hbrBackground = CreateSolidBrush(RGB(30, 30, 30));
+		wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
 		::RegisterClassEx(&wc);
 
 		HWND hwnd = CreateWindowEx(

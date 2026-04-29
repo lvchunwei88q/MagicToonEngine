@@ -11,8 +11,13 @@ include(Engine/Cmake/macro.cmake)
 project ("MagicToonEngine")
 
 # 包含子项目。
+
+ThirdPartyModule(imgui-docking)
+
 EngineModule(Core/Core)
 EngineModule(Core/RenderCore)
+EngineModule(Render/RenderRT)
+EngineModule(Render/RenderUI)
 EngineModule(Editor/IO)
 EngineModule(Editor/Logger)
 EngineModule(Editor/EditorWindows)

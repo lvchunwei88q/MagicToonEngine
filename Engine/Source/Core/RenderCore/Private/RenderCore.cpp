@@ -1,6 +1,7 @@
 #include <RenderInterface.h>
 #include <RenderCore.h>
 #include <RenderContext.h>
+#include <memory>
 
 namespace RenderCore
 {
@@ -53,8 +54,74 @@ namespace RenderCore
             pSwapChainFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
             pSwapChainFactory->Release();
         }
+
+#ifdef _DEBUG
+        // 获取 Debug 接口
+        ID3D11Debug* debugInterface = nullptr;
+        RenderContext::Get().g_pd3dDevice->QueryInterface(__uuidof(ID3D11Debug), (void**)&debugInterface);
+
+        if (debugInterface)
+        {
+            // 可选：设置报告级别
+            ID3D11InfoQueue* infoQueue = nullptr;
+            debugInterface->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&infoQueue);
+
+            if (infoQueue)
+            {
+                // 设置哪些类型的消息需要中断（Break）
+                infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_CORRUPTION, TRUE);
+                infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_ERROR, TRUE);
+                //infoQueue->SetBreakOnSeverity(D3D11_MESSAGE_SEVERITY_WARNING, TRUE);
+
+                infoQueue->Release();
+            }
+            debugInterface->Release();
+        }
+#endif
         return true;
     }
+
+    void RenderCore::DebugD3D11State() {
+        auto* ctx = RenderContext::Get().g_pd3dDeviceContext;
+
+        // 查询当前绑定的 RenderTarget
+        ID3D11RenderTargetView* rtvs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
+        ID3D11DepthStencilView* dsv = nullptr;
+        ctx->OMGetRenderTargets(D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT, rtvs, &dsv);
+
+        // 查询 Viewport
+        UINT numViewports = D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE;
+        D3D11_VIEWPORT viewports[D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE];
+        ctx->RSGetViewports(&numViewports, viewports);
+
+        // 查询绑定的 Shader
+        ID3D11VertexShader* vs = nullptr;
+        ID3D11PixelShader* ps = nullptr;
+        ctx->VSGetShader(&vs, nullptr, nullptr);
+        ctx->PSGetShader(&ps, nullptr, nullptr);
+
+        char buf[512];
+        sprintf_s(buf,
+            "=== DX11 State ===\n"
+            "RTV[0]: %p\n"
+            "DSV:    %p\n"
+            "VP[0]:  %.0f,%.0f %.0fx%.0f\n"
+            "VS:     %p\n"
+            "PS:     %p\n"
+            "==================\n",
+            rtvs[0], dsv,
+            viewports[0].TopLeftX, viewports[0].TopLeftY,
+            viewports[0].Width, viewports[0].Height,
+            vs, ps);
+        OutputDebugStringA(buf);
+
+        // 释放临时接口
+        for (auto& rtv : rtvs) if (rtv) rtv->Release();
+        if (dsv) dsv->Release();
+        if (vs) vs->Release();
+        if (ps) ps->Release();
+    }
+
     bool RenderCore::CleanupDeviceD3D()
     {
         // 先切换到窗口模式
