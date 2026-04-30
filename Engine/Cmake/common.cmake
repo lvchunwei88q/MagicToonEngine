@@ -9,6 +9,8 @@ if(MSVC)
     add_compile_options(
         "/wd4819"
     )
+    # /utf-8 编译选项
+    add_compile_options("/utf-8")
 endif()
 
 # 定义第三方库的根目录

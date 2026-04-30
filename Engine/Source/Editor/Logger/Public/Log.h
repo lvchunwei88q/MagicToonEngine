@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include <deque>  // 环形缓冲区
+
 #define IN_SPECIAL_NAMESPACE
 
 #ifdef IN_SPECIAL_NAMESPACE
@@ -27,12 +29,21 @@ namespace LOG {
 		Error
 	};
 
+	struct LogEntry {
+		LogLevel    level;
+		std::string timestamp;
+		std::string file;
+		int         line;
+		std::string message;
+	};
+
 	class LOG_API LogInterface
 	{
 	public:
 		LogInterface() = default;
 		// 获取流对象
 		virtual void Log(LogLevel level, const char* file, int line, const std::string& message) = 0;
+		virtual const std::deque<LogEntry>& GetEntries() const = 0;
 	};
 
 	LOG_API LogInterface* GetLogInstance();

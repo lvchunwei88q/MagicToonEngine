@@ -1,7 +1,7 @@
 #include <GuiInterface.h>
 
 namespace RenderUI {
-    bool showHelloWorld = true;
+    ComponentSwitch Switch; // 组件开关
 
     void BasicLayout()
     {
@@ -55,7 +55,8 @@ namespace RenderUI {
 
             if (ImGui::BeginMenu("View"))
             {
-                ImGui::MenuItem("Hello World", nullptr, &showHelloWorld);
+                ImGui::MenuItem("Hello World", nullptr, &Switch.ExampleWindow);
+                ImGui::MenuItem("Logger", nullptr, &Switch.LoggerWindow);
                 ImGui::EndMenu();
             }
 
@@ -75,11 +76,11 @@ namespace RenderUI {
     }
     void ExampleWindow()
     {
-        ImGuiIO& io = ImGui::GetIO();
         // --- 示例停靠窗口 ---
-        if (showHelloWorld)
+        if (Switch.ExampleWindow)
         {
-            ImGui::Begin("Hello, world!", &showHelloWorld);
+            ImGuiIO& io = ImGui::GetIO();
+            ImGui::Begin("Hello, world!");
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
                 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();

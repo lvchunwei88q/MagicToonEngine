@@ -14,10 +14,15 @@ target_include_directories(RenderUI
 
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
+        ${THIRD_PARTY_DIR} # 使用反射库
 )
 
 target_compile_definitions(RenderUI PRIVATE RENDERUI_EXPORTS)
 
 target_link_libraries(RenderUI PRIVATE RenderCore)
 target_link_libraries(RenderUI PUBLIC RenderRT)
+
+target_link_libraries(RenderUI PRIVATE Logger)
+
+target_link_libraries(RenderUI PRIVATE IO)
 target_link_libraries(RenderUI PRIVATE IMGUI)

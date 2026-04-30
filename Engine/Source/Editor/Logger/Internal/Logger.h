@@ -22,6 +22,10 @@ namespace LOG {
 
         // 获取流对象
         virtual void Log(LogLevel level, const char* file, int line, const std::string& message);
+        void SwapBuffers(); // 交换缓冲区
+        virtual const std::deque<LogEntry>& GetEntries() const { 
+            return frontBuffer_;
+        }
 
     private:
 
@@ -29,6 +33,7 @@ namespace LOG {
         void FlushToFile();        // 将缓冲区内容写入文件并清空缓冲区
         void WriteToFile(const std::string& text);  // 写入文件
         void WriteToDebugOutput(const std::string& text); // 输出到调试器
+        void ClearRecentEntries(); // 清空缓冲区
 
         std::string GetLevelString(LogLevel level) const;
         std::string GetCurrentTimestamp() const;
@@ -40,10 +45,15 @@ namespace LOG {
         unsigned int checkIntervalSec_;
         std::atomic<bool> running_{ true };
         std::unique_ptr<std::thread> workerThread_;
-        std::mutex fileMutex_;          // 保护文件写入和滚动操作
+        std::mutex Mutex_;          // 线程锁
 
         std::condition_variable cv_; // 通知
 
         std::vector<std::string> buffer_;  // 缓存日志行
+
+        // 环形缓冲区
+        std::deque<LogEntry> backBuffer_;           // 工作线程写入
+        std::deque<LogEntry> frontBuffer_;          // 渲染线程读取
+        static constexpr size_t  MAX_RECENT_ENTRIES = 1000;  // 最多 1000 条
     };
 };

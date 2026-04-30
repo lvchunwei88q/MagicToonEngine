@@ -44,6 +44,7 @@ namespace LOG {
         }
         // 最后再刷新一次缓冲区
         FlushToFile();
+        ClearRecentEntries(); // 清空缓冲区
     }
 
     void Logger::Log(LogLevel level, const char* file, int line, const std::string& message) {
@@ -52,18 +53,41 @@ namespace LOG {
         oss.str("");  // 清空内容
         oss.clear();
 
+        std::string time = GetCurrentTimestamp();
+
         // 格式：[时间] [级别] [文件:行号] 内容
-        oss << "[" << GetCurrentTimestamp() << "] "
+        oss << "[" << time << "] "
             << "[" << GetLevelString(level) << "] "
             << "[" << file << ":" << line   << "] "
             << message;
         std::string logLine = oss.str();
 
         WriteToDebugOutput(logLine);
-        // 加入缓冲区（线程安全）
         {
-            std::lock_guard<std::mutex> lock(fileMutex_);
+            std::lock_guard<std::mutex> lock(Mutex_);
+            // 加入缓冲区（线程安全）
             buffer_.push_back(logLine);
+        
+            // 加入环形缓冲区
+            backBuffer_.push_back({ level, time, file, line, message });
+        }
+    }
+
+    // 把新数据追加到 frontBuffer_
+    void Logger::SwapBuffers() {
+        std::lock_guard lock(Mutex_);
+
+        // 把 backBuffer_ 的内容移动到 frontBuffer_ 末尾
+        frontBuffer_.insert(
+            frontBuffer_.end(),
+            std::make_move_iterator(backBuffer_.begin()),
+            std::make_move_iterator(backBuffer_.end())
+        );
+        backBuffer_.clear();
+
+        // 超过上限就丢最旧的
+        while (frontBuffer_.size() > MAX_RECENT_ENTRIES) {
+            frontBuffer_.pop_front();
         }
     }
 
@@ -106,7 +130,7 @@ namespace LOG {
 
     void Logger::BackgroundWorker() {
         while (running_) {
-            std::unique_lock<std::mutex> lock(fileMutex_);
+            std::unique_lock<std::mutex> lock(Mutex_);
             // 等待指定时间或被唤醒
             cv_.wait_for(lock, std::chrono::seconds(checkIntervalSec_),
                 [this] { return !running_; });
@@ -131,6 +155,12 @@ namespace LOG {
 
         // 清空缓冲区
         buffer_.clear();
+    }
+
+    void Logger::ClearRecentEntries() {
+        std::lock_guard<std::mutex> lock(Mutex_);
+        backBuffer_.clear();
+        frontBuffer_.clear();
     }
 
 }

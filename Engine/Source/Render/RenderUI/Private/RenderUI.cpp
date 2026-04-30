@@ -3,6 +3,16 @@
 #include <RenderUI.h>
 #include <RenderContext.h>
 
+///////////////////////
+// 序列化文件相关
+#include <AbsolutePath.h>
+#include <FileManager.h>
+#include <fstream>
+#include <Serialize/SerializeMacro.h>
+// 编码转换
+#include <Converter.h>
+///////////////////////
+
 namespace RenderUI {
 	void RenderUI::Init(HWND hwnd)
 	{
@@ -18,6 +28,9 @@ namespace RenderUI {
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+
+		// set imgui layout file path
+		io.IniFilename = "Magic-WindowLayout.ini";
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsClassic();
@@ -41,6 +54,10 @@ namespace RenderUI {
 
 		ImGui_ImplDX11_Init(RenderCore::RenderContext::Get().g_pd3dDevice,
 							RenderCore::RenderContext::Get().g_pd3dDeviceContext);
+
+		
+		// 序列化布局
+		FILE_SERIALIZATION_LOADING(Switch, CACHE "Editor\\Windows\\", L"WindowSwitch.mtdata")
 	}
 
 	void RenderUI::Shutdown()
@@ -48,6 +65,9 @@ namespace RenderUI {
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
+
+		// 序列化布局
+		FILE_SERIALIZATION_SAVE(Switch, CACHE "Editor\\Windows\\", L"WindowSwitch.mtdata")
 	}
 
 	void RenderUI::Tick()
@@ -59,8 +79,10 @@ namespace RenderUI {
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
+		// Render Content
 		BasicLayout();
 		ExampleWindow();
+		LoggerWindow();
 
         // Rendering
         ImGui::Render();

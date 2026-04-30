@@ -5,7 +5,7 @@
 #include <WindowsConfig.h>
 #include <RenderInterface.h>
 
-// 序列化
+// 序列化文件相关
 #include <AbsolutePath.h>
 #include <FileManager.h>
 #include <fstream>
