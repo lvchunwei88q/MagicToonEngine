@@ -55,13 +55,12 @@ namespace RenderUI {
                 ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
                 for (const auto& entry : logs) {
-                    ImGui::PushID(&entry);
-
                     if (entry.level == LogLevel::Debug && !LogSwitch.showDebug)   continue;
                     if (entry.level == LogLevel::Info && !LogSwitch.showInfo)    continue;
                     if (entry.level == LogLevel::Warning && !LogSwitch.showWarning) continue;
                     if (entry.level == LogLevel::Error && !LogSwitch.showError)   continue;
 
+                    ImGui::PushID(&entry);
                     ImGui::PushStyleColor(ImGuiCol_Text, GetLevelColor(entry.level));
 
                     // 格式化的日志文本
