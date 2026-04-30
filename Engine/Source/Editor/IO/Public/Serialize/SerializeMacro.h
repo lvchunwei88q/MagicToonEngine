@@ -5,6 +5,7 @@
 * #include <AbsolutePath.h>
 * #include <FileManager.h>
 * #include <fstream>
+* #include <Log.h>
 */
 #define FILE_SERIALIZATION_LOADING(object,path,name)													\
 const std::wstring object##_Executable = IO::AbsolutePath::Get().GetExecutableDirectory();				\
@@ -12,8 +13,13 @@ const std::wstring object##_context_dir = object##_Executable + L"\\" + path;			
 const std::wstring object##_context_path = object##_Executable + L"\\" + path + name;					\
 if (IO::FileManager::Exists(object##_context_path)) {													\
 	std::ifstream file(object##_context_path);															\
-	cereal::BinaryInputArchive archive(file);															\
-	archive(object);																					\
+    try {																								\
+		cereal::BinaryInputArchive archive(file);														\
+		archive(object);																				\
+	}																									\
+	catch (const std::exception& e) {																	\
+		LOG_WARNING("Serialized Read: " + std::string(e.what()));										\
+	}																									\
 }																										\
 else {																									\
 	std::string BinaryStr;																				\

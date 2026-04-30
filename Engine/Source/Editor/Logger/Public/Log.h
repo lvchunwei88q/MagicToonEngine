@@ -43,7 +43,11 @@ namespace LOG {
 		LogInterface() = default;
 		// 获取流对象
 		virtual void Log(LogLevel level, const char* file, int line, const std::string& message) = 0;
+		virtual void SwapBuffers() = 0; // 交换缓冲区
+		virtual void ClearRecentEntries() = 0; // 清空缓冲区
 		virtual const std::deque<LogEntry>& GetEntries() const = 0;
+		// 获取Level
+		virtual std::string GetLevelString(LogLevel level) const = 0;
 	};
 
 	LOG_API LogInterface* GetLogInstance();

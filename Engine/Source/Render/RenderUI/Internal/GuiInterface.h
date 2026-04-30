@@ -14,13 +14,29 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 namespace RenderUI {
 
+	struct LoggerSwitch {
+		bool showDebug;
+		bool showInfo;
+		bool showWarning;
+		bool showError;
+		bool autoScroll;
+
+		template<class Archive>
+		void serialize(Archive& archive) {
+			archive(showDebug, showInfo, showWarning, showError, autoScroll);
+		}
+	};
+
 	struct ComponentSwitch {
+		// Component Switch
+		LoggerSwitch loggerswitch;
+		// Switch
 		bool ExampleWindow;
 		bool LoggerWindow;
 
 		template<class Archive>
 		void serialize(Archive& archive) {
-			archive(ExampleWindow, LoggerWindow);
+			archive(loggerswitch,LoggerWindow, ExampleWindow);
 		}
 	};
 

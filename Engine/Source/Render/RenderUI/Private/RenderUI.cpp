@@ -3,6 +3,8 @@
 #include <RenderUI.h>
 #include <RenderContext.h>
 
+#include <Log.h>
+
 ///////////////////////
 // 序列化文件相关
 #include <AbsolutePath.h>
@@ -80,6 +82,7 @@ namespace RenderUI {
         ImGui::NewFrame();
 
 		// Render Content
+		LOG::GetLogInstance()->SwapBuffers(); // 交换日志缓冲区 这是每帧固定要做的
 		BasicLayout();
 		ExampleWindow();
 		LoggerWindow();

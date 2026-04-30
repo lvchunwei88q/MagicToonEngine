@@ -11,6 +11,8 @@
 #include <fstream>
 #include <Serialize/SerializeMacro.h>
 
+#include <Log.h>
+
 namespace Editor
 {
 	void Windows::CreateWindows()
@@ -51,6 +53,13 @@ namespace Editor
 	void Windows::CleanupWindows()
 	{
 		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
+
+		if (IsIconic(WindowsContext::Get().hWnd)) {
+			// 窗口已最小化
+			LOG_WARNING("The window has been minimized and will use the default position");
+			config.windowsX = 100;
+			config.windowsY = 100;
+		}
 		FILE_SERIALIZATION_SAVE(config, CACHE "Editor\\Windows\\", L"WindowsConfig.mtdata")
 	}
 

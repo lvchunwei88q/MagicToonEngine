@@ -11,5 +11,5 @@ namespace Core
 	{
 	}
 
-	const char* Core::GetVersion() { return "0.0.1.0"; };
+	const char* Core::GetVersion() { return "0.0.1.2"; };
 }

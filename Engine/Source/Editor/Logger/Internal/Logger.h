@@ -22,10 +22,13 @@ namespace LOG {
 
         // 获取流对象
         virtual void Log(LogLevel level, const char* file, int line, const std::string& message);
-        void SwapBuffers(); // 交换缓冲区
+        virtual void SwapBuffers(); // 交换缓冲区
+        virtual void ClearRecentEntries(); // 清空缓冲区
         virtual const std::deque<LogEntry>& GetEntries() const { 
             return frontBuffer_;
         }
+
+        virtual std::string GetLevelString(LogLevel level) const;
 
     private:
 
@@ -33,9 +36,7 @@ namespace LOG {
         void FlushToFile();        // 将缓冲区内容写入文件并清空缓冲区
         void WriteToFile(const std::string& text);  // 写入文件
         void WriteToDebugOutput(const std::string& text); // 输出到调试器
-        void ClearRecentEntries(); // 清空缓冲区
 
-        std::string GetLevelString(LogLevel level) const;
         std::string GetCurrentTimestamp() const;
         std::wstring GenerateNewLogFileName() const;  // 生成新的日志文件名（精确到秒）
 

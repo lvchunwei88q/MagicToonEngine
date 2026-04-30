@@ -163,7 +163,6 @@ namespace RenderCore
 
     void RenderCore::Present()
     {
-        //DXGI_PRESENT_DO_NOT_WAIT：确保当GPU一时忙不过来时程序界面依然能响应
-        RenderContext::Get().g_pSwapChain->Present((UINT)RenderContext::Get().presentSync, DXGI_PRESENT_DO_NOT_WAIT);
+        RenderContext::Get().g_pSwapChain->Present((UINT)RenderContext::Get().presentSync, 0);
     }
 }

@@ -29,6 +29,7 @@ namespace Editor
 		HWND Hwnd = Windows::Get().GetWindowsContext()->hWnd; // 确保窗口上下文已创建
 		ShowWindow(Hwnd, SW_SHOW);
 
+        LOG_INFO("Render init ...");
         EditorRender::Get().Init(); // 渲染初始化
 
         Windows::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {

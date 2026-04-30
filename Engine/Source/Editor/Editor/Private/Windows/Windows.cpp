@@ -38,7 +38,6 @@ namespace Editor
 	void Windows::Uninstall()
 	{
 		CleanupWindows();
-
 	}
 
 	// 注册窗口改变时渲染回调函数
