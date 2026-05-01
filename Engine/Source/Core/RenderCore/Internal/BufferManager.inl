@@ -30,7 +30,7 @@ static UINT GetFormatSize(DXGI_FORMAT format)
     case DXGI_FORMAT_B5G6R5_UNORM:
     case DXGI_FORMAT_B5G5R5A1_UNORM:
     case DXGI_FORMAT_B4G4R4A4_UNORM:
-    case DXGI_FORMAT_A4B4G4R4_UNORM:
+    //case DXGI_FORMAT_A4B4G4R4_UNORM:
     case DXGI_FORMAT_R1_UNORM:  // 实际是1位，但通常按1字节对齐
         return 2;
 
