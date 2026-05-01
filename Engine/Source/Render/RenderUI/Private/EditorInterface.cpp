@@ -56,7 +56,8 @@ namespace RenderUI {
             if (ImGui::BeginMenu("View"))
             {
                 ImGui::MenuItem("Hello World", nullptr, &Switch.ExampleWindow);
-                ImGui::MenuItem("Logger", nullptr, &Switch.LoggerWindow);
+                ImGui::MenuItem("Engine Log", nullptr, &Switch.LoggerWindow);
+                ImGui::MenuItem("Render View", nullptr, &Switch.RenderViewWindow);
                 ImGui::EndMenu();
             }
 

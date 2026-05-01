@@ -84,8 +84,12 @@ namespace RenderUI {
 		// Render Content
 		LOG::GetLogInstance()->SwapBuffers(); // 交换日志缓冲区 这是每帧固定要做的
 		BasicLayout();
-		ExampleWindow();
-		LoggerWindow();
+
+		{
+			ExampleWindow();
+			LoggerWindow();
+			RenderViewWindow();
+		}
 
         // Rendering
         ImGui::Render();
