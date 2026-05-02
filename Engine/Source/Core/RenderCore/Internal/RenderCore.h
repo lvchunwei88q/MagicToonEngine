@@ -1,9 +1,9 @@
 #pragma once
-#include <Renderinterface.h>
+#include <IRender.h>
 
 namespace RenderCore
 {
-	class RenderCore : public RenderInterface
+	class RenderCore : public IRender
 	{
 	public:
 		virtual bool CreateDeviceD3D(HWND hWnd);

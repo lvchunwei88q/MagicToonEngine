@@ -1,6 +1,6 @@
 #pragma once
 #include <Subsystem/SubsystemTemplate.h>
-#include <Log.h>
+#include <ILog.h>
 
 #include <sstream>
 #include <fstream>

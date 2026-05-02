@@ -65,10 +65,10 @@ namespace RenderCore // RenderCore
         std::string BufferName = "mytexture";
     };
 
-    class RENDERCORE_API BufferManagerUserInterface
+    class RENDERCORE_API IBufferManagerUser
     {
     public:
-        virtual ~BufferManagerUserInterface() = default;
+        virtual ~IBufferManagerUser() = default;
 
         // 获取Buffer
         virtual ID3D11Buffer* GetBuffer(std::string name) = 0;
@@ -100,12 +100,12 @@ namespace RenderCore // RenderCore
         virtual void RegisterTexture2DBuffer(BufferContext<D3D11_TEXTURE2D_DESC> context) = 0;
     };
 
-    RENDERCORE_API BufferManagerUserInterface* GetBufferManagerUserInterface();
+    RENDERCORE_API IBufferManagerUser* GetBufferManagerUserInterface();
 
-    class RENDERCORE_API BufferManagerAdminInterface 
+    class RENDERCORE_API IBufferManagerAdmin
     {
     public:
-        virtual ~BufferManagerAdminInterface() = default;
+        virtual ~IBufferManagerAdmin() = default;
 
         // 初始化 一些参数与设置
         virtual void Initialize(ViewContext context) = 0;
@@ -113,5 +113,5 @@ namespace RenderCore // RenderCore
         virtual void UpdateBuffers(ViewContext context) = 0;
     };
 
-    RENDERCORE_API BufferManagerAdminInterface* GetBufferManagerAdminInterface();
+    RENDERCORE_API IBufferManagerAdmin* GetBufferManagerAdminInterface();
 } // namespace RenderCore

@@ -7,7 +7,7 @@ namespace RenderRT {
 		int H; int W;
 	};
 
-	class RENDERRT_API RenderRTInterface
+	class RENDERRT_API IRenderRT
 	{
 	public:
 		virtual void GetGraphicRenderContext(GraphicRenderContext& context) = 0;
@@ -18,5 +18,5 @@ namespace RenderRT {
 		virtual void BindRenderTarget() = 0;
 	};
 
-	RENDERRT_API RenderRTInterface* GetRenderRTInterface();
+	RENDERRT_API IRenderRT* GetRenderRTInterface();
 }

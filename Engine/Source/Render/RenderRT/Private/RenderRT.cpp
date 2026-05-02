@@ -1,13 +1,13 @@
 #include <RenderRT.h>
 #include <RenderContext.h>
-#include <BufferManagerI.h>
+#include <IBufferManager.h>
 #include <Tools/Debouncer.h>
-#include <Log.h>
+#include <ILog.h>
 
 namespace RenderRT {
     AUTO_REGISTER(RenderRT)
 
-	RenderRTInterface* GetRenderRTInterface()
+    IRenderRT* GetRenderRTInterface()
 	{
 		return &RenderRT::Get();
 	}

@@ -10,12 +10,12 @@ namespace RenderCore //RenderCore
 {
     AUTO_REGISTER(BufferManager)
 
-    BufferManagerUserInterface* GetBufferManagerUserInterface()
+    IBufferManagerUser* GetBufferManagerUserInterface()
     {
         return &BufferManager::Get();
     }
 
-    BufferManagerAdminInterface* GetBufferManagerAdminInterface()
+    IBufferManagerAdmin* GetBufferManagerAdminInterface()
     {
         return &BufferManager::Get();
     }

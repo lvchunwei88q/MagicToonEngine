@@ -1,7 +1,7 @@
 #include <Editor.h>
 #include <EditorRender.h>
 
-#include <RenderRTI.h>
+#include <IRenderRT.h>
 
 namespace Editor
 {

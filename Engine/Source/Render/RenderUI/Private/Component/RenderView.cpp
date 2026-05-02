@@ -1,5 +1,5 @@
 #include <GuiInterface.h>
-#include <RenderRTI.h>
+#include <IRenderRT.h>
 
 namespace RenderUI {
 	void RenderViewWindow() {

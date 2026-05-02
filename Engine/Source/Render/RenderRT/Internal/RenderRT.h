@@ -1,13 +1,13 @@
 #pragma once
 #include <Subsystem/SubsystemTemplate.h>
-#include <RenderRTI.h>
+#include <IRenderRT.h>
 
 #include <d3d11.h>   
 #include <wrl/client.h>  // ComPtr
 using Microsoft::WRL::ComPtr;
 
 namespace RenderRT {
-	class RenderRT : public RenderRTInterface,
+	class RenderRT : public IRenderRT,
 		public SubsystemTemplate<RenderRT,Core::SubsystemContext::Priority::Low> {
 	public:
 

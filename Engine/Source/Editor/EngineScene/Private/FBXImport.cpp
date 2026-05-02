@@ -2,11 +2,13 @@
 #include <ufbx.h>
 #include <FileManager.h>
 #include <Converter.h>
-#include <Log.h>
+#include <ILog.h>
 
-namespace EngineAsset{
+namespace EngineScene {
 	void FBXAssetImport::Import(FBXImportSettings settings)
 	{
+		// TODO: Import FBX Function
+
 		if (settings.path.empty())
 		{
 			LOG_ERROR("FBX Import failed: file path is empty");

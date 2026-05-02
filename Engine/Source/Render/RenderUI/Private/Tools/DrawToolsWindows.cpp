@@ -1,7 +1,7 @@
 #include <GuiInterface.h>
 #include <DrawToolsWindows.h>
 
-#include <Log.h>
+#include <ILog.h>
 
 namespace RenderUI {
 	OpenToolsWindows opentools;
@@ -9,6 +9,7 @@ namespace RenderUI {
 	void CloseToolsWindow()
 	{
 		opentools.Open = OpenToolsWindows::OpenTools::NOT;
+		ImGui::CloseCurrentPopup(); // end popup
 	}
 
 	void OpenToolsWindow(OpenToolsWindows::OpenTools toolwindow)

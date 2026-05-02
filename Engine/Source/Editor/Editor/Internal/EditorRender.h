@@ -1,7 +1,7 @@
 #pragma once
 #include <RenderUI.h>
 #include <Tools/Singleton.h>
-#include <RenderInterface.h> // 呈现
+#include <IRender.h> // 呈现
 
 namespace Editor {
 	class EditorRender : public Singleton<EditorRender>

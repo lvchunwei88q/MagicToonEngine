@@ -1,8 +1,8 @@
 #include <Windows/Windows.h>
 #include <WindowsConfig.h>
-#include <Log.h>
+#include <ILog.h>
 
-#include <BufferManagerI.h> // 初始化管理器
+#include <IBufferManager.h> // 初始化管理器
 
 namespace Editor
 {
@@ -26,11 +26,11 @@ namespace Editor
 
 		// init buffer Manager
 		LOG_INFO("Init Buffer Manager.");
-		RenderCore::BufferManagerAdminInterface* BMAdmin = RenderCore::GetBufferManagerAdminInterface();
+		RenderCore::IBufferManagerAdmin* IBMAdmin = RenderCore::GetBufferManagerAdminInterface();
 		WindowsConfig& config = WindowsConfig::Get();
 		RenderCore::ViewContext context;
 		context.ScreenSize = XMINT2(config.width, config.height);
-		BMAdmin->Initialize(context);
+		IBMAdmin->Initialize(context);
 
 		return true;
 	}

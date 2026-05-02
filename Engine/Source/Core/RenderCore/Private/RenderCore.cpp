@@ -1,4 +1,4 @@
-#include <RenderInterface.h>
+#include <IRender.h>
 #include <RenderCore.h>
 #include <RenderContext.h>
 #include <memory>
@@ -6,7 +6,7 @@
 namespace RenderCore
 {
 
-    RenderInterface* GetRenderInterface()
+    IRender* GetRenderInterface()
     {
         static RenderCore instance;
         return &instance;

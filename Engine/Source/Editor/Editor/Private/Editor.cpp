@@ -2,7 +2,7 @@
 #include <ErrorCapture/ErrorCapture.h>
 #include <EditorRender.h>
 
-#include <Log.h>
+#include <ILog.h>
 
 namespace Editor
 {

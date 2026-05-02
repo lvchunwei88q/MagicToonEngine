@@ -3,7 +3,7 @@
 #include <dwmapi.h>
 // windows配置 与渲染接口
 #include <WindowsConfig.h>
-#include <RenderInterface.h>
+#include <IRender.h>
 
 // 序列化文件相关
 #include <AbsolutePath.h>
@@ -11,7 +11,7 @@
 #include <fstream>
 #include <Serialize/SerializeMacro.h>
 
-#include <Log.h>
+#include <ILog.h>
 
 namespace Editor
 {

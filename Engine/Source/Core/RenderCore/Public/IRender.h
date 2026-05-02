@@ -4,7 +4,7 @@
 
 namespace RenderCore
 {
-	class RENDERCORE_API RenderInterface
+	class RENDERCORE_API IRender
 	{
 	public:
 		virtual bool CreateDeviceD3D(HWND hWnd) = 0;
@@ -14,5 +14,5 @@ namespace RenderCore
 		virtual void Present() = 0;
 	};
 
-	RENDERCORE_API RenderInterface* GetRenderInterface();
+	RENDERCORE_API IRender* GetRenderInterface();
 }

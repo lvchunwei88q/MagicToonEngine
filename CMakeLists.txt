@@ -23,7 +23,7 @@ EngineModule(Core/Logger)
 EngineModule(Render/RenderRT)
 EngineModule(Render/RenderUI)
 
-EngineModule(Editor/EngineAsset)
+EngineModule(Editor/EngineScene)
 EngineModule(Editor/Editor)
 
 EngineModule(Launcher)

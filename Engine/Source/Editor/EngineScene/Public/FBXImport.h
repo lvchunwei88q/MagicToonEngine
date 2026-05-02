@@ -1,16 +1,16 @@
-#include <Common/ENGINEASSET_API.h>
+#include <Common/ENGINESCENE_API.h>
 #include <Tools/Singleton.h>
 
 #include <string>
 
-namespace EngineAsset {
+namespace EngineScene {
 
 	struct FBXImportSettings
 	{
 		std::string path;
 	};
 
-	class ENGINEASSET_API FBXAssetImport : public Singleton<FBXAssetImport> {
+	class ENGINESCENE_API FBXAssetImport : public Singleton<FBXAssetImport> {
 	public:
 		void Import(FBXImportSettings settings);
 	};

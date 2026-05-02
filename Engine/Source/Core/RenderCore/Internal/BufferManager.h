@@ -8,7 +8,7 @@
 using namespace Microsoft::WRL; // ComPtr 的 operator& 会自动 Release 旧对象
 
 //////////////////////////////////////////////////
-#include <BufferManagerI.h>
+#include <IBufferManager.h>
 //////////////////////////////////////////////////
 
 #define GET_BUFFERS_FUNCTION(target,type,get,getType)\
@@ -89,7 +89,7 @@ namespace RenderCore //RenderCore
         std::vector<Buffer> buffers;
     };
 
-	class BufferManager : public BufferManagerUserInterface, public BufferManagerAdminInterface,
+	class BufferManager : public IBufferManagerUser, public IBufferManagerAdmin,
         public SubsystemTemplate<BufferManager,Core::SubsystemContext::Priority::High>
     {
     public:

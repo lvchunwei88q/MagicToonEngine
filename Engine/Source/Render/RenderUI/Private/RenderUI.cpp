@@ -3,7 +3,7 @@
 #include <RenderUI.h>
 #include <RenderContext.h>
 
-#include <Log.h>
+#include <ILog.h>
 
 ///////////////////////
 // 序列化文件相关
