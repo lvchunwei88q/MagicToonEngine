@@ -12,6 +12,7 @@ file(GLOB_RECURSE ${ModuleName}_SOURCES
     "*.cpp"
     "*.cc"
     "*.cxx"
+    "*.c"
 )
 
 file(GLOB_RECURSE ${ModuleName}_HEADERS 

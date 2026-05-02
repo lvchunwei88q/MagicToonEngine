@@ -1,6 +1,6 @@
 #pragma once
 #include <Subsystem/SubsystemTemplate.h>
-#include <RenderRTInterface.h>
+#include <RenderRTI.h>
 
 #include <d3d11.h>   
 #include <wrl/client.h>  // ComPtr

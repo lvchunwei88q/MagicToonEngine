@@ -2,7 +2,7 @@
 #include <WindowsConfig.h>
 #include <Log.h>
 
-#include <BufferManagerInterface.h> // 初始化管理器
+#include <BufferManagerI.h> // 初始化管理器
 
 namespace Editor
 {

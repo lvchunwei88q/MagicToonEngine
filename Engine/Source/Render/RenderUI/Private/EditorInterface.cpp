@@ -1,4 +1,5 @@
 #include <GuiInterface.h>
+#include <DrawToolsWindows.h>
 
 namespace RenderUI {
     ComponentSwitch Switch; // 组件开关
@@ -41,6 +42,7 @@ namespace RenderUI {
                 if (ImGui::MenuItem("New")) { /* TODO */ }
                 if (ImGui::MenuItem("Open")) { /* TODO */ }
                 if (ImGui::MenuItem("Save")) { /* TODO */ }
+                if (ImGui::MenuItem("Import FBX")) { OpenToolsWindow(OpenToolsWindows::OpenTools::FBXImport); }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { /* TODO */ }
                 ImGui::EndMenu();

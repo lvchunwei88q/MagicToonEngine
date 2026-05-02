@@ -47,4 +47,6 @@ namespace RenderUI {
 	void LoggerWindow();
 	void RenderViewWindow();
 	void ExampleWindow();
+
+	void DrawToolsWindows();
 }

@@ -8,7 +8,7 @@
 using namespace Microsoft::WRL; // ComPtr 的 operator& 会自动 Release 旧对象
 
 //////////////////////////////////////////////////
-#include <BufferManagerInterface.h>
+#include <BufferManagerI.h>
 //////////////////////////////////////////////////
 
 #define GET_BUFFERS_FUNCTION(target,type,get,getType)\

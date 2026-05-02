@@ -3,8 +3,8 @@
 
 // DX11相关
 #include <RenderUI.h>
-#include <RenderRTInterface.h>
-#include <BufferManagerInterface.h>
+#include <RenderRTI.h>
+#include <BufferManagerI.h>
 
 namespace Editor {
 	LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {

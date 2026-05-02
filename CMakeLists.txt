@@ -13,6 +13,7 @@ project ("MagicToonEngine")
 # 包含子项目。
 
 ThirdPartyModule(imgui-docking)
+ThirdPartyModule(ufbx)
 
 EngineModule(Core/Core)
 EngineModule(Core/RenderCore)
@@ -22,7 +23,9 @@ EngineModule(Core/Logger)
 EngineModule(Render/RenderRT)
 EngineModule(Render/RenderUI)
 
+EngineModule(Editor/EngineAsset)
 EngineModule(Editor/Editor)
+
 EngineModule(Launcher)
 
 # 设置启动项目为 Launcher
