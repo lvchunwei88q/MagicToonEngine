@@ -11,6 +11,9 @@ if(MSVC)
     )
     # /utf-8 编译选项
     add_compile_options("/utf-8")
+
+    # 关闭显示包含文件
+    add_compile_options("/showIncludes:-")
 endif()
 
 # 定义第三方库的根目录
