@@ -23,7 +23,8 @@ namespace RenderUI {
 
             LoggerSwitch& LogSwitch = Switch.loggerswitch;
 
-            ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
+            SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
+
             ImGui::Begin("Engine Log");
 
             // ---- 工具栏 ----
@@ -107,7 +108,6 @@ namespace RenderUI {
 
             ImGui::EndChild();
             ImGui::End();
-            ImGui::PopStyleColor();
         }
     }
 }

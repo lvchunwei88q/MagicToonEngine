@@ -43,9 +43,20 @@ namespace RenderUI {
 
 	extern ComponentSwitch Switch;
 
+	class SetBackColor {
+	public:
+		SetBackColor(ImVec4 color) {
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, color);
+		}
+		~SetBackColor() {
+			ImGui::PopStyleColor();
+		}
+	};
+
 	void BasicLayout();
 	void LoggerWindow();
 	void RenderViewWindow();
+	void DrawContentBrowserWindow();
 	void ExampleWindow();
 
 	void DrawToolsWindows();

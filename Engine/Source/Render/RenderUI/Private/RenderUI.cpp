@@ -89,6 +89,7 @@ namespace RenderUI {
 			ExampleWindow();
 			LoggerWindow();
 			RenderViewWindow();
+			DrawContentBrowserWindow();
 
 			DrawToolsWindows(); // 工具窗口
 		}
