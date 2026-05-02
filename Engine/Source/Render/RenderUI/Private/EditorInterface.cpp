@@ -60,6 +60,7 @@ namespace RenderUI {
                 ImGui::MenuItem("Hello World", nullptr, &Switch.ExampleWindow);
                 ImGui::MenuItem("Engine Log", nullptr, &Switch.LoggerWindow);
                 ImGui::MenuItem("Render View", nullptr, &Switch.RenderViewWindow);
+                ImGui::MenuItem("Content Browser View", nullptr, &Switch.ContentBrowserWindow);
                 ImGui::EndMenu();
             }
 

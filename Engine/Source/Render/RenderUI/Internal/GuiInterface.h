@@ -34,10 +34,11 @@ namespace RenderUI {
 		bool ExampleWindow;
 		bool LoggerWindow;
 		bool RenderViewWindow;
+		bool ContentBrowserWindow;
 
 		template<class Archive>
 		void serialize(Archive& archive) {
-			archive(loggerswitch,LoggerWindow, ExampleWindow, RenderViewWindow);
+			archive(loggerswitch,LoggerWindow, ExampleWindow, RenderViewWindow, ContentBrowserWindow);
 		}
 	};
 

@@ -32,13 +32,15 @@ namespace RenderUI {
 
     void DrawContentBrowserWindow()
     {
-        static bool init = false;
-        if (!init) {
-            init = true;
-            InitContentBrowser();
-        }
+        if (Switch.ContentBrowserWindow) {
+            static bool init = false;
+            if (!init) {
+                init = true;
+                InitContentBrowser();
+            }
 
-        DrawContentBrowser();
+            DrawContentBrowser();
+        }
     }
 
     void InitContentBrowser() {
