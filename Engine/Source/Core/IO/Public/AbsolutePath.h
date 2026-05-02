@@ -1,6 +1,6 @@
 #pragma once
 #include <Common/IO_API.h>
-#include <Common/Singleton.h>
+#include <Tools/Singleton.h>
 #include <string>
 
 #define CACHE L"Cache\\"

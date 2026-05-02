@@ -1,5 +1,8 @@
 #include <RenderRT.h>
 #include <RenderContext.h>
+#include <BufferManagerInterface.h>
+#include <Tools/Debouncer.h>
+#include <Log.h>
 
 namespace RenderRT {
     AUTO_REGISTER(RenderRT)
@@ -64,6 +67,28 @@ namespace RenderRT {
         viewport.Height = (float)height;
         viewport.MaxDepth = 1.0f;
         RenderCore::RenderContext::Get().g_pd3dDeviceContext->RSSetViewports(1, &viewport);
+    }
+
+    void RenderRT::UpdateBufferManagerViewSize(int width, int height) 
+    {
+        static int static_width = 0;
+        static int static_height = 0;
+        static Debouncer debouncer(500, [&]() {
+            LOG_INFO("Update BufferManager ViewSize: " + std::to_string(static_width) + "-" + std::to_string(static_height));
+        });
+
+        if (static_width != width || static_height != height) {
+            RenderCore::ViewContext context;
+            context.ScreenSize.x = width;
+            context.ScreenSize.y = height;
+            RenderCore::GetBufferManagerAdminInterface()->UpdateBuffers(context);
+            debouncer.update(); // 防抖处理
+
+            static_width = width;
+            static_height = height;
+        }
+
+        debouncer.tick();
     }
 
     void RenderRT::SetRenderTarget()

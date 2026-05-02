@@ -1,4 +1,5 @@
 #include <GuiInterface.h>
+#include <RenderRTInterface.h>
 
 namespace RenderUI {
 	void RenderViewWindow() {
@@ -17,6 +18,8 @@ namespace RenderUI {
 
             ImGui::Begin("Render View", nullptr, windowFlags);
             ImVec2 windowSize = ImGui::GetContentRegionAvail();
+
+            RenderRT::GetRenderRTInterface()->UpdateBufferManagerViewSize((int)windowSize.x, (int)windowSize.y);
 
             // Example
             {

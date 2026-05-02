@@ -1,4 +1,4 @@
-#include <Common/Singleton.h>
+#include <Tools/Singleton.h>
 #include <d3d11.h>
 #include <Common/RENDERCORE_API.h>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Common/EDITOR_API.h>
-#include <Common/Singleton.h>
+#include <Tools/Singleton.h>
 
 #include <Windows/Windows.h>
 

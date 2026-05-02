@@ -16,10 +16,12 @@ ThirdPartyModule(imgui-docking)
 
 EngineModule(Core/Core)
 EngineModule(Core/RenderCore)
+EngineModule(Core/IO)
+EngineModule(Core/Logger)
+
 EngineModule(Render/RenderRT)
 EngineModule(Render/RenderUI)
-EngineModule(Editor/IO)
-EngineModule(Editor/Logger)
+
 EngineModule(Editor/Editor)
 EngineModule(Launcher)
 

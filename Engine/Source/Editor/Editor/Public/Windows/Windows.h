@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 #include <Subsystem/Subsystem.h>
-#include <Common/Singleton.h>
+#include <Tools/Singleton.h>
 #include <functional>
 
 #include <Subsystem/SubsystemTemplate.h>

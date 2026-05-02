@@ -20,3 +20,4 @@ target_compile_definitions(RenderRT PRIVATE RENDERRT_EXPORTS)
 
 target_link_libraries(RenderRT PRIVATE Core)
 target_link_libraries(RenderRT PRIVATE RenderCore)
+target_link_libraries(RenderRT PRIVATE Logger)

@@ -24,10 +24,10 @@ namespace Editor {
                 WindowsConfig::Get().width = newWidth;
                 WindowsConfig::Get().height = newHeight;
 
-                RenderCore::ViewContext context;
-                context.ScreenSize.x = newWidth;
-                context.ScreenSize.y = newHeight;
-                RenderCore::GetBufferManagerAdminInterface()->UpdateBuffers(context);
+                //RenderCore::ViewContext context;    不要在更新用于渲染的texture的大小因为我们使用IMGUI控制大小
+                //context.ScreenSize.x = newWidth;
+                //context.ScreenSize.y = newHeight;
+                //RenderCore::GetBufferManagerAdminInterface()->UpdateBuffers(context);
                 RenderRT::GetRenderRTInterface()->UpdateRenderTargetView(newWidth, newHeight);
             }
             break;

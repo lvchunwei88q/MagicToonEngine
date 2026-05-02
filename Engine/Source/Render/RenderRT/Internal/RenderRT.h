@@ -17,6 +17,7 @@ namespace RenderRT {
 		virtual void GetGraphicRenderContext(GraphicRenderContext& context);
 		virtual void SetGraphicRenderContext(GraphicRenderContext& context);
 		virtual void UpdateRenderTargetView(int width, int height);
+		virtual void UpdateBufferManagerViewSize(int width, int height);
 		virtual void SetRenderTarget();
 		virtual void BindRenderTarget();
 

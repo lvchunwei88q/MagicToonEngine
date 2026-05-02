@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include <Common/Singleton.h>
+#include <Tools/Singleton.h>
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>    // 二进制

@@ -1,6 +1,6 @@
 #pragma once
 #include <RenderUI.h>
-#include <Common/Singleton.h>
+#include <Tools/Singleton.h>
 #include <RenderInterface.h> // 呈现
 
 namespace Editor {
