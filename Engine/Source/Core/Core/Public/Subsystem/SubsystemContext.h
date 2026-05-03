@@ -18,9 +18,14 @@ namespace Core
 			Priority priority; // priority
 		};
 
+		struct SubsystemError {
+			bool error;
+			const char* target;
+		};
+
 		// API
 		virtual void RegisterSubsystem(Context context) = 0;
-		virtual bool Init() = 0;
+		virtual SubsystemError Init() = 0;
 		virtual void Uninstall() = 0;
 	};
 }

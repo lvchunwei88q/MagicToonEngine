@@ -37,7 +37,7 @@ namespace Core
 	class CORE_API SubsystemControl
 	{
 	public:
-		static bool Init() {
+		static SubsystemContext::SubsystemError Init() {
 			// Initialize all registered subsystems
 			SubsystemContext* Subsystemcontext = GetSubsystemContext();
 			// Subsystemcontext->InitAllSubsystems(); // This would be an API to initialize all subsystems

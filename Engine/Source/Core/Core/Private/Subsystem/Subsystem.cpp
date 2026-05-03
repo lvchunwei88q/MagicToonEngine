@@ -25,7 +25,7 @@ namespace Core
 		Derived.push_back(std::move(ctx));
 		
 	}
-	bool SubsystemContextImpl::Init()
+	SubsystemContextImpl::SubsystemError SubsystemContextImpl::Init()
 	{
 		std::sort(Derived.begin(), Derived.end(),
 			[](const Context& a, const Context& b) {
@@ -38,9 +38,9 @@ namespace Core
 			if (!it.subsystem)
 				assert(it.subsystem && "Subsystem is null during Init!");
 			if (!it.subsystem->Init())
-				return false;
+				return {false,it.name.c_str()};
 		}
-		return true;
+		return { true,nullptr };
 	}
 	void SubsystemContextImpl::Uninstall()
 	{

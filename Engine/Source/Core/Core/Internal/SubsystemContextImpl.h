@@ -20,7 +20,7 @@ namespace Core
 		SubsystemContextImpl();
 
 		virtual void RegisterSubsystem(SubsystemContext::Context context) override;
-		virtual bool Init() override;
+		virtual SubsystemError Init() override;
 		virtual void Uninstall() override;
 
 	private:
