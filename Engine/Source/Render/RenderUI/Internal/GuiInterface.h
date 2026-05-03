@@ -5,6 +5,8 @@
 #include <backends/imgui_impl_win32.h> // 适配windows
 #include <backends/imgui_impl_dx11.h> // 使用DX11
 
+#include <front/Roboto_Regular_front.h> // 加载字体
+
 // 序列化
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>    // 二进制
@@ -46,8 +48,8 @@ namespace RenderUI {
 
 	class SetBackColor {
 	public:
-		SetBackColor(ImVec4 color) {
-			ImGui::PushStyleColor(ImGuiCol_WindowBg, color);
+		SetBackColor(ImVec4 color, ImGuiCol_ col = ImGuiCol_WindowBg) {
+			ImGui::PushStyleColor(col, color);
 		}
 		~SetBackColor() {
 			ImGui::PopStyleColor();
@@ -55,6 +57,7 @@ namespace RenderUI {
 	};
 
 	void BasicLayout();
+
 	void LoggerWindow();
 	void RenderViewWindow();
 	void DrawContentBrowserWindow();

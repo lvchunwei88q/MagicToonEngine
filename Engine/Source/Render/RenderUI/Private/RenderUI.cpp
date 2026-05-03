@@ -51,6 +51,21 @@ namespace RenderUI {
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
+		// Create a font configuration structure (ImFontConfig) for customizing various parameters when loading fonts
+		ImFontConfig ifc;
+
+		// Set ownership of font data: false means the font data (front_data_data) is not managed by ImGui's font atlas (FontAtlas)
+		ifc.FontDataOwnedByAtlas = false;
+
+		// Load a font from TTF font data in memory and add it to the font atlas
+		ImFont* front = io.Fonts->AddFontFromMemoryTTF(
+			(void*)front_data_data,
+			front_data_size,
+			18.0f,
+			&ifc,
+			io.Fonts->GetGlyphRangesChineseFull()
+		);
+
 		// Setup Platform/Renderer backends
 		ImGui_ImplWin32_Init(hwnd);
 
