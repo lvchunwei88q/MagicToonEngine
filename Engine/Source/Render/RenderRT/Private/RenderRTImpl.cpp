@@ -1,17 +1,17 @@
-#include <RenderRT.h>
+#include <RenderRTImpl.h>
 #include <RenderContext.h>
 #include <IBufferManager.h>
 #include <Tools/Debouncer.h>
 #include <ILog.h>
 
 namespace RenderRT {
-    AUTO_REGISTER(RenderRT)
+    AUTO_REGISTER(RenderRTImpl)
 
     IRenderRT* GetRenderRTInterface()
 	{
-		return &RenderRT::Get();
+		return &RenderRTImpl::Get();
 	}
-	bool RenderRT::Init()
+	bool RenderRTImpl::Init()
 	{
 		// 创建 RenderTarget
         ComPtr<ID3D11Texture2D> backBuffer;
@@ -30,20 +30,20 @@ namespace RenderRT {
 
 		return true;
 	}
-	void RenderRT::Uninstall()
+	void RenderRTImpl::Uninstall()
 	{
 	}
 
-    void RenderRT::GetGraphicRenderContext(GraphicRenderContext& context)
+    void RenderRTImpl::GetGraphicRenderContext(GraphicRenderContext& context)
     {
         // 返回当前的Imgui渲染窗口大小
         context = this->context;
     }
-    void RenderRT::SetGraphicRenderContext(GraphicRenderContext& context)
+    void RenderRTImpl::SetGraphicRenderContext(GraphicRenderContext& context)
     {
         this->context = context;
     }
-    void RenderRT::UpdateRenderTargetView(int width, int height)
+    void RenderRTImpl::UpdateRenderTargetView(int width, int height)
     {
         if (width == 0 || height == 0) return;
 
@@ -69,7 +69,7 @@ namespace RenderRT {
         RenderCore::RenderContext::Get().g_pd3dDeviceContext->RSSetViewports(1, &viewport);
     }
 
-    void RenderRT::UpdateBufferManagerViewSize(int width, int height) 
+    void RenderRTImpl::UpdateBufferManagerViewSize(int width, int height)
     {
         static int static_width = 0;
         static int static_height = 0;
@@ -91,7 +91,7 @@ namespace RenderRT {
         debouncer.tick();
     }
 
-    void RenderRT::SetRenderTarget()
+    void RenderRTImpl::SetRenderTarget()
     {
         const float clear_color[4] = { 0,0,0,1 };
         ID3D11RenderTargetView* rtv = MainRenderTarget.Get();
@@ -99,7 +99,7 @@ namespace RenderRT {
         RenderCore::RenderContext::Get().g_pd3dDeviceContext->ClearRenderTargetView(rtv, clear_color);
     }
 
-    void RenderRT::BindRenderTarget()
+    void RenderRTImpl::BindRenderTarget()
     {
         ID3D11RenderTargetView* rtv = MainRenderTarget.Get();
         RenderCore::RenderContext::Get().g_pd3dDeviceContext->OMSetRenderTargets(1, &rtv, nullptr);

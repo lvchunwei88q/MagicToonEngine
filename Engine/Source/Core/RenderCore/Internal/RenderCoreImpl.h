@@ -3,7 +3,7 @@
 
 namespace RenderCore
 {
-	class RenderCore : public IRender
+	class RenderCoreImpl : public IRender
 	{
 	public:
 		virtual bool CreateDeviceD3D(HWND hWnd);

@@ -89,8 +89,8 @@ namespace RenderCore //RenderCore
         std::vector<Buffer> buffers;
     };
 
-	class BufferManager : public IBufferManagerUser, public IBufferManagerAdmin,
-        public SubsystemTemplate<BufferManager,Core::SubsystemContext::Priority::High>
+	class BufferManagerImpl : public IBufferManagerUser, public IBufferManagerAdmin,
+        public SubsystemTemplate<BufferManagerImpl,Core::SubsystemContext::Priority::High>
     {
     public:
 

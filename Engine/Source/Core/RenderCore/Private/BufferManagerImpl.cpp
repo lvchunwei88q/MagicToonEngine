@@ -1,4 +1,4 @@
-#include <BufferManager.h>
+#include <BufferManagerImpl.h>
 #include <BufferManager.inl>
 #include <RenderContext.h>
 
@@ -8,19 +8,19 @@
 
 namespace RenderCore //RenderCore
 {
-    AUTO_REGISTER(BufferManager)
+    AUTO_REGISTER(BufferManagerImpl)
 
     IBufferManagerUser* GetBufferManagerUserInterface()
     {
-        return &BufferManager::Get();
+        return &BufferManagerImpl::Get();
     }
 
     IBufferManagerAdmin* GetBufferManagerAdminInterface()
     {
-        return &BufferManager::Get();
+        return &BufferManagerImpl::Get();
     }
 
-    bool BufferManager::Init()
+    bool BufferManagerImpl::Init()
     {
         ViewContext view;
         view.ScreenSize = XMINT2(0, 0);
@@ -28,19 +28,19 @@ namespace RenderCore //RenderCore
         return true;
     }
 
-    void BufferManager::Uninstall()
+    void BufferManagerImpl::Uninstall()
     {
         // 提前释放
         buffers.buffers.clear();
         buffers.textures.clear();
     }
 
-    void BufferManager::Initialize(ViewContext context)
+    void BufferManagerImpl::Initialize(ViewContext context)
     {
         this->view = context; // 初始化
     }
 
-    void BufferManager::RegisterBuffer(BufferContext<D3D11_BUFFER_DESC> context)
+    void BufferManagerImpl::RegisterBuffer(BufferContext<D3D11_BUFFER_DESC> context)
     {
         Buffer buffer;
         buffer.Name = context.BufferName;
@@ -58,7 +58,7 @@ namespace RenderCore //RenderCore
         buffers.buffers.push_back(buffer);
     }
 
-    void BufferManager::RegisterTexture2DBuffer(BufferContext<D3D11_TEXTURE2D_DESC> context)
+    void BufferManagerImpl::RegisterTexture2DBuffer(BufferContext<D3D11_TEXTURE2D_DESC> context)
     {
         TextureBuffer textureBuffer;
         textureBuffer.Name = context.BufferName;
@@ -135,7 +135,7 @@ namespace RenderCore //RenderCore
         buffers.textures.push_back(textureBuffer);
     }
 
-    void BufferManager::UpdateBuffers(ViewContext context)
+    void BufferManagerImpl::UpdateBuffers(ViewContext context)
     {
         this->view = context;
         // 只需更新buffers中的textures
@@ -192,62 +192,62 @@ namespace RenderCore //RenderCore
     }
 
     // --------------------------------------- Get
-    ID3D11Buffer* BufferManager::GetBuffer(std::string name)
+    ID3D11Buffer* BufferManagerImpl::GetBuffer(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, buffers, buffer, Get)
     }
 
-    ID3D11Texture2D* BufferManager::GetTexture2D(std::string name)
+    ID3D11Texture2D* BufferManagerImpl::GetTexture2D(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, Texture, Get)
     }
 
-    ID3D11ShaderResourceView* BufferManager::GetTextureSRV(std::string name)
+    ID3D11ShaderResourceView* BufferManagerImpl::GetTextureSRV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, SRV, Get)
     }
 
-    ID3D11RenderTargetView* BufferManager::GetTextureRTV(std::string name)
+    ID3D11RenderTargetView* BufferManagerImpl::GetTextureRTV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, RTV, Get)
     }
 
-    ID3D11DepthStencilView* BufferManager::GetTextureDSV(std::string name)
+    ID3D11DepthStencilView* BufferManagerImpl::GetTextureDSV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, DSV, Get)
     }
 
-    ID3D11UnorderedAccessView* BufferManager::GetTextureUAV(std::string name)
+    ID3D11UnorderedAccessView* BufferManagerImpl::GetTextureUAV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, UAV, Get)
     }
 
-    ID3D11Buffer** BufferManager::GetAddressOfBuffer(std::string name)
+    ID3D11Buffer** BufferManagerImpl::GetAddressOfBuffer(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, buffers, buffer, GetAddressOf)
     }
 
-    ID3D11Texture2D** BufferManager::GetAddressOfTexture2D(std::string name)
+    ID3D11Texture2D** BufferManagerImpl::GetAddressOfTexture2D(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, Texture, GetAddressOf)
     }
 
-    ID3D11ShaderResourceView** BufferManager::GetAddressOfTextureSRV(std::string name)
+    ID3D11ShaderResourceView** BufferManagerImpl::GetAddressOfTextureSRV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, SRV, GetAddressOf)
     }
 
-    ID3D11RenderTargetView** BufferManager::GetAddressOfTextureRTV(std::string name)
+    ID3D11RenderTargetView** BufferManagerImpl::GetAddressOfTextureRTV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, RTV, GetAddressOf)
     }
 
-    ID3D11DepthStencilView** BufferManager::GetAddressOfTextureDSV(std::string name)
+    ID3D11DepthStencilView** BufferManagerImpl::GetAddressOfTextureDSV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, DSV, GetAddressOf)
     }
 
-    ID3D11UnorderedAccessView** BufferManager::GetAddressOfTextureUAV(std::string name)
+    ID3D11UnorderedAccessView** BufferManagerImpl::GetAddressOfTextureUAV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, UAV, GetAddressOf)
     }

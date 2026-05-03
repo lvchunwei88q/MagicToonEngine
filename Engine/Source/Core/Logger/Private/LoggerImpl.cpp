@@ -1,4 +1,4 @@
-#include <Logger.h>
+#include <LoggerImpl.h>
 #include <FileManager.h>  
 #include <AbsolutePath.h>
 #include <Converter.h>
@@ -7,14 +7,14 @@
 #include <ctime>
 
 namespace LOG {
-    AUTO_REGISTER(Logger)
+    AUTO_REGISTER(LoggerImpl)
 
     LogInterface* LOG::GetLogInstance()
     {
-        return &Singleton<LOG::Logger>::Get();
+        return &Singleton<LOG::LoggerImpl>::Get();
     }
 
-    bool Logger::Init()
+    bool LoggerImpl::Init()
     {
 		std::wstring exepath = IO::AbsolutePath::Get().GetExecutableDirectory();
         logDir_ = exepath + L"\\" + CACHE + L"Logs";
@@ -30,11 +30,11 @@ namespace LOG {
         currentLogPath_ = logDir_ + L"/" + GenerateNewLogFileName();
 
         // 启动后台监控线程
-        workerThread_ = std::make_unique<std::thread>(&Logger::BackgroundWorker, this);
+        workerThread_ = std::make_unique<std::thread>(&LoggerImpl::BackgroundWorker, this);
         return true;
     }
 
-    void Logger::Uninstall()
+    void LoggerImpl::Uninstall()
     {
         running_ = false;
 
@@ -47,7 +47,7 @@ namespace LOG {
         ClearRecentEntries(); // 清空缓冲区
     }
 
-    void Logger::Log(LogLevel level, const char* file, int line, const std::string& message) {
+    void LoggerImpl::Log(LogLevel level, const char* file, int line, const std::string& message) {
         // 使用线程局部存储的 ostringstream，保证每次调用独立
         thread_local std::ostringstream oss;
         oss.str("");  // 清空内容
@@ -74,7 +74,7 @@ namespace LOG {
     }
 
     // 把新数据追加到 frontBuffer_
-    void Logger::SwapBuffers() {
+    void LoggerImpl::SwapBuffers() {
         std::lock_guard lock(Mutex_);
 
         // 把 backBuffer_ 的内容移动到 frontBuffer_ 末尾
@@ -91,7 +91,7 @@ namespace LOG {
         }
     }
 
-    std::string Logger::GetLevelString(LogLevel level) const {
+    std::string LoggerImpl::GetLevelString(LogLevel level) const {
         switch (level) {
         case LogLevel::Debug:   return "DEBUG";
         case LogLevel::Info:    return "INFO";
@@ -101,7 +101,7 @@ namespace LOG {
         }
     }
 
-    std::string Logger::GetCurrentTimestamp() const {
+    std::string LoggerImpl::GetCurrentTimestamp() const {
         auto now = std::chrono::system_clock::now();
         auto time_t = std::chrono::system_clock::to_time_t(now);
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
@@ -113,7 +113,7 @@ namespace LOG {
         return oss.str();
     }
 
-    std::wstring Logger::GenerateNewLogFileName() const {
+    std::wstring LoggerImpl::GenerateNewLogFileName() const {
         auto now = std::chrono::system_clock::now();
         auto time_t = std::chrono::system_clock::to_time_t(now);
         std::tm tm;
@@ -124,11 +124,11 @@ namespace LOG {
         return IO::Converter::ToWideString(oss.str());
     }
 
-    void Logger::WriteToFile(const std::string& text) {
+    void LoggerImpl::WriteToFile(const std::string& text) {
         IO::FileManager::AppendText(currentLogPath_, text);
     }
 
-    void Logger::BackgroundWorker() {
+    void LoggerImpl::BackgroundWorker() {
         while (running_) {
             std::unique_lock<std::mutex> lock(Mutex_);
             // 等待指定时间或被唤醒
@@ -140,7 +140,7 @@ namespace LOG {
         }
     }
 
-    void Logger::FlushToFile() {
+    void LoggerImpl::FlushToFile() {
         //std::lock_guard<std::mutex> lock(fileMutex_); 不持有锁
         if (buffer_.empty()) return;
 
@@ -157,7 +157,7 @@ namespace LOG {
         buffer_.clear();
     }
 
-    void Logger::ClearRecentEntries() {
+    void LoggerImpl::ClearRecentEntries() {
         std::lock_guard<std::mutex> lock(Mutex_);
         backBuffer_.clear();
         frontBuffer_.clear();

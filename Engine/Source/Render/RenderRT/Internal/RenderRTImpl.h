@@ -7,8 +7,8 @@
 using Microsoft::WRL::ComPtr;
 
 namespace RenderRT {
-	class RenderRT : public IRenderRT,
-		public SubsystemTemplate<RenderRT,Core::SubsystemContext::Priority::Low> {
+	class RenderRTImpl : public IRenderRT,
+		public SubsystemTemplate<RenderRTImpl,Core::SubsystemContext::Priority::Low> {
 	public:
 
 		virtual bool Init();

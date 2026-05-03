@@ -13,9 +13,9 @@
 
 namespace LOG {
 
-    class Logger : public SubsystemTemplate<Logger, Core::SubsystemContext::Priority::High>, public LogInterface {
+    class LoggerImpl : public SubsystemTemplate<LoggerImpl, Core::SubsystemContext::Priority::High>, public LogInterface {
     public:
-        //Logger() = default;
+        //LoggerImpl() = default;
 
         virtual bool Init();
         virtual void Uninstall();

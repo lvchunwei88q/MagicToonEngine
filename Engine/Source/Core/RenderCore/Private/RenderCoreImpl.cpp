@@ -1,5 +1,5 @@
 #include <IRender.h>
-#include <RenderCore.h>
+#include <RenderCoreImpl.h>
 #include <RenderContext.h>
 #include <memory>
 
@@ -8,12 +8,12 @@ namespace RenderCore
 
     IRender* GetRenderInterface()
     {
-        static RenderCore instance;
+        static RenderCoreImpl instance;
         return &instance;
     }
 
     // Helper functions   src = "https://github.com/ocornut/imgui/tree/docking"
-    bool RenderCore::CreateDeviceD3D(HWND hWnd)
+    bool RenderCoreImpl::CreateDeviceD3D(HWND hWnd)
     {
         // Setup swap chain
         // This is a basic setup. Optimally could use e.g. DXGI_SWAP_EFFECT_FLIP_DISCARD and handle fullscreen mode differently. See #8979 for suggestions.
@@ -81,7 +81,7 @@ namespace RenderCore
         return true;
     }
 
-    void RenderCore::DebugD3D11State() {
+    void RenderCoreImpl::DebugD3D11State() {
         auto* ctx = RenderContext::Get().g_pd3dDeviceContext;
 
         // 查询当前绑定的 RenderTarget
@@ -122,7 +122,7 @@ namespace RenderCore
         if (ps) ps->Release();
     }
 
-    bool RenderCore::CleanupDeviceD3D()
+    bool RenderCoreImpl::CleanupDeviceD3D()
     {
         // 先切换到窗口模式
         if (RenderContext::Get().g_pSwapChain)
@@ -161,7 +161,7 @@ namespace RenderCore
         return true;
     }
 
-    void RenderCore::Present()
+    void RenderCoreImpl::Present()
     {
         RenderContext::Get().g_pSwapChain->Present((UINT)RenderContext::Get().presentSync, 0);
     }
