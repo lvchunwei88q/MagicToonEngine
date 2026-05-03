@@ -15,6 +15,7 @@ target_include_directories(Editor
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
         ${THIRD_PARTY_DIR} # 使用反射库
+        ${CMAKE_SOURCE_DIR}/Engine/Content
 )
 
 target_compile_definitions(Editor PRIVATE EDITOR_EXPORTS)

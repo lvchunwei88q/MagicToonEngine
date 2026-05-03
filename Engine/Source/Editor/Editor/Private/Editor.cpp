@@ -2,6 +2,7 @@
 #include <ErrorCapture/ErrorCapture.h>
 #include <EditorRender.h>
 
+#include <Logo/resource.h>
 #include <ILog.h>
 
 namespace Editor
@@ -27,6 +28,12 @@ namespace Editor
 	void Editor::Run()
 	{
 		HWND Hwnd = Windows::Get().GetWindowsContext()->hWnd; // 确保窗口上下文已创建
+        HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
+        if (hIcon)
+        {
+            SendMessage(Hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);   // 大图标（任务栏）
+            SendMessage(Hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);   // 小图标（标题栏）
+        }
 		ShowWindow(Hwnd, SW_SHOW);
 
         LOG_INFO("Render init ...");

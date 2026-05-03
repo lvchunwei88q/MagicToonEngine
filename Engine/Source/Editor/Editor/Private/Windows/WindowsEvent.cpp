@@ -1,5 +1,6 @@
 #include <WindowsConfig.h>
 #include <Windows/Windows.h>
+#include <dwmapi.h>
 
 // DX11相关
 #include <RenderUI.h>
@@ -12,6 +13,12 @@ namespace Editor {
             return true;
 
 		switch (msg) {
+        case WM_CREATE:
+        {
+            COLORREF color = RGB(40, 40, 40); // 纯黑
+            DwmSetWindowAttribute(hWnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
+        }
+        break;
         case WM_SIZE:
         {
             // 获取新的宽度和高度

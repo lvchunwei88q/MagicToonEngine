@@ -8,6 +8,8 @@ add_executable(Launcher
     ${LAUNCHER_HEADERS}
 )
 
+target_sources(Launcher PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/resources.rc")
+
 target_link_libraries(Launcher PRIVATE 
     Core
     Editor

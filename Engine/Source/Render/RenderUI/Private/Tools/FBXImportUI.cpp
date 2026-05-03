@@ -8,14 +8,13 @@ namespace RenderUI {
 
     void DrawFBXImportWindow() {  // 添加参数控制开关
 
-        // set windows center
-        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-        // set windows size 
-        ImGui::SetNextWindowSize(ImVec2(480, 160), ImGuiCond_Appearing);
-
         if (!ImGui::BeginPopupModal("FBX Importer", NULL, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize)) {
+            // set windows center
+            ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+            // set windows size 
+            ImGui::SetNextWindowSize(ImVec2(480, 160), ImGuiCond_Appearing);
+
             ImGui::OpenPopup("FBX Importer");
             ImGui::BeginPopupModal("FBX Importer", NULL, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize);
         }
