@@ -54,8 +54,12 @@ namespace Editor
 	{
 		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
 
-		if (IsIconic(WindowsContext::Get().hWnd)) {
-			// 窗口已最小化
+		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+		if (config.windowsX > screenWidth || config.windowsY > screenHeight ||
+			config.windowsX < 0 || config.windowsY < 0)
+		{
+			// 窗口位置不正常
 			LOG_WARNING("The window has been minimized and will use the default position");
 			config.windowsX = 100;
 			config.windowsY = 100;
