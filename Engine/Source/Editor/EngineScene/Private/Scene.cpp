@@ -5,6 +5,7 @@ namespace EngineScene {
 
 	bool Scene::Init()
 	{
+		engineasset.LoadAsset(); // 加载引擎资产
 		return true;
 	}
 

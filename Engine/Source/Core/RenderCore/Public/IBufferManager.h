@@ -19,12 +19,6 @@ namespace RenderCore // RenderCore
         XMINT2 ScreenSize;
     };
 
-    enum class Type
-    {
-        Texture = 0,
-        Buffer = 1,
-    };
-
     enum class TextureCreateType : uint32_t
     {
         NONE = 0,
@@ -60,8 +54,13 @@ namespace RenderCore // RenderCore
         D3D11_RENDER_TARGET_VIEW_DESC* RTVDesc = nullptr; // RTV struct
         D3D11_DEPTH_STENCIL_VIEW_DESC* DSVDesc = nullptr; // DSV struct
         D3D11_UNORDERED_ACCESS_VIEW_DESC* UAVDesc = nullptr; // UAV struct
-        Type CreateType = Type::Texture; // texture or buffer
         TextureCreateType TextureCreateType = TextureCreateType::RTV; // RTV or RTVSRV or NOT
+        std::string BufferName = "mytexture";
+    };
+
+    struct ResourcesBufferContext {
+        ID3D11Resource* Resources = nullptr;
+        ID3D11ShaderResourceView* ResourcesSRV = nullptr;
         std::string BufferName = "mytexture";
     };
 
@@ -94,10 +93,22 @@ namespace RenderCore // RenderCore
         virtual ID3D11DepthStencilView** GetAddressOfTextureDSV(std::string name) = 0;
         // GetAddressOf UAV
         virtual ID3D11UnorderedAccessView** GetAddressOfTextureUAV(std::string name) = 0;
+        // resources
+        // 获取Texture 2D
+        virtual ID3D11Texture2D* GetRTexture2D(std::string name) = 0;
+        // 获取 SRV
+        virtual ID3D11ShaderResourceView* GetRTextureSRV(std::string name) = 0;
+        // GetAddressOf Texture 2D
+        virtual ID3D11Texture2D** GetAddressOfRTexture2D(std::string name) = 0;
+        // GetAddressOf SRV
+        virtual ID3D11ShaderResourceView** GetAddressOfRTextureSRV(std::string name) = 0;
+
         // 注册Buffer
         virtual void RegisterBuffer(BufferContext<D3D11_BUFFER_DESC> context) = 0;
         // 注册Texture 2D
         virtual void RegisterTexture2DBuffer(BufferContext<D3D11_TEXTURE2D_DESC> context) = 0;
+        // 注册Resources
+        virtual void RegisterResourcesBuffer(ResourcesBufferContext context) = 0;
     };
 
     RENDERCORE_API IBufferManagerUser* GetBufferManagerUserInterface();
@@ -114,4 +125,7 @@ namespace RenderCore // RenderCore
     };
 
     RENDERCORE_API IBufferManagerAdmin* GetBufferManagerAdminInterface();
+
+    // ------------------------------------------ Tools Function ---------------------------------------------- //
+    void RENDERCORE_API LoadTextureFromFile(const wchar_t* filePath, const char* textureName);
 } // namespace RenderCore

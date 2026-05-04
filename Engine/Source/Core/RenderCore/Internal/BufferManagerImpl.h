@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <mutex>
+#include <atomic>
 
 #include <Subsystem/SubsystemTemplate.h>
 
@@ -58,7 +60,7 @@ namespace RenderCore //RenderCore
     {
         XMINT2 ViewSize;
         bool FixedSize;
-        // 组成纹理的基础 RTV and SRV
+        // 组成纹理的基础 RTV and SRV and DSV and UAV
         D3D11_TEXTURE2D_DESC Desc; // desc struct
         D3D11_SUBRESOURCE_DATA InitialData; // data struct
         D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc; // SRV struct
@@ -75,6 +77,13 @@ namespace RenderCore //RenderCore
         ComPtr<ID3D11UnorderedAccessView> UAV; // default == nullptr
     };
 
+    struct ResourcesTextureBuffer : public BufferBase
+    {
+        XMINT2 ViewSize;
+        ComPtr<ID3D11Texture2D> Texture; // default == nullptr
+        ComPtr<ID3D11ShaderResourceView> SRV; // default == nullptr
+    };
+
     struct Buffer : public BufferBase
     {
         // 组成缓冲区的基础 Buffer
@@ -86,9 +95,14 @@ namespace RenderCore //RenderCore
     struct BufferData
     {
         std::vector<TextureBuffer> textures;
+        std::vector<ResourcesTextureBuffer> resources;
         std::vector<Buffer> buffers;
     };
 
+    /**
+    * 在注册与更新大小时我们使用线程锁确保在多线程加载时的稳定性，
+    * 在获取Texture时我们应该在同一渲染线程中使用这个鞋Get函数来确保不会出现线程问题。
+    */
 	class BufferManagerImpl : public IBufferManagerUser, public IBufferManagerAdmin,
         public SubsystemTemplate<BufferManagerImpl,Core::SubsystemContext::Priority::High>
     {
@@ -105,6 +119,8 @@ namespace RenderCore //RenderCore
         virtual void RegisterBuffer(BufferContext<D3D11_BUFFER_DESC> context) override;
         // 注册Texture 2D
         virtual void RegisterTexture2DBuffer(BufferContext<D3D11_TEXTURE2D_DESC> context) override;
+        // 注册Resources
+        virtual void RegisterResourcesBuffer(ResourcesBufferContext context) override;
 
         // --------------------------------------- Get
         // 获取Buffer
@@ -133,7 +149,19 @@ namespace RenderCore //RenderCore
         // GetAddressOf UAV
         virtual ID3D11UnorderedAccessView** GetAddressOfTextureUAV(std::string name);
 
+        // resources
+        // 获取Texture 2D
+        virtual ID3D11Texture2D* GetRTexture2D(std::string name) override;
+        // 获取 SRV
+        virtual ID3D11ShaderResourceView* GetRTextureSRV(std::string name) override;
+        // GetAddressOf Texture 2D
+        virtual ID3D11Texture2D** GetAddressOfRTexture2D(std::string name) override;
+        // GetAddressOf SRV
+        virtual ID3D11ShaderResourceView** GetAddressOfRTextureSRV(std::string name) override;
     private:
+        std::mutex _Mutex; // 线程锁
+        std::atomic<bool> IsRegisterTextureBuffer{ false };
+
         ViewContext view;
         BufferData buffers;
     };

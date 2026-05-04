@@ -9,6 +9,8 @@ int main()
     std::cout << "Engine Version: " << Core::Core::GetVersion() << std::endl;
     std::cout << "Engine Init ... " << std::endl;
 
+    (void)Editor::Editor::Get(); // 确保Editor初始化比Subsystem早
+
     Core::SubsystemContext::SubsystemError error = Core::SubsystemControl::Init();
     if (!error.error) {
         //每个进程有独立的虚拟地址空间，泄漏只影响自己的进程，不会污染其他程序或系统 所以不需要释放了

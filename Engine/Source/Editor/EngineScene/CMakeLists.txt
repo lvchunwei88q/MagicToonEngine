@@ -22,6 +22,7 @@ target_include_directories(EngineScene
 target_compile_definitions(EngineScene PRIVATE ENGINESCENE_EXPORTS)
 
 target_link_libraries(EngineScene PRIVATE Core)
+target_link_libraries(EngineScene PRIVATE RenderCore)
 target_link_libraries(EngineScene PRIVATE IO)
 target_link_libraries(EngineScene PRIVATE Logger)
 

@@ -33,6 +33,7 @@ namespace RenderCore //RenderCore
         // 提前释放
         buffers.buffers.clear();
         buffers.textures.clear();
+        buffers.resources.clear();
     }
 
     void BufferManagerImpl::Initialize(ViewContext context)
@@ -55,11 +56,17 @@ namespace RenderCore //RenderCore
             return;
         }
 
-        buffers.buffers.push_back(buffer);
+        // 写入时加锁
+        {
+            std::lock_guard<std::mutex> lock(_Mutex);
+            buffers.buffers.push_back(buffer);
+        }
     }
 
     void BufferManagerImpl::RegisterTexture2DBuffer(BufferContext<D3D11_TEXTURE2D_DESC> context)
     {
+        IsRegisterTextureBuffer = true;
+
         TextureBuffer textureBuffer;
         textureBuffer.Name = context.BufferName;
         textureBuffer.ViewSize = XMINT2(context.Desc->Width, context.Desc->Height);
@@ -132,11 +139,54 @@ namespace RenderCore //RenderCore
             return;
         }
 
-        buffers.textures.push_back(textureBuffer);
+
+        // 写入时加锁
+        {
+            std::lock_guard<std::mutex> lock(_Mutex);
+            buffers.textures.push_back(textureBuffer);
+        }
+        //buffers.textures.push_back(textureBuffer);
+        IsRegisterTextureBuffer = false;
+    }
+
+    void BufferManagerImpl::RegisterResourcesBuffer(ResourcesBufferContext context)
+    {
+        ID3D11Texture2D* texture2D = nullptr;
+        HRESULT hr = context.Resources->QueryInterface(IID_PPV_ARGS(&texture2D));
+
+        if (SUCCEEDED(hr))
+        {
+            texture2D->Release();
+        }
+        else {
+            Core::ErrorCapture::Capture("Failed to convert to texture!");
+            return;
+        }
+
+        ResourcesTextureBuffer textureBuffer;
+        textureBuffer.Texture = texture2D;
+        textureBuffer.Name = context.BufferName;
+        textureBuffer.SRV = context.ResourcesSRV;
+
+        if (textureBuffer.Texture == nullptr || textureBuffer.Name.c_str() == nullptr || textureBuffer.SRV == nullptr) {
+            Core::ErrorCapture::Capture("Content missing when registering resources!");
+            return;
+        }
+
+        // 写入时加锁
+        {
+            std::lock_guard<std::mutex> lock(_Mutex);
+            buffers.resources.push_back(textureBuffer);
+        }
     }
 
     void BufferManagerImpl::UpdateBuffers(ViewContext context)
     {
+        if (IsRegisterTextureBuffer) {
+            Core::ErrorCapture::Capture("Updating the texture buffer is not allowed when registering the texture buffer!");
+            return;
+        }
+
         this->view = context;
         // 只需更新buffers中的textures
         for (unsigned int i = 0; i < buffers.textures.size(); i++)
@@ -250,5 +300,24 @@ namespace RenderCore //RenderCore
     ID3D11UnorderedAccessView** BufferManagerImpl::GetAddressOfTextureUAV(std::string name)
     {
         GET_BUFFERS_FUNCTION(name, textures, UAV, GetAddressOf)
+    }
+
+    // resources
+    ID3D11Texture2D* BufferManagerImpl::GetRTexture2D(std::string name)
+    {
+        GET_BUFFERS_FUNCTION(name, resources, Texture, Get)
+    }
+
+    ID3D11ShaderResourceView* BufferManagerImpl::GetRTextureSRV(std::string name)
+    {
+        GET_BUFFERS_FUNCTION(name, resources, SRV, Get)
+    }
+    ID3D11Texture2D** BufferManagerImpl::GetAddressOfRTexture2D(std::string name)
+    {
+        GET_BUFFERS_FUNCTION(name, resources, Texture, GetAddressOf)
+    }
+    ID3D11ShaderResourceView** BufferManagerImpl::GetAddressOfRTextureSRV(std::string name)
+    {
+        GET_BUFFERS_FUNCTION(name, resources, SRV, GetAddressOf)
     }
 }// namespace RenderCore

@@ -12,6 +12,9 @@
 #include <functional>
 #include <vector>
 #include <string>
+#include <IBufferManager.h>
+
+#include <SceneAsset/Asset.h> // engine content id
 
 namespace RenderUI {
     namespace fs = std::filesystem;
@@ -41,6 +44,15 @@ namespace RenderUI {
 
             DrawContentBrowser();
         }
+    }
+
+    void TextCentered(const char* text, float containerWidth)
+    {
+        float textWidth = ImGui::CalcTextSize(text).x;
+        float offsetX = (containerWidth - textWidth) * 0.5f;
+        if (offsetX > 0)
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
+        ImGui::TextUnformatted(text);
     }
 
     void InitContentBrowser() {
@@ -147,6 +159,9 @@ namespace RenderUI {
 
                 int itemIndex = 0;
 
+                ID3D11ShaderResourceView* Folder_Hover_SRV = RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(EDITOR_HOVER_FOLDER_ID);
+                ID3D11ShaderResourceView* Folder_NoHover_SRV = RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(EDITOR_NOHOVER_FOLDER_ID);
+
                 // 文件夹列表
                 for (const auto& entry : fs::directory_iterator(curDir)) {
                     if (!entry.is_directory()) continue;
@@ -160,25 +175,32 @@ namespace RenderUI {
                     ImGui::PushID(itemIndex);
 
                     // 文件夹图标/按钮区域
-                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.7f, 0.2f, 0.6f));
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.8f, 0.3f, 0.8f));
+                    {
+                        ImVec2 cursorPos = ImGui::GetCursorScreenPos(); // 获取绘制位置
+                        
+                        ImGui::SetCursorScreenPos(cursorPos);
+                        ImGui::InvisibleButton("##IconClick", ImVec2(itemSize, itemSize));
 
-                    if (ImGui::Button("[DIR]", ImVec2(itemSize, itemSize))) {
-                        static double lastClickTime = 0.0;
-                        double now = ImGui::GetTime();
+                        bool isHovered = ImGui::IsItemHovered();
+                        ID3D11ShaderResourceView* Folder_SRV = isHovered ? Folder_Hover_SRV : Folder_NoHover_SRV;
 
-                        if (now - lastClickTime < 0.4) {  // 0.4秒内双击
+                        ImGui::SetCursorScreenPos(cursorPos);
+                        ImGui::Image(
+                            (ImTextureID)(uintptr_t)Folder_SRV,
+                            ImVec2(itemSize, itemSize)
+                        );
+
+                        if (isHovered && ImGui::IsMouseDoubleClicked(0))
+                        {
                             g_contentBrowser.currentPath = entry.path().wstring();
                         }
-                        lastClickTime = now;
                     }
-                    ImGui::PopStyleColor(2);
 
                     // 文件名
                     std::string displayName = name;
                     if (displayName.length() > 8)
                         displayName = displayName.substr(0, 7) + "...";
-                    ImGui::TextWrapped("%s", displayName.c_str());
+                    TextCentered(displayName.c_str(), itemSize);
 
                     ImGui::EndGroup();
                     ImGui::PopID();
@@ -229,7 +251,7 @@ namespace RenderUI {
                     std::string displayName = name;
                     if (displayName.length() > 8)
                         displayName = displayName.substr(0, 7) + "...";
-                    ImGui::TextWrapped("%s", displayName.c_str());
+                    TextCentered(displayName.c_str(), itemSize);
 
                     ImGui::EndGroup();
                     ImGui::PopID();
