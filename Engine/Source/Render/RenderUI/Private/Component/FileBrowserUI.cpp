@@ -81,6 +81,30 @@ namespace RenderUI {
             }
         }
     }
+    
+    void DrawFullDirectoryTree(const std::wstring& rootPath)
+    {
+        fs::path root(rootPath);
+    
+        std::string rootName = IO::Converter::ToNarrowString(root.filename().wstring());
+        if (rootName.empty())
+            rootName = root.string();
+    
+        ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
+        bool isCurrent = (root == g_contentBrowser.currentPath);
+        if (isCurrent)
+            rootFlags |= ImGuiTreeNodeFlags_Selected;
+    
+        bool opened = ImGui::TreeNodeEx(rootName.c_str(), rootFlags);
+        if (ImGui::IsItemClicked())
+            g_contentBrowser.currentPath = root.wstring();
+    
+        if (opened)
+        {
+            DrawDirectoryTree(rootPath);  // 原来的函数画子目录
+            ImGui::TreePop();
+        }
+    }
 
     void DrawContentBrowser() {
         SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
@@ -96,8 +120,21 @@ namespace RenderUI {
                 fs::path p(g_contentBrowser.currentPath);
                 fs::path root(g_contentBrowser.rootPath);
                 // 只有当前路径不是根目录时才向上
-                if (p != root) {
-                    g_contentBrowser.currentPath = p.parent_path().wstring();
+                if (p != root)
+                {
+                    // 检查 p 是否以 root 开头
+                    auto [rootEnd, nothing] = std::mismatch(root.begin(), root.end(), p.begin());
+    
+                    if (rootEnd != root.end())
+                    {
+                        // p 不以 root 开头 → 不在 root 下
+                        LOG_ERROR("Attempted to navigate outside root directory!");
+                        g_contentBrowser.currentPath = root.wstring();
+                    }
+                    else
+                    {
+                        g_contentBrowser.currentPath = p.parent_path().wstring();
+                    }
                 }
             }
         }
@@ -110,8 +147,7 @@ namespace RenderUI {
 
             ImGui::BeginChild("DirTree", ImVec2(dirTreeWidth, 0), true);
             {
-                static std::wstring rootPath = IO::AbsolutePath::Get().GetExecutableDirectory();
-                DrawDirectoryTree(rootPath);
+                DrawFullDirectoryTree(g_contentBrowser.rootPath);
             }
             ImGui::EndChild();
 
@@ -221,40 +257,47 @@ namespace RenderUI {
                     ImGui::BeginGroup();
                     ImGui::PushID(itemIndex);
 
-                    // 根据文件类型设置颜色
-                    std::string ext = entry.path().extension().string();
-                    ImVec4 btnColor = ImVec4(0.5f, 0.5f, 0.5f, 0.6f);
-                    if (isSelected)
-                        btnColor = ImVec4(0.3f, 0.6f, 1.0f, 0.8f);
-
-                    ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
-                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(btnColor.x + 0.1f, btnColor.y + 0.1f, btnColor.z + 0.1f, 0.8f));
-
-                    // 文件类型标签
-                    std::string fileLabel = "[" + ext.substr(1) + "]";
-                    std::transform(fileLabel.begin(), fileLabel.end(), fileLabel.begin(), ::toupper);
-
-                    if (ImGui::Button(fileLabel.c_str(), ImVec2(itemSize, itemSize))) {
-                        g_contentBrowser.selectedFilePath = entry.path().string();
-
-                        static double lastClickTime = 0.0;
-                        double now = ImGui::GetTime();
-
-                        if (now - lastClickTime < 0.4) {  // 0.4秒内双击
-                            // code
+                    {
+                        std::string filename = entry.path().filename().string();
+                        std::string ext = entry.path().extension().string();
+                        if (ext.empty() || filename[0] == '.')
+                        {
+                            ext = filename;  // 把整个文件名当扩展名
                         }
-                        lastClickTime = now;
+
+                        ImVec4 btnColor = ImVec4(0.5f, 0.5f, 0.5f, 0.6f);
+                        if (isSelected)
+                            btnColor = ImVec4(0.3f, 0.6f, 1.0f, 0.8f);
+
+                        ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(btnColor.x + 0.1f, btnColor.y + 0.1f, btnColor.z + 0.1f, 0.8f));
+
+                        // 文件类型标签
+                        std::string fileLabel = "[" + ext.substr(1) + "]";
+                        std::transform(fileLabel.begin(), fileLabel.end(), fileLabel.begin(), ::toupper);
+
+                        if (ImGui::Button(fileLabel.c_str(), ImVec2(itemSize, itemSize))) {
+                            g_contentBrowser.selectedFilePath = entry.path().string();
+
+                            static double lastClickTime = 0.0;
+                            double now = ImGui::GetTime();
+
+                            if (now - lastClickTime < 0.4) {  // 0.4秒内双击
+                                // code
+                            }
+                            lastClickTime = now;
+                        }
+                        ImGui::PopStyleColor(2);
+
+                        // 文件名
+                        std::string displayName = name;
+                        if (displayName.length() > 8)
+                            displayName = displayName.substr(0, 7) + "...";
+                        TextCentered(displayName.c_str(), itemSize);
                     }
-                    ImGui::PopStyleColor(2);
 
-                    // 文件名
-                    std::string displayName = name;
-                    if (displayName.length() > 8)
-                        displayName = displayName.substr(0, 7) + "...";
-                    TextCentered(displayName.c_str(), itemSize);
-
-                    ImGui::EndGroup();
                     ImGui::PopID();
+                    ImGui::EndGroup();
 
                     itemIndex++;
                 }
