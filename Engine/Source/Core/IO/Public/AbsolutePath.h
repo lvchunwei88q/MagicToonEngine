@@ -28,5 +28,11 @@ namespace IO {
 		 * @return 可执行文件的完整路径
 		 */
 		std::wstring GetExecutablePath();
+
+		/**
+		* 获取内容路径
+		* @return 内容路径完整路径
+		*/
+		std::wstring GetContentPath();
 	};
 };

@@ -24,4 +24,17 @@ namespace IO {
         }
         return std::filesystem::path(buffer).wstring();
     }
+
+    std::wstring IO::AbsolutePath::GetContentPath()
+    {
+        std::filesystem::path exePath = GetExecutableDirectory();
+
+        // 可执行文件目录 → 上级 → 上级 → Engine/Content
+        std::filesystem::path contentPath = exePath.parent_path()
+            .parent_path()
+            / L"Engine"
+            / L"Content";
+        //std::wstring widePath(narrowPath.begin(), narrowPath.end());
+        return contentPath;
+    }
 }
