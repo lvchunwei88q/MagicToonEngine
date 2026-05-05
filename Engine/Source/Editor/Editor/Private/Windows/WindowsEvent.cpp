@@ -15,7 +15,7 @@ namespace Editor {
 		switch (msg) {
         case WM_CREATE:
         {
-            COLORREF color = RGB(40, 40, 40); // 纯黑
+            COLORREF color = RGB(28, 28, 28); // custom color
             DwmSetWindowAttribute(hWnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
         }
         break;
@@ -72,6 +72,15 @@ namespace Editor {
                 }
             }
             return 0;
+
+        case WM_GETMINMAXINFO:
+        {
+            // Set min size 
+            MINMAXINFO* pMMI = (MINMAXINFO*)lParam;
+            pMMI->ptMinTrackSize.x = 600;
+            pMMI->ptMinTrackSize.y = 400;
+            return 0;
+        }
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 		}
