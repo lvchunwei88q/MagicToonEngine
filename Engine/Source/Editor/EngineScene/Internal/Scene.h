@@ -2,7 +2,7 @@
 
 #include <Subsystem/SubsystemTemplate.h>
 
-#include <SceneAsset/EngineAsset.h>
+#include <SceneAsset/EngineAssetImpl.h>
 
 namespace EngineScene {
 	/*
@@ -16,6 +16,5 @@ namespace EngineScene {
 		virtual void Uninstall();
 
 	private:
-		EngineAsset engineasset;
 	};
 }

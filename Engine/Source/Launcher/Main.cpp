@@ -21,8 +21,12 @@ int main()
     }
 
     std::cout << "Engine initialized successfully with no errors. " << std::endl;
-    FreeConsole();
 
+#ifdef _DEBUG
+    // NOT
+#else
+    FreeConsole();
+#endif
     Editor::Editor::Get().SetEngineState(Editor::Editor::EngineState::Run);
 	Editor::Editor::Get().Run(); // Run Engine Editor
 

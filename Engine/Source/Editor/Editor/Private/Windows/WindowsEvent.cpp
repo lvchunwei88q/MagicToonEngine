@@ -15,6 +15,7 @@ namespace Editor {
 		switch (msg) {
         case WM_CREATE:
         {
+            // win 11
             COLORREF color = RGB(28, 28, 28); // custom color
             DwmSetWindowAttribute(hWnd, DWMWA_CAPTION_COLOR, &color, sizeof(color));
         }

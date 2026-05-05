@@ -18,10 +18,10 @@ namespace Editor
 
 	class EDITOR_API Windows : public Core::Subsystem, public Singleton<Windows>
 	{
+	private:
+		using WindowUpdateRenderingFunc = std::function<void()>;
 	public:
 		Windows();
-
-		using WindowUpdateRenderingFunc = std::function<void()>;
 
 		virtual bool Init();
 		virtual void Uninstall();

@@ -1,5 +1,4 @@
-#include <GuiInterface.h>
-
+#include <Component/FileBrowserUI.h>
 ///////////////////////////////////////
 #include <ILog.h>
 
@@ -8,133 +7,60 @@
 #include <FileManager.h>
 ///////////////////////////////////////
 
-#include <filesystem>
 #include <functional>
 #include <vector>
 #include <string>
-#include <IBufferManager.h>
-
-#include <SceneAsset/Asset.h> // engine content id
 
 namespace RenderUI {
-    namespace fs = std::filesystem;
+    AUTO_REGISTER(FileBrowserUI)
 
-    // 内容浏览器状态
-    struct ContentBrowserState {
-        std::wstring rootPath;                          // 根目录
-        std::wstring currentPath;                       // 当前浏览的目录（宽字符）
-        std::string selectedFilePath;                   // 当前选中的文件（窄字符，相对于当前目录）
-    };
-
-    // 全局实例
-    static ContentBrowserState g_contentBrowser;
-
-    void InitContentBrowser();
-    void DrawDirectoryTree();
-    void DrawContentBrowser();
-
-    void DrawContentBrowserWindow()
+    bool FileBrowserUI::Init()
     {
-        if (Switch.ContentBrowserWindow) {
-            static bool init = false;
-            if (!init) {
-                init = true;
-                InitContentBrowser();
-            }
+        state.currentPath = literal_root; // game ==  rootPath
+        state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory(); // 设置根路径就是工作路径
 
-            DrawContentBrowser();
-        }
+        return true;
     }
 
-    void TextCentered(const char* text, float containerWidth)
+    void FileBrowserUI::Uninstall()
     {
-        float textWidth = ImGui::CalcTextSize(text).x;
-        float offsetX = (containerWidth - textWidth) * 0.5f;
-        if (offsetX > 0)
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
-        ImGui::TextUnformatted(text);
     }
 
-    void InitContentBrowser() {
-        g_contentBrowser.currentPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory();
-        g_contentBrowser.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory();
-    }
-
-    void DrawDirectoryTree(const std::wstring& rootPath) {
-        fs::path root(rootPath);
-        for (const auto& entry : fs::directory_iterator(root)) {
-            if (!entry.is_directory()) continue;
-
-            std::string dirName = IO::Converter::ToNarrowString(entry.path().filename().wstring());
-            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-            bool isCurrent = (entry.path() == g_contentBrowser.currentPath);
-            if (isCurrent)
-                flags |= ImGuiTreeNodeFlags_Selected;
-
-            bool opened = ImGui::TreeNodeEx(dirName.c_str(), flags);
-            if (ImGui::IsItemClicked()) {
-                g_contentBrowser.currentPath = entry.path().wstring();
-            }
-            if (opened) {
-                DrawDirectoryTree(entry.path().wstring());
-                ImGui::TreePop();
-            }
-        }
-    }
-    
-    void DrawFullDirectoryTree(const std::wstring& rootPath)
+    void FileBrowserUI::Draw()
     {
-        fs::path root(rootPath);
-    
-        std::string rootName = IO::Converter::ToNarrowString(root.filename().wstring());
-        if (rootName.empty())
-            rootName = root.string();
-    
-        ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
-        bool isCurrent = (root == g_contentBrowser.currentPath);
-        if (isCurrent)
-            rootFlags |= ImGuiTreeNodeFlags_Selected;
-    
-        bool opened = ImGui::TreeNodeEx(rootName.c_str(), rootFlags);
-        if (ImGui::IsItemClicked())
-            g_contentBrowser.currentPath = root.wstring();
-    
-        if (opened)
-        {
-            DrawDirectoryTree(rootPath);  // 原来的函数画子目录
-            ImGui::TreePop();
-        }
+        // render
+        DrawLayout();
+        //DirTree
+        //File
     }
 
-    void DrawContentBrowser() {
+    void FileBrowserUI::DrawLayout()
+    {
         SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
 
         ImGui::Begin("Content Browser");
 
         // path
         {
-            std::string curPath = IO::Converter::ToNarrowString(g_contentBrowser.currentPath);
-            ImGui::Text("Path: %s", curPath.c_str());
-            ImGui::SameLine();
-            if(ImGui::Button("Up")) {
-                fs::path p(g_contentBrowser.currentPath);
-                fs::path root(g_contentBrowser.rootPath);
-                // 只有当前路径不是根目录时才向上
-                if (p != root)
-                {
-                    // 检查 p 是否以 root 开头
-                    auto [rootEnd, nothing] = std::mismatch(root.begin(), root.end(), p.begin());
-    
-                    if (rootEnd != root.end())
-                    {
-                        // p 不以 root 开头 → 不在 root 下
-                        LOG_ERROR("Attempted to navigate outside root directory!");
-                        g_contentBrowser.currentPath = root.wstring();
-                    }
-                    else
-                    {
-                        g_contentBrowser.currentPath = p.parent_path().wstring();
-                    }
+            std::string curPath = IO::Converter::ToNarrowString(state.currentPath);
+
+            // 输入框缓冲区
+            static char pathBuffer[512] = {};
+            strcpy_s(pathBuffer, curPath.c_str());
+
+            if (ImGui::InputText("##PathEdit", pathBuffer, sizeof(pathBuffer),
+                ImGuiInputTextFlags_EnterReturnsTrue))
+            {
+                std::wstring newPath = IO::Converter::ToWideString(pathBuffer);
+                fs::path p(newPath);
+
+                // 安全检查
+                if (IsUnderGameFolder(p) && IO::FileManager::Exists(GetAbsolutePath(newPath))) {
+                    state.currentPath = newPath;
+                }
+                else {
+                    LOG_WARNING("Invalid path, restoring original path!");
+                    strcpy_s(pathBuffer, curPath.c_str());
                 }
             }
         }
@@ -142,169 +68,237 @@ namespace RenderUI {
 
         // main content
         {
-            static float dirTreeWidth = 250.0f;
-            static float splitterWidth = 4.0f;
-
-            ImGui::BeginChild("DirTree", ImVec2(dirTreeWidth, 0), true);
             {
-                DrawFullDirectoryTree(g_contentBrowser.rootPath);
+                ImGui::BeginChild("DirTree", ImVec2(dirTreeWidth, 0), true);
+                {
+                    DirTreePos = ImGui::GetCursorPos();
+                    this->DirTree();
+                }
+                ImGui::EndChild();
             }
-            ImGui::EndChild();
 
             ImGui::SameLine();
+            {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+                ImGui::Button("##splitter", ImVec2(splitterWidth, -1));
+                ImGui::PopStyleColor(3);
 
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-            ImGui::Button("##splitter", ImVec2(splitterWidth, -1));
-            ImGui::PopStyleColor(3);
+                if (ImGui::IsItemActive()) {
+                    ImVec2 windowSize = ImGui::GetContentRegionAvail();
 
-            if (ImGui::IsItemActive()) {
-                ImVec2 windowSize = ImGui::GetContentRegionAvail();
+                    dirTreeWidth += ImGui::GetIO().MouseDelta.x;
+                    if (dirTreeWidth < 100.0f) dirTreeWidth = 100.0f;  // 最小宽度
+                    if (dirTreeWidth > windowSize.x * 0.6f) dirTreeWidth = windowSize.x * 0.6f;  // 最大宽度
+                }
 
-                dirTreeWidth += ImGui::GetIO().MouseDelta.x;
-                if (dirTreeWidth < 100.0f) dirTreeWidth = 100.0f;  // 最小宽度
-                if (dirTreeWidth > windowSize.x * 0.6f) dirTreeWidth = windowSize.x * 0.6f;  // 最大宽度
+                // 鼠标悬停时改变光标
+                if (ImGui::IsItemHovered()) {
+                    ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+                }
             }
 
-            // 鼠标悬停时改变光标
-            if (ImGui::IsItemHovered()) {
-                ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+            ImGui::SameLine();
+            {
+                // file list
+                SetBackColor color(ImVec4(0.14f, 0.14f, 0.14f, 1.0f), ImGuiCol_ChildBg);
+                ImGui::BeginChild("Files", ImVec2(0, 0), true);
+                {
+                    FilePos = ImGui::GetCursorPos();
+                    this->File();
+                }
+                ImGui::EndChild();
             }
         }
+        ImGui::End();
+    }
 
-        ImGui::SameLine();
+    void FileBrowserUI::DirTree()
+    {
+        fs::path root(state.rootPath);
+
+        ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
+        bool isCurrent = (literal_root == state.currentPath); // 当前是不是在Root中
+        if (isCurrent)
+            rootFlags |= ImGuiTreeNodeFlags_Selected;
+
+        bool opened = ImGui::TreeNodeEx("Game", rootFlags); // 是否展开
+        if (ImGui::IsItemClicked()) {
+            state.currentPath = literal_root;
+        }
+
+        if (opened)
         {
-            // 右侧：当前目录内容
-            ImGui::BeginChild("Files", ImVec2(0, 0), true);
+            DrawDirectoryTree(state.rootPath);  // 原来的函数画子目录
+            ImGui::TreePop();
+        }
+    }
+
+    void FileBrowserUI::DrawDirectoryTree(std::wstring path) {
+        fs::path root(path);
+        for (const auto& entry : fs::directory_iterator(root)) {
+            if (!entry.is_directory()) continue;
+
+            std::string dirName = IO::Converter::ToNarrowString(entry.path().filename().wstring());
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+            bool isCurrent = (entry.path() == GetAbsolutePath(state.currentPath));
+            if (isCurrent)
+                flags |= ImGuiTreeNodeFlags_Selected;
+
+            bool opened = ImGui::TreeNodeEx(dirName.c_str(), flags);
+            if (ImGui::IsItemClicked()) {
+                state.currentPath = ToGameRelative(entry.path().wstring());
+            }
+            if (opened) {
+                DrawDirectoryTree(entry.path().wstring());
+                ImGui::TreePop();
+            }
+        }
+    }
+
+    void FileBrowserUI::File()
+    {
+        if (!IO::FileManager::Exists(GetAbsolutePath(state.currentPath))) {
+            ImGui::Text("Directory does not exist.");
+            return;
+        }
+
+        auto TextCentered = [](const char* text, float containerWidth)
             {
-                fs::path curDir(g_contentBrowser.currentPath);
-                if (!fs::exists(curDir)) {
-                    ImGui::Text("Directory does not exist.");
-                    ImGui::EndChild();
-                    ImGui::End();
-                    return;
+                float textWidth = ImGui::CalcTextSize(text).x;
+                float offsetX = (containerWidth - textWidth) * 0.5f;
+                if (offsetX > 0)
+                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
+                ImGui::TextUnformatted(text);
+            };
+
+        // 计算网格参数
+        float itemSize = 80.0f;        // 每个格子的大小
+        float spacing = 10.0f;         // 格子间距
+        float panelWidth = ImGui::GetContentRegionAvail().x;
+        int columns = (int)(panelWidth / (itemSize + spacing));
+        if (columns < 1) columns = 1;
+
+        int itemIndex = 0;
+
+
+        // File List
+        for (const auto& entry : fs::directory_iterator(GetAbsolutePath(state.currentPath))) {
+
+            std::string name = IO::Converter::ToNarrowString(entry.path().filename().wstring());
+
+            EngineAssetType FileType = GetFileType(entry);
+
+            // New Line
+            if (itemIndex % columns != 0) ImGui::SameLine(0, spacing);
+
+            ImGui::BeginGroup();
+            ImGui::PushID(itemIndex);
+
+            // 文件夹图标/按钮区域
+            {
+                ImVec2 cursorPos = ImGui::GetCursorScreenPos(); // Get Render Postion
+
+                ImGui::SetCursorScreenPos(cursorPos);
+                ImGui::InvisibleButton("##IconClick", ImVec2(itemSize, itemSize));
+
+                bool isHovered = ImGui::IsItemHovered();
+                ID3D11ShaderResourceView* Icon = GetFileIcon(FileType,isHovered);
+
+                ImGui::SetCursorScreenPos(cursorPos);
+                ImGui::Image(
+                    (ImTextureID)(uintptr_t)Icon,
+                    ImVec2(itemSize, itemSize)
+                );
+
+                if (isHovered)
+                {
+                    DoubleClickToEnter({ FileType == EngineAssetType::Folder, entry.path()});
                 }
 
-                // 计算网格参数
-                float itemSize = 80.0f;        // 每个格子的大小
-                float spacing = 10.0f;         // 格子间距
-                float panelWidth = ImGui::GetContentRegionAvail().x;
-                int columns = (int)(panelWidth / (itemSize + spacing));
-                if (columns < 1) columns = 1;
+                // FileName
+                std::string displayName = name;
+                if (displayName.length() > 8)
+                    displayName = displayName.substr(0, 7) + "...";
+                TextCentered(displayName.c_str(), itemSize);
+            }
 
-                int itemIndex = 0;
+            ImGui::PopID();
+            ImGui::EndGroup();
 
-                ID3D11ShaderResourceView* Folder_Hover_SRV = RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(EDITOR_HOVER_FOLDER_ID);
-                ID3D11ShaderResourceView* Folder_NoHover_SRV = RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(EDITOR_NOHOVER_FOLDER_ID);
+            itemIndex++;
+        }
+    }
 
-                // 文件夹列表
-                for (const auto& entry : fs::directory_iterator(curDir)) {
-                    if (!entry.is_directory()) continue;
+    bool FileBrowserUI::IsUnderGameFolder(const fs::path& path) {
+        std::wstring native = path.lexically_normal().wstring();
+        // 必须以 "Game\" 或 "Game/" 开头才算
+        return native.starts_with(L"Game\\") || native.starts_with(L"Game/");
+    }
 
-                    std::string name = IO::Converter::ToNarrowString(entry.path().filename().wstring());
-
-                    // 新行
-                    if (itemIndex % columns != 0) ImGui::SameLine(0, spacing);
-
-                    ImGui::BeginGroup();
-                    ImGui::PushID(itemIndex);
-
-                    // 文件夹图标/按钮区域
-                    {
-                        ImVec2 cursorPos = ImGui::GetCursorScreenPos(); // 获取绘制位置
-                        
-                        ImGui::SetCursorScreenPos(cursorPos);
-                        ImGui::InvisibleButton("##IconClick", ImVec2(itemSize, itemSize));
-
-                        bool isHovered = ImGui::IsItemHovered();
-                        ID3D11ShaderResourceView* Folder_SRV = isHovered ? Folder_Hover_SRV : Folder_NoHover_SRV;
-
-                        ImGui::SetCursorScreenPos(cursorPos);
-                        ImGui::Image(
-                            (ImTextureID)(uintptr_t)Folder_SRV,
-                            ImVec2(itemSize, itemSize)
-                        );
-
-                        if (isHovered && ImGui::IsMouseDoubleClicked(0))
-                        {
-                            g_contentBrowser.currentPath = entry.path().wstring();
-                        }
-                    }
-
-                    // 文件名
-                    std::string displayName = name;
-                    if (displayName.length() > 8)
-                        displayName = displayName.substr(0, 7) + "...";
-                    TextCentered(displayName.c_str(), itemSize);
-
-                    ImGui::EndGroup();
-                    ImGui::PopID();
-
-                    itemIndex++;
+    void FileBrowserUI::DoubleClickToEnter(FileTypeContext filetype)
+    {
+        if (ImGui::IsMouseDoubleClicked(0))
+        {
+            if(filetype.IsFolder)
+                state.currentPath = ToGameRelative(filetype.entry.wstring());
+            else {
+                if (filetype.entry.extension() != "") { // TODO file type 
+                    // not
                 }
-
-                // 文件列表
-                for (const auto& entry : fs::directory_iterator(curDir)) {
-                    if (!entry.is_regular_file()) continue;
-
-                    std::string name = IO::Converter::ToNarrowString(entry.path().filename().wstring());
-                    bool isSelected = (entry.path().string() == g_contentBrowser.selectedFilePath);
-
-                    // 新行
-                    if (itemIndex % columns != 0) ImGui::SameLine(0, spacing);
-
-                    ImGui::BeginGroup();
-                    ImGui::PushID(itemIndex);
-
-                    {
-                        std::string filename = entry.path().filename().string();
-                        std::string ext = entry.path().extension().string();
-                        if (ext.empty() || filename[0] == '.')
-                        {
-                            ext = filename;  // 把整个文件名当扩展名
-                        }
-
-                        ImVec4 btnColor = ImVec4(0.5f, 0.5f, 0.5f, 0.6f);
-                        if (isSelected)
-                            btnColor = ImVec4(0.3f, 0.6f, 1.0f, 0.8f);
-
-                        ImGui::PushStyleColor(ImGuiCol_Button, btnColor);
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(btnColor.x + 0.1f, btnColor.y + 0.1f, btnColor.z + 0.1f, 0.8f));
-
-                        // 文件类型标签
-                        std::string fileLabel = "[" + ext.substr(1) + "]";
-                        std::transform(fileLabel.begin(), fileLabel.end(), fileLabel.begin(), ::toupper);
-
-                        if (ImGui::Button(fileLabel.c_str(), ImVec2(itemSize, itemSize))) {
-                            g_contentBrowser.selectedFilePath = entry.path().string();
-
-                            static double lastClickTime = 0.0;
-                            double now = ImGui::GetTime();
-
-                            if (now - lastClickTime < 0.4) {  // 0.4秒内双击
-                                // code
-                            }
-                            lastClickTime = now;
-                        }
-                        ImGui::PopStyleColor(2);
-
-                        // 文件名
-                        std::string displayName = name;
-                        if (displayName.length() > 8)
-                            displayName = displayName.substr(0, 7) + "...";
-                        TextCentered(displayName.c_str(), itemSize);
-                    }
-
-                    ImGui::PopID();
-                    ImGui::EndGroup();
-
-                    itemIndex++;
+                else {
+                    LOG_WARNING("Unrecognized file type!");
                 }
             }
-            ImGui::EndChild();
+        }
+    }
 
-            ImGui::End();
+    std::wstring FileBrowserUI::GetAbsolutePath(const std::wstring& currentPath)
+    {
+        std::wstring relative = currentPath;
+        if (relative.starts_with(L"Game/") || relative.starts_with(L"Game\\")) {
+            relative = relative.substr(5);  // 跳过 "Game/"
+        }
+        if (!relative.empty() && (relative[0] == L'/' || relative[0] == L'\\')) {
+            relative = relative.substr(1);
+        }
+        fs::path absolute = fs::path(state.rootPath) / relative;
+        return absolute.wstring();
+    }
+
+    std::wstring FileBrowserUI::ToGameRelative(const std::wstring& absolutePath)
+    {
+        fs::path root(state.rootPath);
+        fs::path absolute(absolutePath);
+        fs::path relative = fs::relative(absolute, root); // 计算相对路径
+
+        // 前面拼上 "Game/"
+        fs::path result = fs::path(L"Game") / relative;
+        return result.lexically_normal().wstring();
+    }
+
+    EngineAssetType FileBrowserUI::GetFileType(const fs::directory_entry& entry)
+    {
+        if (entry.is_directory())
+            return EngineAssetType::Folder;
+
+        std::string ext = entry.path().extension().string();
+        // TODO file type
+
+        return EngineAssetType::File;
+    }
+
+    ID3D11ShaderResourceView* FileBrowserUI::GetFileIcon(EngineAssetType filetype,bool isHovered)
+    {
+        return RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(GetEngineAsset()->GetIcon(filetype, isHovered));
+    }
+
+    //------------------------------------------------------
+    void DrawContentBrowserWindow()
+    {
+        if (Switch.ContentBrowserWindow) {
+            FileBrowserUI::Get().Draw();
         }
     }
 }

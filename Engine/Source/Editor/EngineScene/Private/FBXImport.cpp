@@ -16,7 +16,7 @@ namespace EngineScene {
 		}
 		if (!IO::FileManager::Exists(IO::Converter::ToWideString(settings.path)))
 		{
-			LOG_ERROR("FBX Import failed: file does not exist - %s", settings.path.c_str());
+			LOG_ERROR(std::string("FBX Import failed: file does not exist - " + settings.path).c_str());
 			return;
 		}
 
@@ -27,7 +27,7 @@ namespace EngineScene {
 
 		if (!scene)
 		{
-			LOG_ERROR("FBX Import failed: %s", error.description.data);
+			LOG_ERROR(std::string("FBX Import failed: ") + error.description.data);
 			return;
 		}
 
