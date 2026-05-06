@@ -1,4 +1,5 @@
 #include "Main.h"
+#include <Logo/resource.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     const wchar_t* CLASS = L"Project Launcher";
@@ -13,7 +14,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
 
     int screenW = GetSystemMetrics(SM_CXSCREEN);
     int screenH = GetSystemMetrics(SM_CYSCREEN);
-    int winW = 960, winH = 540;
     int x = (screenW - winW) / 2;
     int y = (screenH - winH) / 2;
 
@@ -21,6 +21,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
         WS_POPUP,
         x, y, winW, winH,
         nullptr, nullptr, hInstance, nullptr);
+    HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
+    if (hIcon)
+    {
+        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);   // 大图标（任务栏）
+        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);   // 小图标（标题栏）
+    }
     ShowWindow(hwnd, SW_SHOWMINIMIZED);
 
     MSG msg;

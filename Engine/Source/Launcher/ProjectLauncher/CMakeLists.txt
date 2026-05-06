@@ -11,6 +11,7 @@ add_executable(ProjectLauncher WIN32
 target_include_directories(ProjectLauncher
     PRIVATE
         ${THIRD_PARTY_DIR} # 使用WebView2库
+        ${CMAKE_SOURCE_DIR}/Engine/Content # 内容目录
 )
 
 target_sources(ProjectLauncher PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/resources.rc")
