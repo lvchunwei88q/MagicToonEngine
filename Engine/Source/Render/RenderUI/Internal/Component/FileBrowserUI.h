@@ -51,11 +51,16 @@ namespace RenderUI {
 
 		EngineAssetType GetFileType(const fs::directory_entry& entry);
 		ID3D11ShaderResourceView* GetFileIcon(EngineAssetType filetype, bool isHovered);
+
+		void FileContentAreaInput(); // 控制文件内容区域输入
 	private:
 		ContentBrowserState state;
 
 		float dirTreeWidth = 250.0f;
 		const float splitterWidth = 2.0f;
+
+		const float itemSize = 80.0f;        // 每个格子的大小 默认
+		const float spacing = 10.0f;         // 格子间距 默认
 
 		// 保存的位置
 		ImVec2 DirTreePos;

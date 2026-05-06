@@ -29,9 +29,19 @@ namespace RenderUI {
 		}
 	};
 
+	struct FileBrowserConfig {
+		float Zoom = 1.0f; // value 0.5 - 1.5
+
+		template<class Archive>
+		void serialize(Archive& archive) {
+			archive(Zoom);
+		}
+	};
+
 	struct ComponentSwitch {
-		// Component Switch
+		// Component Config
 		LoggerSwitch loggerswitch;
+		FileBrowserConfig filebrowserconfig;
 		// Switch
 		bool ExampleWindow;
 		bool LoggerWindow;
@@ -40,7 +50,7 @@ namespace RenderUI {
 
 		template<class Archive>
 		void serialize(Archive& archive) {
-			archive(loggerswitch,LoggerWindow, ExampleWindow, RenderViewWindow, ContentBrowserWindow);
+			archive(loggerswitch, filebrowserconfig,LoggerWindow, ExampleWindow, RenderViewWindow, ContentBrowserWindow);
 		}
 	};
 

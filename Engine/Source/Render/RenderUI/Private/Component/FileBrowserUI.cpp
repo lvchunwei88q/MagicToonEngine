@@ -5,6 +5,8 @@
 #include <AbsolutePath.h>
 #include <Converter.h>
 #include <FileManager.h>
+
+#include <Tools/Debouncer.h>
 ///////////////////////////////////////
 
 #include <functional>
@@ -106,6 +108,7 @@ namespace RenderUI {
                 ImGui::BeginChild("Files", ImVec2(0, 0), true);
                 {
                     FilePos = ImGui::GetCursorPos();
+                    FileContentAreaInput();
                     this->File();
                 }
                 ImGui::EndChild();
@@ -174,10 +177,11 @@ namespace RenderUI {
             };
 
         // 计算网格参数
-        float itemSize = 80.0f;        // 每个格子的大小
-        float spacing = 10.0f;         // 格子间距
         float panelWidth = ImGui::GetContentRegionAvail().x;
-        int columns = (int)(panelWidth / (itemSize + spacing));
+        const float Zoom = Switch.filebrowserconfig.Zoom; // 获取缩放
+        const float ZitemSize = itemSize * Zoom;
+        const float Zspacing = spacing * Zoom;
+        int columns = (int)(panelWidth / (ZitemSize + Zspacing));
         if (columns < 1) columns = 1;
 
         int itemIndex = 0;
@@ -191,17 +195,17 @@ namespace RenderUI {
             EngineAssetType FileType = GetFileType(entry);
 
             // New Line
-            if (itemIndex % columns != 0) ImGui::SameLine(0, spacing);
+            if (itemIndex % columns != 0) ImGui::SameLine(0, Zspacing);
 
             ImGui::BeginGroup();
             ImGui::PushID(itemIndex);
 
-            // 文件夹图标/按钮区域
+            // File UI
             {
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos(); // Get Render Postion
 
                 ImGui::SetCursorScreenPos(cursorPos);
-                ImGui::InvisibleButton("##IconClick", ImVec2(itemSize, itemSize));
+                ImGui::InvisibleButton("##IconClick", ImVec2(ZitemSize, ZitemSize));
 
                 bool isHovered = ImGui::IsItemHovered();
                 ID3D11ShaderResourceView* Icon = GetFileIcon(FileType,isHovered);
@@ -209,7 +213,7 @@ namespace RenderUI {
                 ImGui::SetCursorScreenPos(cursorPos);
                 ImGui::Image(
                     (ImTextureID)(uintptr_t)Icon,
-                    ImVec2(itemSize, itemSize)
+                    ImVec2(ZitemSize, ZitemSize)
                 );
 
                 if (isHovered)
@@ -221,7 +225,7 @@ namespace RenderUI {
                 std::string displayName = name;
                 if (displayName.length() > 8)
                     displayName = displayName.substr(0, 7) + "...";
-                TextCentered(displayName.c_str(), itemSize);
+                TextCentered(displayName.c_str(), ZitemSize);
             }
 
             ImGui::PopID();
@@ -292,6 +296,34 @@ namespace RenderUI {
     ID3D11ShaderResourceView* FileBrowserUI::GetFileIcon(EngineAssetType filetype,bool isHovered)
     {
         return RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(GetEngineAsset()->GetIcon(filetype, isHovered));
+    }
+
+    void FileBrowserUI::FileContentAreaInput()
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
+
+        static Debouncer debouncer(300, []() {
+            LOG_INFO("FileBrowser Zoom changed to: " + std::to_string(Switch.filebrowserconfig.Zoom));
+        });
+
+        if (isHovered) {
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && io.MouseWheel != 0.0f) {
+                float wheelDelta = io.MouseWheel;
+                float& Zoom = Switch.filebrowserconfig.Zoom; // 获取缩放
+                if (wheelDelta != 0.0f) {
+                    float newZoom = Zoom + (wheelDelta / 50.0f);
+                    newZoom = std::clamp(newZoom, 0.5f, 1.5f);
+                    if (newZoom != Zoom) {
+                        Zoom = newZoom;
+                        debouncer.update();
+                    }
+                    io.MouseWheel = 0.0f;
+                }
+            }
+        }
+
+        debouncer.tick();
     }
 
     //------------------------------------------------------
