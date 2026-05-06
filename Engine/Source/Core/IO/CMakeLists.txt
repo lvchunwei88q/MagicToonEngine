@@ -18,4 +18,4 @@ target_include_directories(IO
 
 target_compile_definitions(IO PRIVATE IO_EXPORTS)
 
-target_link_libraries(IO PRIVATE Core)
+target_link_libraries(IO PUBLIC Core)

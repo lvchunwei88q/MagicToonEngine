@@ -25,9 +25,11 @@ EngineModule(Render/RenderRT)
 EngineModule(Render/RenderUI)
 
 EngineModule(Editor/EngineScene)
+EngineModule(Editor/EngineProject)
 EngineModule(Editor/Editor)
 
-EngineModule(Launcher)
+EngineModule(Launcher/EngineLauncher)
+EngineModule(Launcher/ProjectLauncher)
 
 # 设置启动项目为 Launcher
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Launcher)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT EngineLauncher)

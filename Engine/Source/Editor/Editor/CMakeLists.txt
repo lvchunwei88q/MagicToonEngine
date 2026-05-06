@@ -20,7 +20,7 @@ target_include_directories(Editor
 
 target_compile_definitions(Editor PRIVATE EDITOR_EXPORTS)
 
-target_link_libraries(Editor PRIVATE Core)
+target_link_libraries(Editor PUBLIC Core)
 target_link_libraries(Editor PRIVATE IO)
 target_link_libraries(Editor PRIVATE Logger)
 
