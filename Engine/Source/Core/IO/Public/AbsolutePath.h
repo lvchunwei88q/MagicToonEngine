@@ -4,6 +4,7 @@
 #include <string>
 
 #define CACHE L"Cache\\"
+#define CONFIG L"Config\\"
 
 namespace IO {
 	class IO_API AbsolutePath : public Singleton<AbsolutePath> // 绝对路径子系统

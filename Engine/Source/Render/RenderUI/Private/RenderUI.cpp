@@ -74,7 +74,7 @@ namespace RenderUI {
 
 		
 		// 序列化布局
-		FILE_SERIALIZATION_LOADING(Switch, CACHE "Editor\\Windows\\", L"WindowSwitch.mtdata")
+		FILE_SERIALIZATION_LOADING(Switch, CONFIG "Editor\\Windows\\", L"WindowSwitch.mtdata")
 	}
 
 	void RenderUI::Shutdown()
@@ -84,7 +84,7 @@ namespace RenderUI {
 		ImGui::DestroyContext();
 
 		// 序列化布局
-		FILE_SERIALIZATION_SAVE(Switch, CACHE "Editor\\Windows\\", L"WindowSwitch.mtdata")
+		FILE_SERIALIZATION_SAVE(Switch, CONFIG "Editor\\Windows\\", L"WindowSwitch.mtdata")
 	}
 
 	void RenderUI::Tick()

@@ -19,7 +19,7 @@ namespace Editor
 	{
 		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
 
-		FILE_SERIALIZATION_LOADING(config, CACHE "Editor\\Windows\\", L"WindowsConfig.mtdata")
+		FILE_SERIALIZATION_LOADING(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
 
 		// init windows
 		WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_CLASSDC, WindowsProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
@@ -64,7 +64,7 @@ namespace Editor
 			config.windowsX = 100;
 			config.windowsY = 100;
 		}
-		FILE_SERIALIZATION_SAVE(config, CACHE "Editor\\Windows\\", L"WindowsConfig.mtdata")
+		FILE_SERIALIZATION_SAVE(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
 	}
 
 	void Windows::CleanupDeviceD3D()

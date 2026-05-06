@@ -12,3 +12,5 @@ target_include_directories(IMGUI
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR} # 别的项目也可以访问
 )
+
+target_link_libraries(IMGUI PRIVATE IO)

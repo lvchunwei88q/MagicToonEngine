@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Launcher</title>
+    <link rel="stylesheet" href="css/back.css">
+    <link rel="stylesheet" href="css/control.css">
+</head>
+<body>
+    <div class="bg">
+        <div class="bg-orb bg-orb--primary"></div>
+        <div class="bg-orb bg-orb--secondary"></div>
+    </div>
+    <input type="text" id="projectPath" class="input-path" placeholder="输入项目路径...">
+    <button class="btn-button" onclick="callCpp()">Open NewProJect</button>
+</body>
+<script>
+    function callCpp() {
+        const path = document.getElementById("projectPath").value.trim();
+        if (!path) {
+            alert("请输入项目路径");
+            return;
+        }
+        // 通过 WebView2 的 chrome.webview 接口发送消息到 C++
+        if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.postMessage(JSON.stringify({
+                action: "create_projnew_projectct",
+                name: "MyGame",
+                path: path
+            }));
+        }
+    }
+</script>
+</html>

@@ -1,4 +1,5 @@
 #include "Main.h"
+#include <IProjectController.h>
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg)
@@ -16,4 +17,26 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	}
 
 	return 0;
+}
+
+void Operation(JSON json)
+{
+	std::string action = json["action"];
+	if (action == "create_projnew_projectct") {
+		std::string name = json["name"];
+		std::string path = json["path"];
+		NewProJect(path,name);
+	}
+}
+
+using namespace EngineProject;
+
+void NewProJect(std::string path, std::string name)
+{
+	IProjectController* controller = GetProjectControllerInterface();
+
+	ProJectConfig config;
+	config.name = name;
+	config.path = path;
+	controller->Create(config);
 }

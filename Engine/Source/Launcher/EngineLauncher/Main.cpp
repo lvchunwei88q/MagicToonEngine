@@ -28,7 +28,7 @@ enum class OperationType {
 OperationType Operation(const std::string& o) {
     // -p | -project
 
-    if (o == " - p" || o == "-project") {
+    if (o == "-p" || o == "-project") {
         return OperationType::SpecifyProJect;
     }
     else {
@@ -44,6 +44,7 @@ int main(int argc, char* argv[])// exe -p path
 #endif
     std::cout << "Engine Version: " << Core::Core::GetVersion() << std::endl;
     std::cout << "Engine Init ... " << std::endl;
+    std::cout << argv[0] << argv[1] << argv[2] << argv[3] << std::endl;
 
     if (argc >= 3) {
         OperationType type = Operation(argv[1]); // exe_name , operation

@@ -1235,6 +1235,10 @@ IMPLEMENTING SUPPORT for ImGuiBackendFlags_RendererHasTextures:
 #include <stdio.h>      // vsnprintf, sscanf, printf
 #include <stdint.h>     // intptr_t
 
+// io moudel
+#include <AbsolutePath.h> // get abs path
+#include <Converter.h> // char to wchar_t 
+
 // [Windows] On non-Visual Studio compilers, we default to IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCTIONS unless explicitly enabled
 #if defined(_WIN32) && !defined(_MSC_VER) && !defined(IMGUI_ENABLE_WIN32_DEFAULT_IME_FUNCTIONS) && !defined(IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCTIONS)
 #define IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCTIONS
@@ -16251,7 +16255,9 @@ void ImGui::ClearIniSettings()
 void ImGui::LoadIniSettingsFromDisk(const char* ini_filename)
 {
     size_t file_data_size = 0;
-    char* file_data = (char*)ImFileLoadToMemory(ini_filename, "rb", &file_data_size);
+    std::string target = IO::Converter::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
+        + L"\\" + CONFIG) + ini_filename;
+    char* file_data = (char*)ImFileLoadToMemory(target.c_str(), "rb", &file_data_size);
     if (!file_data)
         return;
     if (file_data_size > 0)
@@ -16340,7 +16346,10 @@ void ImGui::SaveIniSettingsToDisk(const char* ini_filename)
 
     size_t ini_data_size = 0;
     const char* ini_data = SaveIniSettingsToMemory(&ini_data_size);
-    ImFileHandle f = ImFileOpen(ini_filename, "wt");
+    std::string target = IO::Converter::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
+        + L"\\" + CONFIG)+ ini_filename;
+    // use Program Path
+    ImFileHandle f = ImFileOpen(target.c_str(), "wt");
     if (!f)
         return;
     ImFileWrite(ini_data, sizeof(char), ini_data_size, f);

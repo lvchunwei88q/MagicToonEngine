@@ -37,7 +37,19 @@ void init_app(HWND hwnd) {
                             RECT bounds = { 0, 0, winW, winH };
                             g_controller->put_Bounds(bounds);
 
-                            g_webview->Navigate(L"https://cn.bing.com/");
+                            std::wstring src = IO::AbsolutePath::Get().GetContentPath() + L"\\ProjectLauncher\\index.html";
+                            g_webview->Navigate(src.c_str());
+
+#ifndef _DEBUG
+                            // 禁用右键菜单和开发者工具
+                            ComPtr<ICoreWebView2Settings> settings;
+                            g_webview->get_Settings(&settings);
+                            if (settings) {
+                                settings->put_AreDefaultContextMenusEnabled(FALSE);
+                                settings->put_AreDevToolsEnabled(FALSE);
+                                settings->put_IsZoomControlEnabled(FALSE);
+                            }
+#endif
 
                             g_webview->add_NavigationCompleted(
                                 Callback<ICoreWebView2NavigationCompletedEventHandler>(
@@ -45,6 +57,23 @@ void init_app(HWND hwnd) {
                                         WebViewSuccess();
                                         return S_OK;
                                     }).Get(),nullptr);
+
+                            g_webview->add_WebMessageReceived(
+                                Callback<ICoreWebView2WebMessageReceivedEventHandler>(
+                                    [](ICoreWebView2* sender, ICoreWebView2WebMessageReceivedEventArgs* args) -> HRESULT {
+                                        LPWSTR rawMsg = nullptr;
+                                        args->TryGetWebMessageAsString(&rawMsg);
+                                        if (!rawMsg) return S_OK;
+
+                                        std::wstring msg(rawMsg);
+                                        CoTaskMemFree(rawMsg);
+
+                                        JSON json = JSON::parse(msg);
+                                        Operation(json);
+
+                                        return S_OK;
+                                    }).Get(),nullptr);
+
                             return S_OK;
                         }).Get());
                 return S_OK;
