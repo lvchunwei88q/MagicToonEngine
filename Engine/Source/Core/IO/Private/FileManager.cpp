@@ -66,12 +66,23 @@ namespace IO {
         file.write(data.data(), data.size());
     }
 
-    bool FileManager::DeleteFile(const std::wstring& path) {
+    bool FileManager::DeleteToFile(const std::wstring& path) {
         fs::path p(path);
         if (fs::is_regular_file(p)) {
             return fs::remove(p);
         }
         return false;
+    }
+
+    bool FileManager::DeleteToDirectory(const std::wstring& path) {
+        fs::path p(path);
+        std::error_code ec;
+
+        if (fs::is_directory(p)) {
+            fs::remove_all(p, ec);  // 删除文件夹及其所有内容
+            return !ec;
+        }
+        return false;  // 不是文件夹，返回 false
     }
 
     bool FileManager::MakeFile(const std::wstring& path) {

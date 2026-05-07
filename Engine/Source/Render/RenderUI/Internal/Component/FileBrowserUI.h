@@ -22,7 +22,7 @@ namespace RenderUI {
 
 	struct FileTypeContext {
 		bool IsFolder;
-		fs::path entry;
+		fs::path entry_path;
 	};
 
 	class FileBrowserUI : public SubsystemTemplate<FileBrowserUI,Core::SubsystemContext::Priority::Low>
@@ -45,14 +45,24 @@ namespace RenderUI {
 		void DrawDirectoryTree(std::wstring path);
 
 		bool IsUnderGameFolder(const fs::path& path);
-		void DoubleClickToEnter(FileTypeContext filetype);
-		std::wstring GetAbsolutePath(const std::wstring& currentPath);
-		std::wstring ToGameRelative(const std::wstring& absolutePath);
+		void DoubleClickToEnter(FileTypeContext Context);
+		void RightClickMenuBar();
+		void RightClickMenuBar_File(FileTypeContext Context);
 
 		EngineAssetType GetFileType(const fs::directory_entry& entry);
 		ID3D11ShaderResourceView* GetFileIcon(EngineAssetType filetype, bool isHovered);
 
 		void FileContentAreaInput(); // 控制文件内容区域输入
+
+		void NewFolder();
+		void DeleteFolderOrFile(std::wstring Terget,bool isfile = false);
+
+		// FileOperations
+		void FileOperations(FileTypeContext Context);
+
+	public: // ---------------------------- function API
+		std::wstring GetAbsolutePath(const std::wstring& currentPath);
+		std::wstring ToGameRelative(const std::wstring& absolutePath);
 	private:
 		ContentBrowserState state;
 

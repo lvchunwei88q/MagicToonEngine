@@ -5,6 +5,7 @@ namespace RenderUI {
 		enum class OpenTools {
 			NOT,
 			FBXImport,
+			NewFolder,
 
 		};
 
@@ -18,4 +19,5 @@ namespace RenderUI {
 	void OpenToolsWindow(OpenToolsWindows::OpenTools toolwindow);
 
 	void DrawFBXImportWindow();
+	void DrawNewFolderWindow();
 }

@@ -35,5 +35,11 @@ namespace EngineScene {
 			m_Icons[EngineAssetType::File] = { "engineasset_editor_hover_default_file", "engineasset_editor_default_file" };
 		}
 
+		{
+			std::wstring content_folder = content + L"\\Editor\\ion_return_up_back.png";
+			RenderCore::LoadTextureFromFile(content_folder.c_str(), "engineasset_editor_return_back");
+			m_Icons[EngineAssetType::Return] = { "engineasset_editor_return_back", "engineasset_editor_return_back" };
+		}
+
 	}
 }

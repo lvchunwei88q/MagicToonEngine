@@ -29,7 +29,10 @@ namespace IO {
         static void AppendBytes(const std::wstring& path, const std::vector<char>& data);
 
         // 删除文件
-        static bool DeleteFile(const std::wstring& path);
+        static bool DeleteToFile(const std::wstring& path);
+
+        // 删除文件夹
+        static bool DeleteToDirectory(const std::wstring& path);
 
         // 创建空文件（如果文件已存在则更新其时间戳）
         static bool MakeFile(const std::wstring& path);

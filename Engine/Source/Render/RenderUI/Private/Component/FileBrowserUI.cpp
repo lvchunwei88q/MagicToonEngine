@@ -12,6 +12,7 @@
 #include <functional>
 #include <vector>
 #include <string>
+#include <DrawToolsWindows.h>
 
 namespace RenderUI {
     AUTO_REGISTER(FileBrowserUI)
@@ -65,6 +66,39 @@ namespace RenderUI {
                     strcpy_s(pathBuffer, curPath.c_str());
                 }
             }
+
+            ImGui::SameLine();
+            {
+                ImVec2 cursorPos = ImGui::GetCursorScreenPos(); // Get Render Postion
+
+                ImGui::SetCursorScreenPos(cursorPos);
+                ImGui::InvisibleButton("##Return-Navigation-bar", ImVec2(25, 25));
+
+                bool isHovered = ImGui::IsItemHovered();
+                ID3D11ShaderResourceView* Icon = GetFileIcon(EngineAssetType::Return, isHovered);
+
+                ImGui::SetCursorScreenPos(cursorPos);
+                ImGui::Image(
+                    (ImTextureID)(uintptr_t)Icon,
+                    ImVec2(25, 25)
+                );
+
+                if (isHovered && ImGui::IsMouseClicked(0))
+                {
+                    // return
+                    // 如果已经是 "Game\\"，不再往上
+                    if (state.currentPath == L"Game\\")
+                    {
+                        LOG_INFO("The path to reach the top");
+                    }
+                    else {
+                        fs::path p(state.currentPath);
+                        fs::path parent = p.parent_path();
+                        // 如果是只有Game（Root）那么加入一个\\否则不加
+                        state.currentPath = parent.wstring() == L"Game" ? parent.wstring() + L"\\" : parent.wstring();
+                    }
+                }
+            }
         }
         ImGui::Separator();
 
@@ -109,6 +143,7 @@ namespace RenderUI {
                 {
                     FilePos = ImGui::GetCursorPos();
                     FileContentAreaInput();
+                    RightClickMenuBar(); // 右键菜单
                     this->File();
                 }
                 ImGui::EndChild();
@@ -194,6 +229,10 @@ namespace RenderUI {
 
             EngineAssetType FileType = GetFileType(entry);
 
+            FileTypeContext context;
+            context.entry_path = entry.path();
+            context.IsFolder = FileType == EngineAssetType::Folder;
+
             // New Line
             if (itemIndex % columns != 0) ImGui::SameLine(0, Zspacing);
 
@@ -216,9 +255,11 @@ namespace RenderUI {
                     ImVec2(ZitemSize, ZitemSize)
                 );
 
+                RightClickMenuBar_File(context); // bind 右键菜单
+
                 if (isHovered)
                 {
-                    DoubleClickToEnter({ FileType == EngineAssetType::Folder, entry.path()});
+                    DoubleClickToEnter(context);
                 }
 
                 // FileName
@@ -241,20 +282,70 @@ namespace RenderUI {
         return native.starts_with(L"Game\\") || native.starts_with(L"Game/");
     }
 
-    void FileBrowserUI::DoubleClickToEnter(FileTypeContext filetype)
+    void FileBrowserUI::DoubleClickToEnter(FileTypeContext Context)
     {
         if (ImGui::IsMouseDoubleClicked(0))
         {
-            if(filetype.IsFolder)
-                state.currentPath = ToGameRelative(filetype.entry.wstring());
+            if(Context.IsFolder)
+                state.currentPath = ToGameRelative(Context.entry_path.wstring());
             else {
-                if (filetype.entry.extension() != "") { // TODO file type 
-                    // not
+                if (Context.entry_path.extension() != "") { // TODO file type 
+                    FileOperations(Context);
                 }
                 else {
                     LOG_WARNING("Unrecognized file type!");
                 }
             }
+        }
+    }
+
+    void FileBrowserUI::RightClickMenuBar()
+    {
+        if (ImGui::BeginPopupContextWindow("FileBrowser_RightClickMenu",
+            ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverExistingPopup))
+        {
+            // 空白区域菜单
+            if (ImGui::MenuItem("Reset Size")) {
+                LOG_INFO("Reset Size for file browser...");
+                Switch.filebrowserconfig.Zoom = 1.0f;
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::BeginMenu("New")) {
+                if (ImGui::MenuItem("Folder")) { NewFolder(); }
+                // TODO more type
+                // if (ImGui::MenuItem("Material")) { ... }
+                // if (ImGui::MenuItem("Script")) { ... }
+                ImGui::EndMenu();
+            }
+
+            ImGui::Separator();
+            ImGui::EndPopup();
+        }
+    }
+
+    void FileBrowserUI::RightClickMenuBar_File(FileTypeContext Context)
+    {
+        if (ImGui::BeginPopupContextItem("FileItemMenu"))
+        {
+            if (ImGui::MenuItem("Open")) {
+                if (Context.IsFolder) { // open
+                    state.currentPath = ToGameRelative(Context.entry_path.wstring());
+                }
+                else {
+                    FileOperations(Context);
+                }
+            }
+            if (ImGui::MenuItem("Delete")) {
+                if (Context.IsFolder) {
+                    DeleteFolderOrFile(Context.entry_path.filename().wstring());
+                }
+                else {
+                    DeleteFolderOrFile(Context.entry_path.filename().wstring(),true);
+                }
+            }
+            ImGui::EndPopup();
         }
     }
 
@@ -324,6 +415,31 @@ namespace RenderUI {
         }
 
         debouncer.tick();
+    }
+
+    void FileBrowserUI::NewFolder()
+    {
+        OpenToolsWindow(OpenToolsWindows::OpenTools::NewFolder);
+    }
+
+    void FileBrowserUI::DeleteFolderOrFile(std::wstring Terget, bool isfile)
+    {
+        std::wstring path = GetAbsolutePath(state.currentPath);
+        path += L"\\" + Terget;
+
+        if (isfile) {
+            LOG_INFO("Delete File:" + IO::Converter::ToNarrowString(Terget));
+            IO::FileManager::DeleteToFile(path);
+        }
+        else {
+            LOG_INFO("Delete Folder:" + IO::Converter::ToNarrowString(Terget));
+            IO::FileManager::DeleteToDirectory(path);
+        }
+    }
+
+    void FileBrowserUI::FileOperations(FileTypeContext Context)
+    {
+        // TODO File Operation
     }
 
     //------------------------------------------------------

@@ -5,7 +5,8 @@ namespace EngineScene {
 
     enum class EngineAssetType {
         Folder,
-        File
+        File,
+        Return,
     };
 
     struct EngineAssetPair {

@@ -29,6 +29,9 @@ namespace RenderUI {
 			case OpenToolsWindows::OpenTools::FBXImport:
 				DrawFBXImportWindow();
 			break;
+			case OpenToolsWindows::OpenTools::NewFolder:
+				DrawNewFolderWindow();
+				break;
 		default:
 			break;
 		}
