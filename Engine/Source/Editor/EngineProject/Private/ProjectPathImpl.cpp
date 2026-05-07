@@ -66,10 +66,10 @@ namespace EngineProject {
 	{
 		std::wstring root = IO::AbsolutePath::Get().GetCurrentWorkingDirectory();
 
-		root += "\\" ProjectJSONName;
+		std::wstring project_config = root + L"\\" ProjectJSONName;
 
-		if (IO::FileManager::Exists(root)) {
-			std::string dump = IO::FileManager::ReadAllText(root);
+		if (IO::FileManager::Exists(project_config)) {
+			std::string dump = IO::FileManager::ReadAllText(project_config);
 			JSON project = JSON::parse(dump);
 
 			std::string engine_version = Core::Core::GetVersion();
@@ -77,7 +77,11 @@ namespace EngineProject {
 
 			if (IsVersionCompatible(engine_version, project_version)) {
 				// 当前引擎版本 >= x.x.x.x，通过
-				return true;
+				std::string_view item_content = magic_enum::enum_name(ProJectDirEnum::Content);
+				std::wstring witem_content = root + L"\\" + IO::Converter::ToWideString(std::string(item_content));
+				if (IO::FileManager::Exists(witem_content)) { // 必要目录存在
+					return true;
+				}
 			}
 		}
 		return false;
