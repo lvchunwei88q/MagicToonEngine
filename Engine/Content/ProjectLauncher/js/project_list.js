@@ -1,6 +1,7 @@
 const card_context = {
     name: "",
-    version: ""
+    version: "",
+    path: ""
 };
 
 function claer_project_card(){
@@ -11,8 +12,11 @@ function new_project_card(card_context){
     document.getElementById("cards").innerHTML += 
     `
         <div class="card-container">
-            <div id="card">
-                <div class="card-content">
+            <div class="card">
+                <div class="card-content"
+                     data-name=${card_context.name} 
+                     data-version=${card_context.version} 
+                     data-path=${card_context.path}>
                 ${card_context.name}<br>Version: ${card_context.version}
                 </div>
             </div>

@@ -117,7 +117,7 @@
   height: 245px;
 }
 
-#card {
+.card {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -137,7 +137,7 @@
 }
 
 /* 黑色遮罩 */
-#card::after {
+.card::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -148,7 +148,7 @@
 }
 
 /* 卡片内容要在遮罩上面 */
-#card .card-content {
+.card .card-content {
   position: relative;
   z-index: 2;
 }

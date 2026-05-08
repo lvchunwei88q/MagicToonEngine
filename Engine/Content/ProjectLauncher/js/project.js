@@ -1,14 +1,39 @@
 let engine_version = "0.0.0.0";
 
+function isValidPath(str) {
+    if (!str || typeof str !== 'string') return false;
+    
+    str = str.trim();
+    if (!str) return false;
+    
+    // 检查非法字符
+    const illegalChars = /[<>"|?*]/;
+    if (illegalChars.test(str)) return false;
+    
+    // 检查是否为路径格式
+    const pathRegex = /^([a-zA-Z]:[\\\/]|\\\\|\.{1,2}[\\\/]|\/[^\/])/;
+    return pathRegex.test(str);
+}
+
 function new_project() {
     const path = document.getElementById("projectPath").value.trim();
     const name = document.getElementById("projectName").value.trim();
     if (!path) {
-        alert("请输入项目路径");
+        popup.show('请输入项目路径', { 
+            type: 'warning',
+        });
+        return;
+    }
+    if (!isValidPath(path)) {
+        popup.show('请输入正确项目路径', { 
+            type: 'warning',
+        });
         return;
     }
     if (!name) {
-        alert("请输入项目名称");
+        popup.show('请输入项目名称', { 
+            type: 'warning',
+        });
         return;
     }
 
@@ -33,7 +58,8 @@ function bind_project_list() {
                 const element = lists[index];
                 new_project_card({
                     name: element.name,
-                    version: element.version
+                    version: element.version,
+                    path: element.path
                 });
             }
         }
@@ -66,10 +92,49 @@ function bind_browse_path() {
     });
 }
 
+function bind_project_event() {
+    window.chrome.webview.addEventListener('message', (event) => {
+        const data = event.data;
+        
+        if (data.action === 'project_create_success') {
+            popup.show('项目创建成功', { 
+                type: 'success',
+                title: '完成' ,
+                duration: 2500
+            });
+            document.getElementById("projectPath").value = "";
+            document.getElementById("projectName").value = "";
+        }else if(data.action === 'project_refresh'){
+            popup.show('项目出现变动', { 
+                type: 'warning',
+                title: '注意' ,
+                duration: 5000
+            });
+        }else if(data.action === 'project_existence'){
+            popup.show('项目创建失败，已存在相同的项目！', { 
+                type: 'error',
+                title: '注意' ,
+                duration: 5000
+            });
+        }
+    });
+}
+
 function browse(){
     if (window.chrome && window.chrome.webview) {
         window.chrome.webview.postMessage(JSON.stringify({
             action: "web_browse"
+        }));
+    }
+}
+
+// open project
+function open_project(context){
+    if (window.chrome && window.chrome.webview) {
+        window.chrome.webview.postMessage(JSON.stringify({
+            action: "web_open_project",
+            path:context.path,
+            name:context.name,
         }));
     }
 }

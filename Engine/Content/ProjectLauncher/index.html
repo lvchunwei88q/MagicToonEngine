@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Launcher</title>
     <link rel="stylesheet" href="css/container.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/control.css">
@@ -85,6 +84,7 @@
         </main>
     </div>
 </body>
+<script src="js/popup.js"></script>
 <script src="js/panel_nav.js"></script>
 <script src="js/project.js"></script>
 <script src="js/project_list.js"></script>
@@ -95,6 +95,8 @@
     bind_engine_version();
     bind_browse_path();
     bind_project_list();
+    bind_project_event();
+    bind_project_card_click();
     send_to_cpp_ready(); // 就绪
 </script>
 </html>

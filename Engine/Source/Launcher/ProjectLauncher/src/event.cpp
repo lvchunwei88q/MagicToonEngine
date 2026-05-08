@@ -144,6 +144,11 @@ void Operation(JSON json)
 		msg["path"] = IO::Converter::ToNarrowString(BrowseFolder(g_hwnd));
 		SendJSONToJS(msg);
 	}
+	else if (action == "web_open_project") {
+		std::string name = json["name"];
+		std::string path = json["path"];
+		OpenProject(path, name);
+	}
 }
 
 using namespace EngineProject;
@@ -164,10 +169,23 @@ void NewProJect(std::string path, std::string name)
 		j["version"] = Core::Core::GetVersion();
 		ProjectList::Get().add(j);
 
-		JSON list = ProjectList::Get().GetInfos();
+		{
+			JSON list = ProjectList::Get().GetInfos();
+			JSON msg;
+			msg["action"] = "project_list";
+			msg["list"] = list;
+			SendJSONToJS(msg);
+		}
+
+		{
+			JSON msg;
+			msg["action"] = "project_create_success";
+			SendJSONToJS(msg);
+		}
+	}
+	else {
 		JSON msg;
-		msg["action"] = "project_list";
-		msg["list"] = list;
+		msg["action"] = "project_existence";
 		SendJSONToJS(msg);
 	}
 }

@@ -74,3 +74,4 @@ extern size_t scan_old_info_size;
 // tools function
 void Operation(JSON json);
 void NewProJect(std::string path, std::string name);
+void OpenProject(std::string path, std::string name);

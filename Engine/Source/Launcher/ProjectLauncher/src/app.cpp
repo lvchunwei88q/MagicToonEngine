@@ -114,6 +114,7 @@ void ProjectList::scan()
         }
     }
 
+    save();
     scan_ready = true;
 }
 
@@ -209,6 +210,12 @@ void SendJSONToJS(const JSON& json) {
     }
 }
 
+void OpenProject(std::string path, std::string name) {
+    std::wstring src = IO::AbsolutePath::Get().GetContentPath() + L"\\ProjectLauncher\\loading.html";
+    g_webview->Navigate(src.c_str());
+    // TODO
+}
+
 void Tick()
 {
     // scan
@@ -217,11 +224,19 @@ void Tick()
         scan_ready = false;
         // scan 完成
         if (scan_old_info_size != ProjectList::Get().GetSize()) {
-            JSON list = ProjectList::Get().GetInfos();
-            JSON msg;
-            msg["action"] = "project_list";
-            msg["list"] = list;
-            SendJSONToJS(msg);
+            
+            {
+                JSON list = ProjectList::Get().GetInfos();
+                JSON msg;
+                msg["action"] = "project_list";
+                msg["list"] = list;
+                SendJSONToJS(msg);
+            }
+            {
+                JSON msg;
+                msg["action"] = "project_refresh";
+                SendJSONToJS(msg);
+            }
         }
     }
     // ....
