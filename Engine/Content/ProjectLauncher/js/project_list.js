@@ -3,6 +3,10 @@ const card_context = {
     version: ""
 };
 
+function claer_project_card(){
+    document.getElementById("cards").innerHTML = "";
+}
+
 function new_project_card(card_context){
     document.getElementById("cards").innerHTML += 
     `

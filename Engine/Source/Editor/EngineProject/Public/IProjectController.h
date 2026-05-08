@@ -18,6 +18,9 @@ namespace EngineProject {
 
 		// 指定项目 - 引擎当前的项目
 		virtual void SpecifyProJect(ProJectConfig& config) = 0;
+
+		// 判断这个项目是否完整
+		virtual bool ProjectComplete(ProJectConfig& config) = 0;
 	};
 
 	ENGINEPROJECT_API IProjectController* GetProjectControllerInterface();

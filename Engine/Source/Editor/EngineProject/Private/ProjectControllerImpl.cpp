@@ -22,7 +22,7 @@ namespace EngineProject {
 		std::wstring ProjectPath = IO::Converter::ToWideString(config.path);
 		std::wstring ProjectName = IO::Converter::ToWideString(config.name);
 		if (IO::FileManager::Exists(ProjectPath)) {
-			IO::FileManager::MakeDirectory(ProjectName);
+			IO::FileManager::MakeDirectory(ProjectPath + L"\\" + ProjectName);
 
 			// enum list
 			constexpr auto all_types = magic_enum::enum_values<ProJectDirEnum>();
@@ -54,5 +54,27 @@ namespace EngineProject {
 		std::wstring WorkingDir = IO::Converter::ToWideString(config.path) + L"\\";
 		WorkingDir += IO::Converter::ToWideString(config.name) + L"\\";
 		SetCurrentDirectoryW(WorkingDir.c_str());
+	}
+
+	bool ProjectControllerImpl::ProjectComplete(ProJectConfig& config)
+	{
+		std::wstring pathw = IO::Converter::ToWideString(config.path);
+		std::wstring namew = IO::Converter::ToWideString(config.name);
+		std::wstring root = pathw + L"\\" + namew;
+
+		std::wstring project_config = root + L"\\" ProjectJSONName;
+
+		if (IO::FileManager::Exists(project_config)) {
+			for (auto dir : RequiredDirs) {
+				std::string_view name = magic_enum::enum_name(dir);
+				std::wstring path = root + L"\\" + IO::Converter::ToWideString(std::string(name));
+
+				if (!IO::FileManager::Exists(path)) {// 必要目录存在
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 }

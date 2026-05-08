@@ -3,6 +3,8 @@
     padding: 0;
     box-sizing: border-box;
 
+    user-select: none;
+
     scrollbar-width: thin;
     scrollbar-color: rgba(120, 100, 220, 0.3) rgba(0, 0, 0, 0.2);
 }

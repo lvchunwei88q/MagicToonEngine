@@ -4,6 +4,7 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     const wchar_t* CLASS = L"Project Launcher";
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // 初始化 COM
+    ProjectList::Get().init();
 
     WNDCLASSW wc = {};
     wc.lpfnWndProc = WndProc;
@@ -30,11 +31,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     ShowWindow(hwnd, SW_SHOWMINIMIZED);
 
     MSG msg;
-    while (GetMessageW(&msg, nullptr, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessageW(&msg);
-    }
+    while (true) {
+        // 有消息处理消息，没消息执行 Tick
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT) {
+                goto exit_loop;  // 或 return
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
 
+        // 空闲时执行 Tick
+        Tick();  // 你的逻辑
+    }
+    exit_loop:
+
+    ProjectList::Get().close();
     CoUninitialize();
     return 0;
 }

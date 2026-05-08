@@ -77,11 +77,15 @@ namespace EngineProject {
 
 			if (IsVersionCompatible(engine_version, project_version)) {
 				// 当前引擎版本 >= x.x.x.x，通过
-				std::string_view item_content = magic_enum::enum_name(ProJectDirEnum::Content);
-				std::wstring witem_content = root + L"\\" + IO::Converter::ToWideString(std::string(item_content));
-				if (IO::FileManager::Exists(witem_content)) { // 必要目录存在
-					return true;
+				for (auto dir : RequiredDirs) {
+					std::string_view name = magic_enum::enum_name(dir);
+					std::wstring path = root + L"\\" + IO::Converter::ToWideString(std::string(name));
+
+					if (!IO::FileManager::Exists(path)) {// 必要目录存在
+						return false;
+					}
 				}
+				return true;
 			}
 		}
 		return false;

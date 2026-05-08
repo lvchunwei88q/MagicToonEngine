@@ -40,6 +40,9 @@ namespace IO {
         // 移动/重命名文件或目录
         static bool MoveFile(const std::wstring& src, const std::wstring& dst);
 
+        // 获取文件的目录
+        static bool GetFileDirectory(const std::wstring& src, std::wstring& dst);
+
         // 创建目录（包括父目录）
         static bool MakeDirectory(const std::wstring& path);
 

@@ -1,18 +1,132 @@
 #include "Main.h"
-#include <AbsolutePath.h>
-
+#include <FileManager.h>
 #include <WebView2/WebView2.h>
+#include <IProjectController.h>
 
 #include <wrl/client.h> 
 #include <wrl/event.h>
 #include <string>
+#include <unordered_set>
 
 using namespace Microsoft::WRL;
 
 HWND g_hwnd = nullptr;
+std::atomic<bool> scan_ready(false);
+size_t scan_old_info_size;
 ComPtr<ICoreWebView2Controller> g_controller;
 ComPtr<ICoreWebView2> g_webview;
 CallbackFunc WebViewSuccess = SHOW_WINDOW;
+
+void ProjectList::init()
+{
+    std::wstring exe_path =  IO::AbsolutePath::Get().GetExecutableDirectory();
+    config_path = exe_path + L"\\" PTAH_JSON;
+
+    if (IO::FileManager::Exists(config_path))
+    {
+        std::string Dump = IO::FileManager::ReadAllText(config_path);
+
+        if (!Dump.empty()) {
+            try
+            {
+                JSON items = JSON::parse(Dump);
+                for (const auto& item : items) {
+                    ProjectInfo Info;
+                    Info.fromJson(item);
+                    infos.push_back(Info);
+                }
+            }
+            catch (const std::exception&)
+            {
+                OutputDebugStringA("JSON parsing failed!");
+            }
+            
+        }
+    }
+}
+
+void ProjectList::close()
+{
+    save();
+}
+
+void ProjectList::add(JSON J)
+{
+    ProjectInfo Info;
+    Info.fromJson(J);
+    infos.push_back(Info);
+
+    save();
+}
+
+void ProjectList::save()
+{
+    JSON arr = JSON::array();
+    for (auto& info : infos) {
+        JSON j_info = info.toJson();
+        arr.push_back(j_info);
+    }
+    std::string jsonStr = arr.dump();
+
+    std::wstring config_dir;
+    if (IO::FileManager::GetFileDirectory(config_path, config_dir)) {
+        IO::FileManager::MakeDirectory(config_dir);
+        IO::FileManager::MakeFile(config_path);
+        IO::FileManager::WriteAllText(config_path, jsonStr);
+    }
+}
+
+JSON ProjectList::GetInfos()
+{
+    JSON arr = JSON::array();
+    for (auto& info : infos) {
+        JSON j_info = info.toJson();
+        arr.push_back(j_info);
+    }
+    return arr;
+}
+
+void ProjectList::scan()
+{
+    // ------------------------------------------- 去重
+    std::vector<ProjectInfo> result;
+    std::unordered_set<std::string> seen;
+    for (auto& info : infos) {
+        std::string key = info.name + "|" + info.path;  // 组合键
+        if (seen.find(key) == seen.end()) {
+            seen.insert(key);
+            result.push_back(info);
+        }
+    }
+    infos = std::move(result);
+
+    // ------------------------------------------- 项目是否完整
+    for (auto it = infos.begin(); it != infos.end(); ) {
+        EngineProject::ProJectConfig config;
+        config.name = it->name;
+        config.path = it->path;
+
+        if (!EngineProject::GetProjectControllerInterface()->ProjectComplete(config)) {
+            it = infos.erase(it); 
+        }
+        else {
+            ++it;  // 继续下一个
+        }
+    }
+
+    scan_ready = true;
+}
+
+bool ProjectList::Existence(std::string path, std::string name)
+{
+    for (auto& info : infos)
+    {
+        if (info.name == name && info.path == path) {
+            return true;
+        }
+    }
+    return false;
+}
 
 void init_app(HWND hwnd) {
     g_hwnd = hwnd;
@@ -85,4 +199,30 @@ void SHOW_WINDOW()
     ShowWindow(g_hwnd, SW_SHOWNORMAL);  // 激活并显示，恢复原有大小
     SetForegroundWindow(g_hwnd);
     UpdateWindow(g_hwnd);
+}
+
+void SendJSONToJS(const JSON& json) {
+    if (g_webview) {
+        std::string jsonStr = json.dump();
+        std::wstring wJsonStr(jsonStr.begin(), jsonStr.end());
+        g_webview->PostWebMessageAsJson(wJsonStr.c_str());
+    }
+}
+
+void Tick()
+{
+    // scan
+    if (scan_ready)
+    {
+        scan_ready = false;
+        // scan 完成
+        if (scan_old_info_size != ProjectList::Get().GetSize()) {
+            JSON list = ProjectList::Get().GetInfos();
+            JSON msg;
+            msg["action"] = "project_list";
+            msg["list"] = list;
+            SendJSONToJS(msg);
+        }
+    }
+    // ....
 }

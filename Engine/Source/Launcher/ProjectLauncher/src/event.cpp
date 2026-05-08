@@ -1,5 +1,10 @@
 #include "Main.h"
+#include <shobjidl.h>
+#include <Converter.h>
+
 #include <IProjectController.h>
+#include <Core.h>
+#include <thread>
 
 // 全局变量
 bool g_isDragging = false;
@@ -33,6 +38,7 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
     }
     return CallNextHookEx(g_mouseHook, nCode, wParam, lParam);
 }
+
 void StartDrag(HWND hwnd) {
 	g_isDragging = true;
 	GetCursorPos(&g_lastMousePos);
@@ -49,6 +55,34 @@ void StopDrag() {
 		UnhookWindowsHookEx(g_mouseHook);
 		g_mouseHook = nullptr;
 	}
+}
+
+std::wstring BrowseFolder(HWND hwnd) {
+	IFileDialog* pfd = nullptr;
+	std::wstring result;
+
+	HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC,
+		IID_PPV_ARGS(&pfd));
+	if (SUCCEEDED(hr)) {
+		DWORD dwOptions;
+		pfd->GetOptions(&dwOptions);
+		pfd->SetOptions(dwOptions | FOS_PICKFOLDERS);
+
+		// 显示对话框
+		hr = pfd->Show(hwnd);
+		if (SUCCEEDED(hr)) {
+			IShellItem* psi;
+			pfd->GetResult(&psi);
+
+			PWSTR pszPath;
+			psi->GetDisplayName(SIGDN_FILESYSPATH, &pszPath);
+			result = pszPath;
+			CoTaskMemFree(pszPath);
+			psi->Release();
+		}
+		pfd->Release();
+	}
+	return result;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -79,9 +113,36 @@ void Operation(JSON json)
 	}
 	else if(action == "web_ready") {
 		WebViewSuccess(); // show
+		{
+			JSON j = ProjectList::Get().GetInfos();
+			JSON msg;
+			msg["action"] = "project_list";
+			msg["list"] = j;
+			SendJSONToJS(msg);
+		}
+		{
+			JSON msg;
+			msg["action"] = "engine_version";
+			msg["version"] = Core::Core::GetVersion();
+			SendJSONToJS(msg);
+		}
 	}
 	else if (action == "start_drag") {
 		StartDrag(g_hwnd);
+	}else if(action == "web_close") {
+		PostQuitMessage(0);
+	}
+	else if (action == "web_scan_project") {
+		scan_ready = false;
+		scan_old_info_size = ProjectList::Get().GetSize();
+		std::thread t(&ProjectList::scan, &ProjectList::Get());
+		t.detach();
+	}
+	else if (action == "web_browse") {
+		JSON msg;
+		msg["action"] = "browse_path";
+		msg["path"] = IO::Converter::ToNarrowString(BrowseFolder(g_hwnd));
+		SendJSONToJS(msg);
 	}
 }
 
@@ -89,10 +150,24 @@ using namespace EngineProject;
 
 void NewProJect(std::string path, std::string name)
 {
-	IProjectController* controller = GetProjectControllerInterface();
+	if (!ProjectList::Get().Existence(path, name)) {
+		IProjectController* controller = GetProjectControllerInterface();
 
-	ProJectConfig config;
-	config.name = name;
-	config.path = path;
-	controller->Create(config);
+		ProJectConfig config;
+		config.name = name;
+		config.path = path;
+		controller->Create(config);
+
+		JSON j;
+		j["name"] = name;
+		j["path"] = path;
+		j["version"] = Core::Core::GetVersion();
+		ProjectList::Get().add(j);
+
+		JSON list = ProjectList::Get().GetInfos();
+		JSON msg;
+		msg["action"] = "project_list";
+		msg["list"] = list;
+		SendJSONToJS(msg);
+	}
 }

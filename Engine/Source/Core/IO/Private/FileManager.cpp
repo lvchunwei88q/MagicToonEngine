@@ -115,6 +115,16 @@ namespace IO {
         }
     }
 
+    bool FileManager::GetFileDirectory(const std::wstring& src, std::wstring& dst)
+    {
+        size_t pos = src.find_last_of(L"\\");
+        if (pos != std::wstring::npos) {
+            dst = src.substr(0, pos);
+            return true;
+        }
+        return false;
+    }
+
     bool FileManager::MakeDirectory(const std::wstring& path) {
         fs::path p(path);
         if (fs::exists(p)) {

@@ -41,6 +41,14 @@
                     </svg>
                 </span> 设置
             </button>
+
+            <button class="nav-btn" data-panel="exit" onclick="Close()">
+                <span class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512">
+                        <path fill="#fff" fill-rule="evenodd" d="m256 42.668l192 106.667v119.162l-4.419-4.418l-38.248 38.248V190.401l-128 73.899v143.915l44.776-25.767l1.552 1.551l-59.583 59.583l13.669 13.669L256 469.335L64 362.668V149.335zM106.667 191.596v143.006l128 73.613v-142.72zM256 89.949l-120.256 69.156l119.232 68.843l120.235-69.419zm217.753 234.47l-59.58 59.58l59.582 59.583l-30.17 30.17l-59.582-59.583l-59.583 59.583l-30.17-30.17l59.583-59.583l-59.581-59.58l30.17-30.17l59.581 59.58l59.58-59.58z" clip-rule="evenodd" />
+                    </svg>
+                </span> 退出
+            </button>
         </nav>
 
         <!-- 右侧面板 -->
@@ -49,8 +57,15 @@
             <div class="panel-card active" id="panel-project">
                 <h2>新建项目</h2>
                 <p>输入项目路径以创建新的工程目录。</p>
-                <input type="text" id="projectPath" class="input-path" placeholder="输入项目路径...">
-                <button class="nml-btn" onclick="new_project()">Open NewProJect</button>
+                <div id="project_config">
+                    <h2>Engine Version: <span class="version">0.0.0.0</span></h2>
+                    <hr style="margin-bottom: 10px;border-color: rgb(100, 100, 100);">
+                    <input type="text" id="projectPath" class="input" style="width: 80%;" placeholder="输入项目路径...">
+                    <button class="nml-btn" style="width: 19%; text-align: center;" onclick="browse()">浏览</button>
+                    <input type="text" id="projectName" class="input" placeholder="输入项目名称...">
+                    <hr style="margin-bottom: 10px;border-color: rgb(100, 100, 100);">
+                    <button class="nml-btn" onclick="new_project()">Open NewProJect</button>
+                </div>
             </div>
 
             <!-- 打开项目 -->
@@ -58,6 +73,7 @@
                 <h2>打开项目</h2>
                 <p>浏览并打开已有的项目文件。</p>
                 <div id="cards">
+                    <!-- card -->
                 </div>
             </div>
 
@@ -76,14 +92,9 @@
 <script>
     bind_panel_nav_event();
     bind_windows_event();
+    bind_engine_version();
+    bind_browse_path();
+    bind_project_list();
     send_to_cpp_ready(); // 就绪
-
-    for (let index = 0; index < 10; index++) {
-        new_project_card({
-            name: "aaa",
-            version:"0.0.1.2"
-        });
-        
-    }
 </script>
 </html>
