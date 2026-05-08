@@ -18,6 +18,7 @@ void init_app(HWND hwnd);
 void SHOW_WINDOW();
 
 extern CallbackFunc WebViewSuccess;
+extern HWND g_hwnd;
 
 // tools function
 void Operation(JSON json);

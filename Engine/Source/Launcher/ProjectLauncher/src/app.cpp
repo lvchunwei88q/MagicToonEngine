@@ -54,7 +54,7 @@ void init_app(HWND hwnd) {
                             g_webview->add_NavigationCompleted(
                                 Callback<ICoreWebView2NavigationCompletedEventHandler>(
                                     [](ICoreWebView2* sender, ICoreWebView2NavigationCompletedEventArgs* args) -> HRESULT {
-                                        WebViewSuccess();
+                                        //WebViewSuccess(); 我们使用web 中的就绪回调
                                         return S_OK;
                                     }).Get(),nullptr);
 

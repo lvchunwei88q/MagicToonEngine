@@ -1,0 +1,95 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120, 100, 220, 0.3) rgba(0, 0, 0, 0.2);
+}
+
+/* webkit单独写 */
+::-webkit-scrollbar {
+    width: 8px !important;
+    height: 8px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(120, 100, 220, 0.5) !important;
+    border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 100, 220, 0.7) !important;
+}
+
+html, body {
+    height: 100%;
+}
+
+/* From Uiverse.io by chris_6688 */ 
+body {
+  width: 100%;
+  height: 100%;
+  background-color: #121212; /* Dark background color */
+  background-image: radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 0
+    ),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 0);
+  background-size:
+    40px 40px,
+    20px 20px,
+    20px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.03) 10px,
+    rgba(255, 255, 255, 0.03) 20px
+  );
+  z-index: 1;
+  opacity: 0.8;
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.07) 1px,
+    transparent 1px
+  );
+  background-size: 60px 60px;
+  z-index: 2;
+  opacity: 0.6;
+}
+
+/* 主容器 */
+.main-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+    z-index: 5; /* min index */
+}
