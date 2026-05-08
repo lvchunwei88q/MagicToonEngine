@@ -5,6 +5,7 @@
 #include <IProjectController.h>
 #include <Core.h>
 #include <thread>
+#include <Window/WindowAppointment.hpp>
 
 // 全局变量
 bool g_isDragging = false;
@@ -96,6 +97,35 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
+
+	case WM_COPYDATA: {
+		PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
+		if (pcds->dwData == MessageTypeNumber_0 && pcds->cbData > 0) {
+			uint8_t* pData = (uint8_t*)pcds->lpData;
+			// 先读 int：字符串长度
+			int nameLen = *(int*)pData;
+			pData += sizeof(int);
+			// 再读 float：进度
+			float percent = *(float*)pData;
+			pData += sizeof(float);
+			// 最后读字符串
+			std::string name((char*)pData, nameLen);
+
+			JSON msg;
+			msg["action"] = "synchronous_value";
+			msg["target"] = name;
+			msg["percent"] = percent;
+			SendJSONToJS(msg);
+
+			if (percent >= 0.99f) {
+				// End
+				Sleep(300);
+				PostQuitMessage(0);
+			}
+			return TRUE;
+		}
+		break;
+	}
 	default:return DefWindowProc(hwnd, msg, wParam, lParam);
 		break;
 	}

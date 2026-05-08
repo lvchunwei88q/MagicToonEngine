@@ -7,6 +7,7 @@
 #include <wrl/event.h>
 #include <string>
 #include <unordered_set>
+#include <Converter.h>
 
 using namespace Microsoft::WRL;
 
@@ -213,7 +214,34 @@ void SendJSONToJS(const JSON& json) {
 void OpenProject(std::string path, std::string name) {
     std::wstring src = IO::AbsolutePath::Get().GetContentPath() + L"\\ProjectLauncher\\loading.html";
     g_webview->Navigate(src.c_str());
-    // TODO
+
+    // 构建 EngineLauncher.exe 路径
+    std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
+    std::wstring exePath = exeDir + L"\\EngineLauncher.exe";
+
+    // 构建命令行参数：-p "path" "name"
+    std::wstring cmdLine = L"\"" + exePath + L"\"";
+    cmdLine += L" -p \"";
+    cmdLine += IO::Converter::ToWideString(path);
+    cmdLine += L"\" \"";
+    cmdLine += IO::Converter::ToWideString(name);
+    cmdLine += L"\"";
+
+    // 启动进程
+    STARTUPINFOW si = { sizeof(si) };
+    PROCESS_INFORMATION pi = {};
+    BOOL success = CreateProcessW(
+        nullptr,
+        &cmdLine[0],
+        nullptr,
+        nullptr,
+        FALSE,
+        0,
+        nullptr,
+        nullptr,
+        &si,
+        &pi
+    );
 }
 
 void Tick()

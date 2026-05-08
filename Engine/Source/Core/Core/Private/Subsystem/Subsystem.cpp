@@ -35,6 +35,10 @@ namespace Core
 		for (size_t i = 0; i < Derived.size(); i++)
 		{
 			auto& it = Derived[i];
+
+			for(auto& IC_Function :IC_Functions)
+				if(IC_Function) IC_Function(it.name.c_str(), it.name.size(), i); // get name and allsize | currentindex
+
 			if (!it.subsystem)
 				assert(it.subsystem && "Subsystem is null during Init!");
 			if (!it.subsystem->Init())
@@ -51,5 +55,13 @@ namespace Core
 				assert(it.subsystem && "Subsystem is null during uninstall!");
 			it.subsystem->Uninstall();
 		}
+	}
+
+	void SubsystemContextImpl::RegisterInitCallbackFunction(Init_Callback Func) {
+		IC_Functions.push_back(std::move(Func));
+	}
+
+	size_t SubsystemContextImpl::Num() {
+		return Derived.size();
 	}
 }

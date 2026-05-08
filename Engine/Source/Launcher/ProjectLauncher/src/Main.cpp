@@ -1,8 +1,9 @@
 #include "Main.h"
 #include <Logo/resource.h>
+#include <Window/WindowAppointment.hpp>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
-    const wchar_t* CLASS = L"Project Launcher";
+    const wchar_t* CLASS = PROJECT_CLASS; // 使用约定名称
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // 初始化 COM
     ProjectList::Get().init();
 

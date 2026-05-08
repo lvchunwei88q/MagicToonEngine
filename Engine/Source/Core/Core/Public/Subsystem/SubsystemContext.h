@@ -1,6 +1,8 @@
 #pragma once
 namespace Core
 {
+	using Init_Callback = void(*)(const char*, size_t, size_t); // Get Subsystem name , name size , index
+
 	class SubsystemContext
 	{
 	public:
@@ -27,5 +29,10 @@ namespace Core
 		virtual void RegisterSubsystem(Context context) = 0;
 		virtual SubsystemError Init() = 0;
 		virtual void Uninstall() = 0;
+
+		// Register Init Callback Function
+		virtual void RegisterInitCallbackFunction(Init_Callback Func) = 0;
+		// Get Subsystem Num
+		virtual size_t Num() = 0;
 	};
 }

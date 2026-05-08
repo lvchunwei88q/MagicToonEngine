@@ -8,6 +8,11 @@ add_executable(EngineLauncher
     ${EngineLauncher_HEADERS}
 )
 
+target_include_directories(EngineLauncher
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/Engine/Content
+)
+
 target_sources(EngineLauncher PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/resources.rc")
 
 target_link_libraries(EngineLauncher PRIVATE 

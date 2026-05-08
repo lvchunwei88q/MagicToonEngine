@@ -13,6 +13,8 @@
 
 #include <ILog.h>
 
+#include <Window/WindowAppointment.hpp>
+
 namespace Editor
 {
 	void Windows::CreateWindows()
@@ -23,7 +25,7 @@ namespace Editor
 
 		// init windows
 		WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_CLASSDC, WindowsProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
-			L"MagicEditorClass", nullptr };
+			ENGINE_CLASS, nullptr }; // 使用约定名称
 		wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
 		::RegisterClassEx(&wc);
 

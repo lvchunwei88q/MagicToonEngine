@@ -4,6 +4,8 @@
 #include <Editor.h>
 #include <IProjectPath.h> // 检测当前是否为项目
 #include <IProjectController.h>
+
+#include <Window/WindowAppointment.hpp> // 通过约定确定Class
 #include <iostream>
 
 #ifdef _DEBUG
@@ -19,6 +21,8 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
     }
 }
 #endif
+
+#include "test.h" // 测试用文件
 
 enum class OperationType {
     NOT,
@@ -72,6 +76,26 @@ int main(int argc, char* argv[])// exe -p path
     }
 
     (void)Editor::Editor::Get(); // 确保Editor初始化比Subsystem早
+
+    // 注册初始化回调函数 发送给启动器(显示启动UI)
+    Core::SubsystemControl::Register_Init_Callback([](const char* target, size_t len, size_t index) {
+        float percent = (float)(index+1) / (float)Core::SubsystemControl::GetNum();
+        int char_len = (int)len;// const char*
+
+        std::vector<uint8_t> data;
+        data.insert(data.end(), (uint8_t*)&char_len, (uint8_t*)&char_len + sizeof(int));
+        data.insert(data.end(), (uint8_t*)&percent, (uint8_t*)&percent + sizeof(float));
+        data.insert(data.end(), target, target + len);
+
+        static HWND hTarget = FindWindowW(PROJECT_CLASS, nullptr);
+        if (!hTarget) return;
+
+        COPYDATASTRUCT cds;
+        cds.dwData = MessageTypeNumber_0;
+        cds.cbData = sizeof(int) + sizeof(float) + char_len;
+        cds.lpData = data.data();
+        SendMessageW(hTarget, WM_COPYDATA, 0, (LPARAM)&cds);
+    });
 
     Core::SubsystemContext::SubsystemError error = Core::SubsystemControl::Init();
     if (!error.error) {

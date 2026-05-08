@@ -126,7 +126,7 @@
   align-items: center;
   border-radius: 5px;
   transition: 700ms;
-  background-image: url(../test/image.png);
+  background-image: url(../img/image.png);
   background-size: cover;
   background-position: center;
   border: 2px solid rgba(255, 255, 255, 0.1);

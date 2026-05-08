@@ -40,8 +40,20 @@ namespace Core
 		static SubsystemContext::SubsystemError Init() {
 			// Initialize all registered subsystems
 			SubsystemContext* Subsystemcontext = GetSubsystemContext();
-			// Subsystemcontext->InitAllSubsystems(); // This would be an API to initialize all subsystems
+			// Subsystemcontext->Init(); // This would be an API to initialize all subsystems
 			return Subsystemcontext->Init();
+		}
+
+		static void Register_Init_Callback(Init_Callback func) {
+			// Register Init _Callback Function
+			SubsystemContext* Subsystemcontext = GetSubsystemContext();
+			Subsystemcontext->RegisterInitCallbackFunction(func);
+		}
+
+		static size_t GetNum() {
+			// Get Subsystem Num
+			SubsystemContext* Subsystemcontext = GetSubsystemContext();
+			return Subsystemcontext->Num();
 		}
 
 		static void Uninstall() {
