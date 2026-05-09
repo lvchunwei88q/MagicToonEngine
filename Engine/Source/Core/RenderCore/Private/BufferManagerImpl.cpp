@@ -2,7 +2,7 @@
 #include <BufferManager.inl>
 #include <RenderContext.h>
 
-#include <ErrorCapture/ErrorCapture.h>
+#include <CoreLogCapture/CoreLogCapture.h>
 
 #include <ostream>
 

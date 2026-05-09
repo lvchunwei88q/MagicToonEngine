@@ -20,8 +20,6 @@ namespace LOG {
         virtual bool Init();
         virtual void Uninstall();
 
-        // 获取流对象
-        virtual void Log(LogLevel level, const char* file, int line, const std::string& message);
         virtual void SwapBuffers(); // 交换缓冲区
         virtual void ClearRecentEntries(); // 清空缓冲区
         virtual const std::deque<LogEntry>& GetEntries() const { 
@@ -31,6 +29,7 @@ namespace LOG {
         virtual std::string GetLevelString(LogLevel level) const;
 
     private:
+        virtual void LogImpl(LogLevel level, const char* file, int line, const std::string& message);
 
         void BackgroundWorker();        // 后台线程工作函数
         void FlushToFile();        // 将缓冲区内容写入文件并清空缓冲区

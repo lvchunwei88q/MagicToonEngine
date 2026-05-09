@@ -395,7 +395,7 @@ namespace RenderUI {
         bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
 
         static Debouncer debouncer(300, []() {
-            LOG_INFO("FileBrowser Zoom changed to: " + std::to_string(Switch.filebrowserconfig.Zoom));
+            LOG_INFO("FileBrowser Zoom changed to: " ,Switch.filebrowserconfig.Zoom);
         });
 
         if (isHovered) {

@@ -1,6 +1,6 @@
 #include <IBufferManager.h>
 #include <RenderContext.h>
-#include <ErrorCapture/ErrorCapture.h>
+#include <CoreLogCapture/CoreLogCapture.h>
 
 #include <WICTextureLoader.h>
 

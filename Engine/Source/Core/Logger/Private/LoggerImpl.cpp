@@ -47,7 +47,7 @@ namespace LOG {
         ClearRecentEntries(); // 清空缓冲区
     }
 
-    void LoggerImpl::Log(LogLevel level, const char* file, int line, const std::string& message) {
+    void LoggerImpl::LogImpl(LogLevel level, const char* file, int line, const std::string& message) {
         // 使用线程局部存储的 ostringstream，保证每次调用独立
         thread_local std::ostringstream oss;
         oss.str("");  // 清空内容

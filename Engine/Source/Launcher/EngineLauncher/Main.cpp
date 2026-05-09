@@ -22,7 +22,7 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
 }
 #endif
 
-#include "test.h" // 测试用文件
+//#include "test.h" // 测试用文件
 
 enum class OperationType {
     NOT,

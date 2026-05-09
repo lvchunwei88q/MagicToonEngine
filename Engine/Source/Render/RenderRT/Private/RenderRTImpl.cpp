@@ -74,7 +74,7 @@ namespace RenderRT {
         static int static_width = 0;
         static int static_height = 0;
         static Debouncer debouncer(500, [&]() {
-            LOG_INFO("Update BufferManager ViewSize: " + std::to_string(static_width) + "-" + std::to_string(static_height));
+            LOG_INFO("Update BufferManager ViewSize: " ,static_width , "-" , static_height);
         });
 
         if (static_width != width || static_height != height) {

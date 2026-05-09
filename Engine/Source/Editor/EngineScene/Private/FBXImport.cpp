@@ -16,7 +16,7 @@ namespace EngineScene {
 		}
 		if (!IO::FileManager::Exists(IO::Converter::ToWideString(settings.path)))
 		{
-			LOG_ERROR(std::string("FBX Import failed: file does not exist - " + settings.path).c_str());
+			LOG_ERROR("FBX Import failed: file does not exist - " , settings.path);
 			return;
 		}
 
@@ -27,27 +27,27 @@ namespace EngineScene {
 
 		if (!scene)
 		{
-			LOG_ERROR(std::string("FBX Import failed: ") + error.description.data);
+			LOG_ERROR("FBX Import failed: ", error.description.data);
 			return;
 		}
 
 		LOG_INFO("FBX file loaded successfully: " + settings.path);
 
 		LOG_INFO("========== FBX Scene Summary ==========");
-		LOG_INFO("Nodes:               " + std::to_string(scene->nodes.count));
-		LOG_INFO("Meshes:              " + std::to_string(scene->meshes.count));
-		LOG_INFO("Materials:           " + std::to_string(scene->materials.count));
-		LOG_INFO("Textures:            " + std::to_string(scene->textures.count));
-		LOG_INFO("Textures Files:      " + std::to_string(scene->texture_files.count));
-		LOG_INFO("Bones:               " + std::to_string(scene->bones.count));
-		LOG_INFO("Empties:             " + std::to_string(scene->empties.count));
-		LOG_INFO("Anim Stacks:         " + std::to_string(scene->anim_stacks.count));
-		LOG_INFO("Anim Layers:         " + std::to_string(scene->anim_layers.count));
-		LOG_INFO("Anim Curves:         " + std::to_string(scene->anim_curves.count));
-		LOG_INFO("Skin Deformers:      " + std::to_string(scene->skin_deformers.count));
-		LOG_INFO("Skin Clusters:       " + std::to_string(scene->skin_clusters.count));
-		LOG_INFO("Blend Deformers:     " + std::to_string(scene->blend_deformers.count));
-		LOG_INFO("Blend Shapes:        " + std::to_string(scene->blend_shapes.count));
+		LOG_INFO("Nodes:               ", scene->nodes.count);
+		LOG_INFO("Meshes:              ", scene->meshes.count);
+		LOG_INFO("Materials:           ", scene->materials.count);
+		LOG_INFO("Textures:            ", scene->textures.count);
+		LOG_INFO("Textures Files:      ", scene->texture_files.count);
+		LOG_INFO("Bones:               ", scene->bones.count);
+		LOG_INFO("Empties:             ", scene->empties.count);
+		LOG_INFO("Anim Stacks:         ", scene->anim_stacks.count);
+		LOG_INFO("Anim Layers:         ", scene->anim_layers.count);
+		LOG_INFO("Anim Curves:         ", scene->anim_curves.count);
+		LOG_INFO("Skin Deformers:      ", scene->skin_deformers.count);
+		LOG_INFO("Skin Clusters:       ", scene->skin_clusters.count);
+		LOG_INFO("Blend Deformers:     ", scene->blend_deformers.count);
+		LOG_INFO("Blend Shapes:        ", scene->blend_shapes.count);
 		//LOG_INFO("Poses:               " + std::to_string(scene->poses.count));
 		LOG_INFO("========================================");
 

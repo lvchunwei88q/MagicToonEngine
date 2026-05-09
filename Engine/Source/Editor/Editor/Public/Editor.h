@@ -17,7 +17,7 @@ namespace Editor
 			Stop = 1,
 		};
 
-		void InitCoreErrorCapture();
+		void InitCoreLogCapture();
 		void SetEngineState(EngineState State);
 
 		void Run();
