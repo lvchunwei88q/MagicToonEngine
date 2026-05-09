@@ -21,6 +21,9 @@ namespace EngineProject {
 
 		// 判断这个项目是否完整
 		virtual bool ProjectComplete(ProJectConfig& config) = 0;
+
+		// 加载历史项目
+		virtual bool LoadHistoryProjects() = 0;
 	};
 
 	ENGINEPROJECT_API IProjectController* GetProjectControllerInterface();

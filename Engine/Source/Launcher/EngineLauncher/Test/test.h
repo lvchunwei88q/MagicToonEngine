@@ -1,3 +1,6 @@
+#include <Subsystem/SubsystemTemplate.h>
+#include <synchapi.h>
+
 class CLASS_A : public SubsystemTemplate<CLASS_A, Core::SubsystemContext::Priority::Low>
 {
 public:

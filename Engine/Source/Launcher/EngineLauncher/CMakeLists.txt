@@ -17,6 +17,7 @@ target_sources(EngineLauncher PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/r
 
 target_link_libraries(EngineLauncher PRIVATE 
     Core
+    IO
     Editor
     EngineProject
 )

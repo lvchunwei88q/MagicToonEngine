@@ -4,11 +4,31 @@
 #include <Common/ProjectEnum.h>
 #include <ThirdParty.h>
 
-namespace EngineProject {
+#include <Subsystem/SubsystemTemplate.h>
 
-	class ProjectControllerImpl : public IProjectController, public Singleton<ProjectControllerImpl>
+#include <cereal/cereal.hpp>
+#include <cereal/archives/binary.hpp>    // 二进制
+#include <cereal/types/string.hpp>     // std::string
+
+namespace EngineProject {
+	struct HistoryProject
+	{
+		std::string path;
+		std::string name;
+		bool existence = false;
+
+		template<class Archive>
+		void serialize(Archive& archive) {
+			archive(path, name, existence);
+		}
+	};
+
+	class ProjectControllerImpl : public IProjectController, public SubsystemTemplate<ProjectControllerImpl,Core::SubsystemContext::Priority::High>
 	{
 	public:
+		virtual bool Init();
+		virtual void Uninstall();
+
 		virtual void Create(ProJectConfig& config) override;
 
 		// 指定项目 - 引擎当前的项目
@@ -16,6 +36,10 @@ namespace EngineProject {
 
 		// 判断这个项目是否完整
 		virtual bool ProjectComplete(ProJectConfig& config) override;
+
+		// 加载历史项目
+		virtual bool LoadHistoryProjects() override;
 	private:
+		HistoryProject HProject;
 	};
 }

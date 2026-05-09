@@ -8,6 +8,9 @@
 #include <FileManager.h>
 #include <Converter.h>
 #include <AbsolutePath.h>
+#include <Serialize/SerializeMacro.h>
+
+#include <fstream>
 ///////////////////////////////////
 #include <ILog.h>
 
@@ -15,6 +18,16 @@ namespace EngineProject {
 	IProjectController* GetProjectControllerInterface()
 	{
 		return &ProjectControllerImpl::Get();
+	}
+
+	bool ProjectControllerImpl::Init()
+	{
+		return true;
+	}
+
+	void ProjectControllerImpl::Uninstall()
+	{
+		
 	}
 
 	void ProjectControllerImpl::Create(ProJectConfig& config)
@@ -54,6 +67,13 @@ namespace EngineProject {
 		std::wstring WorkingDir = IO::Converter::ToWideString(config.path) + L"\\";
 		WorkingDir += IO::Converter::ToWideString(config.name) + L"\\";
 		SetCurrentDirectoryW(WorkingDir.c_str());
+
+		// 保留历史
+		HProject.existence = true;
+		HProject.path = config.path;
+		HProject.name = config.name;
+
+		FILE_SERIALIZATION_SAVE(HProject, CONFIG "Project\\", L"HistoryProject.mtdata");
 	}
 
 	bool ProjectControllerImpl::ProjectComplete(ProJectConfig& config)
@@ -73,6 +93,20 @@ namespace EngineProject {
 					return false;
 				}
 			}
+			return true;
+		}
+		return false;
+	}
+
+	bool ProjectControllerImpl::LoadHistoryProjects()
+	{
+		FILE_SERIALIZATION_LOADING(HProject, CONFIG "Project\\", L"HistoryProject.mtdata");
+
+		if (HProject.existence) {
+			ProJectConfig config;
+			config.name = HProject.name;
+			config.path = HProject.path;
+			SpecifyProJect(config);
 			return true;
 		}
 		return false;

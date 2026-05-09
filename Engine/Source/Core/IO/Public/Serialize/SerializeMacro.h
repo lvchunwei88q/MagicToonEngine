@@ -5,7 +5,7 @@
 * #include <AbsolutePath.h>
 * #include <FileManager.h>
 * #include <fstream>
-* #include <Log.h>
+* #include <ILog.h>
 */
 #define FILE_SERIALIZATION_LOADING(object,path,name)													\
 const std::wstring object##_Executable = IO::AbsolutePath::Get().GetExecutableDirectory();				\
