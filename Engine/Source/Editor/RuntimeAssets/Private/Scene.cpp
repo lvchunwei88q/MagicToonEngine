@@ -1,6 +1,6 @@
 #include <Scene.h>
 
-namespace EngineScene {
+namespace RuntimeAssets {
 	AUTO_REGISTER(Scene)
 
 	bool Scene::Init()

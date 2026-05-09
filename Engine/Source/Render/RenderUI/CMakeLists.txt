@@ -27,4 +27,4 @@ target_link_libraries(RenderUI PRIVATE IO)
 
 target_link_libraries(RenderUI PRIVATE IMGUI)
 
-target_link_libraries(RenderUI PRIVATE EngineScene)
+target_link_libraries(RenderUI PRIVATE RuntimeAssets)

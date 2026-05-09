@@ -75,7 +75,7 @@ namespace RenderUI {
                 ImGui::InvisibleButton("##Return-Navigation-bar", ImVec2(25, 25));
 
                 bool isHovered = ImGui::IsItemHovered();
-                ID3D11ShaderResourceView* Icon = GetFileIcon(EngineAssetType::Return, isHovered);
+                ID3D11ShaderResourceView* Icon = GetFileIcon(EngineAssetType::Return);
 
                 ImGui::SetCursorScreenPos(cursorPos);
                 ImGui::Image(
@@ -247,13 +247,23 @@ namespace RenderUI {
                 ImGui::InvisibleButton("##IconClick", ImVec2(ZitemSize, ZitemSize));
 
                 bool isHovered = ImGui::IsItemHovered();
-                ID3D11ShaderResourceView* Icon = GetFileIcon(FileType,isHovered);
+                ID3D11ShaderResourceView* Icon = GetFileIcon(FileType);
 
                 ImGui::SetCursorScreenPos(cursorPos);
                 ImGui::Image(
                     (ImTextureID)(uintptr_t)Icon,
                     ImVec2(ZitemSize, ZitemSize)
                 );
+                if (isHovered) {
+                    ImDrawList* draw = ImGui::GetWindowDrawList();
+                    ImVec2 size(ZitemSize, ZitemSize);
+                    draw->AddRectFilled(
+                        cursorPos,
+                        ImVec2(cursorPos.x + size.x, cursorPos.y + size.y),
+                        IM_COL32(100, 100, 100, 60),
+                        4.0f 
+                    );
+                }
 
                 RightClickMenuBar_File(context); // bind 右键菜单
 
@@ -380,13 +390,16 @@ namespace RenderUI {
 
         std::string ext = entry.path().extension().string();
         // TODO file type
+        if (ext == ".json") {
+            return EngineAssetType::JSON;
+        }
 
         return EngineAssetType::File;
     }
 
-    ID3D11ShaderResourceView* FileBrowserUI::GetFileIcon(EngineAssetType filetype,bool isHovered)
+    ID3D11ShaderResourceView* FileBrowserUI::GetFileIcon(EngineAssetType filetype)
     {
-        return RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(GetEngineAsset()->GetIcon(filetype, isHovered));
+        return RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(GetEngineAsset()->GetIcon(filetype));
     }
 
     void FileBrowserUI::FileContentAreaInput()

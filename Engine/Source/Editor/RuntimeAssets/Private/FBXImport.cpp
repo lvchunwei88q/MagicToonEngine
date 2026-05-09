@@ -4,7 +4,7 @@
 #include <Converter.h>
 #include <ILog.h>
 
-namespace EngineScene {
+namespace RuntimeAssets {
 	void FBXAssetImport::Import(FBXImportSettings settings)
 	{
 		// TODO: Import FBX Function

@@ -12,7 +12,7 @@
 namespace RenderUI {
 	namespace fs = std::filesystem;
 
-	using namespace EngineScene;
+	using namespace RuntimeAssets;
 
     struct ContentBrowserState {
         std::wstring rootPath;                          // 根目录
@@ -50,7 +50,7 @@ namespace RenderUI {
 		void RightClickMenuBar_File(FileTypeContext Context);
 
 		EngineAssetType GetFileType(const fs::directory_entry& entry);
-		ID3D11ShaderResourceView* GetFileIcon(EngineAssetType filetype, bool isHovered);
+		ID3D11ShaderResourceView* GetFileIcon(EngineAssetType filetype);
 
 		void FileContentAreaInput(); // 控制文件内容区域输入
 

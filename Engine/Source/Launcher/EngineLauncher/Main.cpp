@@ -63,6 +63,11 @@ int main(int argc, char* argv[])// exe -p path
                 EngineProject::GetProjectControllerInterface()->SpecifyProJect(config);
             }
             break;
+        case OperationType::NOT: 
+            {
+                // 是否存在历史项目
+            }
+            break;
         default:std::cout << "Operation Type Error!" << std::endl;
             break;
         }

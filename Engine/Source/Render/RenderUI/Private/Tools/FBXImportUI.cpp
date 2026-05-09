@@ -59,9 +59,9 @@ namespace RenderUI {
                     // Import FBX Function
                     LOG_INFO("Import FBX: " + std::string(filePath));
 
-                    EngineScene::FBXImportSettings settings;
+                    RuntimeAssets::FBXImportSettings settings;
                     settings.path = std::string(filePath);
-                    EngineScene::FBXAssetImport::Get().Import(settings);
+                    RuntimeAssets::FBXAssetImport::Get().Import(settings);
 
                     CloseToolsWindow();
                 }
