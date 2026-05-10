@@ -1,5 +1,7 @@
 #include <GuiInterface.h>
 
+#include <Theme.h> // 主题
+
 ///////////////////////////////////////
 #include <ILog.h>
 ///////////////////////////////////////
@@ -9,11 +11,11 @@ namespace RenderUI {
 
     static ImVec4 GetLevelColor(LogLevel level) {
         switch (level) {
-        case LogLevel::Debug:   return ImVec4(0.5f, 0.5f, 0.5f, 1.0f);  // Gray
-        case LogLevel::Info:    return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);  // White
-        case LogLevel::Warning: return ImVec4(1.0f, 1.0f, 0.0f, 1.0f);  // Yellow
-        case LogLevel::Error:   return ImVec4(1.0f, 0.0f, 0.0f, 1.0f);  // Red
-        default:                return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+        case LogLevel::Debug:   return Theme::LOG_DEBUG;
+        case LogLevel::Info:    return Theme::LOG_INFO;
+        case LogLevel::Warning: return Theme::LOG_WARNING;
+        case LogLevel::Error:   return Theme::LOG_ERROR;
+        default:                return Theme::LOG_DEBUG;
         }
     }
 

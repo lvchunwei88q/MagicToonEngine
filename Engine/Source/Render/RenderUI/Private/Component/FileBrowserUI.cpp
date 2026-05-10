@@ -15,7 +15,17 @@
 #include <DrawToolsWindows.h>
 
 namespace RenderUI {
-    AUTO_REGISTER(FileBrowserUI)
+    AUTO_REGISTER(FileBrowserUI);
+
+    auto HighlightedArea = [](ImVec2 pos,ImVec2 size) {
+        ImDrawList* draw = ImGui::GetWindowDrawList();
+        draw->AddRectFilled(
+            pos,
+            ImVec2(pos.x + size.x, pos.y + size.y),
+            IM_COL32(100, 100, 100, 60),
+            4.0f
+        );
+    };
 
     bool FileBrowserUI::Init()
     {
@@ -83,19 +93,23 @@ namespace RenderUI {
                     ImVec2(25, 25)
                 );
 
-                if (isHovered && ImGui::IsMouseClicked(0))
+                if (isHovered)
                 {
-                    // return
-                    // 如果已经是 "Game\\"，不再往上
-                    if (state.currentPath == L"Game\\")
-                    {
-                        LOG_INFO("The path to reach the top");
-                    }
-                    else {
-                        fs::path p(state.currentPath);
-                        fs::path parent = p.parent_path();
-                        // 如果是只有Game（Root）那么加入一个\\否则不加
-                        state.currentPath = parent.wstring() == L"Game" ? parent.wstring() + L"\\" : parent.wstring();
+                    HighlightedArea(cursorPos, {25,25});
+
+                    if (ImGui::IsMouseClicked(0)) {
+                        // return
+                        // 如果已经是 "Game\\"，不再往上
+                        if (state.currentPath == L"Game\\")
+                        {
+                            LOG_INFO("The path to reach the top");
+                        }
+                        else {
+                            fs::path p(state.currentPath);
+                            fs::path parent = p.parent_path();
+                            // 如果是只有Game（Root）那么加入一个\\否则不加
+                            state.currentPath = parent.wstring() == L"Game" ? parent.wstring() + L"\\" : parent.wstring();
+                        }
                     }
                 }
             }
@@ -255,14 +269,7 @@ namespace RenderUI {
                     ImVec2(ZitemSize, ZitemSize)
                 );
                 if (isHovered) {
-                    ImDrawList* draw = ImGui::GetWindowDrawList();
-                    ImVec2 size(ZitemSize, ZitemSize);
-                    draw->AddRectFilled(
-                        cursorPos,
-                        ImVec2(cursorPos.x + size.x, cursorPos.y + size.y),
-                        IM_COL32(100, 100, 100, 60),
-                        4.0f 
-                    );
+                    HighlightedArea(cursorPos, { ZitemSize,ZitemSize });
                 }
 
                 RightClickMenuBar_File(context); // bind 右键菜单

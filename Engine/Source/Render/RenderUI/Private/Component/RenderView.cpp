@@ -29,7 +29,7 @@ namespace RenderUI {
                 // 绘制红色背景填充
                 drawList->AddRectFilled(renderPos,
                     ImVec2(renderPos.x + windowSize.x, renderPos.y + windowSize.y),
-                    IM_COL32(255, 0, 0, 255));  // 纯红色，完全不透明
+                    IM_COL32(55, 55, 55, 255));  // 柔和色，完全不透明
             }
 
             ImGui::End();

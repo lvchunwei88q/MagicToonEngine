@@ -44,6 +44,7 @@ namespace Editor
 	void Windows::RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func) {
 		this->WUR = func;
 	}
+
 	Windows::WindowUpdateRenderingFunc Windows::GetWindowUpdateRenderFunction()
 	{
 		return this->WUR;
