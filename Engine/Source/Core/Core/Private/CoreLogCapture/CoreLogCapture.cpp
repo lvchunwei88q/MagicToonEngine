@@ -2,6 +2,13 @@
 #include <Windows.h> // OutputDebugStringA
 
 namespace Core {
+
+#ifdef _DEBUG
+#define LOG_OUTPUT(msg) OutputDebugStringA(msg)
+#else
+#define LOG_OUTPUT(msg) ((void)0)
+#endif
+
 #define TEMPPLATE_CAPTURE_IMPL(Target)                                                  \
     Target##Capture::FuncType Target##Capture::GetCaptureFunction;                      \
     void Target##Capture::RegisterCaptureFunction(FuncType func) {                      \
@@ -12,11 +19,9 @@ namespace Core {
             GetCaptureFunction(Message);                                                \
         }                                                                               \
         else {                                                                          \
-            if constexpr (_DEBUG){                                                      \
-                OutputDebugStringA("Error CaptureFunction is nullptr! CaptureError:");  \
-                OutputDebugStringA(Message.c_str());                                    \
-                OutputDebugStringA("\n");                                               \
-            }                                                                           \
+            LOG_OUTPUT("Error CaptureFunction is nullptr! CaptureError:");              \
+            LOG_OUTPUT(Message.c_str());                                                \
+            LOG_OUTPUT("\n");                                                           \
         }                                                                               \
     }
 
