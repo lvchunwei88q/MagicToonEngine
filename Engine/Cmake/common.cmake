@@ -10,10 +10,11 @@ if(MSVC)
         "/wd4819"
     )
     # /utf-8 编译选项
-    add_compile_options("/utf-8")
-
+    add_compile_options(/utf-8)
     # 关闭显示包含文件
-    add_compile_options("/showIncludes:-")
+    add_compile_options(/showIncludes:-)
+    # 更改最大数
+    add_compile_options(/bigobj)
 endif()
 
 # 定义第三方库的根目录

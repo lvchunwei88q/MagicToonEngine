@@ -1,44 +1,81 @@
-local gui = GUI
-
--- 数据
-local state = {
-    player_name = "Hero",
-    player_level = 42,
-    player_hp = 100.0,
-    enable_effect = true,
-    selected_item = 1,
-    color = {1.0, 0.5, 0.2, 1.0}
+-- 测试 JSON 数据（用 Lua 表模拟）
+local json_data = {
+    name = "MyActor",
+    visible = true,
+    position = {1.0, 2.0, 3.0},
+    rotation = {0.0, 45.0, 0.0},
+    scale = {1.0, 1.0, 1.0},
+    color = {1.0, 0.5, 0.0, 1.0},
+    speed = 10.0,
+    type = 2,                     -- 0: Static, 1: Dynamic, 2: Player
+    mesh = "default.mesh",
+    tags = "player,hero,important!",  -- 字符串模拟数组
+    description = "This is a sample actor."
 }
 
-local items = {"Sword", "Shield", "Potion", "Scroll"}
+-- ----------------------------------------------------
+-- 绘制 Transform 折叠块
+-- ----------------------------------------------------
+local function DrawTransform(data)
+    if GUI:TreeNode("Transform") then
+        -- 向量控件直接操作以数字索引的表 {1=x, 2=y, 3=z}
+        GUI:Vector3Control("Position", data.position, 1.0, 80.0)
+        GUI:Vector3Control("Rotation", data.rotation, 1.0, 80.0)
+        GUI:Vector3Control("Scale",    data.scale,    1.0, 80.0)
+        GUI:TreePop()
+    end
+end
+
+-- ----------------------------------------------------
+-- 绘制 Rendering 折叠块
+-- ----------------------------------------------------
+local function DrawRendering(data)
+    if GUI:TreeNode("Rendering") then
+        GUI:Checkbox("Visible", data, "visible")
+        GUI:ColorEdit("Color", data.color)
+        GUI:TextInput("Mesh", data, "mesh", 256)
+        GUI:TreePop()
+    end
+end
+
+-- ----------------------------------------------------
+-- 绘制 Configuration 折叠块
+-- ----------------------------------------------------
+local function DrawConfiguration(data)
+    if GUI:TreeNode("Configuration") then
+        GUI:DragFloat("Speed", data, "speed", 0.1, 0.0, 100.0, "%.2f", 1.0)
+
+        -- 下拉框选择类型
+        local type_items = { "Static", "Dynamic", "Player" }
+        GUI:Combo("Type", data, "type", type_items, 3)
+
+        -- 标签字符串
+        GUI:TextInput("Tags", data, "tags", 128)
+        GUI:TextArea("Description", data, "description", 1024)
+        GUI:TreePop()
+    end
+end
+
+-- ----------------------------------------------------
+-- 主绘制函数
+-- ----------------------------------------------------
+local function DrawPropertyPanel(data)
+    -- 基础文本
+    GUI:Label("JSON Property Editor")
+    GUI:Separator()
+
+    -- 名称
+    GUI:TextInput("Name", data, "name", 128)
+    GUI:Separator()
+
+    -- 各分类折叠块
+    DrawTransform(data)
+    GUI:Spacing()
+    DrawRendering(data)
+    GUI:Spacing()
+    DrawConfiguration(data)
+end
 
 function Draw() -- 绘制函数
-	-- 标题
-    gui:Label("=== Player Settings ===")
-    gui:Spacing()
-
-    -- 文本输入
-    gui:TextInput("Name", state, "player_name", 256, 0)
-    
-    -- 拖拽数字
-    gui:DragInt("Level", state, "player_level", 1, 1, 99, "%d")
-    gui:DragFloat("HP", state, "player_hp", 0.5, 0, 999, "%.1f", 1.0)
-    
-    gui:Separator()
-
-    -- 复选框
-    gui:Checkbox("Enable Effect", state, "enable_effect")
-
-    -- 下拉框
-    gui:Combo("Item", state, "selected_item", items, 5)
-
-    -- 颜色选择器
-    gui:ColorEdit("Tint", state["color"])
-
-    gui:Separator()
-
-    -- 按钮
-    gui:Button("Apply", function()
-        print("Settings applied!")
-    end, 120, 0)
+	DrawPropertyPanel(json_data)
 end

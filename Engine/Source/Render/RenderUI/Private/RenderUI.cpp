@@ -1,5 +1,5 @@
 
-#include <GuiInterface.h>
+#include <EditorUIComponentSwitch.h>
 #include <RenderUI.h>
 #include <RenderContext.h>
 
@@ -229,6 +229,8 @@ namespace RenderUI {
 
 		{
             DetailsWindow();
+            LuaUIControlWindow();
+
 			LoggerWindow();
 			RenderViewWindow();
 			DrawContentBrowserWindow();

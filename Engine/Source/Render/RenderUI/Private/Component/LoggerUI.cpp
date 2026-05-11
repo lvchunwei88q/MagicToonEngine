@@ -1,4 +1,4 @@
-#include <GuiComponentSwitch.h>
+#include <EditorUIComponentSwitch.h>
 
 #include <Theme.h> // 主题
 

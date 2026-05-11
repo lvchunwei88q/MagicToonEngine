@@ -73,7 +73,9 @@ namespace RenderUI {
 	void LoggerWindow();
 	void RenderViewWindow();
 	void DrawContentBrowserWindow();
+
 	void DetailsWindow();
+	void LuaUIControlWindow();
 
 	void DrawToolsWindows();
 }

@@ -3,7 +3,7 @@
 #include <Subsystem/SubsystemTemplate.h>
 
 #include <filesystem>
-#include <GuiComponentSwitch.h>
+#include <EditorUIComponentSwitch.h>
 #include <IBufferManager.h>
 #include <SceneAsset/EngineAsset.h>
 

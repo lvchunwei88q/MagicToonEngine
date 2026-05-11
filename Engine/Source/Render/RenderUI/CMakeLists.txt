@@ -17,6 +17,19 @@ target_include_directories(RenderUI
         ${THIRD_PARTY_DIR} # 使用反射库 使用Lua 库与Sol库
 )
 
+# 直接对这几个文件关闭调试 + 并行编译
+set(BIND_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindCore.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindLayout.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindTableDraw.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindUtils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindWindowPopup.cpp
+)
+
+set_source_files_properties(${BIND_SOURCES} PROPERTIES
+    COMPILE_FLAGS "$<$<CXX_COMPILER_ID:MSVC>:/Z7 /MP>"
+)
+
 target_compile_definitions(RenderUI PRIVATE RENDERUI_EXPORTS)
 
 target_link_libraries(RenderUI PRIVATE RenderCore)
