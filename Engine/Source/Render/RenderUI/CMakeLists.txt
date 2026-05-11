@@ -14,7 +14,7 @@ target_include_directories(RenderUI
 
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
-        ${THIRD_PARTY_DIR} # 使用反射库
+        ${THIRD_PARTY_DIR} # 使用反射库 使用Lua 库与Sol库
 )
 
 target_compile_definitions(RenderUI PRIVATE RENDERUI_EXPORTS)
@@ -26,5 +26,6 @@ target_link_libraries(RenderUI PRIVATE Logger)
 target_link_libraries(RenderUI PRIVATE IO)
 
 target_link_libraries(RenderUI PRIVATE IMGUI)
+target_link_libraries(RenderUI PRIVATE liblua)
 
 target_link_libraries(RenderUI PRIVATE RuntimeAssets)

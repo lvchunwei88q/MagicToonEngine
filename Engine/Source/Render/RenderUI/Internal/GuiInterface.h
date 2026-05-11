@@ -43,14 +43,14 @@ namespace RenderUI {
 		LoggerSwitch loggerswitch;
 		FileBrowserConfig filebrowserconfig;
 		// Switch
-		bool ExampleWindow;
+		bool DetailsWindow;
 		bool LoggerWindow;
 		bool RenderViewWindow;
 		bool ContentBrowserWindow;
 
 		template<class Archive>
 		void serialize(Archive& archive) {
-			archive(loggerswitch, filebrowserconfig,LoggerWindow, ExampleWindow, RenderViewWindow, ContentBrowserWindow);
+			archive(loggerswitch, filebrowserconfig,LoggerWindow, DetailsWindow, RenderViewWindow, ContentBrowserWindow);
 		}
 	};
 
@@ -71,7 +71,7 @@ namespace RenderUI {
 	void LoggerWindow();
 	void RenderViewWindow();
 	void DrawContentBrowserWindow();
-	void ExampleWindow();
+	void DetailsWindow();
 
 	void DrawToolsWindows();
 }

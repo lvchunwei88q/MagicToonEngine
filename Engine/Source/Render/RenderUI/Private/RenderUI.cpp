@@ -228,7 +228,7 @@ namespace RenderUI {
 		BasicLayout();
 
 		{
-			ExampleWindow();
+            DetailsWindow();
 			LoggerWindow();
 			RenderViewWindow();
 			DrawContentBrowserWindow();

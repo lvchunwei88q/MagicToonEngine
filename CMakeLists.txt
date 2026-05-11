@@ -15,6 +15,7 @@ project ("MagicToonEngine")
 ThirdPartyModule(imgui-docking)
 ThirdPartyModule(ufbx)
 ThirdPartyModule(WICTextureLoader)
+ThirdPartyModule(lua)
 
 EngineModule(Core/Core)
 EngineModule(Core/RenderCore)

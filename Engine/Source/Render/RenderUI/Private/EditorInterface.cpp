@@ -57,7 +57,7 @@ namespace RenderUI {
 
             if (ImGui::BeginMenu("View"))
             {
-                ImGui::MenuItem("Hello World", nullptr, &Switch.ExampleWindow);
+                ImGui::MenuItem("Hello World", nullptr, &Switch.DetailsWindow);
                 ImGui::MenuItem("Engine Log", nullptr, &Switch.LoggerWindow);
                 ImGui::MenuItem("Render View", nullptr, &Switch.RenderViewWindow);
                 ImGui::MenuItem("Content Browser View", nullptr, &Switch.ContentBrowserWindow);
@@ -77,17 +77,5 @@ namespace RenderUI {
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
         ImGui::End();
-    }
-    void ExampleWindow()
-    {
-        // --- 示例停靠窗口 ---
-        if (Switch.ExampleWindow)
-        {
-            ImGuiIO& io = ImGui::GetIO();
-            ImGui::Begin("Hello, world!");
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
     }
 }

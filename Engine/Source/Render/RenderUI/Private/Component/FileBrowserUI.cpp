@@ -7,6 +7,7 @@
 #include <FileManager.h>
 
 #include <Tools/Debouncer.h>
+#include <Tools/TextLayout.h>
 ///////////////////////////////////////
 
 #include <functional>
@@ -216,13 +217,40 @@ namespace RenderUI {
             return;
         }
 
-        auto TextCentered = [](const char* text, float containerWidth)
+        auto TextCentered = [](const char* text, float containerWidth,
+            float fontSize = 0.0f,
+            const std::string& fontPath = "",
+            float lineHeight = 1.0f,
+            float letterSpacing = 0.0f)
             {
-                float textWidth = ImGui::CalcTextSize(text).x;
-                float offsetX = (containerWidth - textWidth) * 0.5f;
-                if (offsetX > 0)
-                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offsetX);
-                ImGui::TextUnformatted(text);
+                textlayout::TextLayoutParams params;
+                params.text = text;
+                params.fontPath = fontPath;
+                params.fontSize = fontSize;
+                params.wrapWidth = containerWidth;  // 自动换行
+                params.lineHeight = lineHeight;
+                params.letterSpacing = letterSpacing;
+
+                textlayout::TextLayoutResult layout = textlayout::LayoutText(params);
+
+                if (layout.font == nullptr || layout.lines.empty())
+                    return;
+
+                ImDrawList* drawList = ImGui::GetWindowDrawList();
+                ImVec2 pos = ImGui::GetCursorScreenPos();
+
+                // 创建绘制区域
+                ImVec2 min = pos;
+                ImVec2 max = { pos.x + containerWidth, pos.y + layout.totalHeight };
+
+                drawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
+                textlayout::RenderTextBox(drawList, min.x, min.y, max.x, max.y,
+                    layout, IM_COL32(255, 255, 255, 255),
+                    0.5f, 0.0f, letterSpacing);  // alignX=0.5 水平居中
+                drawList->PopTextureID();
+
+                // 预留空间
+                ImGui::Dummy(ImVec2(containerWidth, layout.totalHeight));
             };
 
         // 计算网格参数
@@ -281,8 +309,6 @@ namespace RenderUI {
 
                 // FileName
                 std::string displayName = name;
-                if (displayName.length() > 8)
-                    displayName = displayName.substr(0, 7) + "...";
                 TextCentered(displayName.c_str(), ZitemSize);
             }
 
