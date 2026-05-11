@@ -37,6 +37,7 @@ namespace RenderUI {
 		void UpdateLua();
 
 		const std::string GetLuaType() { return current_lua_type; }
+		const bool GetisLoading();
 	protected:
 		DrawCancel isDraw;
 

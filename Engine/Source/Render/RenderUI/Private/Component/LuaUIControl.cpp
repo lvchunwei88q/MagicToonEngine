@@ -73,11 +73,16 @@ namespace RenderUI {
                 else isDraw.isCompileError = false;
                 lua_script = result;lua_script();
                 isDraw.isError = false;
-
                 LOG_INFO("Lua script compilation completed");
             }
             isDraw.isLoading = false;
         });
+    }
+
+    const bool LuaUIControl::GetisLoading()
+    {
+        bool temp = isDraw.isLoading;
+        return temp;
     }
 
     void LuaUIMember::Register(LuaMember member)
@@ -101,8 +106,11 @@ namespace RenderUI {
             for (auto& LuaMember: LuaMembers)
             {
                 if (LuaMember.member_name == target || LuaMember.lua_type == lua_type) {
-                    LuaMember.member->UpdateLua();
-                    // TODO 健壮的处理
+                    if(!LuaMember.member->GetisLoading())
+                        LuaMember.member->UpdateLua();
+                    else {
+                        LOG_WARNING("Please wait for the thread to finish loading Lua!");
+                    }
                 }
             }
         });
