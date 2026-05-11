@@ -44,13 +44,15 @@ namespace RenderUI {
 		FileBrowserConfig filebrowserconfig;
 		// Switch
 		bool DetailsWindow;
+		bool LuaControl;
 		bool LoggerWindow;
 		bool RenderViewWindow;
 		bool ContentBrowserWindow;
 
 		template<class Archive>
 		void serialize(Archive& archive) {
-			archive(loggerswitch, filebrowserconfig,LoggerWindow, DetailsWindow, RenderViewWindow, ContentBrowserWindow);
+			archive(loggerswitch, filebrowserconfig,LoggerWindow, DetailsWindow, LuaControl,
+				RenderViewWindow, ContentBrowserWindow);
 		}
 	};
 

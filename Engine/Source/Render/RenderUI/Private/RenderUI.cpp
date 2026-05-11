@@ -62,7 +62,7 @@ namespace RenderUI {
             c[ImGuiCol_PopupBg] = L(0.125f, 0.125f, 0.125f, 0.98f);        // #202020
             c[ImGuiCol_FrameBg] = L(0.125f, 0.125f, 0.125f, 1.00f);        // #202020
             c[ImGuiCol_FrameBgHovered] = L(0.165f, 0.165f, 0.165f, 1.00f); // #2A2A2A
-            c[ImGuiCol_FrameBgActive] = L(0.240f, 0.170f, 0.170f, 1.00f);  // reddish tint when active
+            c[ImGuiCol_FrameBgActive] = L(0.210f, 0.170f, 0.240f, 1.00f);  // reddish tint when active
 
             // --- Title bar ---
             c[ImGuiCol_TitleBg] = L(0.098f, 0.098f, 0.098f, 1.00f);

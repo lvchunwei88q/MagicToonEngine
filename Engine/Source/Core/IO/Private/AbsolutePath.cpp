@@ -25,7 +25,7 @@ namespace IO {
         return std::filesystem::path(buffer).wstring();
     }
 
-    std::wstring IO::AbsolutePath::GetContentPath()
+    std::wstring AbsolutePath::GetContentPath()
     {
         std::filesystem::path exePath = GetExecutableDirectory();
 
@@ -36,5 +36,18 @@ namespace IO {
             / L"Content";
         //std::wstring widePath(narrowPath.begin(), narrowPath.end());
         return contentPath;
+    }
+
+    std::wstring AbsolutePath::GetScriptPath()
+    {
+        std::filesystem::path exePath = GetExecutableDirectory();
+
+        // 可执行文件目录 → 上级 → 上级 → Engine/Script
+        std::filesystem::path scriptPath = exePath.parent_path()
+            .parent_path()
+            / L"Engine"
+            / L"Script";
+        //std::wstring widePath(narrowPath.begin(), narrowPath.end());
+        return scriptPath;
     }
 }

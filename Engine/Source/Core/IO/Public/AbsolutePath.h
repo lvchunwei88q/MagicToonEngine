@@ -35,5 +35,11 @@ namespace IO {
 		* @return 内容路径完整路径
 		*/
 		std::wstring GetContentPath();
+
+		/**
+		* 获取脚本路径
+		* @return 脚本路径完整路径
+		*/
+		std::wstring GetScriptPath();
 	};
 };

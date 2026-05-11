@@ -1,4 +1,4 @@
-#include <GuiInterface.h>
+#include <GuiComponentSwitch.h>
 #include <DrawToolsWindows.h>
 
 namespace RenderUI {
@@ -57,7 +57,9 @@ namespace RenderUI {
 
             if (ImGui::BeginMenu("View"))
             {
-                ImGui::MenuItem("Hello World", nullptr, &Switch.DetailsWindow);
+                ImGui::MenuItem("Lua Control", nullptr, &Switch.LuaControl);
+                ImGui::MenuItem("Details Panel", nullptr, &Switch.DetailsWindow);
+                ImGui::Separator();
                 ImGui::MenuItem("Engine Log", nullptr, &Switch.LoggerWindow);
                 ImGui::MenuItem("Render View", nullptr, &Switch.RenderViewWindow);
                 ImGui::MenuItem("Content Browser View", nullptr, &Switch.ContentBrowserWindow);

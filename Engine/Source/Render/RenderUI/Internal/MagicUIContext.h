@@ -1,7 +1,9 @@
 #pragma once
+#include <Tools/Singleton.h>
 
 // imgui for lua context
 #include <imgui.h>
+#include <sol/sol.hpp> // lua bind
 
 #include <cstdint>
 #include <functional>
@@ -13,9 +15,12 @@ namespace RenderUI
     // ── Property batch rendering ────────────────────────────────────────────
     // Lua builds a list of PropertyDesc, C++ renders all widgets in one call.
 
-    class MteGUIContext // from https://github.com/ChenlizheMe/Infernux
+    class MteGUIContext : public Singleton<MteGUIContext> // from https://github.com/ChenlizheMe/Infernux
     {
     public:
+        /* bind for lua function */
+        void BindLuaFunction(sol::state& lua);
+
         /* basic text & labels */
         void Label(const std::string& text);
         void TextWrapped(const std::string& text);
