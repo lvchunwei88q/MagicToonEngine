@@ -243,7 +243,7 @@ namespace RenderUI {
                 ImVec2 min = pos;
                 ImVec2 max = { pos.x + containerWidth, pos.y + layout.totalHeight };
 
-                drawList->PushTextureID(ImGui::GetIO().Fonts->TexID);
+                drawList->PushTextureID(ImGui::GetIO().Fonts->TexRef);
                 textlayout::RenderTextBox(drawList, min.x, min.y, max.x, max.y,
                     layout, IM_COL32(255, 255, 255, 255),
                     0.5f, 0.0f, letterSpacing);  // alignX=0.5 水平居中

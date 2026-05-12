@@ -25,7 +25,7 @@ namespace RenderUI {
         gui_type.set("DrawCircle", &MteGUIContext::DrawCircle);
         gui_type.set("DrawFilledCircle", &MteGUIContext::DrawFilledCircle);
         gui_type.set("DrawImageRect", &MteGUIContext::DrawImageRect);
-        gui_type.set("DrawText", &MteGUIContext::DrawText);
+        gui_type.set("DrawTextDefault", &MteGUIContext::DrawTextDefault);
         gui_type.set("DrawTextAligned", &MteGUIContext::DrawTextAligned);
         gui_type.set("DrawTextRotated90Aligned", &MteGUIContext::DrawTextRotated90Aligned);
         gui_type.set("DrawTextExAligned", &MteGUIContext::DrawTextExAligned);

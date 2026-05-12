@@ -43,6 +43,8 @@ namespace RenderUI {
 
 		std::string lua_path;
 		std::string current_lua_type = "null";
+		std::string current_lua_error = "noError";
+
 		sol::state lua; // state
 		sol::protected_function lua_script; // current lua script
 	};

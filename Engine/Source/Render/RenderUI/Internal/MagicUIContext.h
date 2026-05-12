@@ -259,8 +259,10 @@ namespace RenderUI
             float uv0_y = 0.0f, float uv1_x = 1.0f, float uv1_y = 1.0f, float tintR = 1.0f,
             float tintG = 1.0f, float tintB = 1.0f, float tintA = 1.0f, float rotation = 0.0f,
             bool mirrorH = false, bool mirrorV = false, float rounding = 0.0f);
-        void DrawText(float x, float y, const std::string& text, float r, float g, float b, float a, float fontSize = 0.0f);
-        void DrawTextAligned(float minX, float minY, float maxX, float maxY, const std::string& text, float r, float g,
+        void DrawTextDefault(float x, float y, const std::string& text, float r, float g, float b, float a, float fontSize = 0.0f);
+        void DrawTextAligned(float width, float height, const std::string& text, float r,
+            float g, float b, float a, float alignX, float alignY, float fontSize, bool clip);
+        void DrawTextAlignedPos(float minX, float minY, float maxX, float maxY, const std::string& text, float r, float g,
             float b, float a, float alignX, float alignY, float fontSize = 0.0f, bool clip = false);
         void DrawTextRotated90Aligned(float minX, float minY, float maxX, float maxY, const std::string& text, float r,
             float g, float b, float a, float alignX, float alignY, float fontSize = 0.0f,

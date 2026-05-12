@@ -3,6 +3,7 @@
 
 #include <ILog.h>
 #include <Jobsystem/JobSystem.h>
+#include <Theme.h>
 //////////////////////////////
 #include <AbsolutePath.h>
 #include <Converter.h>
@@ -25,11 +26,26 @@ namespace RenderUI {
             if (ret != LUA_OK) {
                 // 错误信息会在栈顶
                 const char* err = lua_tostring(lua, -1);
-                LOG_ERROR("Lua Draw() Error:", err);
+                current_lua_error = err;
+                LOG_ERROR("Lua Draw() Error:", current_lua_error);
                 isDraw.isError = true;
                 lua_pop(lua, 1);
             }
-		}
+        }
+        else {
+            MteGUIContext& content = MteGUIContext::Get();
+            //content.Label("Lua script error");
+            content.BeginChild("LuaScriptError");
+            content.DrawTextAligned(
+                300,200,
+                current_lua_error,
+                Theme::LOG_WARNING.x, Theme::LOG_WARNING.y, Theme::LOG_WARNING.z, Theme::LOG_WARNING.w,
+                0.0f, 0.0f,
+                0.0F, // fon size
+                false
+            );
+            content.EndChild();
+        }
 	}
 
     void LuaUIControl::LoadLua(std::string lua_type)
@@ -95,6 +111,7 @@ namespace RenderUI {
         return members;
     }
 
+    // ----------------------------------------------------- UI ---------------------------------------------------------//
     bool LuaUIControlWindows::Init()
     {
         MteGUIContext::Get().BindLuaFunction(lua);

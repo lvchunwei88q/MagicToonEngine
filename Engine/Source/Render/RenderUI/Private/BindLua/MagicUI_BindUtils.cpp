@@ -21,10 +21,16 @@ namespace RenderUI {
 
         // ========== Style API ==========
         gui_type.set("PushStyleColor", &MteGUIContext::PushStyleColor);
-        gui_type.set("PopStyleColor", &MteGUIContext::PopStyleColor);
+        gui_type.set("PopStyleColor", [](MteGUIContext& self, sol::object count) {
+            int c = count.is<int>() ? count.as<int>() : 1;
+            return self.PopStyleColor(c);
+        });
         gui_type.set("PushStyleVarFloat", &MteGUIContext::PushStyleVarFloat);
         gui_type.set("PushStyleVarVec2", &MteGUIContext::PushStyleVarVec2);
-        gui_type.set("PopStyleVar", &MteGUIContext::PopStyleVar);
+        gui_type.set("PopStyleVar", [](MteGUIContext& self, sol::object count) {
+            int c = count.is<int>() ? count.as<int>() : 1;
+            return self.PopStyleVar(c);
+            });
         gui_type.set("BeginDisabled", &MteGUIContext::BeginDisabled);
         gui_type.set("EndDisabled", &MteGUIContext::EndDisabled);
 

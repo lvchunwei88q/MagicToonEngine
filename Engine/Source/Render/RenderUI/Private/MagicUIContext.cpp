@@ -1,6 +1,4 @@
 #include <windows.h>
-#pragma push_macro("DrawText")
-#undef DrawText
 
 #include <MagicUIContext.h>
 #include <Tools/TextLayout.h>
@@ -1086,7 +1084,7 @@ namespace RenderUI
         }
     }
 
-    void MteGUIContext::DrawText(float x, float y, const std::string& text, float r, float g, float b, float a,
+    void MteGUIContext::DrawTextDefault(float x, float y, const std::string& text, float r, float g, float b, float a,
         float fontSize)
     {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
@@ -1102,18 +1100,25 @@ namespace RenderUI
         }
     }
 
-    void MteGUIContext::DrawTextAligned(float minX, float minY, float maxX, float maxY, const std::string& text, float r,
+    void MteGUIContext::DrawTextAligned(float width, float height, const std::string& text, float r,
+        float g, float b, float a, float alignX, float alignY, float fontSize, bool clip) {
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        DrawTextAlignedPos(pos.x, pos.y, pos.x + width, pos.y + height, text, r,g,b,a, alignX, alignY, fontSize, clip);
+        ImGui::Dummy(ImVec2(width, height));
+    }
+
+    void MteGUIContext::DrawTextAlignedPos(float minX, float minY, float maxX, float maxY, const std::string& text, float r,
         float g, float b, float a, float alignX, float alignY, float fontSize, bool clip)
     {
         ImDrawList* drawList = ImGui::GetWindowDrawList();
         if (!drawList)
             return;
 
-        const textlayout::TextLayoutResult layout =
-            textlayout::LayoutText({ text, "", ResolveFontSize(fontSize), 0.0f, 1.0f, 0.0f });
-
         float boxW = maxX - minX;
         float boxH = maxY - minY;
+
+        const textlayout::TextLayoutResult layout =
+            textlayout::LayoutText({ text, "", ResolveFontSize(fontSize), boxW, 1.0f, 0.0f });
 
         ImU32 col = ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
 
@@ -1291,5 +1296,3 @@ namespace RenderUI
             drawList->PopClipRect();
     }
 } // namespace RenderUI
-
-#pragma pop_macro("DrawText")  // 恢复宏

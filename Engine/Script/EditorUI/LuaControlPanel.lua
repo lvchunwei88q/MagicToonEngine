@@ -71,29 +71,40 @@ function Draw()
             selectedType = ""
         end
 
+        GUI:EndChild()
+    end
+
+    --GUI:PushStyleColor(3, 1.0, 0.0, 0.0, 1.0) 
+    if GUI:BeginChild("Select Control Target Windows")then
+        GUI:Dummy(0.0, 0.0)
+
         GUI:Separator()
 
-
-        -- 显示选中项信息
         GUI:Dummy(2.0, 0)
         GUI:SameLine(0.0, -1.0)
+        -- 显示选中项信息
         GUI:Label("Selected Target:")
+        GUI:Dummy(10.0, 0)
+        GUI:SameLine(0.0, -1.0)
         GUI:Label("  Name: " .. selectedName)
+        GUI:Dummy(10.0, 0)
+        GUI:SameLine(0.0, -1.0)
         GUI:Label("  Type: " .. selectedType)
 
         GUI:Separator()
 
-        -- 按钮操作
         GUI:Dummy(10.0, 0)
         GUI:SameLine(0.0, -1.0)
+        -- 按钮操作
         GUI:Button("Update", function()
             if selectedName ~= "" then
                 Update(selectedType,selectedName)
             end
         end, 100, 30)
 
+        --GUI:SameLine(0.0, -1.0) 
     end
     GUI:EndChild()
-
-    --GUI:SameLine(0.0, -1.0) 
+    --GUI:PopStyleColor()
+    
 end
