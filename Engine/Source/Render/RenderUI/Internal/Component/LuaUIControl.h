@@ -36,6 +36,8 @@ namespace RenderUI {
 		void LoadLua(std::string lua_type);
 		void UpdateLua();
 
+		void RuntimeError();
+
 		const std::string GetLuaType() { return current_lua_type; }
 		const bool GetisLoading();
 	protected:
@@ -67,6 +69,7 @@ namespace RenderUI {
 	public:
 		virtual bool Init();
 		virtual void Uninstall();
+		virtual void Notification(const char* msg);
 
 		virtual void Preprocessing() override;
 	};

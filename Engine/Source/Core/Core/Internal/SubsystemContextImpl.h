@@ -13,6 +13,7 @@ namespace Core
 		struct Context
 		{
 			std::string name;
+			std::string tags;
 			Subsystem* subsystem;
 			Priority priority; 
 		};
@@ -22,6 +23,7 @@ namespace Core
 		virtual void RegisterSubsystem(SubsystemContext::Context context) override;
 		virtual SubsystemError Init() override;
 		virtual void Uninstall() override;
+		virtual void Notification(const char* target_tags, const char* msg) override; // Notification Subsystem
 
 		// Register Init Callback Function
 		virtual void RegisterInitCallbackFunction(Init_Callback Func) override;

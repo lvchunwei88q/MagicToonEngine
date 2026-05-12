@@ -2,8 +2,10 @@
 #include <MagicUIContext.h>
 #include <ILog.h>
 
+#define WINDOWS_NAME "Details Panel"
+
 namespace RenderUI {
-    AUTO_REGISTER(DetailsPanel);
+    AUTO_REGISTER_NOTIFICATION(DetailsPanel,"IMGUI");
 
     bool DetailsPanel::Init()
     {
@@ -17,12 +19,19 @@ namespace RenderUI {
     {
     }
 
+    void DetailsPanel::Notification(const char* msg)
+    {
+        if (strstr(msg, WINDOWS_NAME) != nullptr) {
+            RuntimeError();
+        }
+    }
+
 	void DetailsWindow() // main Draw
 	{
         if (Switch.DetailsWindow)
         {
             ImGuiIO& io = ImGui::GetIO();
-            ImGui::Begin("Details Panel");
+            ImGui::Begin(WINDOWS_NAME);
             {
                 DetailsPanel::Get().Draw();
             }

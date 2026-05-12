@@ -65,7 +65,7 @@ namespace LOG {
         WriteToDebugOutput(logLine);
         {
             std::lock_guard<std::mutex> lock(Mutex_);
-            // 加入缓冲区（线程安全）
+            // 加入缓冲区
             buffer_.push_back(logLine);
         
             // 加入环形缓冲区
@@ -109,7 +109,7 @@ namespace LOG {
         localtime_s(&tm, &time_t);
 
         std::ostringstream oss;
-        oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "." << std::setfill('0') << std::setw(3) << ms.count();
+        oss << std::put_time(&tm, "%m-%d %H:%M:%S");
         return oss.str();
     }
 

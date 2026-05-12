@@ -9,8 +9,10 @@
 #include <Converter.h>
 //////////////////////////////
 
+#define WINDOWS_NAME "LuaControl Panel"
+
 namespace RenderUI {
-    AUTO_REGISTER(LuaUIControlWindows);
+    AUTO_REGISTER_NOTIFICATION(LuaUIControlWindows,"IMGUI");
 
     LuaMember::LuaMember(LuaUIControl* m, std::string n) : member(m), member_name(n)
     {
@@ -95,6 +97,12 @@ namespace RenderUI {
         });
     }
 
+    void LuaUIControl::RuntimeError()
+    {
+        isDraw.isError = true;
+        current_lua_error = "IMGUI internal error, please check the output log";
+    }
+
     const bool LuaUIControl::GetisLoading()
     {
         bool temp = isDraw.isLoading;
@@ -137,6 +145,13 @@ namespace RenderUI {
     {
     }
 
+    void LuaUIControlWindows::Notification(const char* msg)
+    {
+        if (strstr(msg, WINDOWS_NAME) != nullptr) {
+            RuntimeError();
+        }
+    }
+
     void LuaUIControlWindows::Preprocessing()
     {
         const std::vector<LuaMember>& LuaMembers = LuaUIMember::Get().GetLuaMember();
@@ -162,7 +177,7 @@ namespace RenderUI {
         if (Switch.LuaControl)
         {
             ImGuiIO& io = ImGui::GetIO();
-            ImGui::Begin("LuaControl Panel");
+            ImGui::Begin(WINDOWS_NAME);
             {
                 LuaUIControlWindows::Get().Draw();
             }

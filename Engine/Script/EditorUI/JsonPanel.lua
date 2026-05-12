@@ -60,20 +60,24 @@ end
 -- 主绘制函数
 -- ----------------------------------------------------
 local function DrawPropertyPanel(data)
-    -- 基础文本
-    GUI:Label("JSON Property Editor")
-    GUI:Separator()
 
-    -- 名称
-    GUI:TextInput("Name", data, "name", 128)
-    GUI:Separator()
+    if GUI:BeginChild("Select Control Target Windows")then
+        -- 基础文本
+        GUI:Label("JSON Property Editor")
+        GUI:Separator()
 
-    -- 各分类折叠块
-    DrawTransform(data)
-    GUI:Spacing()
-    DrawRendering(data)
-    GUI:Spacing()
-    DrawConfiguration(data)
+        -- 名称
+        GUI:TextInput("Name", data, "name", 128)
+        GUI:Separator()
+
+        -- 各分类折叠块
+        DrawTransform(data)
+        GUI:Spacing()
+        DrawRendering(data)
+        GUI:Spacing()
+        DrawConfiguration(data)
+    end
+    GUI:EndChild()
 end
 
 function Draw() -- 绘制函数

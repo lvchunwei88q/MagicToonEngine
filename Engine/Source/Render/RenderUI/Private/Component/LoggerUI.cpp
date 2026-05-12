@@ -72,6 +72,8 @@ namespace RenderUI {
                         entry.message;
 
                     //ImGui::Text(lineText.c_str());
+                    ImGui::Dummy(ImVec2(2.0, 0));
+                    ImGui::SameLine(0.0, -1.0);
                     ImGui::Selectable(lineText.c_str(), false,
                         ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick);
 

@@ -18,14 +18,16 @@ namespace Core
 		// api
 		virtual bool Init() = 0;
 		virtual void Uninstall() = 0;
+		virtual void Notification(const char*) {}; // Notification
 
 		template<typename Derived, SubsystemContext::Priority Priority>
-		void Register() {
+		void Register(const char* tags = "NONE") {
 			// Register the subsystem in the system manager
 			const char* name = typeid(Derived).name();
 
 			SubsystemContext::Context context;
 			context.name = name;
+			context.tags = tags;
 			context.subsystem = this;
 			context.priority = Priority; // Default priority, can be customized
 
@@ -44,6 +46,12 @@ namespace Core
 			return Subsystemcontext->Init();
 		}
 
+		static void Uninstall() {
+			// Uninstall all registered subsystems
+			SubsystemContext* Subsystemcontext = GetSubsystemContext();
+			Subsystemcontext->Uninstall();
+		}
+
 		static void Register_Init_Callback(Init_Callback func) {
 			// Register Init _Callback Function
 			SubsystemContext* Subsystemcontext = GetSubsystemContext();
@@ -56,10 +64,10 @@ namespace Core
 			return Subsystemcontext->Num();
 		}
 
-		static void Uninstall() {
-			// Uninstall all registered subsystems
+		static void NotificationSubsystem(const char* target_tags, const char* msg) {
+			// Notification Subsystem Msg
 			SubsystemContext* Subsystemcontext = GetSubsystemContext();
-			Subsystemcontext->Uninstall();
+			Subsystemcontext->Notification(target_tags, msg);
 		}
 	};
 }

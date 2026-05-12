@@ -14,3 +14,5 @@ target_include_directories(IMGUI
 )
 
 target_link_libraries(IMGUI PRIVATE IO)
+target_link_libraries(IMGUI PRIVATE Logger)
+target_link_libraries(IMGUI PRIVATE Core)

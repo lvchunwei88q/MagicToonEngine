@@ -13,6 +13,8 @@
 //-----------------------------------------------------------------------------
 
 #pragma once
+#include <ILog.h>
+#include <Subsystem/Subsystem.h>
 
 //---- Define assertion handler. Defaults to calling assert().
 // - If your macro uses multiple statements, make sure is enclosed in a 'do { .. } while (0)' block so it can be used as a single statement.
@@ -137,6 +139,39 @@
 
 //---- Debug Tools: Enable slower asserts
 //#define IMGUI_DEBUG_PARANOID
+
+#define GET_CURRENT_WINDOWS_NAME                        \
+const char* WindowName = ImGui::GetCurrentWindow() ?    \
+ImGui::GetCurrentWindow()->Name : "Unknown";            \
+
+#define IM_ASSERT_USER_ERROR(_EXPR, _MSG)                                                       \
+    do {                                                                                        \
+        if (!(_EXPR)) {                                                                         \
+            GET_CURRENT_WINDOWS_NAME                                                            \
+            LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",WindowName);                  \
+        }                                                                                       \
+    } while(0)
+
+#define IM_ASSERT_USER_ERROR_RET(_EXPR, _MSG)                                                   \
+    do {                                                                                        \
+        if (!(_EXPR)) {                                                                         \
+            GET_CURRENT_WINDOWS_NAME                                                            \
+            LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",WindowName);                  \
+            return;                                                                             \
+        }                                                                                       \
+    } while(0)
+
+#define IM_ASSERT_USER_ERROR_RETV(_EXPR, _RETV, _MSG)                                           \
+    do {                                                                                        \
+        if (!(_EXPR)) {                                                                         \
+            GET_CURRENT_WINDOWS_NAME                                                            \
+            LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",WindowName);                  \
+            return _RETV;                                                                       \
+        }                                                                                       \
+    } while(0)
 
 //---- Tip: You can add extra functions within the ImGui:: namespace from anywhere (e.g. your own sources/header files)
 /*

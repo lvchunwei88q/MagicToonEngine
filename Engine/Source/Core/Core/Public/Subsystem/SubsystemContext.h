@@ -16,6 +16,7 @@ namespace Core
 		struct Context
 		{
 			const char* name;
+			const char* tags; //subsystem notification tags
 			void* subsystem; // Pointer to the subsystem instance
 			Priority priority; // priority
 		};
@@ -29,6 +30,7 @@ namespace Core
 		virtual void RegisterSubsystem(Context context) = 0;
 		virtual SubsystemError Init() = 0;
 		virtual void Uninstall() = 0;
+		virtual void Notification(const char* target,const char* msg) = 0; // Notification Subsystem
 
 		// Register Init Callback Function
 		virtual void RegisterInitCallbackFunction(Init_Callback Func) = 0;

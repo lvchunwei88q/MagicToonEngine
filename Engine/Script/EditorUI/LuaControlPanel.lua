@@ -41,40 +41,43 @@ function Draw()
 
         GUI:Label("Select Control Target:")
 
-        if count > 0 then
-            -- 确保选中索引在有效范围
-            if listboxState.selected < 0 or listboxState.selected >= count then
-                listboxState.selected = 0
+        if GUI:TreeNode("Control List") then
+            if count > 0 then
+                -- 确保选中索引在有效范围
+                if listboxState.selected < 0 or listboxState.selected >= count then
+                    listboxState.selected = 0
+                end
+
+                -- 限制显示高度
+                local height = count
+                if height > 10 then height = 10 end
+
+                local availWidth = GUI:GetContentRegionAvailWidth()
+                GUI:SetNextItemWidth(availWidth)
+                -- 列表选择控件
+                GUI:ListBox("##control_list", listboxState, "selected", items, height)
+
+                -- 根据选中的索引（0-based）读取对应的 LuaMember
+                local idx = listboxState.selected
+                local member = LuaMembers[idx]
+                if member then
+                    selectedName = member.member_name or "???"
+                    selectedType = member.lua_type or "???"
+                end
+            else
+                GUI:Dummy(2.0, 0)
+                GUI:SameLine(0.0, -1.0)
+                GUI:Label("No controls registered")
+                selectedName = ""
+                selectedType = ""
             end
-
-            -- 限制显示高度
-            local height = count
-            if height > 10 then height = 10 end
-
-            local availWidth = GUI:GetContentRegionAvailWidth()
-            GUI:SetNextItemWidth(availWidth)
-            -- 列表选择控件
-            GUI:ListBox("##control_list", listboxState, "selected", items, height)
-
-            -- 根据选中的索引（0-based）读取对应的 LuaMember
-            local idx = listboxState.selected
-            local member = LuaMembers[idx]
-            if member then
-                selectedName = member.member_name or "???"
-                selectedType = member.lua_type or "???"
-            end
-        else
-            GUI:Dummy(2.0, 0)
-            GUI:SameLine(0.0, -1.0)
-            GUI:Label("No controls registered")
-            selectedName = ""
-            selectedType = ""
+            GUI:TreePop()
         end
 
         GUI:EndChild()
     end
 
-    --GUI:PushStyleColor(3, 1.0, 0.0, 0.0, 1.0) 
+    GUI:PushStyleColor(3, 1.0, 0.0, 0.0, 1.0) 
     if GUI:BeginChild("Select Control Target Windows")then
         GUI:Dummy(0.0, 0.0)
 
@@ -105,6 +108,6 @@ function Draw()
         --GUI:SameLine(0.0, -1.0) 
     end
     GUI:EndChild()
-    --GUI:PopStyleColor()
+    GUI:PopStyleColor()
     
 end

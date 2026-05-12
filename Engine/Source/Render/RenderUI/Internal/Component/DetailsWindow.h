@@ -15,6 +15,7 @@ namespace RenderUI {
 	public:
 		virtual bool Init();
 		virtual void Uninstall();
+		virtual void Notification(const char* msg);
 
 	private:
 	};

@@ -8,7 +8,10 @@ class SubsystemTemplate : public Core::Subsystem, public Singleton<T>
 {
 public:
     static void RegisterStatic() {
-        SubsystemTemplate::Get().template Register<T,Priority>();
+        SubsystemTemplate::Get().template Register<T, Priority>();
+    }
+    static void RegisterStatic(const char* tags) {
+        SubsystemTemplate::Get().template Register<T,Priority>(tags);
     }
 };
 
@@ -16,6 +19,13 @@ public:
 #define AUTO_REGISTER(T) \
     inline static bool CAT(T, _registered) = []() { \
         T::RegisterStatic(); \
+        return true; \
+    }(); \
+    inline bool CAT(T, _dummy) = CAT(T, _registered);
+
+#define AUTO_REGISTER_NOTIFICATION(T,TAGS) \
+    inline static bool CAT(T, _registered) = []() { \
+        T::RegisterStatic(TAGS); \
         return true; \
     }(); \
     inline bool CAT(T, _dummy) = CAT(T, _registered);
@@ -30,6 +40,15 @@ struct CAT(T, _AutoRegister)                                                 \
 {                                                                           \
     CAT(T, _AutoRegister)() {                                                \
         T::Get().Register<T, Core::SubsystemContext::Priority::Priority_>();\
+    }                                                                       \
+};                                                                          \
+static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);
+
+#define AUTO_REGISTER_SINGLETON_NOTIFICATION(T,TAGS , Priority_)             \
+struct CAT(T, _AutoRegister)                                                 \
+{                                                                           \
+    CAT(T, _AutoRegister)() {                                                \
+        T::Get().Register<T, Core::SubsystemContext::Priority::Priority_>(TAGS);\
     }                                                                       \
 };                                                                          \
 static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);
