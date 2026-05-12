@@ -1,24 +1,23 @@
 #include <Component/FileBrowserUI.h>
-///////////////////////////////////////
-#include <ILog.h>
-
-#include <AbsolutePath.h>
 #include <Converter.h>
 #include <FileManager.h>
-
-#include <Tools/Debouncer.h>
 #include <Tools/TextLayout.h>
-///////////////////////////////////////
 
-#include <functional>
-#include <vector>
-#include <string>
-#include <DrawToolsWindows.h>
+#include <Component/EditorGeneralLayout.h>
 
 namespace RenderUI {
-    AUTO_REGISTER(FileBrowserUI);
 
-    auto HighlightedArea = [](ImVec2 pos,ImVec2 size) {
+    class SetBackColor {
+    public:
+        SetBackColor(ImVec4 color, ImGuiCol_ col = ImGuiCol_WindowBg) {
+            ImGui::PushStyleColor(col, color);
+        }
+        ~SetBackColor() {
+            ImGui::PopStyleColor();
+        }
+    };
+
+    auto HighlightedArea = [](ImVec2 pos, ImVec2 size) {
         ImDrawList* draw = ImGui::GetWindowDrawList();
         draw->AddRectFilled(
             pos,
@@ -28,24 +27,15 @@ namespace RenderUI {
         );
     };
 
-    bool FileBrowserUI::Init()
+    void FileBrowserUI::Tick()
     {
-        state.currentPath = literal_root; // game ==  rootPath
-        state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory(); // 设置根路径就是工作路径
-
-        return true;
-    }
-
-    void FileBrowserUI::Uninstall()
-    {
-    }
-
-    void FileBrowserUI::Draw()
-    {
-        // render
-        DrawLayout();
-        //DirTree
-        //File
+        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        if (Switch.ContentBrowserWindow) {
+            // render
+            DrawLayout();
+            //DirTree
+            //File
+        }
     }
 
     void FileBrowserUI::DrawLayout()
@@ -96,7 +86,7 @@ namespace RenderUI {
 
                 if (isHovered)
                 {
-                    HighlightedArea(cursorPos, {25,25});
+                    HighlightedArea(cursorPos, { 25,25 });
 
                     if (ImGui::IsMouseClicked(0)) {
                         // return
@@ -255,7 +245,7 @@ namespace RenderUI {
 
         // 计算网格参数
         float panelWidth = ImGui::GetContentRegionAvail().x;
-        const float Zoom = Switch.filebrowserconfig.Zoom; // 获取缩放
+        const float Zoom = Config.Zoom; // 获取缩放
         const float ZitemSize = itemSize * Zoom;
         const float Zspacing = spacing * Zoom;
         int columns = (int)(panelWidth / (ZitemSize + Zspacing));
@@ -329,7 +319,7 @@ namespace RenderUI {
     {
         if (ImGui::IsMouseDoubleClicked(0))
         {
-            if(Context.IsFolder)
+            if (Context.IsFolder)
                 state.currentPath = ToGameRelative(Context.entry_path.wstring());
             else {
                 if (Context.entry_path.extension() != "") { // TODO file type 
@@ -350,7 +340,7 @@ namespace RenderUI {
             // 空白区域菜单
             if (ImGui::MenuItem("Reset Size")) {
                 LOG_INFO("Reset Size for file browser...");
-                Switch.filebrowserconfig.Zoom = 1.0f;
+                Config.Zoom = 1.0f;
             }
 
             ImGui::Separator();
@@ -385,7 +375,7 @@ namespace RenderUI {
                     DeleteFolderOrFile(Context.entry_path.filename().wstring());
                 }
                 else {
-                    DeleteFolderOrFile(Context.entry_path.filename().wstring(),true);
+                    DeleteFolderOrFile(Context.entry_path.filename().wstring(), true);
                 }
             }
             ImGui::EndPopup();
@@ -414,85 +404,5 @@ namespace RenderUI {
         // 前面拼上 "Game/"
         fs::path result = fs::path(L"Game") / relative;
         return result.lexically_normal().wstring();
-    }
-
-    EngineAssetType FileBrowserUI::GetFileType(const fs::directory_entry& entry)
-    {
-        if (entry.is_directory())
-            return EngineAssetType::Folder;
-
-        std::string ext = entry.path().extension().string();
-        // TODO file type
-        if (ext == ".json") {
-            return EngineAssetType::JSON;
-        }
-
-        return EngineAssetType::File;
-    }
-
-    ID3D11ShaderResourceView* FileBrowserUI::GetFileIcon(EngineAssetType filetype)
-    {
-        return RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(GetEngineAsset()->GetIcon(filetype));
-    }
-
-    void FileBrowserUI::FileContentAreaInput()
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
-
-        static Debouncer debouncer(300, []() {
-            LOG_INFO("FileBrowser Zoom changed to: " ,Switch.filebrowserconfig.Zoom);
-        });
-
-        if (isHovered) {
-            if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && io.MouseWheel != 0.0f) {
-                float wheelDelta = io.MouseWheel;
-                float& Zoom = Switch.filebrowserconfig.Zoom; // 获取缩放
-                if (wheelDelta != 0.0f) {
-                    float newZoom = Zoom + (wheelDelta / 50.0f);
-                    newZoom = std::clamp(newZoom, 0.5f, 1.5f);
-                    if (newZoom != Zoom) {
-                        Zoom = newZoom;
-                        debouncer.update();
-                    }
-                    io.MouseWheel = 0.0f;
-                }
-            }
-        }
-
-        debouncer.tick();
-    }
-
-    void FileBrowserUI::NewFolder()
-    {
-        OpenToolsWindow(OpenToolsWindows::OpenTools::NewFolder);
-    }
-
-    void FileBrowserUI::DeleteFolderOrFile(std::wstring Terget, bool isfile)
-    {
-        std::wstring path = GetAbsolutePath(state.currentPath);
-        path += L"\\" + Terget;
-
-        if (isfile) {
-            LOG_INFO("Delete File:" + IO::Converter::ToNarrowString(Terget));
-            IO::FileManager::DeleteToFile(path);
-        }
-        else {
-            LOG_INFO("Delete Folder:" + IO::Converter::ToNarrowString(Terget));
-            IO::FileManager::DeleteToDirectory(path);
-        }
-    }
-
-    void FileBrowserUI::FileOperations(FileTypeContext Context)
-    {
-        // TODO File Operation
-    }
-
-    //------------------------------------------------------
-    void DrawContentBrowserWindow()
-    {
-        if (Switch.ContentBrowserWindow) {
-            FileBrowserUI::Get().Draw();
-        }
     }
 }

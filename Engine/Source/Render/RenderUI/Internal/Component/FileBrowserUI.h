@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
-#include <Subsystem/SubsystemTemplate.h>
+#include <RenderSubsystem/RenderSubsystem.h>
+#include <cereal/cereal.hpp>
+#include <EditorUIWarehouse.h>
+
+#include <RenderMode/ImGuiMode.h>
 
 #include <filesystem>
-#include <EditorUIComponentSwitch.h>
 #include <IBufferManager.h>
 #include <SceneAsset/EngineAsset.h>
 
@@ -13,6 +16,15 @@ namespace RenderUI {
 	namespace fs = std::filesystem;
 
 	using namespace RuntimeAssets;
+
+	struct FileBrowserConfig {
+		float Zoom = 1.0f;
+
+		template<class Archive>
+		void serialize(Archive& archive) {
+			archive(Zoom);
+		}
+	};
 
     struct ContentBrowserState {
         std::wstring rootPath;                          // 根目录
@@ -25,16 +37,15 @@ namespace RenderUI {
 		fs::path entry_path;
 	};
 
-	class FileBrowserUI : public SubsystemTemplate<FileBrowserUI,Core::SubsystemContext::Priority::Low>
+	class FileBrowserUI : public SubsystemTemplate<FileBrowserUI, ModeType::ImGui>, public ImGuiMode
 	{
 	public:
 		const ContentBrowserState& GetState() {return state;};
 
-		virtual bool Init();
-		virtual void Uninstall();
-
-
-		void Draw();
+		virtual void Init() override;
+		virtual void Uninstall() override;
+		virtual void Tick() override;
+		virtual void* PublicData(uint8_t type) override;
 
 	protected:
 		void DrawLayout();
@@ -75,5 +86,7 @@ namespace RenderUI {
 		// 保存的位置
 		ImVec2 DirTreePos;
 		ImVec2 FilePos;
+
+		FileBrowserConfig Config;
 	};
 }

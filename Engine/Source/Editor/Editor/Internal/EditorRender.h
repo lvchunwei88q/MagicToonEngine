@@ -1,5 +1,5 @@
 #pragma once
-#include <RenderUI.h>
+#include <EditorUI.h>
 #include <Tools/Singleton.h>
 #include <IRender.h> // 呈现
 
@@ -12,6 +12,6 @@ namespace Editor {
 		void End();
 
 	private:
-		RenderUI::RenderUI renderui;
+		RenderUI::EditorUI editorUIui;
 	};
 }

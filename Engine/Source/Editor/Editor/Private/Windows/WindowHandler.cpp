@@ -3,13 +3,13 @@
 #include <dwmapi.h>
 
 // DX11相关
-#include <RenderUI.h>
+#include <EditorUI.h>
 #include <IRenderRT.h>
 #include <IBufferManager.h>
 
 namespace Editor {
 	LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-        if (RenderUI::RenderUI_Windows_Event(hWnd, msg, wParam, lParam))
+        if (RenderUI::EditorUI_Windows_Event(hWnd, msg, wParam, lParam))
             return true;
 
 		switch (msg) {

@@ -1,13 +1,35 @@
-#include <EditorUIComponentSwitch.h>
+#include <Component/Simple/LoggerUI.h>
 
 #include <Theme.h> // 主题
+#include <EditorUIWarehouse.h>
 
 ///////////////////////////////////////
 #include <ILog.h>
+///////////////////////
+// 序列化文件相关
+#include <AbsolutePath.h>
+#include <FileManager.h>
+#include <fstream>
+#include <Serialize/SerializeMacro.h>
+// 编码转换
+#include <Converter.h>
+#include <Component/EditorGeneralLayout.h>
+///////////////////////
 ///////////////////////////////////////
 
 namespace RenderUI {
+    RENDERUI_REGISTER(LoggerUI);
     using namespace LOG;
+
+    class SetBackColor {
+    public:
+        SetBackColor(ImVec4 color, ImGuiCol_ col = ImGuiCol_WindowBg) {
+            ImGui::PushStyleColor(col, color);
+        }
+        ~SetBackColor() {
+            ImGui::PopStyleColor();
+        }
+    };
 
     static ImVec4 GetLevelColor(LogLevel level) {
         switch (level) {
@@ -19,11 +41,22 @@ namespace RenderUI {
         }
     }
 
-    void LoggerWindow()
+    void LoggerUI::Init()
     {
+        FILE_SERIALIZATION_LOADING(Switch, CONFIG "Editor\\Windows\\", L"LoggerSwitch.mtdata")
+    }
+
+    void LoggerUI::Uninstall()
+    {
+        FILE_SERIALIZATION_SAVE(Switch, CONFIG "Editor\\Windows\\", L"LoggerSwitch.mtdata")
+    }
+
+    void LoggerUI::Tick()
+    {
+        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.LoggerWindow) {
 
-            LoggerSwitch& LogSwitch = Switch.loggerswitch;
+            LoggerSwitch& LogSwitch = this->Switch;
 
             SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
 
@@ -113,5 +146,10 @@ namespace RenderUI {
             ImGui::EndChild();
             ImGui::End();
         }
+    }
+
+    void* LoggerUI::PublicData(uint8_t type)
+    {
+        return nullptr;
     }
 }

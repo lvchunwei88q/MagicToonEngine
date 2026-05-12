@@ -31,13 +31,14 @@ set_source_files_properties(${BIND_SOURCES} PROPERTIES
 
 target_compile_definitions(RenderUI PRIVATE RENDERUI_EXPORTS)
 
+target_link_libraries(RenderUI PUBLIC Core)
 target_link_libraries(RenderUI PRIVATE RenderCore)
 target_link_libraries(RenderUI PUBLIC RenderRT)
 
 target_link_libraries(RenderUI PRIVATE Logger)
 target_link_libraries(RenderUI PRIVATE IO)
 
-target_link_libraries(RenderUI PRIVATE IMGUI)
-target_link_libraries(RenderUI PRIVATE liblua)
+target_link_libraries(RenderUI PUBLIC IMGUI)
+target_link_libraries(RenderUI PUBLIC liblua)
 
 target_link_libraries(RenderUI PRIVATE RuntimeAssets)

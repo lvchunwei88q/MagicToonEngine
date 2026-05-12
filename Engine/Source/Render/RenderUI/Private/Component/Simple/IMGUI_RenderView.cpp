@@ -1,16 +1,28 @@
-#include <EditorUIComponentSwitch.h>
+
+#include <Component/Simple/RenderView.h>
+
 #include <IRenderRT.h>
+#include <Component/EditorGeneralLayout.h>
+
+#include <EditorUIWarehouse.h>
 
 namespace RenderUI {
-	void RenderViewWindow() {
-		if (Switch.RenderViewWindow) {
+    RENDERUI_REGISTER(RenderView);
 
-            // Save Current style
-            ImGuiStyle& style = ImGui::GetStyle();
-            ImVec2 originalWindowPadding = style.WindowPadding;
+    void RenderView::Init()
+    {
+    }
 
-            // set this windows padding
-            style.WindowPadding = ImVec2(0.0f, 0.0f);
+    void RenderView::Uninstall()
+    {
+    }
+
+    void RenderView::Tick()
+    {
+        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        if (Switch.RenderViewWindow) {
+            // Set style
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
             // set windows flags
             ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar |
@@ -34,7 +46,12 @@ namespace RenderUI {
 
             ImGui::End();
 
-            style.WindowPadding = originalWindowPadding;
-		}
-	}
+            ImGui::PopStyleVar();
+        }
+    }
+
+    void* RenderView::PublicData(uint8_t type)
+    {
+        return nullptr;
+    }
 }

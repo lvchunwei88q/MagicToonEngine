@@ -1,14 +1,13 @@
-#include <EditorUIComponentSwitch.h>
-#include <DrawToolsWindows.h>
+#include <Component/EditorGeneralLayout.h>
+#include <EditorUIWarehouse.h>
+#include <Component/OpenToolsView.h>
 
 namespace RenderUI {
-    ComponentSwitch Switch; // 组件开关
-
-    void BasicLayout()
-    {
+	void EditorGeneralLayout::Tick()
+	{
         ImGuiIO& io = ImGui::GetIO();
 
-        // 获取主视口（窗口）的工作区域
+        // 获取主视口的工作区域
         ImGuiViewport* viewport = ImGui::GetMainViewport();
 
         // 设置下一个窗口填满整个视口
@@ -42,7 +41,7 @@ namespace RenderUI {
                 if (ImGui::MenuItem("New")) { /* TODO */ }
                 if (ImGui::MenuItem("Open")) { /* TODO */ }
                 if (ImGui::MenuItem("Save")) { /* TODO */ }
-                if (ImGui::MenuItem("Import FBX")) { OpenToolsWindow(OpenToolsWindows::OpenTools::FBXImport); }
+                if (ImGui::MenuItem("Import FBX")) { OpenToolsView::Get().OpenToolsWindow(OpenToolsWindows::OpenTools::FBXImport); }
                 ImGui::Separator();
                 if (ImGui::MenuItem("Exit")) { /* TODO */ }
                 ImGui::EndMenu();
@@ -79,5 +78,5 @@ namespace RenderUI {
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
         ImGui::End();
-    }
+	}
 }

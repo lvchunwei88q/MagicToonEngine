@@ -72,10 +72,10 @@ namespace Editor
 
     void EditorRender::Init()
     {
-        renderui.Init(Windows::Get().GetWindowsContext()->hWnd); // 初始化UI系统
+        editorUIui.Init(Windows::Get().GetWindowsContext()->hWnd); // 初始化UI系统
     }
     void EditorRender::End()
     {
-        renderui.Shutdown();
+        editorUIui.Shutdown();
     }
 }
