@@ -14,10 +14,11 @@ namespace RenderUI {
 		bool showWarning;
 		bool showError;
 		bool autoScroll;
+		bool detailedInformation;
 
 		template<class Archive>
 		void serialize(Archive& archive) {
-			archive(showDebug, showInfo, showWarning, showError, autoScroll);
+			archive(showDebug, showInfo, showWarning, showError, autoScroll, detailedInformation);
 		}
 	};
 

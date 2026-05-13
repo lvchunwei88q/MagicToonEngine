@@ -23,6 +23,9 @@ namespace RenderUI {
             },
             [](MteGUIContext& self, const std::string& name, float width, float height, bool border) -> bool {
                 return self.BeginChild(name, width, height, border);
+            },
+            [](MteGUIContext& self, const std::string& name, float width, float height, ImGuiChildFlags childFlags, ImGuiWindowFlags windowFlags) -> bool {
+                return ImGui::BeginChild(name.c_str(), ImVec2(width, height), childFlags, windowFlags);
             }
         ));
         gui_type.set("EndChild", &MteGUIContext::EndChild);

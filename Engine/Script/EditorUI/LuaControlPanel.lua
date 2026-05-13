@@ -41,14 +41,9 @@ function Draw()
     local items = BuildMemberItems()
     local count = #items
 
-    if GUI:BeginChild("Select Control Target Windows")then
+    if GUI:BeginChild("Select Control Target Windows Up",0,0,ImGuiChildFlags.AutoResizeY,ImGuiWindowFlags.None)then
 
-        GUI:Dummy(2.0, 0)
-        GUI:SameLine(0.0, -1.0)
-
-        GUI:Label("Select Control Target:")
-
-        if GUI:TreeNode("Control List") then
+        if GUI:TreeNode("Editor Select Control Target:") then
             if count > 0 then
                 -- 确保选中索引在有效范围
                 if listboxState.selected < 0 or listboxState.selected >= count then
@@ -80,14 +75,17 @@ function Draw()
             end
             GUI:TreePop()
         end
+
+        if GUI:TreeNode("Custom Select Control Target:") then
+            if count > 0 then
+            end
+            GUI:TreePop()
+        end
     end
     GUI:EndChild()
 
-    GUI:PushStyleColor(ImGuiCol.ChildBg, 1.0, 0.0, 0.0, 1.0)
-    if GUI:BeginChild("Select Control Target Windows")then
-        GUI:Dummy(0.0, 0.0)
-
-        GUI:Separator()
+    GUI:PushStyleColor(ImGuiCol.ChildBg, 0.10, 0.10, 0.10, 1.0)
+    if GUI:BeginChild("Select Control Target Windows Low",0, 0,ImGuiChildFlags.Borders,ImGuiWindowFlags.None)then
 
         GUI:Dummy(2.0, 0)
         GUI:SameLine(0.0, -1.0)

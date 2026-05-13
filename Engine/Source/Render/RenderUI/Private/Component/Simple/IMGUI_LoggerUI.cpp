@@ -29,6 +29,14 @@ namespace RenderUI {
         }
     };
 
+    auto CalcCheckboxWidth = [](const char* label) {
+        float checkboxSquare = ImGui::GetFrameHeight();  // Checkbox 方框宽度 = 高度（正方形）
+        float padding = ImGui::GetStyle().FramePadding.x * 2;
+        float innerSpacing = checkboxSquare > 0 ? ImGui::GetStyle().ItemInnerSpacing.x : 0;
+        float textWidth = ImGui::CalcTextSize(label).x;
+        return checkboxSquare + innerSpacing + padding + textWidth;
+    };
+
     static ImVec4 GetLevelColor(LogLevel level) {
         switch (level) {
         case LogLevel::Debug:   return Theme::LOG_DEBUG;
@@ -61,28 +69,43 @@ namespace RenderUI {
             ImGui::Begin("Engine Log");
 
             // ---- 工具栏 ----
-            if (ImGui::Button("Clear")) {
-                GetLogInstance()->ClearRecentEntries();
+            {
+                if (ImGui::Button("Clear")) {
+                    GetLogInstance()->ClearRecentEntries();
+                }
+                ImGui::SameLine();
+
+                // 级别过滤复选框
+                ImGui::Checkbox("Debug", &LogSwitch.showDebug);
+                ImGui::SameLine();
+                ImGui::Checkbox("Info", &LogSwitch.showInfo);
+                ImGui::SameLine();
+                ImGui::Checkbox("Warning", &LogSwitch.showWarning);
+                ImGui::SameLine();
+                ImGui::Checkbox("Error", &LogSwitch.showError);
+
+                float usedWidth = ImGui::GetItemRectMax().x - ImGui::GetWindowPos().x;
+                float AutoScrollCheckboxWidth = CalcCheckboxWidth("Auto-scroll");
+                float DetailedInformationCheckboxWidth = CalcCheckboxWidth("Detailed-information");
+                float WindowWidth = ImGui::GetWindowWidth();
+
+                if (WindowWidth >= (AutoScrollCheckboxWidth + DetailedInformationCheckboxWidth + usedWidth)) {
+                    ImGui::SameLine(ImGui::GetContentRegionAvail().x - AutoScrollCheckboxWidth - DetailedInformationCheckboxWidth);
+                    ImGui::Checkbox("Auto-scroll", &LogSwitch.autoScroll);
+                    ImGui::SameLine();
+                    ImGui::Checkbox("Detailed-information", &LogSwitch.detailedInformation);
+                }
+                else if (WindowWidth >= (DetailedInformationCheckboxWidth + usedWidth)) {
+                    ImGui::SameLine(ImGui::GetContentRegionAvail().x - DetailedInformationCheckboxWidth);
+                    ImGui::Checkbox("Detailed-information", &LogSwitch.detailedInformation);
+                }
             }
-            ImGui::SameLine();
-
-            // 级别过滤复选框
-            ImGui::Checkbox("Debug", &LogSwitch.showDebug);
-            ImGui::SameLine();
-            ImGui::Checkbox("Info", &LogSwitch.showInfo);
-            ImGui::SameLine();
-            ImGui::Checkbox("Warning", &LogSwitch.showWarning);
-            ImGui::SameLine();
-            ImGui::Checkbox("Error", &LogSwitch.showError);
-
-            ImGui::SameLine();
-            ImGui::Checkbox("Auto-scroll", &LogSwitch.autoScroll);
 
             ImGui::Separator();
 
             // ---- 日志列表 ----
             float RemainingHeight = ImGui::GetContentRegionAvail().y;
-            float Height = RemainingHeight - 300 > 0 ? RemainingHeight - 150 : RemainingHeight;
+            float Height = RemainingHeight - 200 > 0 && LogSwitch.detailedInformation ? RemainingHeight - 150 : RemainingHeight;
             ImGui::BeginChild("LogScrollRegion", ImVec2(0, Height), false, ImGuiWindowFlags_HorizontalScrollbar);
 
             {
@@ -152,11 +175,11 @@ namespace RenderUI {
 
             ImGui::EndChild();
 
-            if ((RemainingHeight - Height) > 0.0f) {
-                ImGui::BeginChild("LogContentRegion", ImVec2(0, ImGui::GetContentRegionAvail().y));
+            if ((RemainingHeight - Height) > 0.0f && LogSwitch.detailedInformation) {
+                SetBackColor color(ImVec4(0.10f, 0.10f, 0.10f, 1.0f), ImGuiCol_ChildBg);
+                ImGui::BeginChild("LogContentRegion", ImVec2(0, ImGui::GetContentRegionAvail().y), ImGuiChildFlags_Borders,0);
                 {
                     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
-                    SetBackColor color(ImVec4(0.10f, 0.10f, 0.10f, 1.0f));
                     ImGui::BeginChild("LogContentInfoRegion", ImVec2(0, ImGui::GetContentRegionAvail().y - 20));
                     {
                         textlayout::TextLayoutParams params;
