@@ -19,10 +19,11 @@ namespace RenderUI {
 
 	struct FileBrowserConfig {
 		float Zoom = 1.0f;
+		float dirTreeWidth = 250.0f;
 
 		template<class Archive>
 		void serialize(Archive& archive) {
-			archive(Zoom);
+			archive(Zoom,dirTreeWidth);
 		}
 	};
 
@@ -76,8 +77,6 @@ namespace RenderUI {
 		std::wstring ToGameRelative(const std::wstring& absolutePath);
 	private:
 		ContentBrowserState state;
-
-		float dirTreeWidth = 250.0f;
 		const float splitterWidth = 4.0f;
 
 		const float itemSize = 80.0f;        // 每个格子的大小 默认

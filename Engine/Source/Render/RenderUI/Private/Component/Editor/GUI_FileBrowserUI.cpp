@@ -110,7 +110,7 @@ namespace RenderUI {
         // main content
         {
             {
-                ImGui::BeginChild("DirTree", ImVec2(dirTreeWidth, 0), true);
+                ImGui::BeginChild("DirTree", ImVec2(Config.dirTreeWidth, 0), true);
                 {
                     DirTreePos = ImGui::GetCursorPos();
                     this->DirTree();
@@ -125,8 +125,8 @@ namespace RenderUI {
                 ImGui::InvisibleButton("##splitter", splitterSize);
 
                 if (ImGui::IsItemActive()) {
-                    dirTreeWidth += ImGui::GetIO().MouseDelta.x;
-                    dirTreeWidth = ImClamp(dirTreeWidth, 100.0f, ImGui::GetContentRegionAvail().x * 0.6f);
+                    Config.dirTreeWidth += ImGui::GetIO().MouseDelta.x;
+                    Config.dirTreeWidth = ImClamp(Config.dirTreeWidth, 100.0f, ImGui::GetContentRegionAvail().x * 0.6f);
                 }
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);

@@ -17,11 +17,13 @@ namespace RenderUI {
 		bool LoggerWindow;
 		bool RenderViewWindow;
 		bool ContentBrowserWindow;
+		// -----------------------
+		bool EditorSettingsView;
 
 		template<class Archive>
 		void serialize(Archive& archive) {
 			archive(DetailsWindow, LuaControl, LoggerWindow,
-				RenderViewWindow, ContentBrowserWindow);
+				RenderViewWindow, ContentBrowserWindow, EditorSettingsView);
 		}
 	};
 

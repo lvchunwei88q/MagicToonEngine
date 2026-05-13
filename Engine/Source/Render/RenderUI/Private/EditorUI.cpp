@@ -8,6 +8,7 @@
 
 #include <ILog.h>
 #include <Theme.h> // 主题
+#include <FileManager.h>
 
 #include <front/Roboto_Regular_front.h> // 加载字体
 
@@ -191,6 +192,19 @@ namespace RenderUI {
 			&ifc,
 			io.Fonts->GetGlyphRangesChineseFull()
 		);
+
+        if (IO::FileManager::Exists(L"c:\\Windows\\Fonts\\msyh.ttc")) {
+            ifc.MergeMode = true; // add for front
+            ImGui::GetIO().Fonts->AddFontFromFileTTF(
+                "c:\\Windows\\Fonts\\msyh.ttc", 18.0f, &ifc, // windows default front path
+                ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon());
+        }
+        else {
+            LOG_WARNING("No Chinese font files were detected on this system! Target: c:\\Windows\\Fonts\\msyh.ttc");
+        }
+
+        // Set Default Front
+        ImGui::GetIO().FontDefault = front;
 
 		// Setup Platform/Renderer backends
 		ImGui_ImplWin32_Init(hwnd);

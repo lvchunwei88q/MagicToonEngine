@@ -49,6 +49,8 @@ namespace RenderUI {
 
             if (ImGui::BeginMenu("Edit"))
             {
+                ImGui::MenuItem("Editor Settings", nullptr, &Switch.EditorSettingsView);
+                ImGui::Separator();
                 if (ImGui::MenuItem("Undo")) { /* TODO */ }
                 if (ImGui::MenuItem("Redo")) { /* TODO */ }
                 ImGui::EndMenu();
