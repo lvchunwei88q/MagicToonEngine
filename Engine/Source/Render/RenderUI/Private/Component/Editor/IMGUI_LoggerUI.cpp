@@ -1,4 +1,4 @@
-#include <Component/Simple/LoggerUI.h>
+#include <Component/Editor/LoggerUI.h>
 
 #include <Theme.h> // 主题
 #include <EditorUIWarehouse.h>
@@ -10,7 +10,7 @@
 #include <Serialize/SerializeMacro.h>
 // 编码转换
 #include <Converter.h>
-#include <Component/EditorGeneralLayout.h>
+#include <Component/Editor/EditorGeneralLayout.h>
 #include <Tools/TextLayout.h>
 ///////////////////////
 ///////////////////////////////////////

@@ -1,8 +1,8 @@
-#include <Component/OpenToolsView.h>
+#include <Component/Tools/OpenToolsView.h>
 #include <ILog.h>
 
 #include <FBXImport.h> // fbx import 
-#include <Component/FileBrowserUI.h>
+#include <Component/Editor/FileBrowserUI.h>
 
 ///////////////////////
 #include <FileManager.h>

@@ -1,4 +1,4 @@
-#include <Component/OpenToolsView.h>
+#include <Component/Tools/OpenToolsView.h>
 #include <EditorUIWarehouse.h>
 
 namespace RenderUI {

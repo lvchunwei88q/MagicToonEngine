@@ -1,9 +1,9 @@
-#include <Component/FileBrowserUI.h>
+#include <Component/Editor/FileBrowserUI.h>
 #include <Converter.h>
 #include <FileManager.h>
 #include <Tools/TextLayout.h>
 
-#include <Component/EditorGeneralLayout.h>
+#include <Component/Editor/EditorGeneralLayout.h>
 
 namespace RenderUI {
 

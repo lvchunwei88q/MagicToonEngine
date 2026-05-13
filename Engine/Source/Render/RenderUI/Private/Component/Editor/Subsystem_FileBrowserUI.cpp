@@ -1,4 +1,4 @@
-#include <Component/FileBrowserUI.h>
+#include <Component/Editor/FileBrowserUI.h>
 
 #include <EditorUIWarehouse.h>
 ///////////////////////////////////////
@@ -15,7 +15,7 @@
 
 #include <functional>
 #include <string>
-#include <Component/OpenToolsView.h>
+#include <Component/Tools/OpenToolsView.h>
 
 namespace RenderUI {
     RENDERUI_REGISTER(FileBrowserUI);

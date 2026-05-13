@@ -1,8 +1,8 @@
 
-#include <Component/Simple/RenderView.h>
+#include <Component/Render/RenderView.h>
 
 #include <IRenderRT.h>
-#include <Component/EditorGeneralLayout.h>
+#include <Component/Editor/EditorGeneralLayout.h>
 
 #include <EditorUIWarehouse.h>
 

@@ -1,6 +1,6 @@
-#include <Component/Simple/LuaUIControl.h>
+#include <Component/Editor/LuaUIControl.h>
 #include <MagicUIContext.h>
-#include <Component/EditorGeneralLayout.h>
+#include <Component/Editor/EditorGeneralLayout.h>
 
 #include <ILog.h>
 #include <Jobsystem/JobSystem.h>

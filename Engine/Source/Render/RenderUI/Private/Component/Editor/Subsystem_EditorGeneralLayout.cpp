@@ -1,6 +1,6 @@
 #include <EditorUIWarehouse.h>
 
-#include <Component/EditorGeneralLayout.h>
+#include <Component/Editor/EditorGeneralLayout.h>
 ///////////////////////
 // 序列化文件相关
 #include <AbsolutePath.h>

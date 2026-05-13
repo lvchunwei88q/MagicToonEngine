@@ -1,6 +1,6 @@
-#include <Component/EditorGeneralLayout.h>
+#include <Component/Editor/EditorGeneralLayout.h>
 #include <EditorUIWarehouse.h>
-#include <Component/OpenToolsView.h>
+#include <Component/Tools/OpenToolsView.h>
 
 namespace RenderUI {
 	void EditorGeneralLayout::Tick()
