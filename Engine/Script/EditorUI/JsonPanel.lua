@@ -1,6 +1,6 @@
 -- 测试 JSON 数据（用 Lua 表模拟）
 local json_data = {
-    name = "MyActor",
+    name = "GameActor",
     visible = true,
     position = {1.0, 2.0, 3.0},
     rotation = {0.0, 45.0, 0.0},

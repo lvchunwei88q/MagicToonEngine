@@ -9,9 +9,10 @@ namespace RenderUI {
 
     void DetailsPanel::Init()
     {
+        RegisterLua("EditorUI\\JsonPanel.lua");
         MteGUIContext::Get().BindLuaFunction(lua);
-        LoadLua("EditorUI\\JsonPanel.lua");
-        REGISTER_LUA_MEMBER(&DetailsPanel::Get(), "Details Panel");
+
+        REGISTER_LUA_MEMBER(&DetailsPanel::Get(), "Json Panel");
     }
 
     void DetailsPanel::Uninstall()

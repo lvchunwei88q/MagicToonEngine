@@ -1,9 +1,10 @@
 require("Common/LuaUIEnum") 
 
 -- 全局状态
-local listboxState = { selected = 0 }
-local selectedName = "Please select a control target"
-local selectedType = "..."
+PersistentData = PersistentData or {}
+PersistentData.listboxState = PersistentData.listboxState or { selected = 0 }
+PersistentData.selectedName = PersistentData.selectedName or "Please select a control target"
+PersistentData.selectedType = PersistentData.selectedType or "..."
 
 -- ----------------------------------------------------
 -- 从 LuaMembers 构建选项列表
@@ -33,6 +34,10 @@ end
 -- 主绘制函数
 -- ----------------------------------------------------
 function Draw()
+    local listboxState = PersistentData.listboxState -- 引用
+    local selectedName = PersistentData.selectedName -- 引用
+    local selectedType = PersistentData.selectedType -- 引用
+
     local items = BuildMemberItems()
     local count = #items
 

@@ -27,10 +27,11 @@ namespace RenderUI {
 	public:
 		void Draw();
 		virtual void Preprocessing() {};
-		void LoadLua(std::string lua_type);
+		void RegisterLua(std::string lua_type); // 注册Lua每次会清除状态
 		void UpdateLua();
 
 		void RuntimeError();
+		void RuntimeError(const sol::protected_function_result& result);
 
 		const std::string GetLuaType() { return current_lua_type; }
 		const bool GetisLoading();
@@ -53,6 +54,7 @@ namespace RenderUI {
 
 	RENDERUI_API ILuaUIMember* GetLuaUIMember();
 
+	// TODO 更加智能化控制
 #define REGISTER_LUA_MEMBER(Object,Name)			\
 		GetLuaUIMember()->Register({Object,Name});
 }

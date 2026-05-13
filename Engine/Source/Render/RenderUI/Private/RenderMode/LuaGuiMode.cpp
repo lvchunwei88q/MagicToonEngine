@@ -21,17 +21,9 @@ namespace RenderUI {
     {
         if (AllowDraw.Allow() == false) { // 绘制
             Preprocessing();
-            auto result = lua.safe_script("Draw()",
-                [](lua_State*, sol::protected_function_result pfr) {
-                    // 出错时返回 pfr 本身，不抛异常
-                    return pfr;
-                }
-            );
+            auto result = lua.safe_script("Draw()", sol::script_pass_on_error);
             if (!result.valid()) {
-                sol::error err = result;
-                current_lua_error = err.what();
-                LOG_ERROR("Lua Draw() Error: ", current_lua_error);
-                AllowDraw.isError = true;
+                RuntimeError(result);
             }
         }
         else {
@@ -50,56 +42,48 @@ namespace RenderUI {
         }
     }
 
-    void LuaGuiMode::LoadLua(std::string lua_type)
+    void LuaGuiMode::RegisterLua(std::string lua_type)
     {
+        lua = sol::state();
         lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::debug); // base lib
+
         std::wstring ScriptPath = IO::AbsolutePath::Get().GetScriptPath();
         std::string narrowPath = IO::Converter::ToNarrowString(ScriptPath);
+        std::replace(narrowPath.begin(), narrowPath.end(), '\\', '/');
         {
-            size_t pos = 0;
-            while ((pos = narrowPath.find('\\', pos)) != std::string::npos) {
-                narrowPath.replace(pos, 1, "\\\\");
-                pos += 2;
-            }
-        }
-        {
-            std::string script = // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            std::string script =
                 "package.path = package.path .. \";" +
                 narrowPath +
                 "/?.lua\"";
             auto result = lua.safe_script(script, sol::script_pass_on_error);
             if (!result.valid()) {
-                sol::error err = result;
-                LOG_ERROR("Lua Load Error: ", err.what());
-            }
-        }
-
-        if (current_lua_type != lua_type) {
-            std::wstring script_path = IO::AbsolutePath::Get().GetScriptPath();
-            this->lua_path = IO::Converter::ToNarrowString(script_path) + "\\" + lua_type;
-            current_lua_type = lua_type;
-
-            sol::load_result result = lua.load_file(this->lua_path);
-            if (!result.valid()) {
-                sol::error err = result;
-                LOG_ERROR("Lua script compilation failed: ", err.what());
-                AllowDraw.isCompileError = true;
+                RuntimeError(result);
                 return;
             }
-            else AllowDraw.isCompileError = false;
-            lua_script = result;
-
-            // 执行一次Lua
-            auto exec_result = lua_script();
-            if (!exec_result.valid()) {
-                sol::error err = exec_result;
-                LOG_ERROR("Lua script execution failed: ", err.what());
-                AllowDraw.isError = true;
-            }
-            AllowDraw.isError = false;
-
-            LOG_INFO("Lua script compilation completed: ", lua_type);
         }
+
+        this->lua_path = IO::Converter::ToNarrowString(ScriptPath) + "\\" + lua_type;
+        current_lua_type = lua_type;
+
+        sol::load_result result = lua.load_file(this->lua_path);
+        if (!result.valid()) {
+            sol::error err = result;
+            LOG_ERROR("Lua script compilation failed: ", err.what());
+            AllowDraw.isCompileError = true;
+            return;
+        }
+        else AllowDraw.isCompileError = false;
+        lua_script = result;
+
+        // 执行一次Lua
+        auto exec_result = lua_script();
+        if (!exec_result.valid()) {
+            RuntimeError(exec_result);
+            return;
+        }
+        AllowDraw.isError = false;
+
+        LOG_INFO("Lua script compilation completed: ", lua_type);
     }
 
     void LuaGuiMode::UpdateLua()
@@ -109,6 +93,7 @@ namespace RenderUI {
             Core::JobHandle handle = Core::JobSystem::Get().Schedule([this]() {
                 LOG_INFO("Task Lua completed");
                 {
+                    // lua_load
                     sol::load_result result = lua.load_file(this->lua_path);
                     if (!result.valid()) {
                         sol::error err = result;
@@ -117,7 +102,13 @@ namespace RenderUI {
                         return;
                     }
                     else AllowDraw.isCompileError = false;
-                    lua_script = result;lua_script();
+                    lua_script = result;
+                    // lua_script
+                    auto exec_result = lua_script();
+                    if (!exec_result.valid()) {
+                        RuntimeError(exec_result);
+                        return;
+                    }
                     AllowDraw.isError = false;
                     LOG_INFO("Lua script compilation completed");
                 }
@@ -133,6 +124,19 @@ namespace RenderUI {
     {
         AllowDraw.isError = true;
         current_lua_error = "IMGUI internal error, please check the output log";
+    }
+
+    void LuaGuiMode::RuntimeError(const sol::protected_function_result& result)
+    {
+        AllowDraw.isError = true;
+        if (!result.valid()) {
+            sol::error err = result;
+            LOG_ERROR("Lua script execution failed: ", err.what());
+            current_lua_error = err.what();
+        }
+        else {
+            current_lua_error = "IMGUI internal error, please check the output log";
+        }
     }
 
     const bool LuaGuiMode::GetisLoading()

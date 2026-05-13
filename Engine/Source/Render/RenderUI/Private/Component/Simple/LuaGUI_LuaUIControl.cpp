@@ -15,10 +15,11 @@ namespace RenderUI {
 
     void LuaUIControlWindows::Init()
     {
+        RegisterLua("EditorUI\\LuaControlPanel.lua");
         MteGUIContext::Get().BindLuaFunction(lua);
-        LoadLua("EditorUI\\LuaControlPanel.lua");
         REGISTER_LUA_MEMBER(&LuaUIControlWindows::Get(), "LuaUI Control");
 
+        sol::table persistent = lua["PersistentData"].get_or_create<sol::table>();
         lua.set_function("Update", [](std::string lua_type, std::string target) {
             const std::vector<LuaMember>& LuaMembers = LuaUIMember::Get().GetLuaMember();
             for (auto& LuaMember : LuaMembers)
@@ -31,7 +32,7 @@ namespace RenderUI {
                     }
                 }
             }
-            });
+        });
     }
     void LuaUIControlWindows::Uninstall()
     {
