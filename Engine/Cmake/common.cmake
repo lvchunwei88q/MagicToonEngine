@@ -28,3 +28,25 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Windows API 用宽字符版本
 add_definitions(-DUNICODE -D_UNICODE)
+
+# ============================================================
+# 项目版本号定义：MagicToon Engine
+# 版本号格式：大版本.功能新增.功能升级.Bug修复 (MAJOR.FEATURE.UPGRADE.BUGFIX)
+# 
+# 版本分类说明：
+#   第一位 (MAJOR)    大版本：    架构级重构、不兼容的 API 变更、重大里程碑发布
+#   第二位 (FEATURE)  功能新增：  全新的子系统、模块或重要特性引入
+#   第三位 (UPGRADE)  功能升级：  现有功能的扩展、增强、性能优化
+#   第四位 (BUGFIX)   Bug修复：   缺陷修复、补丁、小范围调整
+#
+# 注意：本规则为项目自定义版本规范，与标准 Semver (Major.Minor.Patch) 略有差异
+# ============================================================
+file(READ "${CMAKE_SOURCE_DIR}/VERSION" PROJECT_VERSION_STRING)
+string(STRIP "${PROJECT_VERSION_STRING}" PROJECT_VERSION_STRING)
+
+# 按 . 拆分成列表
+string(REPLACE "." ";" VERSION_LIST "${PROJECT_VERSION_STRING}")
+list(GET VERSION_LIST 0 MAJOR_VERSION)
+list(GET VERSION_LIST 1 FEATURE_VERSION)
+list(GET VERSION_LIST 2 UPGRADE_VERSION)
+list(GET VERSION_LIST 3 BUGFIX_VERSION)
