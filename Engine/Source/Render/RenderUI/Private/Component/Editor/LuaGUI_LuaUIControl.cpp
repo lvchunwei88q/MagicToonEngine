@@ -15,16 +15,16 @@ namespace RenderUI {
 
     void LuaUIControlWindows::Init()
     {
+        REGISTER_LUA_MEMBER(&LuaUIControlWindows::Get(), "LuaUI Control");
         RegisterLua("EditorUI\\LuaControlPanel.lua");
         MteGUIContext::Get().BindLuaFunction(lua);
-        REGISTER_LUA_MEMBER(&LuaUIControlWindows::Get(), "LuaUI Control");
 
         sol::table persistent = lua["PersistentData"].get_or_create<sol::table>();
         lua.set_function("Update", [](std::string lua_type, std::string target) {
             const std::vector<LuaMember>& LuaMembers = LuaUIMember::Get().GetLuaMember();
             for (auto& LuaMember : LuaMembers)
             {
-                if (LuaMember.member_name == target || LuaMember.lua_type == lua_type) {
+                if (LuaMember.member_name == target || LuaMember.member->GetLuaType() == lua_type) {
                     if (!LuaMember.member->GetisLoading())
                         LuaMember.member->UpdateLua();
                     else {
@@ -72,7 +72,7 @@ namespace RenderUI {
         for (size_t i = 0; i < LuaMembers.size(); ++i)
         {
             std::string name = LuaMembers[i].member_name;
-            std::string ltype = LuaMembers[i].lua_type;
+            std::string ltype = LuaMembers[i].member->GetLuaType();
 
             sol::table m = lua.create_table();
             m["member_name"] = name;

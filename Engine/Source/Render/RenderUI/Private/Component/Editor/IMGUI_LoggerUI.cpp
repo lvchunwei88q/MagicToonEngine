@@ -105,7 +105,7 @@ namespace RenderUI {
 
             // ---- 日志列表 ----
             float RemainingHeight = ImGui::GetContentRegionAvail().y;
-            float Height = RemainingHeight - 200 > 0 && LogSwitch.detailedInformation ? RemainingHeight - 150 : RemainingHeight;
+            float Height = RemainingHeight - 200 > 0 && LogSwitch.detailedInformation ? RemainingHeight - 100 : RemainingHeight;
             ImGui::BeginChild("LogScrollRegion", ImVec2(0, Height), false, ImGuiWindowFlags_HorizontalScrollbar);
 
             {

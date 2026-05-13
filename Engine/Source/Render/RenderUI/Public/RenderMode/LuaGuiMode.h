@@ -33,7 +33,7 @@ namespace RenderUI {
 		void RuntimeError();
 		void RuntimeError(const sol::protected_function_result& result);
 
-		const std::string GetLuaType() { return current_lua_type; }
+		const std::string& GetLuaType() { return current_lua_type; }
 		const bool GetisLoading();
 	protected:
 		DrawCancel AllowDraw;
