@@ -66,7 +66,7 @@ namespace RenderUI {
                         ImGui::Separator();
                     }
                         break;
-                    case 4: // Language
+                    case 1: // Language
                     {
                         ImGui::Text("Language Settings");
                         ImGui::Separator();
