@@ -9,10 +9,8 @@ if(MSVC)
     add_compile_options(
         "/wd4819"
     )
-    # /utf-8 编译选项
-    add_compile_options(/utf-8)
-    # 关闭显示包含文件
-    add_compile_options(/showIncludes:-)
+    add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
     # 更改最大数
     add_compile_options(/bigobj)
 endif()
@@ -28,5 +26,5 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# 设置编码 使用 Unicode 编码 UTF-16 Unicode
-add_definitions(-DUNICODE)
+# Windows API 用宽字符版本
+add_definitions(-DUNICODE -D_UNICODE)

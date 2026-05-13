@@ -57,7 +57,6 @@ bool EnginePreInit(int argc, char* argv[]) {
         std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
         std::wstring exePath = exeDir + L"\\ProjectLauncher.exe";
 
-        // 构建命令行参数：-p "path" "name"
         std::wstring cmdLine = L"\"" + exePath + L"\"";
 
         // 启动进程

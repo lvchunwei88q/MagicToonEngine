@@ -9,17 +9,22 @@
 namespace RenderUI {
 	class Subsystem;
 
-	struct Context
+	struct RegisterSubsystemContext
 	{
 		Subsystem* Subsystem;
 		const char* Name;
+	};
+
+	// As a globally shared resource when rendering the UI
+	struct RenderUIContext {
+		uintptr_t hwnd;
 	};
 
 	// Interface 
 	class RENDERUI_API ISubsystem
 	{
 	public:
-		virtual void RegisterSubsystem(Context context) = 0;
+		virtual void RegisterSubsystem(RegisterSubsystemContext context) = 0;
 		// Control
 		virtual void Init() = 0;
 		virtual void Uninstall() = 0;
@@ -27,6 +32,8 @@ namespace RenderUI {
 		virtual void Notification(const char* msg) = 0;
 
 		virtual void* GetSubsystemPublicData(std::string Target,uint8_t Type) = 0;
+
+		virtual [[nodiscard]] const RenderUIContext& GetRenderUIContext() const = 0;
 	};
 	RENDERUI_API ISubsystem* GetSubsystem();
 
@@ -48,7 +55,7 @@ namespace RenderUI {
 			// Register the subsystem in the system manager
 			const char* name = typeid(Derived).name();
 
-			Context context{};
+			RegisterSubsystemContext context{};
 			context.Name = name;
 			context.Subsystem = this;
 			this->Type = type;

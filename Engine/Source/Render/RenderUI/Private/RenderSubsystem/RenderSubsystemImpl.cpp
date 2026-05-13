@@ -10,24 +10,24 @@ namespace RenderUI {
 		return &RenderSubsystemImpl::Get();
 	}
 
-	void RenderSubsystemImpl::RegisterSubsystem(Context context)
+	void RenderSubsystemImpl::RegisterSubsystem(RegisterSubsystemContext context)
 	{
 		SubsystemContext sub_context;
 		sub_context.Name = context.Name;
 		sub_context.Subsystem = context.Subsystem;
-		Contexts.push_back(std::move(sub_context));
+		Subsystems.push_back(std::move(sub_context));
 	}
 
 	void RenderSubsystemImpl::Init()
 	{
-		std::sort(Contexts.begin(), Contexts.end(),
+		std::sort(Subsystems.begin(), Subsystems.end(),
 		[](const SubsystemContext& a, const SubsystemContext& b) {
 			return a.Subsystem->GetPriority() < b.Subsystem->GetPriority();
 		});
 
-		for (size_t i = 0; i < Contexts.size(); i++)
+		for (size_t i = 0; i < Subsystems.size(); i++)
 		{
-			auto& context = Contexts[i];
+			auto& context = Subsystems[i];
 			if (context.Subsystem)
 				context.Subsystem->Init();
 		}
@@ -35,9 +35,9 @@ namespace RenderUI {
 
 	void RenderSubsystemImpl::Uninstall()
 	{
-		for (size_t i = Contexts.size(); i-- > 0;)
+		for (size_t i = Subsystems.size(); i-- > 0;)
 		{
-			auto& context = Contexts[i];
+			auto& context = Subsystems[i];
 			if (context.Subsystem)
 				context.Subsystem->Uninstall();
 		}
@@ -45,9 +45,9 @@ namespace RenderUI {
 
 	void RenderSubsystemImpl::Tick()
 	{
-		for (size_t i = 0; i < Contexts.size(); i++)
+		for (size_t i = 0; i < Subsystems.size(); i++)
 		{
-			auto& context = Contexts[i];
+			auto& context = Subsystems[i];
 			if (context.Subsystem) {
 				switch (context.Subsystem->GetModeType())
 				{
@@ -68,9 +68,9 @@ namespace RenderUI {
 
 	void* RenderSubsystemImpl::GetSubsystemPublicData(std::string Target, uint8_t Type)
 	{
-		for (size_t i = 0; i < Contexts.size(); i++)
+		for (size_t i = 0; i < Subsystems.size(); i++)
 		{
-			auto& context = Contexts[i];
+			auto& context = Subsystems[i];
 			if (context.Name.find(Target) != std::string::npos) {
 				return context.Subsystem->PublicData(Type);
 			}
@@ -78,11 +78,21 @@ namespace RenderUI {
 		return nullptr;
 	}
 
+	const RenderUIContext& RenderSubsystemImpl::GetRenderUIContext() const
+	{
+		return UIContext;
+	}
+
+	RenderUIContext& RenderSubsystemImpl::SetRenderUIContext()
+	{
+		return UIContext;
+	}
+
 	void RenderSubsystemImpl::Notification(const char* msg)
 	{
-		for (size_t i = 0; i < Contexts.size(); i++)
+		for (size_t i = 0; i < Subsystems.size(); i++)
 		{
-			auto& context = Contexts[i];
+			auto& context = Subsystems[i];
 			if (context.Subsystem)
 				context.Subsystem->Notification(msg);
 		}

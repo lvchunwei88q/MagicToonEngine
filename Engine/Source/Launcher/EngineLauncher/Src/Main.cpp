@@ -1,28 +1,10 @@
 #include "Main.h"
 #include <Editor.h>
 
-#ifdef _DEBUG
-BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
-    switch (dwCtrlType) {
-    case CTRL_CLOSE_EVENT:
-    case CTRL_LOGOFF_EVENT:
-    case CTRL_SHUTDOWN_EVENT:
-        Core::SubsystemControl::Uninstall();
-        return TRUE;  // 返回 TRUE 表示我们处理了这个事件
-    default:
-        return FALSE;
-    }
-}
-#endif
-
 //#include "test.h" // 测试用文件
 
 int main(int argc, char* argv[])// exe -p path
 {
-#ifdef _DEBUG
-    // console event
-    SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE);
-#endif
 
     std::cout << "Engine Version: " << Core::Core::GetVersion() << std::endl;
     std::cout << "Engine Init ... " << std::endl;
@@ -41,11 +23,7 @@ int main(int argc, char* argv[])// exe -p path
 
     std::cout << "Engine initialized successfully. " << std::endl;
 
-#ifdef _DEBUG
-    // NOT
-#else
-    FreeConsole();
-#endif
+    FreeConsole(); // Free Console
     Editor::Editor::Get().SetEngineState(Editor::Editor::EngineState::Run);
 	Editor::Editor::Get().Run(); // Run Engine Editor
 

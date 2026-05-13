@@ -73,9 +73,8 @@ function Draw()
             end
             GUI:TreePop()
         end
-
-        GUI:EndChild()
     end
+    GUI:EndChild()
 
     GUI:PushStyleColor(3, 1.0, 0.0, 0.0, 1.0) 
     if GUI:BeginChild("Select Control Target Windows")then

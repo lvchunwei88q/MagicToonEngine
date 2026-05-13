@@ -4,6 +4,8 @@
 #include <RenderUI.h>
 #include <RenderContext.h>
 
+#include <RenderSubsystem/RenderSubsystemImpl.h>
+
 #include <ILog.h>
 #include <Theme.h> // 主题
 
@@ -12,6 +14,10 @@
 namespace RenderUI {
 	void EditorUI::Init(HWND hwnd)
 	{
+        // Set RenderUIContext -> Subsystem
+        RenderUIContext& UIContext = RenderSubsystemImpl::Get().SetRenderUIContext();
+        UIContext.hwnd = reinterpret_cast<uintptr_t>(hwnd);
+
 		// 启用DPI感知
 		ImGui_ImplWin32_EnableDpiAwareness();
 		float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));

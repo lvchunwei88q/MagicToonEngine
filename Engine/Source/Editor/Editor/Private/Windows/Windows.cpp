@@ -1,8 +1,21 @@
 #include <Windows/Windows.h>
+// windows配置
 #include <WindowsConfig.h>
 #include <ILog.h>
 
-#include <IBufferManager.h> // 初始化管理器
+#include <IBufferManager.h> // 内存管理器
+#include <IRender.h> // 渲染接口
+
+// 序列化文件相关
+#include <AbsolutePath.h>
+#include <FileManager.h>
+#include <fstream>
+#include <Serialize/SerializeMacro.h>
+
+#include <Window/WindowAppointment.hpp> // 约定
+
+// 主题文件
+#include <dwmapi.h>
 
 namespace Editor
 {
@@ -18,6 +31,9 @@ namespace Editor
 	{
 		LOG_INFO("Editor subsystem created.");
 
+		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
+		FILE_SERIALIZATION_LOADING(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
+
 		// Initialize the editor subsystem, e.g. create windows, initialize resources, etc.
 		LOG_INFO("Editor Create Windows.");
 		CreateWindows();
@@ -27,7 +43,6 @@ namespace Editor
 		// init buffer Manager
 		LOG_INFO("Init Buffer Manager.");
 		RenderCore::IBufferManagerAdmin* IBMAdmin = RenderCore::GetBufferManagerAdminInterface();
-		WindowsConfig& config = WindowsConfig::Get();
 		RenderCore::ViewContext context;
 		context.ScreenSize = XMINT2(config.width, config.height);
 		IBMAdmin->Initialize(context);
@@ -38,6 +53,61 @@ namespace Editor
 	void Windows::Uninstall()
 	{
 		CleanupWindows();
+	}
+
+	void Windows::CreateWindows()
+	{
+		WindowsConfig& config = WindowsConfig::Get();
+
+		// init windows
+		WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_CLASSDC, WindowsProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
+				ENGINE_CLASS, nullptr }; // 使用约定名称
+		wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
+		::RegisterClassEx(&wc);
+
+		HWND hwnd = CreateWindowEx(
+			0, wc.lpszClassName, L"Magic Editor",
+			WS_OVERLAPPEDWINDOW,
+			config.windowsX, config.windowsY, config.width, config.height,
+			nullptr, nullptr,
+			wc.hInstance,
+			nullptr
+		);
+		BOOL useDarkMode = TRUE;
+		DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &useDarkMode, sizeof(useDarkMode));
+
+		// 强制重绘标题栏
+		SetWindowPos(hwnd, nullptr, 0, 0, 0, 0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+		WindowsContext::Get().hWnd = hwnd; // Store the window handle in the WindowsContext singleton
+	}
+
+	void Windows::CreateDeviceD3D()
+	{
+		RenderCore::GetRenderInterface()->CreateDeviceD3D(WindowsContext::Get().hWnd);
+	}
+
+	void Windows::CleanupWindows()
+	{
+		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
+
+		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+		if (config.windowsX > screenWidth || config.windowsY > screenHeight ||
+			config.windowsX < 0 || config.windowsY < 0)
+		{
+			// 窗口位置不正常
+			LOG_WARNING("The window has been minimized and will use the default position");
+			config.windowsX = 100;
+			config.windowsY = 100;
+		}
+		FILE_SERIALIZATION_SAVE(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
+	}
+
+	void Windows::CleanupDeviceD3D()
+	{
+		RenderCore::GetRenderInterface()->CleanupDeviceD3D();
 	}
 
 	// 注册窗口改变时渲染回调函数

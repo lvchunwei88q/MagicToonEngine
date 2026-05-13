@@ -18,7 +18,7 @@ namespace RenderUI {
 	class RenderSubsystemImpl : public Singleton<RenderSubsystemImpl> , public ISubsystem
 	{
 	public:
-		virtual void RegisterSubsystem(Context context) override;
+		virtual void RegisterSubsystem(RegisterSubsystemContext context) override;
 		// Control
 		virtual void Init() override;
 		virtual void Uninstall() override;
@@ -26,7 +26,11 @@ namespace RenderUI {
 		virtual void Notification(const char* msg) override;
 		// Data
 		virtual void* GetSubsystemPublicData(std::string Target, uint8_t Type) override;
+		virtual [[nodiscard]] const RenderUIContext& GetRenderUIContext() const override;
+		virtual [[nodiscard]] RenderUIContext& SetRenderUIContext();
 	private:
-		std::vector<SubsystemContext> Contexts;
+		std::vector<SubsystemContext> Subsystems;
+
+		RenderUIContext UIContext;
 	};
 }

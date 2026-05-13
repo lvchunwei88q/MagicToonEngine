@@ -43,7 +43,7 @@ namespace RenderUI {
                 if (ImGui::MenuItem("Save")) { /* TODO */ }
                 if (ImGui::MenuItem("Import FBX")) { OpenToolsView::Get().OpenToolsWindow(OpenToolsWindows::OpenTools::FBXImport); }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Exit")) { /* TODO */ }
+                if (ImGui::MenuItem("Exit")) { ExitProgram(); }
                 ImGui::EndMenu();
             }
 

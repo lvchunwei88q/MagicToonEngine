@@ -38,6 +38,8 @@ namespace RenderUI {
 			return -100; // High
 		}
 
+	protected:
+		void ExitProgram();
 	private:
 		ViewSwitch Switch;
 	};

@@ -1,6 +1,6 @@
-#include <Component/EditorGeneralLayout.h>
-
 #include <EditorUIWarehouse.h>
+
+#include <Component/EditorGeneralLayout.h>
 ///////////////////////
 // 序列化文件相关
 #include <AbsolutePath.h>
@@ -34,5 +34,12 @@ namespace RenderUI {
 		}
 
 		return nullptr;
+	}
+
+	void EditorGeneralLayout::ExitProgram()
+	{
+		RenderUIContext UIContext = GetSubsystem()->GetRenderUIContext();
+		HWND hwnd = reinterpret_cast<HWND>(UIContext.hwnd);
+		PostMessage(hwnd, WM_CLOSE, 0, 0); // Close
 	}
 }
