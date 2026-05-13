@@ -255,20 +255,33 @@ typedef struct luaL_Stream {
 ** ===================================================================
 */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    void Lua_LogWrite(const char* s, size_t len);
+    void Lua_ErrorLogWrite(const char* s, size_t len);
+#ifdef __cplusplus
+}
+#endif
+
 /* print a string */
 #if !defined(lua_writestring)
-#define lua_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
+#define lua_writestring(s,l)   Lua_LogWrite((s), (l))
 #endif
 
 /* print a newline and flush the output */
 #if !defined(lua_writeline)
-#define lua_writeline()        (lua_writestring("\n", 1), fflush(stdout))
+#define lua_writeline()        Lua_LogWrite("\n", 1)
 #endif
 
 /* print an error message */
 #if !defined(lua_writestringerror)
 #define lua_writestringerror(s,p) \
-        (fprintf(stderr, (s), (p)), fflush(stderr))
+        do { \
+            char _lua_err_buf[512]; \
+            snprintf(_lua_err_buf, sizeof(_lua_err_buf), (s), (p)); \
+            Lua_ErrorLogWrite(_lua_err_buf, strlen(_lua_err_buf)); \
+        } while(0)
 #endif
 
 /* }================================================================== */

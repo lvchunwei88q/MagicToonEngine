@@ -1,7 +1,9 @@
+require("Common/LuaUIEnum") 
+
 -- 全局状态
 local listboxState = { selected = 0 }
-local selectedName = ""
-local selectedType = ""
+local selectedName = "Please select a control target"
+local selectedType = "..."
 
 -- ----------------------------------------------------
 -- 从 LuaMembers 构建选项列表
@@ -68,15 +70,15 @@ function Draw()
                 GUI:Dummy(2.0, 0)
                 GUI:SameLine(0.0, -1.0)
                 GUI:Label("No controls registered")
-                selectedName = ""
-                selectedType = ""
+                selectedName = "Please select a control target"
+                selectedType = "..."
             end
             GUI:TreePop()
         end
     end
     GUI:EndChild()
 
-    GUI:PushStyleColor(3, 1.0, 0.0, 0.0, 1.0) 
+    GUI:PushStyleColor(ImGuiCol.ChildBg, 1.0, 0.0, 0.0, 1.0)
     if GUI:BeginChild("Select Control Target Windows")then
         GUI:Dummy(0.0, 0.0)
 

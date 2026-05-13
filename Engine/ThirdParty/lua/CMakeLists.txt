@@ -8,6 +8,8 @@ add_library(liblua STATIC
     ${liblua_HEADERS}
 )
 
+target_link_libraries(liblua PRIVATE Logger)
+
 target_include_directories(liblua
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR} # 别的项目也可以访问

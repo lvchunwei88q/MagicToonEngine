@@ -139,7 +139,7 @@ namespace RenderUI {
             // =====================================================================
             // Style dimensions — Notion-style clean, modern spacing
             // =====================================================================
-            style.WindowPadding = ImVec2(10.0f, 10.0f);
+            style.WindowPadding = ImVec2(5.0f, 5.0f);
             style.FramePadding = ImVec2(8.0f, 3.0f);
             style.CellPadding = ImVec2(4.0f, 4.0f);
             style.ItemSpacing = ImVec2(8.0f, 6.0f);

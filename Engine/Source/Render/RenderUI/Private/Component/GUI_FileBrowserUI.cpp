@@ -118,32 +118,34 @@ namespace RenderUI {
                 ImGui::EndChild();
             }
 
-            ImGui::SameLine();
+            ImGui::SameLine(0.0f, 0.0f);
             {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-                ImGui::Button("##splitter", ImVec2(splitterWidth, -1));
-                ImGui::PopStyleColor(3);
+                ImVec2 splitterSize(splitterWidth, ImGui::GetContentRegionAvail().y);
+
+                ImGui::InvisibleButton("##splitter", splitterSize);
 
                 if (ImGui::IsItemActive()) {
-                    ImVec2 windowSize = ImGui::GetContentRegionAvail();
-
                     dirTreeWidth += ImGui::GetIO().MouseDelta.x;
-                    if (dirTreeWidth < 100.0f) dirTreeWidth = 100.0f;  // 最小宽度
-                    if (dirTreeWidth > windowSize.x * 0.6f) dirTreeWidth = windowSize.x * 0.6f;  // 最大宽度
+                    dirTreeWidth = ImClamp(dirTreeWidth, 100.0f, ImGui::GetContentRegionAvail().x * 0.6f);
                 }
-
-                // 鼠标悬停时改变光标
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
                 }
+
+                ImDrawList* draw = ImGui::GetWindowDrawList();
+                ImVec2 min = ImGui::GetItemRectMin();
+                ImVec2 max = ImGui::GetItemRectMax();
+                bool active = ImGui::IsItemActive();
+                ImU32 color = active ? IM_COL32(170, 170, 170, 255)
+                    : ImGui::IsItemHovered() ? IM_COL32(100, 100, 100, 255)
+                    : IM_COL32(50, 50, 50, 255);
+                draw->AddRectFilled(min, max, color);
             }
 
-            ImGui::SameLine();
+            ImGui::SameLine(0.0f, 0.0f);
             {
                 // file list
-                SetBackColor color(ImVec4(0.14f, 0.14f, 0.14f, 1.0f), ImGuiCol_ChildBg);
+                SetBackColor color(ImVec4(0.10f, 0.10f, 0.10f, 1.0f), ImGuiCol_ChildBg);
                 ImGui::BeginChild("Files", ImVec2(0, 0), true);
                 {
                     FilePos = ImGui::GetCursorPos();

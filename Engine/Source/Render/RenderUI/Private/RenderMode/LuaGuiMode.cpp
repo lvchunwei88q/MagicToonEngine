@@ -21,15 +21,17 @@ namespace RenderUI {
     {
         if (AllowDraw.Allow() == false) { // 绘制
             Preprocessing();
-            lua_getglobal(lua, "Draw");
-            int ret = lua_pcall(lua, 0, 0, 0);
-            if (ret != LUA_OK) {
-                // 错误信息会在栈顶
-                const char* err = lua_tostring(lua, -1);
-                current_lua_error = err;
-                LOG_ERROR("Lua Draw() Error:", current_lua_error);
+            auto result = lua.safe_script("Draw()",
+                [](lua_State*, sol::protected_function_result pfr) {
+                    // 出错时返回 pfr 本身，不抛异常
+                    return pfr;
+                }
+            );
+            if (!result.valid()) {
+                sol::error err = result;
+                current_lua_error = err.what();
+                LOG_ERROR("Lua Draw() Error: ", current_lua_error);
                 AllowDraw.isError = true;
-                lua_pop(lua, 1);
             }
         }
         else {
@@ -37,7 +39,7 @@ namespace RenderUI {
             //content.Label("Lua script error");
             content.BeginChild("LuaScriptError");
             content.DrawTextAligned(
-                300, 200,
+                content.GetContentRegionAvailWidth(), content.GetContentRegionAvailHeight(),
                 current_lua_error,
                 Theme::LOG_WARNING.x, Theme::LOG_WARNING.y, Theme::LOG_WARNING.z, Theme::LOG_WARNING.w,
                 0.0f, 0.0f,
@@ -50,6 +52,28 @@ namespace RenderUI {
 
     void LuaGuiMode::LoadLua(std::string lua_type)
     {
+        lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::debug); // base lib
+        std::wstring ScriptPath = IO::AbsolutePath::Get().GetScriptPath();
+        std::string narrowPath = IO::Converter::ToNarrowString(ScriptPath);
+        {
+            size_t pos = 0;
+            while ((pos = narrowPath.find('\\', pos)) != std::string::npos) {
+                narrowPath.replace(pos, 1, "\\\\");
+                pos += 2;
+            }
+        }
+        {
+            std::string script = // !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                "package.path = package.path .. \";" +
+                narrowPath +
+                "/?.lua\"";
+            auto result = lua.safe_script(script, sol::script_pass_on_error);
+            if (!result.valid()) {
+                sol::error err = result;
+                LOG_ERROR("Lua Load Error: ", err.what());
+            }
+        }
+
         if (current_lua_type != lua_type) {
             std::wstring script_path = IO::AbsolutePath::Get().GetScriptPath();
             this->lua_path = IO::Converter::ToNarrowString(script_path) + "\\" + lua_type;
@@ -66,7 +90,12 @@ namespace RenderUI {
             lua_script = result;
 
             // 执行一次Lua
-            lua_script();
+            auto exec_result = lua_script();
+            if (!exec_result.valid()) {
+                sol::error err = exec_result;
+                LOG_ERROR("Lua script execution failed: ", err.what());
+                AllowDraw.isError = true;
+            }
             AllowDraw.isError = false;
 
             LOG_INFO("Lua script compilation completed: ", lua_type);

@@ -1,4 +1,8 @@
 #pragma once
+///////////////////////////////////////
+#include <ILog.h>
+///////////////////////
+
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <cereal/cereal.hpp>
 #include <RenderMode/ImGuiMode.h>
@@ -27,5 +31,9 @@ namespace RenderUI {
 
 	private:
 		LoggerSwitch Switch;
+
+		std::string Current_Log_Src;
+		std::string Current_Log_Info;
+		LOG::LogLevel Current_Log_Level;
 	};
 }
