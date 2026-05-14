@@ -212,7 +212,7 @@ void SendJSONToJS(const JSON& json) {
 }
 
 void OpenProject(std::string path, std::string name) {
-    std::wstring src = IO::AbsolutePath::Get().GetContentPath() + L"\\ProjectLauncher\\loading.html";
+    std::wstring src = IO::AbsolutePath::Get().GetScriptPath() + L"\\ProjectLauncher\\loading.html";
     g_webview->Navigate(src.c_str());
 
     // 构建 EngineLauncher.exe 路径
