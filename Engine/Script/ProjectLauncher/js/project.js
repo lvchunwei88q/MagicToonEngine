@@ -47,6 +47,7 @@ export class Project {
     bindEvents() {
         this.communicator.on('project_list', (data) => {
             const lists = data.list;
+            // this is json list for project
             this.projectList.clear();
             lists.forEach(element => {
                 this.projectList.addCard({
