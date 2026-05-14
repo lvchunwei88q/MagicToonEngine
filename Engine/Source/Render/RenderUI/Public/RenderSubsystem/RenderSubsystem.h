@@ -2,6 +2,8 @@
 #include <Common/RENDERUI_API.h>
 #include <RenderMode/RenderMode.h>
 
+#include <RenderSubsystem/RenderUICotext.h>
+
 #include <Tools/Singleton.h>
 #include <cstdint>
 #include <string>
@@ -13,11 +15,6 @@ namespace RenderUI {
 	{
 		Subsystem* Subsystem;
 		const char* Name;
-	};
-
-	// As a globally shared resource when rendering the UI
-	struct RenderUIContext {
-		uintptr_t hwnd;
 	};
 
 	// Interface 

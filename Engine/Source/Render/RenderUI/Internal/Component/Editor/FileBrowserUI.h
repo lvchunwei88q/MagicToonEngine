@@ -5,6 +5,7 @@
 #include <EditorUIWarehouse.h>
 
 #include <RenderMode/ImGuiMode.h>
+#include <Tools/GetLanguage.h>
 
 #include <filesystem>
 #include <IBufferManager.h>

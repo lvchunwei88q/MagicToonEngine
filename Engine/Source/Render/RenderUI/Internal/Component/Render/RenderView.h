@@ -2,6 +2,7 @@
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <cereal/cereal.hpp>
 #include <RenderMode/ImGuiMode.h>
+#include <Tools/GetLanguage.h>
 
 namespace RenderUI {
 	class RenderView : public SubsystemTemplate<RenderView, ModeType::ImGui>, public ImGuiMode

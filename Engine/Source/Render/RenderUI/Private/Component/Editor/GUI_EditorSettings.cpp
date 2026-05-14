@@ -17,15 +17,15 @@ namespace RenderUI {
             ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar |
                 ImGuiWindowFlags_NoScrollWithMouse;
 
-            ImGui::Begin("Editor Settings", nullptr, windowFlags);
+            ImGui::Begin(Lang::Get("editor.setting.title").c_str(), nullptr, windowFlags);
             {
                 // Model
                 ImGui::BeginChild("SettingsModules", ImVec2(ModulesWidth, 0), ImGuiChildFlags_Borders, ImGuiWindowFlags_None);
                 {
-                    const char* modules[] = { "General", "Language" };
+                    std::string modules[] = { Lang::Get("editor.setting.general"), Lang::Get("editor.setting.language") };
                     
                     for (int i = 0; i < IM_ARRAYSIZE(modules); i++) {
-                        if (ImGui::Selectable(modules[i], selectedModule == i)) {
+                        if (ImGui::Selectable(modules[i].c_str(), selectedModule == i)) {
                             selectedModule = i;
                         }
                     }
@@ -62,17 +62,25 @@ namespace RenderUI {
                     switch (selectedModule) {
                     case 0: // General
                     {
-                        ImGui::Text("General Settings");
+                        ImGui::Text(Lang::Get("editor.setting.general").c_str());
                         ImGui::Separator();
                     }
                         break;
                     case 1: // Language
                     {
-                        ImGui::Text("Language Settings");
+                        ImGui::Text(Lang::Get("editor.setting.language").c_str());
                         ImGui::Separator();
-                        static int language = 0;
-                        const char* languages[] = { "English", "Chinese" };
-                        ImGui::Combo("Language", &language, languages, IM_ARRAYSIZE(languages));
+                        {
+                            int language = static_cast<int>(Setting.language);
+                            std::string english = Lang::Get("editor.setting.english");
+                            std::string chinese = Lang::Get("editor.setting.chinese");
+
+                            const char* languages[] = { english.c_str(),chinese.c_str() };
+                            if (ImGui::Combo(Lang::Get("editor.setting.language").c_str(), &language, languages, IM_ARRAYSIZE(languages))) {
+                                Setting.language = static_cast<Languages>(language);
+                                LoadLanguageFile();
+                            }
+                        }
                     }
                         break;
                     }

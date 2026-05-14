@@ -1,6 +1,7 @@
 #pragma once
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <RenderMode/ImGuiMode.h>
+#include <Tools/GetLanguage.h>
 
 namespace RenderUI {
 	struct OpenToolsWindows {

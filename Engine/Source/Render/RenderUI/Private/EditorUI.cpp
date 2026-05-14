@@ -185,7 +185,7 @@ namespace RenderUI {
 		ifc.FontDataOwnedByAtlas = false;
 
 		// Load a font from TTF font data in memory and add it to the font atlas
-		ImFont* front = io.Fonts->AddFontFromMemoryTTF(
+		ImFont* front = io.Fonts->AddFontFromMemoryTTF( // base front
 			(void*)front_data_data,
 			front_data_size,
 			18.0f,

@@ -7,6 +7,8 @@
 #include <cereal/cereal.hpp>
 #include <RenderMode/ImGuiMode.h>
 
+#include <Tools/GetLanguage.h>
+
 namespace RenderUI {
 	struct LoggerSwitch {
 		bool showDebug;

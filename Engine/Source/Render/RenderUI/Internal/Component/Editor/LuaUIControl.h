@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <RenderMode/LuaGuiModeInternal.h> // 内部使用
+#include <Tools/GetLanguage.h>
 
 #define WINDOWS_NAME "LuaControl Panel"
 
