@@ -36,34 +36,34 @@ namespace RenderUI {
         // --- 菜单栏 ---
         if (ImGui::BeginMenuBar())
         {
-            if (ImGui::BeginMenu("File"))
+            if (ImGui::BeginMenu(Lang::Get("editor.menu.file").c_str()))
             {
-                if (ImGui::MenuItem("New")) { /* TODO */ }
-                if (ImGui::MenuItem("Open")) { /* TODO */ }
-                if (ImGui::MenuItem("Save")) { /* TODO */ }
-                if (ImGui::MenuItem("Import FBX")) { OpenToolsView::Get().OpenToolsWindow(OpenToolsWindows::OpenTools::FBXImport); }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.new").c_str())) { /* TODO */ }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.open").c_str())) { /* TODO */ }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.save").c_str())) { /* TODO */ }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.import_fbx").c_str())) { OpenToolsView::Get().OpenToolsWindow(OpenToolsWindows::OpenTools::FBXImport); }
                 ImGui::Separator();
-                if (ImGui::MenuItem("Exit")) { ExitProgram(); }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.exit").c_str())) { ExitProgram(); }
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Edit"))
+            if (ImGui::BeginMenu(Lang::Get("editor.menu.edit").c_str()))
             {
-                ImGui::MenuItem("Editor Settings", nullptr, &Switch.EditorSettingsView);
+                ImGui::MenuItem(Lang::Get("editor.menu.editor_settings").c_str(), nullptr, &Switch.EditorSettingsView);
                 ImGui::Separator();
-                if (ImGui::MenuItem("Undo")) { /* TODO */ }
-                if (ImGui::MenuItem("Redo")) { /* TODO */ }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.undo").c_str())) { /* TODO */ }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.redo").c_str())) { /* TODO */ }
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("View"))
+            if (ImGui::BeginMenu(Lang::Get("editor.menu.view").c_str()))
             {
-                ImGui::MenuItem("Lua Control", nullptr, &Switch.LuaControl);
-                ImGui::MenuItem("Details Panel", nullptr, &Switch.DetailsWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.lua_control").c_str(), nullptr, &Switch.LuaControl);
+                ImGui::MenuItem(Lang::Get("editor.menu.details_panel").c_str(), nullptr, &Switch.DetailsWindow);
                 ImGui::Separator();
-                ImGui::MenuItem("Engine Log", nullptr, &Switch.LoggerWindow);
-                ImGui::MenuItem("Render View", nullptr, &Switch.RenderViewWindow);
-                ImGui::MenuItem("Content Browser View", nullptr, &Switch.ContentBrowserWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.engine_log").c_str(), nullptr, &Switch.LoggerWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.render_view").c_str(), nullptr, &Switch.RenderViewWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.content_browser").c_str(), nullptr, &Switch.ContentBrowserWindow);
                 ImGui::EndMenu();
             }
 

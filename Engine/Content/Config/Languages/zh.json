@@ -6,6 +6,24 @@
             "language": "语言",
             "english": "英语",
             "chinese": "中文"
+        },
+        "menu": {
+            "file": "文件",
+            "new": "新建",
+            "open": "打开",
+            "save": "保存",
+            "import_fbx": "导入FBX",
+            "exit": "退出",
+            "edit": "编辑",
+            "editor_settings": "编辑器设置",
+            "undo": "撤销",
+            "redo": "重做",
+            "view": "视图",
+            "lua_control": "Lua控制",
+            "details_panel": "详情面板",
+            "engine_log": "引擎日志",
+            "render_view": "渲染视图",
+            "content_browser": "内容浏览器"
         }
     }
 }

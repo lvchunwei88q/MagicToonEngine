@@ -6,6 +6,24 @@
             "language": "Language",
             "english": "English",
             "chinese": "Chinese"
+        },
+        "menu": {
+            "file": "File",
+            "new": "New",
+            "open": "Open",
+            "save": "Save",
+            "import_fbx": "Import FBX",
+            "exit": "Exit",
+            "edit": "Edit",
+            "editor_settings": "Editor Settings",
+            "undo": "Undo",
+            "redo": "Redo",
+            "view": "View",
+            "lua_control": "Lua Control",
+            "details_panel": "Details Panel",
+            "engine_log": "Engine Log",
+            "render_view": "Render View",
+            "content_browser": "Content Browser"
         }
     }
 }
