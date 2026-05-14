@@ -153,7 +153,7 @@ void init_app(HWND hwnd) {
                             RECT bounds = { 0, 0, winW, winH };
                             g_controller->put_Bounds(bounds);
 
-                            std::wstring src = IO::AbsolutePath::Get().GetContentPath() + L"\\ProjectLauncher\\index.html";
+                            std::wstring src = IO::AbsolutePath::Get().GetScriptPath() + L"\\ProjectLauncher\\index.html";
                             g_webview->Navigate(src.c_str());
 
 #ifndef _DEBUG
