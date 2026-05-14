@@ -134,6 +134,8 @@ void init_app(HWND hwnd) {
     g_hwnd = hwnd;
     std::wstring userDataFolder = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\" + CACHE + L"WebViewCache";
 
+    run_server();
+
     CreateCoreWebView2EnvironmentWithOptions(
         nullptr, userDataFolder.c_str(), nullptr,
         Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>(
@@ -153,8 +155,8 @@ void init_app(HWND hwnd) {
                             RECT bounds = { 0, 0, winW, winH };
                             g_controller->put_Bounds(bounds);
 
-                            std::wstring src = IO::AbsolutePath::Get().GetScriptPath() + L"\\ProjectLauncher\\index.html";
-                            g_webview->Navigate(src.c_str());
+                            std::wstring url_wide = L"http://localhost:" + std::to_wstring(server_port) + L"/index.html";
+                            g_webview->Navigate(url_wide.c_str());
 
 #ifndef _DEBUG
                             // 禁用右键菜单和开发者工具
@@ -212,8 +214,8 @@ void SendJSONToJS(const JSON& json) {
 }
 
 void OpenProject(std::string path, std::string name) {
-    std::wstring src = IO::AbsolutePath::Get().GetScriptPath() + L"\\ProjectLauncher\\loading.html";
-    g_webview->Navigate(src.c_str());
+    std::wstring url_wide = L"http://localhost:" + std::to_wstring(server_port) + L"/loading.html";
+    g_webview->Navigate(url_wide.c_str());
 
     // 构建 EngineLauncher.exe 路径
     std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();

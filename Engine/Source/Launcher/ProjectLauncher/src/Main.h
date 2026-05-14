@@ -70,8 +70,13 @@ extern CallbackFunc WebViewSuccess;
 extern HWND g_hwnd;
 extern std::atomic<bool> scan_ready;
 extern size_t scan_old_info_size;
+extern int server_port;
 
 // tools function
 void Operation(JSON json);
 void NewProJect(std::string path, std::string name);
 void OpenProject(std::string path, std::string name);
+
+// server function
+void run_server();
+void stop_server();

@@ -47,6 +47,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     }
     exit_loop:
 
+    stop_server();
     ProjectList::Get().close();
     CoUninitialize();
     return 0;

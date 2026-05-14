@@ -10,7 +10,7 @@ add_executable(ProjectLauncher WIN32
 
 target_include_directories(ProjectLauncher
     PRIVATE
-        ${THIRD_PARTY_DIR} # 使用WebView2库
+        ${THIRD_PARTY_DIR} # 使用WebView2JSON HTTP 库 
         ${CMAKE_SOURCE_DIR}/Engine/Content # 内容目录
 )
 
