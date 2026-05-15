@@ -217,9 +217,9 @@ void OpenProject(std::string path, std::string name) {
     std::wstring url_wide = L"http://localhost:" + std::to_wstring(server_port) + L"/loading.html";
     g_webview->Navigate(url_wide.c_str());
 
-    // 构建 EngineLauncher.exe 路径
+    // 构建 MagicEditor.exe 路径
     std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
-    std::wstring exePath = exeDir + L"\\EngineLauncher.exe";
+    std::wstring exePath = exeDir + L"\\MagicEditor.exe";
 
     // 构建命令行参数：-p "path" "name"
     std::wstring cmdLine = L"\"" + exePath + L"\"";

@@ -42,6 +42,8 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
-REM 打开对应的解决方案
-start "" "MagicToonEngine.%SOLUTION_EXT%"
-pause
+set /p USER_INPUT="Do you want to open the solution? (Y/N): "
+if /i "%USER_INPUT%"=="Y" (
+    start "" "MagicToonEngine.%SOLUTION_EXT%"
+    pause
+)

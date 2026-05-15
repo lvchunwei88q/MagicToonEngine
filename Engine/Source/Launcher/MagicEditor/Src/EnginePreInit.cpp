@@ -53,9 +53,9 @@ bool EnginePreInit(int argc, char* argv[]) {
     if (!EngineProject::GetProjectPathInterface()->Detection()) { // 检测是否为项目
         // no!
         std::cout << "The engine has not yet opened a project!" << std::endl;
-        // 构建 ProjectLauncher.exe 路径
+        // 构建 EngineLauncher.exe 路径
         std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
-        std::wstring exePath = exeDir + L"\\ProjectLauncher.exe";
+        std::wstring exePath = exeDir + L"\\EngineLauncher.exe";
 
         std::wstring cmdLine = L"\"" + exePath + L"\"";
 

@@ -1,32 +1,54 @@
 #include "Main.h"
-#include <Editor.h>
+#include <Logo/resource.h>
+#include <Window/WindowAppointment.hpp>
 
-//#include "test.h" // 测试用文件
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
+    const wchar_t* CLASS = PROJECT_CLASS; // 使用约定名称
+    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // 初始化 COM
+    ProjectList::Get().init();
 
-int main(int argc, char* argv[])// exe -p path
-{
+    WNDCLASSW wc = {};
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = hInstance;
+    wc.lpszClassName = CLASS;
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    RegisterClassW(&wc);
 
-    std::cout << "Engine Version: " << Core::Core::GetVersion() << std::endl;
-    std::cout << "Engine Init ... " << std::endl;
+    int screenW = GetSystemMetrics(SM_CXSCREEN);
+    int screenH = GetSystemMetrics(SM_CYSCREEN);
+    int x = (screenW - winW) / 2;
+    int y = (screenH - winH) / 2;
 
-    if (!EnginePreInit(argc, argv)) { return 0; }
-    (void)Editor::Editor::Get(); // 确保Editor初始化比Subsystem早
-
-    Core::SubsystemContext::SubsystemError error = Core::SubsystemControl::Init();
-    if (!error.error) {
-        //每个进程有独立的虚拟地址空间，泄漏只影响自己的进程，不会污染其他程序或系统 所以不需要释放了
-        std::cout << "There was a problem during engine initialization!" << std::endl;
-        std::cout << "Problem Subsystem:" << error.target << std::endl;
-        std::cin.get();
-        return 0;
+    HWND hwnd = CreateWindowW(CLASS, L"Project Launcher",
+        WS_POPUP,
+        x, y, winW, winH,
+        nullptr, nullptr, hInstance, nullptr);
+    HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
+    if (hIcon)
+    {
+        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);   // 大图标（任务栏）
+        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);   // 小图标（标题栏）
     }
+    ShowWindow(hwnd, SW_SHOWMINIMIZED);
 
-    std::cout << "Engine initialized successfully. " << std::endl;
+    MSG msg;
+    while (true) {
+        // 有消息处理消息，没消息执行 Tick
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT) {
+                goto exit_loop;  // 或 return
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
 
-    FreeConsole(); // Free Console
-    Editor::Editor::Get().SetEngineState(Editor::Editor::EngineState::Run);
-	Editor::Editor::Get().Run(); // Run Engine Editor
+        // 空闲时执行 Tick
+        Tick();  // 你的逻辑
+    }
+    exit_loop:
 
-	Core::SubsystemControl::Uninstall();
-	return 0;
+    stop_server();
+    ProjectList::Get().close();
+    CoUninitialize();
+    return 0;
 }
