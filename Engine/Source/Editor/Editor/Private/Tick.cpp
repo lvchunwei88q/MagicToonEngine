@@ -16,7 +16,7 @@ namespace Editor
 	{
 		RenderRT::GetRenderRTInterface()->SetRenderTarget();
 
-		editorUIui.Tick(); // Tick UI
+		editorUI.Tick(); // Tick UI
 
 		// Present
 		RenderRT::GetRenderRTInterface()->BindRenderTarget();

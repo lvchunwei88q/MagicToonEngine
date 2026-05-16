@@ -7,8 +7,6 @@
 //#include <cereal/types/string.hpp>     // std::string
 
 namespace Editor {
-	// Forward declaration of the window procedure
-	LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	struct WindowsConfig : public Singleton<WindowsConfig>
 	{

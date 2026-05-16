@@ -16,12 +16,12 @@ namespace Editor
 		HWND hWnd = nullptr; // windows id
 	};
 
-	class EDITOR_API Windows : public Core::Subsystem, public Singleton<Windows>
+	class EDITOR_API Win32Application : public Core::Subsystem, public Singleton<Win32Application>
 	{
 	private:
 		using WindowUpdateRenderingFunc = std::function<void()>;
 	public:
-		Windows();
+		Win32Application();
 
 		virtual bool Init();
 		virtual void Uninstall();
@@ -30,17 +30,18 @@ namespace Editor
 		void RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func);
 		WindowUpdateRenderingFunc GetWindowUpdateRenderFunction();
 
-	private:
+	public:
 		void CreateWindows();
 		void CreateDeviceD3D();
 		void CleanupWindows();
-
-	public: // 这个函数需要在窗口销毁时调用，以确保D3D设备被正确清理
 		void CleanupDeviceD3D();
+
+		// Forward declaration of the window procedure
+		static LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	private:
 		WindowUpdateRenderingFunc WUR;
 	};
 
-	AUTO_REGISTER_SINGLETON_INCLUDE(Windows)
+	AUTO_REGISTER_SINGLETON_INCLUDE(Win32Application)
 }

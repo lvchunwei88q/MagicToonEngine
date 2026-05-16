@@ -12,6 +12,6 @@ namespace Editor {
 		void End();
 
 	private:
-		RenderUI::EditorUI editorUIui;
+		RenderUI::EditorUI editorUI;
 	};
 }

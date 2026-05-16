@@ -33,7 +33,7 @@ namespace Editor
 
 	void Editor::Run()
 	{
-		HWND Hwnd = Windows::Get().GetWindowsContext()->hWnd; // 确保窗口上下文已创建
+		HWND Hwnd = Win32Application::Get().GetWindowsContext()->hWnd; // 确保窗口上下文已创建
         HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
         if (hIcon)
         {
@@ -45,7 +45,7 @@ namespace Editor
         LOG_INFO("Render init ...");
         EditorRender::Get().Init(); // 渲染初始化
 
-        Windows::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {
+        Win32Application::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {
             if (state == EngineState::Run) Tick(); // 每帧更新逻辑
         });
 
@@ -72,10 +72,10 @@ namespace Editor
 
     void EditorRender::Init()
     {
-        editorUIui.Init(Windows::Get().GetWindowsContext()->hWnd); // 初始化UI系统
+        editorUI.Init(Win32Application::Get().GetWindowsContext()->hWnd); // 初始化UI系统
     }
     void EditorRender::End()
     {
-        editorUIui.Shutdown();
+        editorUI.Shutdown();
     }
 }

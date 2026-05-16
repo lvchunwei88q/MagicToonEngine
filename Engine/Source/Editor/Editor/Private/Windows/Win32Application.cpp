@@ -1,4 +1,4 @@
-#include <Windows/Windows.h>
+#include <Windows/Win32Application.h>
 // windows配置
 #include <WindowsConfig.h>
 #include <ILog.h>
@@ -19,15 +19,14 @@
 
 namespace Editor
 {
+	AUTO_REGISTER_SINGLETON(Win32Application, Normal);
 
-	AUTO_REGISTER_SINGLETON(Windows, Normal)
-
-	Windows::Windows()
+	Win32Application::Win32Application()
 	{
 		// not
 	}
 
-	bool Windows::Init()
+	bool Win32Application::Init()
 	{
 		LOG_INFO("Editor subsystem created.");
 
@@ -50,12 +49,12 @@ namespace Editor
 		return true;
 	}
 
-	void Windows::Uninstall()
+	void Win32Application::Uninstall()
 	{
 		CleanupWindows();
 	}
 
-	void Windows::CreateWindows()
+	void Win32Application::CreateWindows()
 	{
 		WindowsConfig& config = WindowsConfig::Get();
 
@@ -83,12 +82,12 @@ namespace Editor
 		WindowsContext::Get().hWnd = hwnd; // Store the window handle in the WindowsContext singleton
 	}
 
-	void Windows::CreateDeviceD3D()
+	void Win32Application::CreateDeviceD3D()
 	{
 		RenderCore::GetRenderInterface()->CreateDeviceD3D(WindowsContext::Get().hWnd);
 	}
 
-	void Windows::CleanupWindows()
+	void Win32Application::CleanupWindows()
 	{
 		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
 
@@ -105,17 +104,17 @@ namespace Editor
 		FILE_SERIALIZATION_SAVE(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
 	}
 
-	void Windows::CleanupDeviceD3D()
+	void Win32Application::CleanupDeviceD3D()
 	{
 		RenderCore::GetRenderInterface()->CleanupDeviceD3D();
 	}
 
 	// 注册窗口改变时渲染回调函数
-	void Windows::RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func) {
+	void Win32Application::RegisterWindowUpdateRenderCallbackFunction(WindowUpdateRenderingFunc func) {
 		this->WUR = func;
 	}
 
-	Windows::WindowUpdateRenderingFunc Windows::GetWindowUpdateRenderFunction()
+	Win32Application::WindowUpdateRenderingFunc Win32Application::GetWindowUpdateRenderFunction()
 	{
 		return this->WUR;
 	}

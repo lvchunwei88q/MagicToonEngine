@@ -1,5 +1,5 @@
 #include <WindowsConfig.h>
-#include <Windows/Windows.h>
+#include <Windows/Win32Application.h>
 #include <dwmapi.h>
 
 // DX11相关
@@ -8,7 +8,7 @@
 #include <IBufferManager.h>
 
 namespace Editor {
-	LRESULT CALLBACK WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	LRESULT CALLBACK Win32Application::WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         if (RenderUI::EditorUI_Windows_Event(hWnd, msg, wParam, lParam))
             return true;
 
@@ -52,7 +52,7 @@ namespace Editor {
             break;
         }
 		case WM_DESTROY:
-            Windows::Get().CleanupDeviceD3D(); // 确保在窗口销毁时清理D3D设备
+            Win32Application::Get().CleanupDeviceD3D(); // 确保在窗口销毁时清理D3D设备
 			PostQuitMessage(0);
 			break;
 
@@ -68,8 +68,8 @@ namespace Editor {
         case WM_TIMER:
             if (wParam == 1) {
                 // 处理一帧
-                if (Windows::Get().GetWindowUpdateRenderFunction()) {
-                    Windows::Get().GetWindowUpdateRenderFunction()();
+                if (Win32Application::Get().GetWindowUpdateRenderFunction()) {
+                    Win32Application::Get().GetWindowUpdateRenderFunction()();
                 }
             }
             return 0;

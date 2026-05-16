@@ -3,7 +3,7 @@
 #include <Common/EDITOR_API.h>
 #include <Tools/Singleton.h>
 
-#include <Windows/Windows.h>
+#include <Windows/Win32Application.h>
 
 namespace Editor
 {
