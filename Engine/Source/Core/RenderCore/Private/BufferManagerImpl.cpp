@@ -115,19 +115,20 @@ namespace RenderCore //RenderCore
             return;
         }
 
-        if (HasFlag(context.TextureCreateType, TextureCreateType::RTV))
+        // TODO Hr的值使用不准确
+        if (EnumHasAnyFlags(context.TextureCreateType, TextureCreateType::RTV))
         {
             hr = RenderContext::Get().g_pd3dDevice->CreateRenderTargetView(textureBuffer.Texture.Get(), context.RTVDesc, textureBuffer.RTV.GetAddressOf());
         }
-        if (HasFlag(context.TextureCreateType, TextureCreateType::SRV))
+        if (EnumHasAnyFlags(context.TextureCreateType, TextureCreateType::SRV))
         {
             hr = RenderContext::Get().g_pd3dDevice->CreateShaderResourceView(textureBuffer.Texture.Get(), context.SRVDesc, textureBuffer.SRV.GetAddressOf());
         }
-        if (HasFlag(context.TextureCreateType, TextureCreateType::DSV))
+        if (EnumHasAnyFlags(context.TextureCreateType, TextureCreateType::DSV))
         {
             hr = RenderContext::Get().g_pd3dDevice->CreateDepthStencilView(textureBuffer.Texture.Get(), context.DSVDesc, textureBuffer.DSV.GetAddressOf());
         }
-        if (HasFlag(context.TextureCreateType, TextureCreateType::UAV))
+        if (EnumHasAnyFlags(context.TextureCreateType, TextureCreateType::UAV))
         {
             hr = RenderContext::Get().g_pd3dDevice->CreateUnorderedAccessView(textureBuffer.Texture.Get(), context.UAVDesc, textureBuffer.UAV.GetAddressOf());
         }
@@ -210,25 +211,26 @@ namespace RenderCore //RenderCore
                 continue;
             }
 
-            if (HasFlag(texture.CreateType, TextureCreateType::RTV))
+            // TODO Hr的值使用不准确
+            if (EnumHasAnyFlags(texture.CreateType, TextureCreateType::RTV))
             {
                 hr = RenderContext::Get().g_pd3dDevice->CreateRenderTargetView(texture.Texture.Get(),
-                    HasFlag(texture.custom_desc, CUSTOM_DESC::RTV) ? &texture.RTVDesc : nullptr, &texture.RTV);
+                    EnumHasAnyFlags(texture.custom_desc, CUSTOM_DESC::RTV) ? &texture.RTVDesc : nullptr, &texture.RTV);
             }
-            if (HasFlag(texture.CreateType, TextureCreateType::SRV))
+            if (EnumHasAnyFlags(texture.CreateType, TextureCreateType::SRV))
             {
                 hr = RenderContext::Get().g_pd3dDevice->CreateShaderResourceView(texture.Texture.Get(),
-                    HasFlag(texture.custom_desc, CUSTOM_DESC::SRV) ? &texture.SRVDesc : nullptr, &texture.SRV);
+                    EnumHasAnyFlags(texture.custom_desc, CUSTOM_DESC::SRV) ? &texture.SRVDesc : nullptr, &texture.SRV);
             }
-            if (HasFlag(texture.CreateType, TextureCreateType::DSV))
+            if (EnumHasAnyFlags(texture.CreateType, TextureCreateType::DSV))
             {
                 hr = RenderContext::Get().g_pd3dDevice->CreateDepthStencilView(texture.Texture.Get(),
-                    HasFlag(texture.custom_desc, CUSTOM_DESC::DSV) ? &texture.DSVDesc : nullptr, &texture.DSV);
+                    EnumHasAnyFlags(texture.custom_desc, CUSTOM_DESC::DSV) ? &texture.DSVDesc : nullptr, &texture.DSV);
             }
-            if (HasFlag(texture.CreateType, TextureCreateType::UAV))
+            if (EnumHasAnyFlags(texture.CreateType, TextureCreateType::UAV))
             {
                 hr = RenderContext::Get().g_pd3dDevice->CreateUnorderedAccessView(texture.Texture.Get(),
-                    HasFlag(texture.custom_desc, CUSTOM_DESC::UAV) ? &texture.UAVDesc : nullptr, &texture.UAV);
+                    EnumHasAnyFlags(texture.custom_desc, CUSTOM_DESC::UAV) ? &texture.UAVDesc : nullptr, &texture.UAV);
             }
 
             if (FAILED(hr))

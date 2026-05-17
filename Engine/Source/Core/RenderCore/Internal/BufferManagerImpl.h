@@ -2,6 +2,7 @@
 #include <vector>
 #include <mutex>
 #include <atomic>
+#include <Tools/EnumClassFlags.h>
 
 #include <Subsystem/SubsystemTemplate.h>
 
@@ -34,22 +35,7 @@ namespace RenderCore //RenderCore
         DSV = 1 << 2,  // 4
         UAV = 1 << 3,  // 8
     };
-
-    // 重载位运算符
-    inline CUSTOM_DESC operator|(CUSTOM_DESC a, CUSTOM_DESC b)
-    {
-        return static_cast<CUSTOM_DESC>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
-    }
-
-    inline CUSTOM_DESC operator&(CUSTOM_DESC a, CUSTOM_DESC b)
-    {
-        return static_cast<CUSTOM_DESC>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
-    }
-
-    inline bool HasFlag(CUSTOM_DESC value, CUSTOM_DESC flag)
-    {
-        return (static_cast<uint32_t>(value) & static_cast<uint32_t>(flag)) != 0;
-    }
+    ENUM_CLASS_FLAGS(CUSTOM_DESC);
 
     struct BufferBase // 存放了纹理可以访问的属性
     {

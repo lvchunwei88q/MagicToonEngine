@@ -1,5 +1,6 @@
 #pragma once
 #include <Common/RENDERCORE_API.h>
+#include <Tools/EnumClassFlags.h>
 // DX 数学库
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -27,22 +28,7 @@ namespace RenderCore // RenderCore
         UAV = 1 << 2,// 创建 UAV
         DSV = 1 << 3,// 创建 DSV
     };
-
-    // 重载位运算符
-    inline TextureCreateType operator|(TextureCreateType a, TextureCreateType b)
-    {
-        return static_cast<TextureCreateType>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
-    }
-
-    inline TextureCreateType operator&(TextureCreateType a, TextureCreateType b)
-    {
-        return static_cast<TextureCreateType>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
-    }
-
-    inline bool HasFlag(TextureCreateType value, TextureCreateType flag)
-    {
-        return (static_cast<uint32_t>(value) & static_cast<uint32_t>(flag)) != 0;
-    }
+    ENUM_CLASS_FLAGS(TextureCreateType);
 
     template <typename D3D11_DESC>
     struct BufferContext
