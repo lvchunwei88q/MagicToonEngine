@@ -1,0 +1,47 @@
+# Third Party Notices
+
+本项目使用了以下第三方库：
+
+## Microsoft Edge WebView2 Runtime
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Microsoft Edge WebView2 License.
+详见 ThirdParty/WebView2/LICENSE.txt
+
+## Lua
+Copyright (c) 1994–2025 Lua.org, PUC-Rio.
+Licensed under the MIT License.
+详见 ThirdParty/lua/LICENSE.txt
+
+## imgui-docking
+Copyright (c) 2014-2024 Omar Cornut
+Licensed under the MIT License.
+详见 ThirdParty/imgui-docking/LICENSE.txt
+
+## httplib
+Copyright (c) 2020 yhirose
+Licensed under the MIT License.
+详见 ThirdParty/httplib/LICENSE.txt
+
+## nlohmann/json
+Copyright (c) 2013-2022 Niels Lohmann
+Licensed under the MIT License.
+详见 ThirdParty/nlohmann/LICENSE.txt
+
+## cereal
+Copyright (c) 2014-2024 Randolph Voorhies, Shane Grant
+Licensed under the MIT License.
+详见 ThirdParty/cereal/LICENSE.txt
+
+## magic_enum
+Copyright (c) 2019-2024 Neargye
+Licensed under the MIT License.
+详见 ThirdParty/magic_enum/LICENSE.txt
+
+## ufbx
+Copyright (c) 2021-2024 Samuli Raivio
+Licensed under the MIT License or Unlicense.
+详见 ThirdParty/ufbx/LICENSE.txt
+
+## WICTextureLoader
+Copyright (c) Microsoft Corporation.
+Licensed under the MIT License.
