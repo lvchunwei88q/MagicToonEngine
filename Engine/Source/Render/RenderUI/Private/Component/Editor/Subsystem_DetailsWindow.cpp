@@ -1,8 +1,8 @@
-#include <Component/Editor/DetailsWindow.h>
-#include <MagicUIContext.h>
+#include "Component/Editor/DetailsWindow.h"
+#include "MagicUIContext.h"
 #include <ILog.h>
 
-#include <Component/Editor/EditorGeneralLayout.h>
+#include "Component/Editor/EditorGeneralLayout.h"
 
 
 namespace RenderUI {

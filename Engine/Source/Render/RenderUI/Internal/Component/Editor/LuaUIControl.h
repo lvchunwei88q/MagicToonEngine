@@ -1,11 +1,11 @@
 #pragma once
 #include <Tools/Singleton.h>
-#include <RenderMode/LuaGuiMode.h>
-#include <RenderSubsystem/RenderSubsystem.h>
+#include "RenderMode/LuaGuiMode.h"
+#include "RenderSubsystem/RenderSubsystem.h"
 
 #include <vector>
-#include <RenderMode/LuaGuiModeInternal.h> // 内部使用
-#include <Tools/GetLanguage.h>
+#include "RenderMode/LuaGuiModeInternal.h" // 内部使用
+#include "Tools/GetLanguage.h"
 
 #define WINDOWS_NAME "LuaControl Panel"
 

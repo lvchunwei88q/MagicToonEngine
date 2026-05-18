@@ -1,7 +1,7 @@
-#include <Component/Editor/LoggerUI.h>
+#include "Component/Editor/LoggerUI.h"
 
 #include <Theme.h> // 主题
-#include <EditorUIWarehouse.h>
+#include "EditorUIWarehouse.h"
 
 // 序列化文件相关
 #include <AbsolutePath.h>
@@ -10,8 +10,8 @@
 #include <Serialize/SerializeMacro.h>
 // 编码转换
 #include <Converter.h>
-#include <Component/Editor/EditorGeneralLayout.h>
-#include <Tools/TextLayout.h>
+#include "Component/Editor/EditorGeneralLayout.h"
+#include "Tools/TextLayout.h"
 ///////////////////////
 ///////////////////////////////////////
 

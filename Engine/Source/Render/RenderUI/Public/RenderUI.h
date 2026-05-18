@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Common/RENDERUI_API.h>
-#include <RenderMode/RenderMode.h> // 绘制模式 
+#include "Common/RENDERUI_API.h"
+#include "RenderMode/RenderMode.h" // 绘制模式 
 
 #include <atomic>
 #include <queue>

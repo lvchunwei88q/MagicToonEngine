@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <Tools/Singleton.h>
-#include <RenderMode/LuaGuiMode.h>
+#include "RenderMode/LuaGuiMode.h"
 
 namespace RenderUI {
 	struct LuaMember {

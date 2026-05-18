@@ -1,5 +1,5 @@
-#include <RenderMode/LuaGuiModeInternal.h>
-#include <RenderMode/LuaGuiMode.h>
+#include "RenderMode/LuaGuiModeInternal.h"
+#include "RenderMode/LuaGuiMode.h"
 
 #include <ILog.h>
 #include <Jobsystem/JobSystem.h>
@@ -10,7 +10,7 @@
 #include <Converter.h>
 //////////////////////////////
 
-#include <MagicUIContext.h>
+#include "MagicUIContext.h"
 
 namespace RenderUI {
     ILuaUIMember* GetLuaUIMember() {

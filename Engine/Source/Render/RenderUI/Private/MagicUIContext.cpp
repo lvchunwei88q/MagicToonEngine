@@ -1,7 +1,7 @@
 #include <windows.h>
 
-#include <MagicUIContext.h>
-#include <Tools/TextLayout.h>
+#include "MagicUIContext.h"
+#include "Tools/TextLayout.h"
 
 #include <algorithm>
 #include <cfloat>

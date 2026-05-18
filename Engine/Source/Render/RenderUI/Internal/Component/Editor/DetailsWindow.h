@@ -1,7 +1,7 @@
 #pragma once
-#include <RenderSubsystem/RenderSubsystem.h>
-#include <RenderMode/LuaGuiMode.h>
-#include <Tools/GetLanguage.h>
+#include "RenderSubsystem/RenderSubsystem.h"
+#include "RenderMode/LuaGuiMode.h"
+#include "Tools/GetLanguage.h"
 
 #define WINDOWS_NAME "Details Panel"
 

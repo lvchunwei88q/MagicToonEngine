@@ -1,6 +1,6 @@
-#include <Component/Editor/DetailsWindow.h>
-#include <Component/Editor/EditorGeneralLayout.h>
-#include <EditorUIWarehouse.h>
+#include "Component/Editor/DetailsWindow.h"
+#include "Component/Editor/EditorGeneralLayout.h"
+#include "EditorUIWarehouse.h"
 
 namespace RenderUI {
     void DetailsPanel::Tick()
