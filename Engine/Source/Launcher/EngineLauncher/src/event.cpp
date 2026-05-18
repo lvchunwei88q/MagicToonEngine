@@ -120,6 +120,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			if (percent >= 0.99f) {
 				// End
 				Sleep(300);
+				ShowWindow(hwnd,SW_SHOWMINIMIZED);
+				Sleep(300);
 				PostQuitMessage(0);
 			}
 			return TRUE;
