@@ -1,6 +1,6 @@
 #pragma once
 #include <Windows.h>
-#include <Common/RENDERCORE_API.h>
+#include "Common/RENDERCORE_API.h"
 
 namespace RenderCore
 {

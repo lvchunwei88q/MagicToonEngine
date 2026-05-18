@@ -1,6 +1,6 @@
 #include <Windows.h>
 
-#include <LoggerImpl.h>
+#include "LoggerImpl.h"
 
 namespace LOG {
     void LoggerImpl::WriteToDebugOutput(const std::string& text) {

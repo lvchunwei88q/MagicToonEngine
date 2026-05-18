@@ -1,4 +1,4 @@
-#include <CoreLogCapture/CoreLogCapture.h>
+#include "CoreLogCapture/CoreLogCapture.h"
 #include <Windows.h> // OutputDebugStringA
 
 namespace Core {

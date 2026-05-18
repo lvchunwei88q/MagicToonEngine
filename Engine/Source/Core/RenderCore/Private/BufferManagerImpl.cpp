@@ -1,5 +1,5 @@
-#include <BufferManagerImpl.h>
-#include <BufferManager.inl>
+#include "BufferManagerImpl.h"
+#include "BufferManager.inl"
 #include <RenderContext.h>
 
 #include <CoreLogCapture/CoreLogCapture.h>

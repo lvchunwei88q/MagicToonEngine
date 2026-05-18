@@ -1,9 +1,9 @@
 #pragma once
-#include <Common/CORE_API.h>
+#include "Common/CORE_API.h"
 
-#include <Subsystem/Subsystem.h>
-#include <Subsystem/SubsystemTemplate.h> // AUTO_REGISTER_SINGLETON
-#include <Tools/Singleton.h>
+#include "Subsystem/Subsystem.h"
+#include "Subsystem/SubsystemTemplate.h" // AUTO_REGISTER_SINGLETON
+#include "Tools/Singleton.h"
 #include <atomic>
 #include <condition_variable>
 #include <cstddef>
