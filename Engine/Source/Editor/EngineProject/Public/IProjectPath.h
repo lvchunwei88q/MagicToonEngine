@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Common/ENGINEPROJECT_API.h>
-#include <Common/ProjectEnum.h>
+#include "Common/ENGINEPROJECT_API.h"
+#include "Common/ProjectEnum.h"
 #include <string>
 
 namespace EngineProject {

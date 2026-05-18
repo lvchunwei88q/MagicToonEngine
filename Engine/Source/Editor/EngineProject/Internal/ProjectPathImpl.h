@@ -1,7 +1,7 @@
 #pragma once
 
-#include <IProjectPath.h>
-#include <ThirdParty.h>
+#include "IProjectPath.h"
+#include "ThirdParty.h"
 
 namespace EngineProject {
 	class ProjectPathImpl : public IProjectPath,public Singleton<ProjectPathImpl>

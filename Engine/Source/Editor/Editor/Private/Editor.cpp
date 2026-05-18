@@ -1,6 +1,6 @@
-#include <Editor.h>
+#include "Editor.h"
 #include <CoreLogCapture/CoreLogCapture.h>
-#include <EditorRender.h>
+#include "EditorRender.h"
 
 #include <Logo/resource.h>
 #include <ILog.h>

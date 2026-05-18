@@ -1,8 +1,8 @@
 #pragma once
 
-#include <IProjectController.h>
-#include <Common/ProjectEnum.h>
-#include <ThirdParty.h>
+#include "IProjectController.h"
+#include "Common/ProjectEnum.h"
+#include "ThirdParty.h"
 
 #include <Subsystem/SubsystemTemplate.h>
 

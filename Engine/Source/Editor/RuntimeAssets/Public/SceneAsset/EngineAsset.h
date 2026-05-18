@@ -1,5 +1,5 @@
 #pragma once
-#include <Common/RUNTIMEASSETS_API.h>
+#include "Common/RUNTIMEASSETS_API.h"
 
 namespace RuntimeAssets {
 

@@ -1,6 +1,6 @@
-#include <Windows/Win32Application.h>
+#include "Windows/Win32Application.h"
 // windows配置
-#include <WindowsConfig.h>
+#include "WindowsConfig.h"
 #include <ILog.h>
 
 #include <IBufferManager.h> // 内存管理器

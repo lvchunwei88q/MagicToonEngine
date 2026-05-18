@@ -2,7 +2,7 @@
 
 #include <Subsystem/SubsystemTemplate.h>
 
-#include <SceneAsset/EngineAssetImpl.h>
+#include "SceneAsset/EngineAssetImpl.h"
 
 namespace RuntimeAssets {
 	/*

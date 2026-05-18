@@ -1,4 +1,4 @@
-#include <Scene.h>
+#include "Scene.h"
 
 namespace RuntimeAssets {
 	AUTO_REGISTER(Scene)

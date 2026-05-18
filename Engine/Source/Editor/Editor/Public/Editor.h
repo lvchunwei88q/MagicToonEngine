@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Common/EDITOR_API.h>
+#include "Common/EDITOR_API.h"
 #include <Tools/Singleton.h>
 
-#include <Windows/Win32Application.h>
+#include "Windows/Win32Application.h"
 
 namespace Editor
 {
