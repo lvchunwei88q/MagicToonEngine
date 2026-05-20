@@ -2,11 +2,6 @@
 
 本项目使用了以下第三方库：
 
-## Microsoft Edge WebView2 Runtime
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Microsoft Edge WebView2 License.
-详见 ThirdParty/WebView2/LICENSE.txt
-
 ## Lua
 Copyright (c) 1994–2025 Lua.org, PUC-Rio.
 Licensed under the MIT License.

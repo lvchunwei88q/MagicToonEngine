@@ -1,6 +1,5 @@
 #pragma once
 #include <windows.h>
-#include <EditorUI.h>
 #include <Tools/Singleton.h>
 #include <IRender.h> // 呈现
 
@@ -13,6 +12,5 @@ namespace EngineLauncher {
 		void End();
 
 	private:
-		RenderUI::EditorUI editorUI;
 	};
 }

@@ -6,8 +6,7 @@ namespace RenderUI {
 	class RENDERUI_API EditorUI
 	{
 	public:
-		void Engine_Tick();
-		void Launcher_Tick();
+		void Tick();
 
 		void Init(HWND hwnd);
 		void Shutdown();

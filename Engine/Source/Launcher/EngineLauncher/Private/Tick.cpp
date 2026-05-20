@@ -12,19 +12,15 @@ namespace EngineLauncher
 
 	void LauncherRender::Init()
 	{
-		editorUI.Init(g_hwnd);
 	}
 
 	void LauncherRender::End()
 	{
-		editorUI.Shutdown();
 	}
 
 	void LauncherRender::Tick()
 	{
 		RenderRT::GetRenderRTInterface()->SetRenderTarget();
-
-		editorUI.Launcher_Tick(); // Tick Launcher UI
 
 		// Present
 		RenderRT::GetRenderRTInterface()->BindRenderTarget();

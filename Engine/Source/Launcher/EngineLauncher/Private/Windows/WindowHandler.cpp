@@ -1,13 +1,9 @@
 #include "Main.h"
 #include <IRenderRT.h> // Get RT interface for resizing
-#include <EditorUI.h>
 
 namespace EngineLauncher
 {
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-		if (RenderUI::EditorUI_Windows_Event(hwnd, msg, wParam, lParam))
-			return true;
-
 		switch (msg) {
 		case WM_DESTROY:
 			PostQuitMessage(0);
