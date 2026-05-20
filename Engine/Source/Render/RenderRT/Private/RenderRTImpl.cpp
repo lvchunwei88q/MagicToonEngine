@@ -46,6 +46,8 @@ namespace RenderRT {
     void RenderRTImpl::UpdateRenderTargetView(int width, int height)
     {
         if (width == 0 || height == 0) return;
+        if (RenderCore::RenderContext::Get().g_pd3dDeviceContext == nullptr
+            || RenderCore::RenderContext::Get().g_pSwapChain == nullptr)return;
 
         // 释放旧 RTV
         RenderCore::RenderContext::Get().g_pd3dDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);

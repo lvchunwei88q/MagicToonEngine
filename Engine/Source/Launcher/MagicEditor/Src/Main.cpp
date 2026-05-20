@@ -10,7 +10,6 @@ int main(int argc, char* argv[])// exe -p path
     std::cout << "Engine Init ... " << std::endl;
 
     if (!EnginePreInit(argc, argv)) { return 0; }
-    (void)Editor::Editor::Get(); // 确保Editor初始化比Subsystem早
 
     Core::SubsystemContext::SubsystemError error = Core::SubsystemControl::Init();
     if (!error.error) {

@@ -11,6 +11,7 @@ namespace Core
 			Low = -1,      // 低优先级
 			Normal = 0,    // 普通优先级
 			High = 1,      // 高优先级
+			Core = 2,      // 核心优先级
 		};
 
 		struct Context

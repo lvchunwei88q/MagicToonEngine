@@ -13,7 +13,7 @@
 
 namespace LOG {
 
-    class LoggerImpl : public SubsystemTemplate<LoggerImpl, Core::SubsystemContext::Priority::High>, public LogInterface {
+    class LoggerImpl : public SubsystemTemplate<LoggerImpl, Core::SubsystemContext::Priority::Core>, public LogInterface {
     public:
         //LoggerImpl() = default;
 

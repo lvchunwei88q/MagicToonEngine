@@ -1,23 +1,26 @@
 #pragma once
 
 #include "Common/EDITOR_API.h"
-#include <Tools/Singleton.h>
+#include <Subsystem/Subsystem.h>
+#include <Subsystem/SubsystemTemplate.h>
 
 #include "Windows/Win32Application.h"
 
 namespace Editor
 {
-	class EDITOR_API Editor : public Singleton<Editor>
+	class EDITOR_API Editor : public Singleton<Editor> , public Core::Subsystem
 	{
 	public:
-		Editor();
+		Editor() = default;
+
+		virtual bool Init();
+		virtual void Uninstall();
 
 		enum class EngineState {
 			Run = 0,
 			Stop = 1,
 		};
 
-		void InitCoreLogCapture();
 		void SetEngineState(EngineState State);
 
 		void Run();
@@ -27,4 +30,6 @@ namespace Editor
 		EngineState state;
 		void Tick();
 	};
+
+	AUTO_REGISTER_SINGLETON_INCLUDE(Editor);
 }

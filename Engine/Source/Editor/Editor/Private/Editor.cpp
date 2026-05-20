@@ -7,23 +7,26 @@
 
 namespace Editor
 {
-	Editor::Editor()
-	{
-        InitCoreLogCapture();
-	}
+    AUTO_REGISTER_SINGLETON(Editor,Core);
 
-    void Editor::InitCoreLogCapture()
+    bool Editor::Init()
     {
         // 初始化核心日志捕获 在单例构造函数进行，但是这并不代表可以很早使用。
-        Core::ErrorCapture::RegisterCaptureFunction([](const std::string& errorMessage){
+        Core::ErrorCapture::RegisterCaptureFunction([](const std::string& errorMessage) {
             LOG_ERROR(errorMessage.c_str());
-        });
+            });
         Core::WarningCapture::RegisterCaptureFunction([](const std::string& warningMessage) {
             LOG_WARNING(warningMessage.c_str());
-        });
+            });
         Core::InfoCapture::RegisterCaptureFunction([](const std::string& infoMessage) {
             LOG_INFO(infoMessage.c_str());
-        });
+            });
+
+        return true;
+    }
+
+    void Editor::Uninstall()
+    {
     }
 
     void Editor::SetEngineState(EngineState State)

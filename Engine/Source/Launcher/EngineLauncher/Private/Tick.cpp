@@ -1,22 +1,30 @@
-#include "Editor.h"
-#include "EditorRender.h"
-
+#include "LauncherRender.h"
+#include "Main.h"
 #include <IRenderRT.h>
 
-namespace Editor
+namespace EngineLauncher
 {
-	void Editor::Tick()
+	void Tick()
 	{
 		// 这里可以添加每帧需要执行的逻辑，例如处理输入、更新界面等
-		EditorRender::Get().Tick();
+		LauncherRender::Get().Tick();
 	}
 
+	void LauncherRender::Init()
+	{
+		editorUI.Init(g_hwnd);
+	}
 
-	void EditorRender::Tick()
+	void LauncherRender::End()
+	{
+		editorUI.Shutdown();
+	}
+
+	void LauncherRender::Tick()
 	{
 		RenderRT::GetRenderRTInterface()->SetRenderTarget();
 
-		editorUI.Engine_Tick(); // Tick Engine UI
+		editorUI.Launcher_Tick(); // Tick Launcher UI
 
 		// Present
 		RenderRT::GetRenderRTInterface()->BindRenderTarget();

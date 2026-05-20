@@ -221,7 +221,7 @@ namespace RenderUI {
 		ImGui::DestroyContext();
 	}
 
-	void EditorUI::Tick()
+	void EditorUI::Engine_Tick()
 	{
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 
@@ -249,6 +249,31 @@ namespace RenderUI {
         }
 		
 	}
+
+    void EditorUI::Launcher_Tick()
+    {
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+        // Start the Dear ImGui frame
+        ImGui_ImplDX11_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
+
+        {
+            // Launcher UI
+        }
+
+        // Rendering
+        ImGui::Render();
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+        // Update and Render additional Platform Windows
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
+    }
 
 	LRESULT EditorUI_Windows_Event(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{

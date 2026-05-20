@@ -9,23 +9,23 @@ add_executable(EngineLauncher WIN32
 )
 
 target_include_directories(EngineLauncher
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Public # 别的项目也可以访问
     PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
         ${THIRD_PARTY_DIR} # 使用WebView2JSON HTTP 库 
         ${CMAKE_SOURCE_DIR}/Engine/Content # 内容目录
 )
 
 target_sources(EngineLauncher PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/resources.rc")
 
-target_link_libraries(EngineLauncher PRIVATE 
-    IO
-    EngineProject
-    ${THIRD_PARTY_DIR}/WebView2/WebView2Loader.dll.lib
+target_link_libraries(EngineLauncher PRIVATE # windows
     user32
     dwmapi
 )
 
-add_custom_command(TARGET EngineLauncher POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${THIRD_PARTY_DIR}/WebView2/WebView2Loader.dll"
-        "$<TARGET_FILE_DIR:EngineLauncher>/WebView2Loader.dll"
-)
+target_link_libraries(EngineLauncher PRIVATE Core)
+target_link_libraries(EngineLauncher PRIVATE IO)
+target_link_libraries(EngineLauncher PRIVATE EngineProject)
+target_link_libraries(EngineLauncher PRIVATE RenderCore)
+target_link_libraries(EngineLauncher PRIVATE RenderUI)   # RenderUI + RenderRT
