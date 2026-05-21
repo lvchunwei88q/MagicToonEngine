@@ -47,4 +47,11 @@ namespace RenderLauncher {
 	{
 		return std::hash<std::string>{}(data);
 	}
+
+	void LauncherGeneralLayout::ExitProgram()
+	{
+		RenderUIContext UIContext = GetSubsystem()->GetRenderUIContext();
+		HWND hwnd = reinterpret_cast<HWND>(UIContext.hwnd);
+		PostMessage(hwnd, WM_CLOSE, 0, 0); // Close
+	}
 }

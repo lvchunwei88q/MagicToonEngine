@@ -1,5 +1,6 @@
 #pragma once
 #include <RenderSubsystem/RenderSubsystem.h>
+#include <RenderUIWarehouse.h>
 #include <cereal/cereal.hpp>
 #include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
@@ -23,5 +24,10 @@ namespace RenderLauncher {
 	private:
 		size_t ComputeJSONHash(const JSON& data);
 		size_t ComputeStringHash(const std::string& data);
+
+		void ExitProgram();
+
+		bool m_bDragging = false;
+		ImVec2 m_dragOffset;
 	};
 }
