@@ -1,12 +1,13 @@
 #pragma once
 #include "RenderSubsystem/RenderSubsystem.h"
+#include "Common/RENDERUI_API.h"
 
 #include <nlohmann/json.hpp>
 using JSON = nlohmann::json;
 
 namespace RenderUI {
     namespace Language {
-        class LanguageManager {
+        class RENDERUI_API LanguageManager {
         private:
             static JSON m_langData;
             static size_t s_languageHash;

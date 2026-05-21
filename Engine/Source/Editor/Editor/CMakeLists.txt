@@ -25,7 +25,6 @@ target_link_libraries(Editor PRIVATE IO)
 target_link_libraries(Editor PRIVATE Logger)
 
 target_link_libraries(Editor PRIVATE RenderCore)
-target_link_libraries(Editor PRIVATE RenderRT)
-target_link_libraries(Editor PRIVATE RenderUI)
+target_link_libraries(Editor PRIVATE RenderEditor)
 
 target_link_libraries(Editor PRIVATE dwmapi.lib)

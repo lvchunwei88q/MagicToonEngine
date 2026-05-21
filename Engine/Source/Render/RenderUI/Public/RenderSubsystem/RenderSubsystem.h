@@ -9,16 +9,16 @@
 #include <string>
 
 namespace RenderUI {
-	class Subsystem;
+	class RSubsystem;
 
 	struct RegisterSubsystemContext
 	{
-		Subsystem* Subsystem;
+		RSubsystem* Subsystem;
 		const char* Name;
 	};
 
 	// Interface 
-	class RENDERUI_API ISubsystem
+	class RENDERUI_API IRSubsystem
 	{
 	public:
 		virtual void RegisterSubsystem(RegisterSubsystemContext context) = 0;
@@ -31,14 +31,15 @@ namespace RenderUI {
 		virtual void* GetSubsystemPublicData(std::string Target,uint8_t Type) = 0;
 
 		virtual [[nodiscard]] const RenderUIContext& GetRenderUIContext() const = 0;
+		virtual [[nodiscard]] RenderUIContext& SetRenderUIContext() = 0;
 	};
-	RENDERUI_API ISubsystem* GetSubsystem();
+	RENDERUI_API IRSubsystem* GetSubsystem();
 
 	// Main Type
-	class RENDERUI_API Subsystem
+	class RENDERUI_API RSubsystem
 	{
 	public:
-		Subsystem() = default;
+		RSubsystem() = default;
 
 		// api
 		virtual void Init() = 0;
@@ -57,7 +58,7 @@ namespace RenderUI {
 			context.Subsystem = this;
 			this->Type = type;
 
-			ISubsystem* Subsystemcontext = GetSubsystem();
+			IRSubsystem* Subsystemcontext = GetSubsystem();
 			Subsystemcontext->RegisterSubsystem(context);
 		}
 
@@ -74,11 +75,11 @@ namespace RenderUI {
 
 	// the subsystems template Cannot be used as an export API!!!
 	template<typename T, ModeType type>
-	class SubsystemTemplate : public Subsystem, public Singleton<T>
+	class RSubsystemTemplate : public RSubsystem, public Singleton<T>
 	{
 	public:
 		static void RegisterStatic() {
-			SubsystemTemplate::Get().template Register<T, type>();
+			RSubsystemTemplate::Get().template Register<T, type>();
 		}
 	};
 

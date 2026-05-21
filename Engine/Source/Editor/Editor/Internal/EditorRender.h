@@ -3,6 +3,8 @@
 #include <Tools/Singleton.h>
 #include <IRender.h> // 呈现
 
+using namespace RenderEditor;
+
 namespace Editor {
 	class EditorRender : public Singleton<EditorRender>
 	{
@@ -12,6 +14,6 @@ namespace Editor {
 		void End();
 
 	private:
-		RenderUI::EditorUI editorUI;
+		EditorUI editorUI;
 	};
 }

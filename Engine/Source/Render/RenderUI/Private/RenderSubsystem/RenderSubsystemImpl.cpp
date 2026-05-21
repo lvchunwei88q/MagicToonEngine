@@ -1,11 +1,11 @@
 #include "RenderSubsystem/RenderSubsystemImpl.h"
-#include "EditorUIWarehouse.h"
+#include "RenderUIWarehouse.h"
 #include <ILog.h>
 
 #include <algorithm>
 
 namespace RenderUI {
-	ISubsystem* GetSubsystem()
+	IRSubsystem* GetSubsystem()
 	{
 		return &RenderSubsystemImpl::Get();
 	}

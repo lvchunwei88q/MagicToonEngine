@@ -11,11 +11,11 @@ namespace RenderUI {
 
 	struct SubsystemContext
 	{
-		Subsystem* Subsystem;
+		RSubsystem* Subsystem;
 		std::string Name;
 	};
 
-	class RenderSubsystemImpl : public Singleton<RenderSubsystemImpl> , public ISubsystem
+	class RenderSubsystemImpl : public Singleton<RenderSubsystemImpl> , public IRSubsystem
 	{
 	public:
 		virtual void RegisterSubsystem(RegisterSubsystemContext context) override;
@@ -27,7 +27,7 @@ namespace RenderUI {
 		// Data
 		virtual void* GetSubsystemPublicData(std::string Target, uint8_t Type) override;
 		virtual [[nodiscard]] const RenderUIContext& GetRenderUIContext() const override;
-		virtual [[nodiscard]] RenderUIContext& SetRenderUIContext();
+		virtual [[nodiscard]] RenderUIContext& SetRenderUIContext() override;
 	private:
 		std::vector<SubsystemContext> Subsystems;
 

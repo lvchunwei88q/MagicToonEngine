@@ -5,10 +5,7 @@ if (POLICY CMP0141)
 endif()
 
 if(MSVC)
-    # 关闭警告 C4819: 无效的字符。避免中文注释被警告
-    add_compile_options(
-        "/wd4819"
-    )
+    add_compile_options(/wd4819)
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
     # 更改最大数

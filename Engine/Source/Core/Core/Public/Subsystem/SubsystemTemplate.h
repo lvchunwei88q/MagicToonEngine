@@ -3,7 +3,7 @@
 #include "Tools/Singleton.h"
 
 // the subsystems template Cannot be used as an export API!!!
-template<typename T, Core::SubsystemContext::Priority Priority>
+template<typename T, Core::Priority Priority>
 class SubsystemTemplate : public Core::Subsystem, public Singleton<T>
 {
 public:
@@ -39,7 +39,7 @@ public:
 struct CAT(T, _AutoRegister)                                                 \
 {                                                                           \
     CAT(T, _AutoRegister)() {                                                \
-        T::Get().Register<T, Core::SubsystemContext::Priority::Priority_>();\
+        T::Get().Register<T, Core::Priority::Priority_>();\
     }                                                                       \
 };                                                                          \
 static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);
@@ -48,7 +48,7 @@ static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);
 struct CAT(T, _AutoRegister)                                                 \
 {                                                                           \
     CAT(T, _AutoRegister)() {                                                \
-        T::Get().Register<T, Core::SubsystemContext::Priority::Priority_>(TAGS);\
+        T::Get().Register<T, Core::Priority::Priority_>(TAGS);\
     }                                                                       \
 };                                                                          \
 static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);

@@ -90,7 +90,7 @@ namespace RenderCore //RenderCore
     * 在获取Texture时我们应该在同一渲染线程中使用这个鞋Get函数来确保不会出现线程问题。
     */
 	class BufferManagerImpl : public IBufferManagerUser, public IBufferManagerAdmin,
-        public SubsystemTemplate<BufferManagerImpl,Core::SubsystemContext::Priority::Core>
+        public SubsystemTemplate<BufferManagerImpl,Core::Priority::Core>
     {
     public:
 

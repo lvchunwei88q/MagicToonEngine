@@ -46,7 +46,7 @@ namespace Editor
 		ShowWindow(Hwnd, SW_SHOW);
 
         LOG_INFO("Render init ...");
-        EditorRender::Get().Init(); // 渲染初始化
+        EditorRender::Get().Init(); // UI初始化
 
         Win32Application::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {
             if (state == EngineState::Run) Tick(); // 每帧更新逻辑
@@ -75,7 +75,7 @@ namespace Editor
 
     void EditorRender::Init()
     {
-        editorUI.Init(Win32Application::Get().GetWindowsContext()->hWnd); // 初始化UI系统
+        editorUI.Init(); // 编辑器UI设置 - 同步Imgui上下文
     }
     void EditorRender::End()
     {

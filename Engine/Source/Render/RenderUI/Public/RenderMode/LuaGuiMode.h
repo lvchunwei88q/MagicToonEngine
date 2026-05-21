@@ -22,6 +22,16 @@ namespace RenderUI {
 		std::string member_name;
 	};
 
+	struct LuaMember {
+		LuaGuiMode* member;
+		std::string member_name;
+		LuaMember() = default;
+		LuaMember(LuaGuiMode* m, std::string n)
+			: member(m), member_name(n)
+		{
+		}
+	};
+
 	class RENDERUI_API LuaGuiMode
 	{
 	public:
@@ -50,6 +60,7 @@ namespace RenderUI {
 	{
 	public:
 		virtual void Register(LuaMemberContext member) = 0;
+		virtual const std::vector<LuaMember>& GetLuaMember() = 0;
 	};
 
 	RENDERUI_API ILuaUIMember* GetLuaUIMember();

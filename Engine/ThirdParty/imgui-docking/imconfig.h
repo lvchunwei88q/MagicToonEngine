@@ -149,7 +149,7 @@ ImGui::GetCurrentWindow()->Name : "Unknown";            \
         if (!(_EXPR)) {                                                                         \
             GET_CURRENT_WINDOWS_NAME                                                            \
             LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
-            Core::SubsystemControl::NotificationSubsystem("IMGUI",WindowName);                  \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",{1,WindowName});              \
         }                                                                                       \
     } while(0)
 
@@ -158,7 +158,7 @@ ImGui::GetCurrentWindow()->Name : "Unknown";            \
         if (!(_EXPR)) {                                                                         \
             GET_CURRENT_WINDOWS_NAME                                                            \
             LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
-            Core::SubsystemControl::NotificationSubsystem("IMGUI",WindowName);                  \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",{1,WindowName});              \
             return;                                                                             \
         }                                                                                       \
     } while(0)
@@ -168,7 +168,7 @@ ImGui::GetCurrentWindow()->Name : "Unknown";            \
         if (!(_EXPR)) {                                                                         \
             GET_CURRENT_WINDOWS_NAME                                                            \
             LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
-            Core::SubsystemControl::NotificationSubsystem("IMGUI",WindowName);                  \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",{1,WindowName});              \
             return _RETV;                                                                       \
         }                                                                                       \
     } while(0)

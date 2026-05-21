@@ -1,15 +1,14 @@
 #include "WindowsConfig.h"
+#include "EditorRender.h"
 #include "Windows/Win32Application.h"
 #include <dwmapi.h>
 
-// DX11相关
-#include <EditorUI.h>
 #include <IRenderRT.h>
 #include <IBufferManager.h>
 
 namespace Editor {
 	LRESULT CALLBACK Win32Application::WindowsProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-        if (RenderUI::EditorUI_Windows_Event(hWnd, msg, wParam, lParam))
+        if (EditorUI_IMGUI_Event(hWnd, msg, wParam, lParam))
             return true;
 
 		switch (msg) {

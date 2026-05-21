@@ -19,7 +19,7 @@
 
 namespace Editor
 {
-	AUTO_REGISTER_SINGLETON(Win32Application, Normal);
+	AUTO_REGISTER_SINGLETON(Win32Application, High);
 
 	Win32Application::Win32Application()
 	{
@@ -80,6 +80,10 @@ namespace Editor
 			SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
 		WindowsContext::Get().hWnd = hwnd; // Store the window handle in the WindowsContext singleton
+
+		char buffer[sizeof(HWND)];
+		memcpy(buffer, &hwnd, sizeof(HWND));
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", { 2,buffer });
 	}
 
 	void Win32Application::CreateDeviceD3D()
