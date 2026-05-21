@@ -1,3 +1,4 @@
+#include <windows.h>
 #include "Main.h"
 #include <Editor.h>
 

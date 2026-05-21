@@ -1,10 +1,11 @@
-#include "Windows/Win32Application.h"
+#include "Win32Application.h"
 // windows配置
 #include "WindowsConfig.h"
 #include <ILog.h>
 
 #include <IBufferManager.h> // 内存管理器
 #include <IRender.h> // 渲染接口
+#include <IRenderRT.h>
 
 // 序列化文件相关
 #include <AbsolutePath.h>
@@ -111,6 +112,27 @@ namespace Editor
 	void Win32Application::CleanupDeviceD3D()
 	{
 		RenderCore::GetRenderInterface()->CleanupDeviceD3D();
+	}
+
+	void Win32Application::InitializeUI()
+	{
+		editorUI.Init(); // 编辑器UI设置 - 同步Imgui上下文
+	}
+
+	void Win32Application::Tick() {
+		RenderRT::GetRenderRTInterface()->SetRenderTarget();
+
+		editorUI.Tick(); // Tick Engine UI
+
+		// Present
+		RenderRT::GetRenderRTInterface()->BindRenderTarget();
+		//RenderCore::GetRenderInterface()->DebugD3D11State();
+		RenderCore::GetRenderInterface()->Present();
+	}
+
+	void Win32Application::EndUI()
+	{
+		editorUI.Shutdown();
 	}
 
 	// 注册窗口改变时渲染回调函数

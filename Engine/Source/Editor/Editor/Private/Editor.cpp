@@ -1,6 +1,6 @@
 #include "Editor.h"
 #include <CoreLogCapture/CoreLogCapture.h>
-#include "EditorRender.h"
+#include "Win32Application.h" 
 
 #include <Logo/resource.h>
 #include <ILog.h>
@@ -46,10 +46,10 @@ namespace Editor
 		ShowWindow(Hwnd, SW_SHOW);
 
         LOG_INFO("Render init ...");
-        EditorRender::Get().Init(); // UI初始化
+        Win32Application::Get().InitializeUI(); // UI初始化
 
         Win32Application::Get().RegisterWindowUpdateRenderCallbackFunction([this]() {
-            if (state == EngineState::Run) Tick(); // 每帧更新逻辑
+            if (state == EngineState::Run) Win32Application::Get().Tick(); // 每帧更新逻辑
         });
 
         // 游戏循环 + 消息处理
@@ -67,18 +67,9 @@ namespace Editor
                 DispatchMessage(&msg);
             }
 
-			if(state == EngineState::Run) Tick(); // 每帧更新逻辑
+			if(state == EngineState::Run) Win32Application::Get().Tick(); // 每帧更新逻辑
         }
 
-        EditorRender::Get().End();
+        Win32Application::Get().EndUI();
 	}
-
-    void EditorRender::Init()
-    {
-        editorUI.Init(); // 编辑器UI设置 - 同步Imgui上下文
-    }
-    void EditorRender::End()
-    {
-        editorUI.Shutdown();
-    }
 }

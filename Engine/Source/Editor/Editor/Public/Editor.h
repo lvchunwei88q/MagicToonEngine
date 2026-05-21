@@ -4,8 +4,6 @@
 #include <Subsystem/Subsystem.h>
 #include <Subsystem/SubsystemTemplate.h>
 
-#include "Windows/Win32Application.h"
-
 namespace Editor
 {
 	class EDITOR_API Editor : public Singleton<Editor> , public Core::Subsystem
@@ -28,7 +26,6 @@ namespace Editor
 	private:
 		//EditorWindows::EditorWindows* editorWindows_ = &EditorWindows::EditorWindows::Get();
 		EngineState state;
-		void Tick();
 	};
 
 	AUTO_REGISTER_SINGLETON_INCLUDE(Editor);

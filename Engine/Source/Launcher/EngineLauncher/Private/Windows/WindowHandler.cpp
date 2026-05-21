@@ -1,9 +1,13 @@
 #include "Main.h"
+#include "Win32Application.h"
 #include <IRenderRT.h> // Get RT interface for resizing
 
 namespace EngineLauncher
 {
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        if (LauncherUI_IMGUI_Event(hwnd, msg, wParam, lParam))
+            return true;
+
 		switch (msg) {
 		case WM_DESTROY:
 			PostQuitMessage(0);

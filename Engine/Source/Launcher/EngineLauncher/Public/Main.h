@@ -42,8 +42,4 @@ namespace EngineLauncher
     LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     void Tick();
-	void Init();
-
-    // Values
-	extern HWND g_hwnd;
 }

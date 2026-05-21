@@ -1,6 +1,5 @@
 #include "WindowsConfig.h"
-#include "EditorRender.h"
-#include "Windows/Win32Application.h"
+#include "Win32Application.h"
 #include <dwmapi.h>
 
 #include <IRenderRT.h>

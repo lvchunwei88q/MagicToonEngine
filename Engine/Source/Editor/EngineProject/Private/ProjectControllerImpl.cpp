@@ -15,6 +15,8 @@
 #include <ILog.h>
 
 namespace EngineProject {
+	AUTO_REGISTER(ProjectControllerImpl);
+
 	IProjectController* GetProjectControllerInterface()
 	{
 		return &ProjectControllerImpl::Get();
