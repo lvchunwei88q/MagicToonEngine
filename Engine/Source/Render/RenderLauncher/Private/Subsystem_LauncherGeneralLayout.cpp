@@ -14,7 +14,7 @@ namespace RenderLauncher {
 	auto GetLanguageFileName = []() {
 			std::wstring ContentPath = IO::AbsolutePath::Get().GetContentPath();
 			ContentPath += L"\\Config\\Languages\\";
-			ContentPath += L"en.json"; // 默认 English
+			ContentPath += L"launcher.json"; // 默认 English
 
 			return ContentPath;
 		};
@@ -27,6 +27,11 @@ namespace RenderLauncher {
 		std::string JsonDump = IO::FileManager::ReadAllText(ContentPath);
 		UIContext.EditorLanguage = JSON::parse(JsonDump);
 		UIContext.EditorLanguageHash = ComputeStringHash(JsonDump);
+
+		// 加载 UI 相关资源
+		new_btn  = new MenuButton( Lang::Get("launcher.menu.new")  );
+		open_btn = new MenuButton( Lang::Get("launcher.menu.open") );
+		exit_btn = new MenuButton( Lang::Get("launcher.menu.exit") );
 	}
 
 	void LauncherGeneralLayout::Uninstall()

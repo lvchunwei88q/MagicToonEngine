@@ -1,0 +1,9 @@
+{
+  "launcher": {
+    "menu": {
+      "new": "New ProJect",
+      "open": "Open ProJect",
+      "exit": "Exit"
+    }
+  }
+}

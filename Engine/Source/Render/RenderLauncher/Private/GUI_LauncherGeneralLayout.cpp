@@ -68,7 +68,6 @@ namespace RenderLauncher {
             ImGui::SetCursorPos(ImVec2(10, 8));
             ImGui::TextColored(ImVec4(1, 1, 1, 1), "Magic Launcher");
 
-            // 分隔线
             ImGui::SetCursorPosY(title_bar_height);
             ImGui::Separator();
         }
@@ -88,29 +87,25 @@ namespace RenderLauncher {
         {
             ImGui::SetCursorPosY(20.0f);
             ImGui::SetCursorPosX((left_panel_width - button_size.x) * 0.5f);
-            if (ImGui::Button(Lang::Get("editor.menu.new").c_str(), button_size))
-            {
-                // 新建逻辑
+            if (new_btn->Draw(button_size, Type == LauncherUIType::NewProject)) {
+                Type = LauncherUIType::NewProject;
             }
 
             ImGui::Spacing();
             ImGui::SetCursorPosX((left_panel_width - button_size.x) * 0.5f);
-            if (ImGui::Button(Lang::Get("editor.menu.open").c_str(), button_size))
-            {
-                // 打开逻辑
+            if (open_btn->Draw(button_size, Type == LauncherUIType::OpenProject)) {
+                Type = LauncherUIType::OpenProject;
             }
 
 
             float panel_height = ImGui::GetWindowHeight();
             float cursor_y = panel_height - button_size.y - 10.0f; // 10px 底部边距
             if (cursor_y > ImGui::GetCursorPosY())
-            {
                 ImGui::SetCursorPosY(cursor_y);
-            }
 
             ImGui::SetCursorPosX((left_panel_width - button_size.x) * 0.5f);
-            if (ImGui::Button(Lang::Get("editor.menu.exit").c_str(), button_size))
-            {
+            if (exit_btn->Draw(button_size, Type == LauncherUIType::Exit)) {
+                Type = LauncherUIType::Exit;
                 ExitProgram();
             }
         }
@@ -125,15 +120,29 @@ namespace RenderLauncher {
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
         {
-            // ===================== 右侧内容区 =====================
-            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Content Area");
-            ImGui::Separator();
-
-            ImGui::Text("Welcome to Launcher");
+            switch (Type)
+            {
+            case RenderLauncher::LauncherUIType::NewProject:
+                DrawNewProjectUI();
+                break;
+            case RenderLauncher::LauncherUIType::OpenProject:
+                DrawOpenProjectUI();
+                break;
+            default:
+                break;
+            }
         }
 
         ImGui::EndChild();
 
         ImGui::End();
+    }
+
+    void LauncherGeneralLayout::DrawNewProjectUI() {
+
+    }
+
+    void LauncherGeneralLayout::DrawOpenProjectUI() {
+
     }
 }
