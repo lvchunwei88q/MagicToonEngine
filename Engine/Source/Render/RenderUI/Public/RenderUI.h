@@ -45,6 +45,9 @@ namespace RenderUI {
 		std::atomic<bool> TaskRun = false;
 		std::atomic<int> TaskNum = 0;
 		std::queue<TaskFunction> FunctionQueue;
+
+		// dpi scale
+		float main_scale = 1.0f;
 	};
 
 	AUTO_REGISTER_SINGLETON_INCLUDE(RenderUIManager);

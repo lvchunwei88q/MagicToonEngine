@@ -65,6 +65,7 @@ namespace Editor
 		wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
 		::RegisterClassEx(&wc);
 
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", { 3,nullptr }); // Set Imgui Dpi Scale
 		HWND hwnd = CreateWindowEx(
 			0, wc.lpszClassName, L"Magic Editor",
 			WS_OVERLAPPEDWINDOW,

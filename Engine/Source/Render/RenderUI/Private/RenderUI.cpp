@@ -16,10 +16,6 @@ namespace RenderUI {
 	{
 		GetSubsystem()->Init(); // render subsystem
 
-        // 启用DPI感知
-        ImGui_ImplWin32_EnableDpiAwareness();
-        float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));
-
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -271,6 +267,11 @@ namespace RenderUI {
 			memcpy(&Hwnd, Context.msg, sizeof(HWND));
             RenderUIContext& UIContext = GetSubsystem()->SetRenderUIContext();
             UIContext.hwnd = reinterpret_cast<uintptr_t>(Hwnd);
+        }break;
+        case 3: { // RenderUIContext - EnableDpiAwareness
+            // 启用DPI感知
+            ImGui_ImplWin32_EnableDpiAwareness();
+            main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));
         }break;
         default:LOG_WARNING("Unknown tag type");
             break;
