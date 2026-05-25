@@ -10,53 +10,57 @@ namespace RenderLauncher {
         static const char* apiOptions[] = { "DX12", "DX11" };
 
         ImGui::Spacing();
-        ImGui::Text("Create New Project");
+        ImGui::Text(Lang::Get("launcher.menu.new").c_str());
         ImGui::Separator();
         ImGui::Spacing();
 
         // 项目名称输入
-        ImGui::InputText("Project Name", projectName, sizeof(projectName));
+        ImGui::InputText(Lang::Get("launcher.new.project_name").c_str(), projectName, sizeof(projectName));
 
-        ImGui::InputText("Project Path", projectPath, sizeof(projectPath));
+        ImGui::InputText(Lang::Get("launcher.new.project_path").c_str(), projectPath, sizeof(projectPath));
         ImGui::SameLine();
-        if (ImGui::Button("Browse...")) {
+        if (ImGui::Button(Lang::Get("launcher.new.browse").c_str())) {
             // TODO: 集成文件对话框，获取用户选择的路径并填充到 projectPath 中
         }
 
-        ImGui::Combo("Graphics API", &selectedAPI, apiOptions, IM_ARRAYSIZE(apiOptions));
+        ImGui::Combo(Lang::Get("launcher.new.graphics_api").c_str(), &selectedAPI, apiOptions, IM_ARRAYSIZE(apiOptions));
 
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
 
         // 创建按钮
-        if (ImGui::Button("Create", ImVec2(120, 0))) {
+        if (ImGui::Button(Lang::Get("launcher.new.create").c_str(), ImVec2(120, 0))) {
             if (strlen(projectName) == 0 || strlen(projectPath) == 0) {
-                ImGui::OpenPopup("CreateError");
+                ImGui::OpenPopup(Lang::Get("launcher.new.error_popup").c_str());
             }
             else {
-				// TODO : 实际创建项目的逻辑（文件夹结构、配置文件等）
-                ImGui::OpenPopup("CreateSuccess");
+                // TODO : 实际创建项目的逻辑（文件夹结构、配置文件等）
+                ImGui::OpenPopup(Lang::Get("launcher.new.success_popup").c_str());
 
             }
         }
 
         // 错误提示弹窗
-        if (ImGui::BeginPopupModal("CreateError", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Project name and path cannot be empty!");
-            if (ImGui::Button("OK", ImVec2(120, 0))) {
+        if (ImGui::BeginPopupModal(Lang::Get("launcher.new.error_popup").c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text(Lang::Get("launcher.new.error_message").c_str());
+            if (ImGui::Button(Lang::Get("launcher.common.ok").c_str(), ImVec2(120, 0))) {
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
         }
 
         // 成功提示弹窗
-        if (ImGui::BeginPopupModal("CreateSuccess", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGui::Text("Project \"%s\" created at %s (API: %s)",
+        if (ImGui::BeginPopupModal(Lang::Get("launcher.new.success_popup").c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+            char successMsg[512];
+            snprintf(successMsg, sizeof(successMsg),
+                Lang::Get("launcher.new.success_message").c_str(),
                 projectName, projectPath, apiOptions[selectedAPI]);
-            if (ImGui::Button("OK", ImVec2(120, 0))) {
+            ImGui::Text("%s", successMsg);
+
+            if (ImGui::Button(Lang::Get("launcher.common.ok").c_str(), ImVec2(120, 0))) {
                 ImGui::CloseCurrentPopup();
-                // 可选：清空输入框，方便新建下一个项目
+                // 清除
                 memset(projectName, 0, sizeof(projectName));
                 memset(projectPath, 0, sizeof(projectPath));
             }

@@ -4,6 +4,28 @@
       "new": "New ProJect",
       "open": "Open ProJect",
       "exit": "Exit"
+    },
+    "new": {
+      "project_name": "Project Name",
+      "project_path": "Project Path",
+      "browse": "Browse...",
+      "graphics_api": "Graphics API",
+      "create": "Create",
+      "error_popup": "Creation Error",
+      "error_message": "Project name and path cannot be empty!",
+      "success_popup": "Creation Successful",
+      "success_message": "Project \"%s\" created at %s (API: %s)"
+    },
+    "open": {
+      "search_hint": "Search by project name...",
+      "path_label": "Path",
+      "version_label": "Version",
+      "open_button": "Open",
+      "no_match": "No projects match the search criteria.",
+      "opening_message": "Opening project... (placeholder)"
+    },
+    "common": {
+      "ok": "OK"
     }
   }
 }
