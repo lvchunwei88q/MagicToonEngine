@@ -2,6 +2,7 @@
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <RenderMode/LuaGuiMode.h>
 #include <Tools/GetLanguage.h>
+#include <ILog.h>
 
 #define WINDOWS_NAME "Details Panel"
 
@@ -12,6 +13,16 @@ namespace RenderEditor {
 	enum class DetailsPanelType {
 		JSON,
 	};
+
+    class LuaMemberClass {
+    public:
+        std::string member_name;
+        std::string lua_type;
+
+        void Print() const {
+			LOG_INFO("Name: ", member_name, ", Type: ", lua_type);
+        }
+    };
 
 	class DetailsPanel : public RSubsystemTemplate<DetailsPanel, ModeType::LuaGui> , public LuaGuiMode
 	{

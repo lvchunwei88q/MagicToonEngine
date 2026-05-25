@@ -1,5 +1,6 @@
 #pragma once
 #include <RenderSubsystem/RenderSubsystem.h>
+#include "AssetStruct.h"
 #include <RenderUIWarehouse.h>
 #include <cereal/cereal.hpp>
 #include <RenderMode/ImGuiMode.h>
@@ -26,24 +27,27 @@ namespace RenderLauncher {
 		}
 
 		bool Draw(const ImVec2& size, bool is_selected) {
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
 
-			// 设置颜色
+			// 根据选中状态设置不同颜色方案
 			if (is_selected) {
-				ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(ACCENT_R, ACCENT_G, ACCENT_B, 0.4f));
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 0.4f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.4f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.4f));
+				ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(ACCENT_R, ACCENT_G, ACCENT_B, 0.8f));
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(ACCENT_R, ACCENT_G, ACCENT_B, 0.25f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(ACCENT_R, ACCENT_G, ACCENT_B, 0.40f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(ACCENT_R, ACCENT_G, ACCENT_B, 0.60f));
 			}
 			else {
-				ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0, 0, 0, 0));
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.4f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.4f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 0.4f));
+				ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.4f, 0.4f, 0.4f, 0.5f));
+				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.2f, 0.2f, 0.5f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.7f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 0.8f));
 			}
 
 			bool clicked = ImGui::Button(m_label.c_str(), size);
-
 			ImGui::PopStyleColor(4);
+			ImGui::PopStyleVar(2);
+
 			return clicked;
 		}
 
@@ -68,6 +72,8 @@ namespace RenderLauncher {
 		size_t ComputeJSONHash(const JSON& data);
 		size_t ComputeStringHash(const std::string& data);
 
+		bool LoadProjectList();
+
 		// UI Function
 		void DrawNewProjectUI();
 		void DrawOpenProjectUI();
@@ -82,5 +88,7 @@ namespace RenderLauncher {
 		MenuButton* new_btn  = nullptr;
 		MenuButton* open_btn = nullptr;
 		MenuButton* exit_btn = nullptr;
+
+		std::vector<ProjectInfo> projects;
 	};
 }

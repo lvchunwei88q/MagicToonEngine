@@ -11,6 +11,12 @@
 namespace RenderLauncher {
 	RENDERUI_REGISTER(LauncherGeneralLayout);
 
+	const char* testJson = R"([
+                {"name":"GameTEST","path":"D:\\Test\\MTE","version":"0.0.1.8"},
+                {"name":"NewGameTEST","path":"D:\\Test\\MTE","version":"0.2.0.2"},
+                {"name":"AAAA","path":"D:\\Test\\MTE","version":"0.2.0.4"}
+            ])";
+
 	auto GetLanguageFileName = []() {
 			std::wstring ContentPath = IO::AbsolutePath::Get().GetContentPath();
 			ContentPath += L"\\Config\\Languages\\";
@@ -32,6 +38,8 @@ namespace RenderLauncher {
 		new_btn  = new MenuButton( Lang::Get("launcher.menu.new")  );
 		open_btn = new MenuButton( Lang::Get("launcher.menu.open") );
 		exit_btn = new MenuButton( Lang::Get("launcher.menu.exit") );
+
+		this->LoadProjectList();
 	}
 
 	void LauncherGeneralLayout::Uninstall()
@@ -51,6 +59,29 @@ namespace RenderLauncher {
 	size_t LauncherGeneralLayout::ComputeStringHash(const std::string& data)
 	{
 		return std::hash<std::string>{}(data);
+	}
+
+	bool LauncherGeneralLayout::LoadProjectList() {
+		try {
+			auto jsonData = nlohmann::json::parse(testJson);
+			for (const auto& item : jsonData) {
+				ProjectInfo info;
+				info.name = item.value("name", "");
+				info.path = item.value("path", "");
+				info.version = item.value("version", "");
+				if (!info.name.empty()) {
+					projects.push_back(info);
+				}
+			}
+
+			return true;
+		}
+		catch (const std::exception& e) {
+			// 解析失败时打印错误
+			IM_ASSERT(false && "Failed to parse test JSON");
+
+			return false;
+		}
 	}
 
 	void LauncherGeneralLayout::ExitProgram()

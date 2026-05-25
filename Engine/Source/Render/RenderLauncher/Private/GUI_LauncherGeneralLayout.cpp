@@ -137,12 +137,4 @@ namespace RenderLauncher {
 
         ImGui::End();
     }
-
-    void LauncherGeneralLayout::DrawNewProjectUI() {
-
-    }
-
-    void LauncherGeneralLayout::DrawOpenProjectUI() {
-
-    }
 }
