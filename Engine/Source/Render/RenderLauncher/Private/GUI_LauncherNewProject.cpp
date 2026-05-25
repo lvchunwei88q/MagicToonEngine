@@ -1,7 +1,32 @@
 #include "LauncherGeneralLayout.h"
 #include <RenderUIWarehouse.h>
+#include <windows.h>
+#include <shlobj.h>
+#include <IProjectController.h>
+
 
 namespace RenderLauncher {
+    namespace {
+        std::string BrowseFolder(const std::string& title) {
+            BROWSEINFOW bi = { 0 };
+            bi.lpszTitle = std::wstring(title.begin(), title.end()).c_str();
+            bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+
+            LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
+            if (pidl != 0) {
+                wchar_t path[MAX_PATH];
+                if (SHGetPathFromIDListW(pidl, path)) {
+                    std::wstring ws(path);
+                    std::string result(ws.begin(), ws.end());
+                    CoTaskMemFree(pidl);
+                    return result;
+                }
+                CoTaskMemFree(pidl);
+            }
+            return "";
+        }
+    }
+
     void LauncherGeneralLayout::DrawNewProjectUI() {
         // 持久化输入状态
         static char projectName[128] = "";
@@ -20,7 +45,10 @@ namespace RenderLauncher {
         ImGui::InputText(Lang::Get("launcher.new.project_path").c_str(), projectPath, sizeof(projectPath));
         ImGui::SameLine();
         if (ImGui::Button(Lang::Get("launcher.new.browse").c_str())) {
-            // TODO: 集成文件对话框，获取用户选择的路径并填充到 projectPath 中
+            std::string selectedPath = BrowseFolder("Select project folder");
+            if (!selectedPath.empty() && selectedPath.length() < 256) {
+                strcpy_s(projectPath, selectedPath.c_str());
+            }
         }
 
         ImGui::Combo(Lang::Get("launcher.new.graphics_api").c_str(), &selectedAPI, apiOptions, IM_ARRAYSIZE(apiOptions));
@@ -36,8 +64,12 @@ namespace RenderLauncher {
             }
             else {
                 // TODO : 实际创建项目的逻辑（文件夹结构、配置文件等）
-                ImGui::OpenPopup(Lang::Get("launcher.new.success_popup").c_str());
+                EngineProject::ProJectConfig config;
+                config.name = projectName;
+                config.path = projectPath;
+                EngineProject::GetProjectControllerInterface()->Create(config);
 
+                ImGui::OpenPopup(Lang::Get("launcher.new.success_popup").c_str());
             }
         }
 

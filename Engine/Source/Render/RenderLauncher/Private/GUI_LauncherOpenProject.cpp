@@ -42,7 +42,6 @@ namespace RenderLauncher {
                     ImGui::Text("%s: %s", Lang::Get("launcher.open.version_label").c_str(), proj.version.c_str());
                     ImGui::SameLine(ImGui::GetWindowWidth() - 80.0f);
                     if (ImGui::Button(Lang::Get("launcher.open.open_button").c_str(), ImVec2(60, 0))) {
-                        // TODO 这里执行打开项目的逻辑
                         ImGui::OpenPopup("OpenProjectInfo");
                     }
                 }
