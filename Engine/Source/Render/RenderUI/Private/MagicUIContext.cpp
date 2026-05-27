@@ -76,7 +76,7 @@ namespace RenderUI
     }
 
     bool MteGUIContext::DragFloat(const std::string& label, float* value, float speed, float min, float max,
-        const char* fmt, float power)
+        const char* fmt, int power)
     {
         CompensateWarp();
         bool changed = ImGui::DragFloat(label.c_str(), value, speed, min, max, fmt, power);

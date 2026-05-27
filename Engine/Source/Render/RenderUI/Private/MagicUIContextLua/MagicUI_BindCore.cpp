@@ -43,7 +43,7 @@ namespace RenderUI {
             tbl[key] = value;
             });
         gui_type.set("DragFloat", [](MteGUIContext& self, const std::string& label, sol::table tbl, const std::string& key,
-            float speed, float min, float max, const std::string& fmt, float power) -> bool {
+            float speed, float min, float max, const std::string& fmt, int power) -> bool {
                 float value = tbl[key].get_or(0.0f);
                 bool changed = self.DragFloat(label, &value, speed, min, max, fmt.c_str(), power);
                 if (changed) tbl[key] = value;

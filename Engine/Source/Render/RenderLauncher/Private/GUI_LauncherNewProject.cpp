@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <shlobj.h>
 #include <IProjectController.h>
-
+#include <Converter.h>
 
 namespace RenderLauncher {
     namespace {
@@ -17,7 +17,7 @@ namespace RenderLauncher {
                 wchar_t path[MAX_PATH];
                 if (SHGetPathFromIDListW(pidl, path)) {
                     std::wstring ws(path);
-                    std::string result(ws.begin(), ws.end());
+                    std::string result = IO::Converter::ToNarrowString(ws);
                     CoTaskMemFree(pidl);
                     return result;
                 }
