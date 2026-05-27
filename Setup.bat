@@ -20,23 +20,9 @@ echo Current directory: %CD%
 echo.
 
 :: ========================================
-:: 1. Check if Git is installed
+::  Check if Git LFS is installed
 :: ========================================
-echo [1/4] Checking Git environment...
-
-git --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ERROR] Git not found. Please install Git first.
-    echo Download: https://git-scm.com/downloads
-    pause
-    exit /b 1
-)
-echo        Git is installed
-
-:: ========================================
-:: 2. Check if Git LFS is installed
-:: ========================================
-echo [2/4] Checking Git LFS environment...
+echo Checking Git LFS environment...
 
 git lfs version >nul 2>&1
 if %errorlevel% neq 0 (
@@ -50,18 +36,27 @@ if %errorlevel% neq 0 (
 )
 echo        Git LFS is installed
 
-:: ========================================
-:: 3. Initialize LFS (if needed)
-:: ========================================
-echo [3/4] Initializing Git LFS...
+:: Check if skip-smudge is already configured
+git config --local --get lfs.smudge >nul 2>&1
+if %errorlevel% neq 0 (
+    echo First run, configuring Git LFS (skip automatic download)...
+    git lfs install --skip-smudge
+    if %errorlevel% neq 0 (
+        echo [ERROR] Failed to configure Git LFS
+        pause
+        exit /b 1
+    )
+    echo Configuration complete.
+    echo.
+) else (
+    echo Git LFS is already configured, proceeding with download...
+    echo.
+)
 
-git lfs install >nul 2>&1
-echo        Git LFS is ready
-
 :: ========================================
-:: 4. Download LFS files
+:: Download LFS files
 :: ========================================
-echo [4/4] Downloading LFS files...
+echo Downloading LFS files...
 echo.
 echo Note: First download may take a few minutes. Please be patient.
 echo Files to download:
