@@ -36,61 +36,55 @@ if %errorlevel% neq 0 (
 )
 echo        Git LFS is installed
 
-:: Check if skip-smudge is already configured
-git config --local --get lfs.smudge >nul 2>&1
+:: ========================================
+::  Initialize Git LFS (if needed)
+:: ========================================
+echo Initializing Git LFS...
+
+git lfs install >nul 2>&1
 if %errorlevel% neq 0 (
-    echo First run, configuring Git LFS (skip automatic download)...
-    git lfs install --skip-smudge
-    if %errorlevel% neq 0 (
-        echo [ERROR] Failed to configure Git LFS
-        pause
-        exit /b 1
-    )
-    echo Configuration complete.
-    echo.
-) else (
-    echo Git LFS is already configured, proceeding with download...
-    echo.
+    echo [ERROR] Failed to initialize Git LFS
+    pause
+    exit /b 1
 )
+echo        Git LFS is ready
 
 :: ========================================
 :: Download LFS files
 :: ========================================
+echo.
 echo Downloading LFS files...
 echo.
 echo Note: First download may take a few minutes. Please be patient.
-echo Files to download:
-echo   - .dll files under ThirdParty folder
-echo   - .lib files under ThirdParty folder
-echo   - .bin files under ThirdParty folder
 echo.
 
 git lfs pull
+set PULL_RESULT=%errorlevel%
 
-if %errorlevel% equ 0 (
+if %PULL_RESULT% equ 0 (
     echo.
     echo ========================================
     echo   Download completed successfully!
     echo ========================================
     echo.
-    echo Verify downloaded files:
+    echo Verifying downloaded files:
     git lfs ls-files
     echo.
     echo All LFS files are now available locally. You can proceed to build.
 ) else (
     echo.
     echo ========================================
-    echo   Download failed!
+    echo   Download failed with error code: %PULL_RESULT%
     echo ========================================
     echo.
     echo Possible reasons:
-    echo   1. Network connection issue (unstable connection to GitHub)
-    echo   2. Authentication failed (private repo requires SSH or Token)
+    echo   1. Network connection issue
+    echo   2. Authentication failed
     echo   3. No LFS files to download
     echo.
     echo Troubleshooting:
     echo   1. Check network or configure proxy
-    echo   2. Ensure you have repository access permissions
+    echo   2. Ensure you have repository access
     echo   3. Manually run: git lfs pull
     echo.
     pause
