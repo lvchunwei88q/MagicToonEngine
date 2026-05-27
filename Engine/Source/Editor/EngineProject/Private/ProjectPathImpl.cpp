@@ -1,8 +1,6 @@
 #include "ProjectPathImpl.h"
 ///////////////////////////////////
-#include <FileManager.h>
-#include <Converter.h>
-#include <AbsolutePath.h>
+#include <IO.h> 
 ///////////////////////////////////
 #include <ILog.h>
 #include <Core.h>
@@ -68,8 +66,8 @@ namespace EngineProject {
 
 		std::wstring project_config = root + L"\\" ProjectJSONName;
 
-		if (IO::FileManager::Exists(project_config)) {
-			std::string dump = IO::FileManager::ReadAllText(project_config);
+		if (IO::Exists(project_config)) {
+			std::string dump = IO::ReadAllText(project_config);
 			JSON project = JSON::parse(dump);
 
 			std::string engine_version = Core::Core::GetVersion();
@@ -79,9 +77,9 @@ namespace EngineProject {
 				// 当前引擎版本 >= x.x.x.x，通过
 				for (auto dir : RequiredDirs) {
 					std::string_view name = magic_enum::enum_name(dir);
-					std::wstring path = root + L"\\" + IO::Converter::ToWideString(std::string(name));
+					std::wstring path = root + L"\\" + IO::ToWideString(std::string(name));
 
-					if (!IO::FileManager::Exists(path)) {// 必要目录存在
+					if (!IO::Exists(path)) {// 必要目录存在
 						return false;
 					}
 				}

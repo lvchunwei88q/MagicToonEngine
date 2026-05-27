@@ -1,72 +1,70 @@
-#include "FileManager.h"
+#include "IO.h"
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
 
-#include "Converter.h"
-
 namespace fs = std::filesystem;
 namespace IO {
 
-    std::string FileManager::ReadAllText(const std::wstring& path) {
+    std::string ReadAllText(const std::wstring& path) {
         fs::path p(path);
         std::ifstream file(p, std::ios::in | std::ios::binary);
         if (!file.is_open()) {
-            throw std::runtime_error("Failed to open file: " + Converter::ToNarrowString(path));
+            throw std::runtime_error("Failed to open file: " + ToNarrowString(path));
         }
         std::string content((std::istreambuf_iterator<char>(file)),
             std::istreambuf_iterator<char>());
         return content;
     }
 
-    std::vector<char> FileManager::ReadAllBytes(const std::wstring& path) {
+    std::vector<char> ReadAllBytes(const std::wstring& path) {
         fs::path p(path);
         std::ifstream file(p, std::ios::in | std::ios::binary);
         if (!file.is_open()) {
-            throw std::runtime_error("Failed to open file: " + Converter::ToNarrowString(path));
+            throw std::runtime_error("Failed to open file: " + ToNarrowString(path));
         }
         std::vector<char> content((std::istreambuf_iterator<char>(file)),
             std::istreambuf_iterator<char>());
         return content;
     }
 
-    void FileManager::WriteAllText(const std::wstring& path, const std::string& content) {
+    void WriteAllText(const std::wstring& path, const std::string& content) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::trunc);
         if (!file.is_open()) {
-            throw std::runtime_error("Failed to write file: " + Converter::ToNarrowString(path));
+            throw std::runtime_error("Failed to write file: " + ToNarrowString(path));
         }
         file.write(content.data(), content.size());
     }
 
-    void FileManager::WriteAllBytes(const std::wstring& path, const std::vector<char>& data) {
+    void WriteAllBytes(const std::wstring& path, const std::vector<char>& data) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::trunc);
         if (!file.is_open()) {
-            throw std::runtime_error("Failed to write file: " + Converter::ToNarrowString(path));
+            throw std::runtime_error("Failed to write file: " + ToNarrowString(path));
         }
         file.write(data.data(), data.size());
     }
 
-    void FileManager::AppendText(const std::wstring& path, const std::string& content) {
+    void AppendText(const std::wstring& path, const std::string& content) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::app);
         if (!file.is_open()) {
-            throw std::runtime_error("Failed to append to file: " + Converter::ToNarrowString(path));
+            throw std::runtime_error("Failed to append to file: " + ToNarrowString(path));
         }
         file.write(content.data(), content.size());
     }
 
-    void FileManager::AppendBytes(const std::wstring& path, const std::vector<char>& data) {
+    void AppendBytes(const std::wstring& path, const std::vector<char>& data) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::app);
         if (!file.is_open()) {
-            throw std::runtime_error("Failed to append to file: " + Converter::ToNarrowString(path));
+            throw std::runtime_error("Failed to append to file: " + ToNarrowString(path));
         }
         file.write(data.data(), data.size());
     }
 
-    bool FileManager::DeleteToFile(const std::wstring& path) {
+    bool DeleteToFile(const std::wstring& path) {
         fs::path p(path);
         if (fs::is_regular_file(p)) {
             return fs::remove(p);
@@ -74,7 +72,7 @@ namespace IO {
         return false;
     }
 
-    bool FileManager::DeleteToDirectory(const std::wstring& path) {
+    bool DeleteToDirectory(const std::wstring& path) {
         fs::path p(path);
         std::error_code ec;
 
@@ -85,7 +83,7 @@ namespace IO {
         return false;  // 不是文件夹，返回 false
     }
 
-    bool FileManager::MakeFile(const std::wstring& path) {
+    bool MakeFile(const std::wstring& path) {
         fs::path p(path);
         if (fs::exists(p)) {
             // 更新最后修改时间
@@ -96,7 +94,7 @@ namespace IO {
         return file.is_open();
     }
 
-    bool FileManager::MoveFile(const std::wstring& src, const std::wstring& dst) {
+    bool MoveFile(const std::wstring& src, const std::wstring& dst) {
         try {
             fs::path srcPath(src);
             fs::path dstPath(dst);
@@ -115,7 +113,7 @@ namespace IO {
         }
     }
 
-    bool FileManager::GetFileDirectory(const std::wstring& src, std::wstring& dst)
+    bool GetFileDirectory(const std::wstring& src, std::wstring& dst)
     {
         size_t pos = src.find_last_of(L"\\");
         if (pos != std::wstring::npos) {
@@ -125,7 +123,7 @@ namespace IO {
         return false;
     }
 
-    bool FileManager::MakeDirectory(const std::wstring& path) {
+    bool MakeDirectory(const std::wstring& path) {
         fs::path p(path);
         if (fs::exists(p)) {
             return fs::is_directory(p);
@@ -133,11 +131,11 @@ namespace IO {
         return fs::create_directories(p);
     }
 
-    bool FileManager::Exists(const std::wstring& path) {
+    bool Exists(const std::wstring& path) {
         return fs::exists(fs::path(path));
     }
 
-    std::vector<std::string> FileManager::GetFilesInDirectory(const std::wstring& path) {
+    std::vector<std::string> GetFilesInDirectory(const std::wstring& path) {
         fs::path dir(path);
         std::vector<std::string> files;
         if (!fs::is_directory(dir)) {

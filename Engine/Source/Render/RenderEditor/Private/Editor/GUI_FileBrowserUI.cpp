@@ -1,6 +1,5 @@
 #include "Editor/FileBrowserUI.h"
-#include <Converter.h>
-#include <FileManager.h>
+#include <IO.h> 
 #include <Tools/TextLayout.h>
 
 #include "Editor/EditorGeneralLayout.h"
@@ -46,7 +45,7 @@ namespace RenderEditor {
 
         // path
         {
-            std::string curPath = IO::Converter::ToNarrowString(state.currentPath);
+            std::string curPath = IO::ToNarrowString(state.currentPath);
 
             // 输入框缓冲区
             static char pathBuffer[512] = {};
@@ -55,11 +54,11 @@ namespace RenderEditor {
             if (ImGui::InputText("##PathEdit", pathBuffer, sizeof(pathBuffer),
                 ImGuiInputTextFlags_EnterReturnsTrue))
             {
-                std::wstring newPath = IO::Converter::ToWideString(pathBuffer);
+                std::wstring newPath = IO::ToWideString(pathBuffer);
                 fs::path p(newPath);
 
                 // 安全检查
-                if (IsUnderGameFolder(p) && IO::FileManager::Exists(GetAbsolutePath(newPath))) {
+                if (IsUnderGameFolder(p) && IO::Exists(GetAbsolutePath(newPath))) {
                     state.currentPath = newPath;
                 }
                 else {
@@ -185,7 +184,7 @@ namespace RenderEditor {
         for (const auto& entry : fs::directory_iterator(root)) {
             if (!entry.is_directory()) continue;
 
-            std::string dirName = IO::Converter::ToNarrowString(entry.path().filename().wstring());
+            std::string dirName = IO::ToNarrowString(entry.path().filename().wstring());
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
             bool isCurrent = (entry.path() == GetAbsolutePath(state.currentPath));
             if (isCurrent)
@@ -204,7 +203,7 @@ namespace RenderEditor {
 
     void FileBrowserUI::File()
     {
-        if (!IO::FileManager::Exists(GetAbsolutePath(state.currentPath))) {
+        if (!IO::Exists(GetAbsolutePath(state.currentPath))) {
             ImGui::Text("Directory does not exist.");
             return;
         }
@@ -259,7 +258,7 @@ namespace RenderEditor {
         // File List
         for (const auto& entry : fs::directory_iterator(GetAbsolutePath(state.currentPath))) {
 
-            std::string name = IO::Converter::ToNarrowString(entry.path().filename().wstring());
+            std::string name = IO::ToNarrowString(entry.path().filename().wstring());
 
             EngineAssetType FileType = GetFileType(entry);
 

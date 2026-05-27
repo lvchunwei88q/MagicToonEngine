@@ -8,7 +8,7 @@
 #include <queue>
 
 #include <RenderContext.h>
-#include <FileManager.h>
+#include <IO.h>
 #include <front/Roboto_Regular_front.h> // 加载字体
 #include <mutex>
 
@@ -199,7 +199,7 @@ namespace RenderUI {
             io.Fonts->GetGlyphRangesChineseFull()
         );
 
-        if (IO::FileManager::Exists(L"c:\\Windows\\Fonts\\msyh.ttc")) {
+        if (IO::Exists(L"c:\\Windows\\Fonts\\msyh.ttc")) {
             ifc.MergeMode = true; // add for front
             ImGui::GetIO().Fonts->AddFontFromFileTTF(
                 "c:\\Windows\\Fonts\\msyh.ttc", 18.0f, &ifc, // windows default front path

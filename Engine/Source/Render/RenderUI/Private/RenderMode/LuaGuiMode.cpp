@@ -6,8 +6,7 @@
 #include <Theme.h>
 
 //////////////////////////////
-#include <AbsolutePath.h>
-#include <Converter.h>
+#include <IO.h> 
 //////////////////////////////
 
 #include "MagicUIContext.h"
@@ -48,7 +47,7 @@ namespace RenderUI {
         lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::debug); // base lib
 
         std::wstring ScriptPath = IO::AbsolutePath::Get().GetScriptPath();
-        std::string narrowPath = IO::Converter::ToNarrowString(ScriptPath);
+        std::string narrowPath = IO::ToNarrowString(ScriptPath);
         std::replace(narrowPath.begin(), narrowPath.end(), '\\', '/');
         {
             std::string script =
@@ -62,7 +61,7 @@ namespace RenderUI {
             }
         }
 
-        this->lua_path = IO::Converter::ToNarrowString(ScriptPath) + "\\" + lua_type;
+        this->lua_path = IO::ToNarrowString(ScriptPath) + "\\" + lua_type;
         current_lua_type = lua_type;
 
         sol::load_result result = lua.load_file(this->lua_path);

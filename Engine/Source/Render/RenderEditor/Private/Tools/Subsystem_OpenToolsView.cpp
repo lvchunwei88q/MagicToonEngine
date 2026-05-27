@@ -5,9 +5,7 @@
 #include "Editor/FileBrowserUI.h"
 
 ///////////////////////
-#include <FileManager.h>
-// 编码转换
-#include <Converter.h>
+#include <IO.h> 
 ///////////////////////
 
 namespace RenderEditor {
@@ -46,8 +44,8 @@ namespace RenderEditor {
 	void OpenToolsView::CreateFolder(const char* Src)
 	{
 		std::wstring currentPath = FileBrowserUI::Get().GetAbsolutePath(FileBrowserUI::Get().GetState().currentPath);
-		std::wstring Folder = IO::Converter::ToWideString(std::string(Src));
+		std::wstring Folder = IO::ToWideString(std::string(Src));
 		Folder = currentPath + L"\\" + Folder;
-		IO::FileManager::MakeDirectory(Folder);
+		IO::MakeDirectory(Folder);
 	}
 }

@@ -4,11 +4,9 @@
 ///////////////////////////////////////
 #include <ILog.h>
 
-#include <AbsolutePath.h>
-#include <Converter.h>
-#include <FileManager.h>
+#include <IO.h> 
 #include <fstream>
-#include <Serialize/SerializeMacro.h>
+#include <SerializeMacro.h>
 
 #include <Tools/Debouncer.h>
 ///////////////////////////////////////
@@ -102,12 +100,12 @@ namespace RenderEditor {
         path += L"\\" + Terget;
 
         if (isfile) {
-            LOG_INFO("Delete File:" + IO::Converter::ToNarrowString(Terget));
-            IO::FileManager::DeleteToFile(path);
+            LOG_INFO("Delete File:" + IO::ToNarrowString(Terget));
+            IO::DeleteToFile(path);
         }
         else {
-            LOG_INFO("Delete Folder:" + IO::Converter::ToNarrowString(Terget));
-            IO::FileManager::DeleteToDirectory(path);
+            LOG_INFO("Delete Folder:" + IO::ToNarrowString(Terget));
+            IO::DeleteToDirectory(path);
         }
     }
 

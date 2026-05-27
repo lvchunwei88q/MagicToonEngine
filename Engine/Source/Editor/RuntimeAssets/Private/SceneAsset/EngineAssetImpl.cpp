@@ -1,6 +1,6 @@
 #include "SceneAsset/EngineAssetImpl.h"
 #include <IBufferManager.h>
-#include <AbsolutePath.h>
+#include <IO.h>
 
 namespace RuntimeAssets {
 

@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <string>
 #include <Tools/Singleton.h> // from Core
-#include <AbsolutePath.h>
+#include <IO.h>
 #include <atomic>
 
 #include <nlohmann/json.hpp>

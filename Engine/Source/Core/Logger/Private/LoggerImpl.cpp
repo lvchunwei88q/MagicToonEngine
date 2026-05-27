@@ -1,7 +1,5 @@
 #include "LoggerImpl.h"
-#include <FileManager.h> 
-#include <AbsolutePath.h>
-#include <Converter.h>
+#include <IO.h> 
 #include <chrono>
 #include <iomanip>
 #include <ctime>
@@ -22,8 +20,8 @@ namespace LOG {
         checkIntervalSec_ = 5; // 5s
 
         // 确保日志目录存在
-        if (!IO::FileManager::Exists(logDir_)) {
-            IO::FileManager::MakeDirectory(logDir_);
+        if (!IO::Exists(logDir_)) {
+            IO::MakeDirectory(logDir_);
         }
 
         // 生成当前日志文件名（精确到秒）
@@ -121,11 +119,11 @@ namespace LOG {
 
         std::ostringstream oss;
         oss << "log_" << std::put_time(&tm, "%Y%m%d_%H%M%S") << ".log";
-        return IO::Converter::ToWideString(oss.str());
+        return IO::ToWideString(oss.str());
     }
 
     void LoggerImpl::WriteToFile(const std::string& text) {
-        IO::FileManager::AppendText(currentLogPath_, text);
+        IO::AppendText(currentLogPath_, text);
     }
 
     void LoggerImpl::BackgroundWorker() {
@@ -150,8 +148,8 @@ namespace LOG {
             allLines += line + "\n";
         }
 
-        // 写入文件（追加模式）
-        IO::FileManager::AppendText(currentLogPath_, allLines);
+        // 写入文件
+        IO::AppendText(currentLogPath_, allLines);
 
         // 清空缓冲区
         buffer_.clear();

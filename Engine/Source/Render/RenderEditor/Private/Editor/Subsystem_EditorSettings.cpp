@@ -6,16 +6,13 @@
 
 ///////////////////////
 // 序列化文件相关
-#include <AbsolutePath.h>
-#include <FileManager.h>
+#include <IO.h> 
 #include <fstream>
-#include <Serialize/SerializeMacro.h>
+#include <SerializeMacro.h>
 
 // 序列化
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>    // 二进制
-// 编码转换
-#include <Converter.h>
 ///////////////////////
 
 namespace RenderEditor {
@@ -47,11 +44,11 @@ namespace RenderEditor {
         RenderUIContext& UIContext = GetSubsystem()->SetRenderUIContext();
         std::wstring ContentPath = GetLanguageFileName(Setting.language);
 
-        std::string JsonDump = IO::FileManager::ReadAllText(ContentPath);
+        std::string JsonDump = IO::ReadAllText(ContentPath);
         UIContext.EditorLanguage = JSON::parse(JsonDump);
         UIContext.EditorLanguageHash = ComputeStringHash(JsonDump);
 
-        LOG_INFO("Language file loaded! Form: ", IO::Converter::ToNarrowString(ContentPath));
+        LOG_INFO("Language file loaded! Form: ", IO::ToNarrowString(ContentPath));
     }
 
     void EditorSettings::Uninstall()
@@ -70,7 +67,7 @@ namespace RenderEditor {
             RenderUIContext& UIContext = GetSubsystem()->SetRenderUIContext();
             std::wstring ContentPath = GetLanguageFileName(Setting.language);
 
-            std::string JsonDump = IO::FileManager::ReadAllText(ContentPath);
+            std::string JsonDump = IO::ReadAllText(ContentPath);
             UIContext.EditorLanguage = JSON::parse(JsonDump);
             UIContext.EditorLanguageHash = ComputeStringHash(JsonDump);
         });

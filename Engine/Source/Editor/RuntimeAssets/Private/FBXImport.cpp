@@ -1,7 +1,6 @@
 #include "FBXImport.h"
 #include <ufbx.h>
-#include <FileManager.h>
-#include <Converter.h>
+#include <IO.h> 
 #include <ILog.h>
 
 namespace RuntimeAssets {
@@ -14,7 +13,7 @@ namespace RuntimeAssets {
 			LOG_ERROR("FBX Import failed: file path is empty");
 			return;
 		}
-		if (!IO::FileManager::Exists(IO::Converter::ToWideString(settings.path)))
+		if (!IO::Exists(IO::ToWideString(settings.path)))
 		{
 			LOG_ERROR("FBX Import failed: file does not exist - " , settings.path);
 			return;

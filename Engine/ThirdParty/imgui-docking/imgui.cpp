@@ -1236,8 +1236,7 @@ IMPLEMENTING SUPPORT for ImGuiBackendFlags_RendererHasTextures:
 #include <stdint.h>     // intptr_t
 
 // io moudel
-#include <AbsolutePath.h> // get abs path
-#include <Converter.h> // char to wchar_t 
+#include <IO.h> 
 
 // [Windows] On non-Visual Studio compilers, we default to IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCTIONS unless explicitly enabled
 #if defined(_WIN32) && !defined(_MSC_VER) && !defined(IMGUI_ENABLE_WIN32_DEFAULT_IME_FUNCTIONS) && !defined(IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCTIONS)
@@ -16255,7 +16254,7 @@ void ImGui::ClearIniSettings()
 void ImGui::LoadIniSettingsFromDisk(const char* ini_filename)
 {
     size_t file_data_size = 0;
-    std::string target = IO::Converter::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
+    std::string target = IO::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
         + L"\\" + CONFIG) + ini_filename;
     char* file_data = (char*)ImFileLoadToMemory(target.c_str(), "rb", &file_data_size);
     if (!file_data)
@@ -16346,7 +16345,7 @@ void ImGui::SaveIniSettingsToDisk(const char* ini_filename)
 
     size_t ini_data_size = 0;
     const char* ini_data = SaveIniSettingsToMemory(&ini_data_size);
-    std::string target = IO::Converter::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
+    std::string target = IO::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
         + L"\\" + CONFIG)+ ini_filename;
     // use Program Path
     ImFileHandle f = ImFileOpen(target.c_str(), "wt");

@@ -2,10 +2,7 @@
 #include <RenderUI.h>
 
 ///////////////////////
-#include <AbsolutePath.h>
-#include <FileManager.h>
-// 编码转换
-#include <Converter.h>
+#include <IO.h> 
 ///////////////////////
 
 namespace RenderLauncher {
@@ -30,7 +27,7 @@ namespace RenderLauncher {
 		RenderUIContext& UIContext = GetSubsystem()->SetRenderUIContext();
 		std::wstring ContentPath = GetLanguageFileName();
 
-		std::string JsonDump = IO::FileManager::ReadAllText(ContentPath);
+		std::string JsonDump = IO::ReadAllText(ContentPath);
 		UIContext.EditorLanguage = JSON::parse(JsonDump);
 		UIContext.EditorLanguageHash = ComputeStringHash(JsonDump);
 
@@ -95,9 +92,9 @@ namespace RenderLauncher {
 		// 构建命令行参数：-p "path" "name"
 		std::wstring cmdLine = L"\"" + exePath + L"\"";
 		cmdLine += L" -p \"";
-		cmdLine += IO::Converter::ToWideString(path);
+		cmdLine += IO::ToWideString(path);
 		cmdLine += L"\" \"";
-		cmdLine += IO::Converter::ToWideString(name);
+		cmdLine += IO::ToWideString(name);
 		cmdLine += L"\"";
 
 		// 启动进程
