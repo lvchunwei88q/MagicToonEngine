@@ -33,15 +33,26 @@ namespace Core
 
     } // namespace
 
+    struct JobSystem::ThreadPool
+    {
+        std::vector<std::thread> workers;
+        std::queue<Task> queue;
+        std::mutex queueMutex;
+        std::condition_variable queueCv;
+        std::atomic<bool> running{ false };
+    };
+
     bool JobSystem::Init()
     {
         std::lock_guard<std::mutex> guard(g_singletonMutex);
-        m_running.store(true, std::memory_order_release);
+
+        m_pool = std::make_unique<ThreadPool>();
+        m_pool->running.store(true, std::memory_order_release);
 
         const uint32_t resolved = ResolveWorkerCount(workerCount);
-        m_workers.reserve(resolved);
+        m_pool->workers.reserve(resolved);
         for (uint32_t i = 0; i < resolved; ++i) {
-            m_workers.emplace_back([] { JobSystem::Get().WorkerLoop(); });
+            m_pool->workers.emplace_back([] { JobSystem::Get().WorkerLoop(); });
         }
 
         InfoCapture::Capture("JobSystem online with "+ std::to_string(resolved)+ " worker thread(s) (hw_concurrency="
@@ -52,15 +63,15 @@ namespace Core
 
     void JobSystem::Uninstall()
     {
-        m_running.store(false, std::memory_order_release);
-        m_queueCv.notify_all();
+        m_pool->running.store(false, std::memory_order_release);
+        m_pool->queueCv.notify_all();
 
-        for (auto& t : m_workers) {
+        for (auto& t : m_pool->workers) {
             if (t.joinable()) {
                 t.join();
             }
         }
-        m_workers.clear();
+        m_pool->workers.clear();
     }
 
     JobHandle JobSystem::Schedule(JobFn job)
@@ -68,10 +79,10 @@ namespace Core
         auto counter = std::make_shared<std::atomic<int>>(1);
         Task task{ std::move(job), counter };
         {
-            std::lock_guard<std::mutex> guard(m_queueMutex);
-            m_queue.push(std::move(task));
+            std::lock_guard<std::mutex> guard(m_pool->queueMutex);
+            m_pool->queue.push(std::move(task));
         }
-        m_queueCv.notify_one();
+        m_pool->queueCv.notify_one();
         return JobHandle(std::move(counter));
     }
 
@@ -83,12 +94,12 @@ namespace Core
 
         auto counter = std::make_shared<std::atomic<int>>(static_cast<int>(count));
         {
-            std::lock_guard<std::mutex> guard(m_queueMutex);
+            std::lock_guard<std::mutex> guard(m_pool->queueMutex);
             for (uint32_t i = 0; i < count; ++i) {
-                m_queue.push(Task{ factory(i), counter });
+                m_pool->queue.push(Task{ factory(i), counter });
             }
         }
-        m_queueCv.notify_all();
+        m_pool->queueCv.notify_all();
         return JobHandle(std::move(counter));
     }
 
@@ -124,12 +135,12 @@ namespace Core
     {
         Task task;
         {
-            std::lock_guard<std::mutex> guard(m_queueMutex);
-            if (m_queue.empty()) {
+            std::lock_guard<std::mutex> guard(m_pool->queueMutex);
+            if (m_pool->queue.empty()) {
                 return false;
             }
-            task = std::move(m_queue.front());
-            m_queue.pop();
+            task = std::move(m_pool->queue.front());
+            m_pool->queue.pop();
         }
 
         if (task.fn) {
@@ -143,22 +154,22 @@ namespace Core
 
     void JobSystem::WorkerLoop()
     {
-        while (m_running.load(std::memory_order_acquire)) {
+        while (m_pool->running.load(std::memory_order_acquire)) {
             Task task;
             {
-                std::unique_lock<std::mutex> guard(m_queueMutex);
-                m_queueCv.wait(guard, [this] { return !m_queue.empty() || !m_running.load(std::memory_order_acquire); });
+                std::unique_lock<std::mutex> guard(m_pool->queueMutex);
+                m_pool->queueCv.wait(guard, [this] { return !m_pool->queue.empty() || !m_pool->running.load(std::memory_order_acquire); });
 
-                if (!m_running.load(std::memory_order_acquire) && m_queue.empty()) {
+                if (!m_pool->running.load(std::memory_order_acquire) && m_pool->queue.empty()) {
                     return;
                 }
 
-                if (m_queue.empty()) {
+                if (m_pool->queue.empty()) {
                     continue;
                 }
 
-                task = std::move(m_queue.front());
-                m_queue.pop();
+                task = std::move(m_pool->queue.front());
+                m_pool->queue.pop();
             }
 
             if (task.fn) {
@@ -171,6 +182,11 @@ namespace Core
                 task.counter->fetch_sub(1, std::memory_order_acq_rel);
             }
         }
+    }
+
+    uint32_t JobSystem::GetWorkerCount() const noexcept
+    {
+        return static_cast<uint32_t>(m_pool->workers.size());
     }
 
 } // namespace Core

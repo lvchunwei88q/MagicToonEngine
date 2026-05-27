@@ -95,10 +95,7 @@ namespace Core
         void Wait(const JobHandle& handle);
 
         /// @brief How many worker threads are running. 0 if Shutdown.
-        uint32_t GetWorkerCount() const noexcept
-        {
-            return static_cast<uint32_t>(m_workers.size());
-        }
+        uint32_t GetWorkerCount() const noexcept;
 
     private:
 
@@ -112,11 +109,9 @@ namespace Core
         bool TryRunOne(); // Returns true if a task was executed.
 
         uint8_t workerCount = 4u;
-        std::vector<std::thread> m_workers;
-        std::queue<Task> m_queue;
-        std::mutex m_queueMutex;
-        std::condition_variable m_queueCv;
-        std::atomic<bool> m_running{ false };
+        // PIMPL 
+        struct ThreadPool;
+        std::unique_ptr<ThreadPool> m_pool;
     };
 
     AUTO_REGISTER_SINGLETON_INCLUDE(JobSystem)
