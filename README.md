@@ -17,19 +17,11 @@
 
 ### 获取源码
 
-稍后下载LFS:
-```bash
-# 克隆仓库（推荐使用快速克隆，跳过 LFS 自动下载）
-git clone --config lfs.skipSmudge=true https://github.com/lvchunwei88q/MagicToonEngine.git
-cd MagicToonEngine
-
-# 运行 setup 脚本下载 LFS 大文件
-setup.bat
-```
-直接下载LFS:
 ```bash
 git clone https://github.com/lvchunwei88q/MagicToonEngine.git
 ```
+这里也会自动下载 ThirdParty 文件夹中的依赖库。
+之后更新仓库时请使用Update.bat脚本，以确保依赖库也能正确更新。
 ### 构建
 在构建之前，请确保已安装 Visual Studio 和 CMake，并且已正确设置环境变量。
 ```bash
