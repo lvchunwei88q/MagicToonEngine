@@ -4,20 +4,16 @@
 #include "Subsystem/Subsystem.h"
 #include "Subsystem/SubsystemTemplate.h" // AUTO_REGISTER_SINGLETON
 #include "Tools/Singleton.h"
+#include "Common/Compiler.h"
+#include <memory>
 #include <atomic>
-#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <memory>
-#include <mutex>
-#include <queue>
-#include <thread>
-#include <vector>
 
 namespace Core
 {
-
+    BEGIN_PIMPL;
     /**
      * @brief Opaque, move-only handle identifying a single scheduled job.
      *
@@ -114,6 +110,8 @@ namespace Core
         std::unique_ptr<ThreadPool> m_pool;
     };
 
-    AUTO_REGISTER_SINGLETON_INCLUDE(JobSystem)
+    AUTO_REGISTER_SINGLETON_INCLUDE(JobSystem);
+
+    END_PIMPL;
 
 } // namespace Core

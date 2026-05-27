@@ -3,9 +3,7 @@
 #include "Common/RENDERUI_API.h"
 #include "RenderMode/RenderMode.h" // 绘制模式 
 #include <imgui.h>
-
-#include <atomic>
-#include <queue>
+#include <Common/Compiler.h>
 
 #include <Subsystem/Subsystem.h>
 #include <Subsystem/SubsystemTemplate.h>
@@ -18,6 +16,8 @@
 * 并且 RenderUI 的Subsystem初始化时机是 Normal 所以必须要在 Normal 初始化之前设置windows句柄与渲染API设备
 */
 namespace RenderUI {
+	BEGIN_PIMPL;
+
 	using TaskFunction = std::function<void()>;
 
 	class RENDERUI_API RenderUIManager : public Core::Subsystem , public Singleton<RenderUIManager>
@@ -41,14 +41,14 @@ namespace RenderUI {
 		void AddTask(TaskFunction Function);
 
 	private:
-		// Task var
-		std::atomic<bool> TaskRun = false;
-		std::atomic<int> TaskNum = 0;
-		std::queue<TaskFunction> FunctionQueue;
+		struct Impl;
+		std::unique_ptr<Impl> m_impl;
 
 		// dpi scale
 		float main_scale = 1.0f;
 	};
 
 	AUTO_REGISTER_SINGLETON_INCLUDE(RenderUIManager);
+
+	END_PIMPL;
 }

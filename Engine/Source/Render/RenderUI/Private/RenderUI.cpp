@@ -4,6 +4,9 @@
 #include "RenderSubsystem/RenderSubsystem.h"
 #include "Theme.h"
 
+#include <atomic>
+#include <queue>
+
 #include <RenderContext.h>
 #include <FileManager.h>
 #include <front/Roboto_Regular_front.h> // 加载字体
@@ -12,9 +15,18 @@
 namespace RenderUI {
 	AUTO_REGISTER_SINGLETON_NOTIFICATION(RenderUIManager,"IMGUI", Normal);
 
+    struct RenderUIManager::Impl
+    {
+        // Task var
+        std::atomic<bool> TaskRun = false;
+        std::atomic<int> TaskNum = 0;
+        std::queue<TaskFunction> FunctionQueue;
+    };
+
 	bool RenderUIManager::Init()
 	{
 		GetSubsystem()->Init(); // render subsystem
+		m_impl = std::make_unique<Impl>(); // init impl
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -280,22 +292,22 @@ namespace RenderUI {
 
 	void RenderUIManager::TaskQueue()
 	{
-		TaskRun = true;
+        m_impl->TaskRun = true;
 		{
 			// 处理任务
-			if (TaskNum <= 0) {
-				TaskRun = false;
+			if (m_impl->TaskNum <= 0) {
+                m_impl->TaskRun = false;
 				return;
 			}
 
 			// 每个Tick执行一个任务依次处理
-			TaskFunction Task = std::move(FunctionQueue.front());
-			FunctionQueue.pop();
-			TaskNum = FunctionQueue.size();
+			TaskFunction Task = std::move(m_impl->FunctionQueue.front());
+            m_impl->FunctionQueue.pop();
+            m_impl->TaskNum = m_impl->FunctionQueue.size();
 			Task();
 		}
 
-		TaskRun = false;
+        m_impl->TaskRun = false;
 	}
 
 	void RenderUIManager::AddTask(TaskFunction Function)
@@ -307,10 +319,10 @@ namespace RenderUI {
 		{
 			std::lock_guard<std::mutex> lock(mtx);
 			{
-				if (!TaskRun.load()) { // 这里主要处理多线程时的任务
+				if (!m_impl->TaskRun.load()) { // 这里主要处理多线程时的任务
 					IsComplete = true;
-					FunctionQueue.push(std::move(Function));
-					TaskNum = FunctionQueue.size();
+                    m_impl->FunctionQueue.push(std::move(Function));
+                    m_impl->TaskNum = m_impl->FunctionQueue.size();
 				}
 			}
 

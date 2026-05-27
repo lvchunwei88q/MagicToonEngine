@@ -6,6 +6,12 @@
 #include "Jobsystem/JobSystem.h"
 #include <algorithm>
 #include <cassert>
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#include <thread>
+#include <vector>
+
 #include "CoreLogCapture/CoreLogCapture.h"
 
 namespace Core
