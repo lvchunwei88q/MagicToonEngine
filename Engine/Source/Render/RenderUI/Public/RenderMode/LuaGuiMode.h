@@ -2,6 +2,7 @@
 
 #include "Common/RENDERUI_API.h"
 #include <sol/sol.hpp> // lua bind
+#include <Common/Compiler.h>
 
 namespace RenderUI {
 	class LuaGuiMode;
@@ -32,6 +33,7 @@ namespace RenderUI {
 		}
 	};
 
+	DISABLE_DLL_WARNINGS_PUSH;
 	class RENDERUI_API LuaGuiMode
 	{
 	public:
@@ -55,6 +57,7 @@ namespace RenderUI {
 		sol::state lua; // state
 		sol::protected_function lua_script; // current lua script
 	};
+	DISABLE_DLL_WARNINGS_POP;
 
 	class RENDERUI_API ILuaUIMember
 	{

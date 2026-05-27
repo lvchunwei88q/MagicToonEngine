@@ -2,10 +2,13 @@
 #include "RenderSubsystem/RenderSubsystem.h"
 #include "Common/RENDERUI_API.h"
 
+#include <Common/Compiler.h>
 #include <nlohmann/json.hpp>
 using JSON = nlohmann::json;
 
 namespace RenderUI {
+    DISABLE_DLL_WARNINGS_PUSH;
+
     namespace Language {
         class RENDERUI_API LanguageManager {
         private:
@@ -43,4 +46,6 @@ namespace RenderUI {
 
         return current->is_string() ? current->get<std::string>() : src;
     }
+
+    DISABLE_DLL_WARNINGS_POP;
 }

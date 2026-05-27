@@ -16,7 +16,7 @@
 * 并且 RenderUI 的Subsystem初始化时机是 Normal 所以必须要在 Normal 初始化之前设置windows句柄与渲染API设备
 */
 namespace RenderUI {
-	BEGIN_PIMPL;
+	DISABLE_DLL_WARNINGS_PUSH;
 
 	using TaskFunction = std::function<void()>;
 
@@ -50,5 +50,5 @@ namespace RenderUI {
 
 	AUTO_REGISTER_SINGLETON_INCLUDE(RenderUIManager);
 
-	END_PIMPL;
+	DISABLE_DLL_WARNINGS_POP;
 }

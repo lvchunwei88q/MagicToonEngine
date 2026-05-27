@@ -13,7 +13,7 @@
 
 namespace Core
 {
-    BEGIN_PIMPL;
+    DISABLE_DLL_WARNINGS_PUSH;
     /**
      * @brief Opaque, move-only handle identifying a single scheduled job.
      *
@@ -112,6 +112,6 @@ namespace Core
 
     AUTO_REGISTER_SINGLETON_INCLUDE(JobSystem);
 
-    END_PIMPL;
+    DISABLE_DLL_WARNINGS_POP;
 
 } // namespace Core
