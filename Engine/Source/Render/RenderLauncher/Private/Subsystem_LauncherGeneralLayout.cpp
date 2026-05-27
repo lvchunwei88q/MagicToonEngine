@@ -78,7 +78,8 @@ namespace RenderLauncher {
 		}
 		catch (const std::exception& e) {
 			// 解析失败时打印错误
-			IM_ASSERT(false && "Failed to parse test JSON");
+			std::string errorMsg = std::string("Failed to parse test JSON: ") + e.what();
+			IM_ASSERT(false && errorMsg.c_str());
 
 			return false;
 		}

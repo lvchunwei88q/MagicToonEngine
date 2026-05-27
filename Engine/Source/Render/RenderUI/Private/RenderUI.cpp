@@ -19,7 +19,7 @@ namespace RenderUI {
     {
         // Task var
         std::atomic<bool> TaskRun = false;
-        std::atomic<int> TaskNum = 0;
+        std::atomic<size_t> TaskNum = 0;
         std::queue<TaskFunction> FunctionQueue;
     };
 
