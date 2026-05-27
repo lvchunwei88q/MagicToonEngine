@@ -5,9 +5,14 @@ if (POLICY CMP0141)
 endif()
 
 if(MSVC)
+    message(STATUS "🔧 MSVC: Applying MSVC-specific settings...")
     add_compile_options(/wd4819)
-    add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
-    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+    add_compile_options(/wd4828) 
+    add_compile_options(/utf-8)
+
+    string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_C "${CMAKE_DEPFILE_FLAGS_C}")
+    string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_CXX "${CMAKE_DEPFILE_FLAGS_CXX}")
+    message(STATUS "MSVC: /utf-8 enabled")
     # 更改最大数
     add_compile_options(/bigobj)
 endif()
