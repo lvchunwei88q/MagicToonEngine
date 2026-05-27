@@ -12,6 +12,12 @@ using namespace RenderUI;
 
 namespace RenderLauncher {
 
+	enum class UIType : uint8_t
+	{
+		Launcher,
+		Loading,
+	};
+
 	enum class LauncherUIType : uint8_t
 	{
 		NewProject,
@@ -55,7 +61,7 @@ namespace RenderLauncher {
 		std::string m_label;
 	};
 
-	class LauncherGeneralLayout : public RSubsystemTemplate<LauncherGeneralLayout, ModeType::ImGui>, public ImGuiMode
+	class LauncherGeneralLayout final : public RSubsystemTemplate<LauncherGeneralLayout, ModeType::ImGui>, public ImGuiMode
 	{
 	public:
 		virtual void Init() override;
@@ -68,6 +74,10 @@ namespace RenderLauncher {
 			return -100; // High
 		}
 
+		void SetUIType(UIType newType) {
+			uiType = newType;
+		}
+
 	private:
 		size_t ComputeJSONHash(const JSON& data);
 		size_t ComputeStringHash(const std::string& data);
@@ -78,17 +88,22 @@ namespace RenderLauncher {
 		void DrawNewProjectUI();
 		void DrawOpenProjectUI();
 
+		void OpenProject(std::string path, std::string name);
 		void ExitProgram();
 
 		bool m_bDragging = false;
 		ImVec2 m_dragOffset;
 
 		LauncherUIType Type = LauncherUIType::NewProject;
+		UIType uiType = UIType::Launcher;
 
 		MenuButton* new_btn  = nullptr;
 		MenuButton* open_btn = nullptr;
 		MenuButton* exit_btn = nullptr;
 
 		std::vector<ProjectInfo> projects;
+
+		friend void Launcher(LauncherGeneralLayout* This);
+		friend void Loading(LauncherGeneralLayout* This);
 	};
 }

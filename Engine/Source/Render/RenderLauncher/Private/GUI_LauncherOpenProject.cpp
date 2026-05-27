@@ -51,12 +51,26 @@ namespace RenderLauncher {
 
                 if (ImGui::BeginPopupModal("OpenProjectInfo", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
                     ImGui::Text(Lang::Get("launcher.open.opening_message").c_str());
+                    ImGui::Separator();
 
-                    if (ImGui::Button("OK", ImVec2(80, 0))) {
-                        // TODO: 实际打开项目的逻辑
-                        // 可以根据 selectedProject 找到对应的项目信息并打开
+                    ImGui::Indent(20.0f);
+                    ImGui::Text(("Name: " + proj.name).c_str());
+                    ImGui::Text(("Path: " + proj.path).c_str());
+                    ImGui::Text(("Version: " + proj.version).c_str());
+                    ImGui::Unindent(20.0f);
+                    ImGui::Separator();
+                    ImGui::Indent(10.0f);
+
+                    if (ImGui::Button("Open", ImVec2(80, 0))) {
+                        OpenProject(proj.path, proj.name);
                         ImGui::CloseCurrentPopup();
                     }
+					ImGui::SameLine();
+                    if (ImGui::Button("Close", ImVec2(80, 0))) {
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::Unindent(10.0f);
+
                     ImGui::EndPopup();
                 }
 

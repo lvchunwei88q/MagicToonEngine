@@ -2,34 +2,50 @@
 #include <RenderUIWarehouse.h>
 
 namespace RenderLauncher {
-    void LauncherGeneralLayout::Tick()
-    {
-        ImGuiIO& io = ImGui::GetIO();
 
-        ImGuiViewport* viewport = ImGui::GetMainViewport();
+    namespace {
+        void LoadingDots(const char* label) {
+            static float time = 0.0f;
+            time += ImGui::GetIO().DeltaTime;
 
-        ImGui::SetNextWindowPos(viewport->WorkPos);
-        ImGui::SetNextWindowSize(viewport->WorkSize);
-        ImGui::SetNextWindowViewport(viewport->ID);
-        ImGuiWindowFlags window_flags =
-            ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoCollapse |
-            ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoMove |
-            ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoNavFocus;
+            int dotCount = (int)(time * 2.0f) % 4;  // 0-3 循环
 
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            std::string text = std::string(label) + std::string(dotCount, '.');
+            ImGui::Text("%s", text.c_str());
+        }
 
-        ImGui::Begin("Launcher", nullptr, window_flags);
-        ImGui::PopStyleVar(3);
+        auto CreateIMGUIWindows = [](const char* label) -> void {
+                ImGuiIO& io = ImGui::GetIO();
+
+                ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+                ImGui::SetNextWindowPos(viewport->WorkPos);
+                ImGui::SetNextWindowSize(viewport->WorkSize);
+                ImGui::SetNextWindowViewport(viewport->ID);
+                ImGuiWindowFlags window_flags =
+                    ImGuiWindowFlags_NoTitleBar |
+                    ImGuiWindowFlags_NoCollapse |
+                    ImGuiWindowFlags_NoResize |
+                    ImGuiWindowFlags_NoMove |
+                    ImGuiWindowFlags_NoBringToFrontOnFocus |
+                    ImGuiWindowFlags_NoNavFocus;
+
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+                ImGui::Begin(label, nullptr, window_flags);
+                ImGui::PopStyleVar(3);
+			};
+    }
+
+    void Launcher(LauncherGeneralLayout* This) {
+        CreateIMGUIWindows("Launcher");
 
         // ===================== 标题栏 =====================
         const float title_bar_height = 35.0f;
         {
-            
+
             ImVec2 title_bar_size = ImVec2(ImGui::GetWindowWidth(), title_bar_height);
 
             // 绘制标题栏背景
@@ -87,14 +103,14 @@ namespace RenderLauncher {
         {
             ImGui::SetCursorPosY(20.0f);
             ImGui::SetCursorPosX((left_panel_width - button_size.x) * 0.5f);
-            if (new_btn->Draw(button_size, Type == LauncherUIType::NewProject)) {
-                Type = LauncherUIType::NewProject;
+            if (This->new_btn->Draw(button_size, This->Type == LauncherUIType::NewProject)) {
+                This->Type = LauncherUIType::NewProject;
             }
 
             ImGui::Spacing();
             ImGui::SetCursorPosX((left_panel_width - button_size.x) * 0.5f);
-            if (open_btn->Draw(button_size, Type == LauncherUIType::OpenProject)) {
-                Type = LauncherUIType::OpenProject;
+            if (This->open_btn->Draw(button_size, This->Type == LauncherUIType::OpenProject)) {
+                This->Type = LauncherUIType::OpenProject;
             }
 
 
@@ -104,9 +120,9 @@ namespace RenderLauncher {
                 ImGui::SetCursorPosY(cursor_y);
 
             ImGui::SetCursorPosX((left_panel_width - button_size.x) * 0.5f);
-            if (exit_btn->Draw(button_size, Type == LauncherUIType::Exit)) {
-                Type = LauncherUIType::Exit;
-                ExitProgram();
+            if (This->exit_btn->Draw(button_size, This->Type == LauncherUIType::Exit)) {
+                This->Type = LauncherUIType::Exit;
+                This->ExitProgram();
             }
         }
 
@@ -120,13 +136,13 @@ namespace RenderLauncher {
             ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
         {
-            switch (Type)
+            switch (This->Type)
             {
-            case RenderLauncher::LauncherUIType::NewProject:
-                DrawNewProjectUI();
+            case LauncherUIType::NewProject:
+                This->DrawNewProjectUI();
                 break;
-            case RenderLauncher::LauncherUIType::OpenProject:
-                DrawOpenProjectUI();
+            case LauncherUIType::OpenProject:
+                This->DrawOpenProjectUI();
                 break;
             default:
                 break;
@@ -136,5 +152,29 @@ namespace RenderLauncher {
         ImGui::EndChild();
 
         ImGui::End();
+    }
+
+    void Loading(LauncherGeneralLayout* This) {
+        CreateIMGUIWindows("Launcher");
+
+        LoadingDots("Loading");
+
+        ImGui::End();
+	}
+    
+    void LauncherGeneralLayout::Tick()
+    {
+        switch (uiType)
+        {
+        case UIType::Launcher:
+            Launcher(this);
+            break;
+        case UIType::Loading:
+            Loading(this);
+            break;
+        default:
+            break;
+        }
+        
     }
 }

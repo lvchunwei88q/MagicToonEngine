@@ -85,6 +85,38 @@ namespace RenderLauncher {
 		}
 	}
 
+	void LauncherGeneralLayout::OpenProject(std::string path, std::string name) {
+		SetUIType(UIType::Loading); // 设置为加载界面
+
+		// 构建 MagicEditor.exe 路径
+		std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
+		std::wstring exePath = exeDir + L"\\MagicEditor.exe";
+
+		// 构建命令行参数：-p "path" "name"
+		std::wstring cmdLine = L"\"" + exePath + L"\"";
+		cmdLine += L" -p \"";
+		cmdLine += IO::Converter::ToWideString(path);
+		cmdLine += L"\" \"";
+		cmdLine += IO::Converter::ToWideString(name);
+		cmdLine += L"\"";
+
+		// 启动进程
+		STARTUPINFOW si = { sizeof(si) };
+		PROCESS_INFORMATION pi = {};
+		BOOL success = CreateProcessW(
+			nullptr,
+			&cmdLine[0],
+			nullptr,
+			nullptr,
+			FALSE,
+			0,
+			nullptr,
+			nullptr,
+			&si,
+			&pi
+		);
+	}
+
 	void LauncherGeneralLayout::ExitProgram()
 	{
 		RenderUIContext UIContext = GetSubsystem()->GetRenderUIContext();

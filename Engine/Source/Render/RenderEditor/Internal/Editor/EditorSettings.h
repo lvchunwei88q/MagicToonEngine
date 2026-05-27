@@ -23,7 +23,7 @@ namespace RenderEditor {
 		}
 	};
 
-	class EditorSettings : public RSubsystemTemplate<EditorSettings, ModeType::ImGui>, public ImGuiMode
+	class EditorSettings final : public RSubsystemTemplate<EditorSettings, ModeType::ImGui>, public ImGuiMode
 	{
 	public:
 		virtual void Init() override;

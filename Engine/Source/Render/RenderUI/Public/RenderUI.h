@@ -20,7 +20,7 @@ namespace RenderUI {
 
 	using TaskFunction = std::function<void()>;
 
-	class RENDERUI_API RenderUIManager : public Core::Subsystem , public Singleton<RenderUIManager>
+	class RENDERUI_API RenderUIManager final : public Core::Subsystem , public Singleton<RenderUIManager>
 	{
 	public:
 		virtual bool Init();

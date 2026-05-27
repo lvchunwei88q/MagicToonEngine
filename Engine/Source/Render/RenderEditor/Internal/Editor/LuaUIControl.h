@@ -12,7 +12,7 @@
 using namespace RenderUI;
 
 namespace RenderEditor {
-	class LuaUIControlWindows : public LuaGuiMode, public RSubsystemTemplate<LuaUIControlWindows, ModeType::LuaGui>
+	class LuaUIControlWindows final : public LuaGuiMode, public RSubsystemTemplate<LuaUIControlWindows, ModeType::LuaGui>
 	{
 	public:
 		virtual void Init()override;

@@ -41,7 +41,7 @@ namespace RenderEditor {
 		fs::path entry_path;
 	};
 
-	class FileBrowserUI : public RSubsystemTemplate<FileBrowserUI, ModeType::ImGui>, public ImGuiMode
+	class FileBrowserUI final : public RSubsystemTemplate<FileBrowserUI, ModeType::ImGui>, public ImGuiMode
 	{
 	public:
 		const ContentBrowserState& GetState() {return state;};

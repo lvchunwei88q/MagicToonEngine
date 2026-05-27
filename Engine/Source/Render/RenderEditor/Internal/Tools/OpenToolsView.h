@@ -17,7 +17,7 @@ namespace RenderEditor {
 		OpenTools Open = OpenTools::NOT;
 	};
 
-	class OpenToolsView : public RSubsystemTemplate<OpenToolsView, ModeType::ImGui>, public ImGuiMode
+	class OpenToolsView final : public RSubsystemTemplate<OpenToolsView, ModeType::ImGui>, public ImGuiMode
 	{
 	public:
 		virtual void Init() override;

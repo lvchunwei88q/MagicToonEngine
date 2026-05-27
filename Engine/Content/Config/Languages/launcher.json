@@ -22,10 +22,11 @@
       "version_label": "Version",
       "open_button": "Open",
       "no_match": "No projects match the search criteria.",
-      "opening_message": "Opening project... (placeholder)"
+      "opening_message": "Opening project, Please review the project information below and confirm to start the project."
     },
     "common": {
-      "ok": "OK"
+      "ok": "OK",
+      "open": "Open"
     }
   }
 }

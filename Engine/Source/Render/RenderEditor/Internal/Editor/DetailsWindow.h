@@ -24,7 +24,7 @@ namespace RenderEditor {
         }
     };
 
-	class DetailsPanel : public RSubsystemTemplate<DetailsPanel, ModeType::LuaGui> , public LuaGuiMode
+	class DetailsPanel final : public RSubsystemTemplate<DetailsPanel, ModeType::LuaGui> , public LuaGuiMode
 	{
 	public:
 		virtual void Init();

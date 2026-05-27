@@ -7,7 +7,7 @@
 using namespace RenderUI;
 
 namespace RenderEditor {
-	class RenderView : public RSubsystemTemplate<RenderView, ModeType::ImGui>, public ImGuiMode
+	class RenderView final : public RSubsystemTemplate<RenderView, ModeType::ImGui>, public ImGuiMode
 	{
 	public:
 		virtual void Init() override;

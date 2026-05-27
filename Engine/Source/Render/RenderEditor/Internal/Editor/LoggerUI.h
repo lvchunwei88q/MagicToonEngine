@@ -26,7 +26,7 @@ namespace RenderEditor {
 		}
 	};
 
-	class LoggerUI : public RSubsystemTemplate<LoggerUI, ModeType::ImGui>, public ImGuiMode
+	class LoggerUI final : public RSubsystemTemplate<LoggerUI, ModeType::ImGui>, public ImGuiMode
 	{
 	public:
 		virtual void Init() override;
