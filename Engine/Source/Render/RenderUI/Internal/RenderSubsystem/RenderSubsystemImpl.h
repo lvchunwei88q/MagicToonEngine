@@ -15,7 +15,7 @@ namespace RenderUI {
 		std::string Name;
 	};
 
-	class RenderSubsystemImpl : public Singleton<RenderSubsystemImpl> , public IRSubsystem
+	class RenderSubsystemImpl final : public Singleton<RenderSubsystemImpl> , public IRSubsystem
 	{
 	public:
 		virtual void RegisterSubsystem(RegisterSubsystemContext context) override;

@@ -6,7 +6,7 @@
 
 namespace Editor
 {
-	class EDITOR_API Editor : public Singleton<Editor> , public Core::Subsystem
+	class EDITOR_API Editor final : public Singleton<Editor> , public Core::Subsystem
 	{
 	public:
 		Editor() = default;

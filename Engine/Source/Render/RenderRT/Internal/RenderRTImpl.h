@@ -7,7 +7,7 @@
 using Microsoft::WRL::ComPtr;
 
 namespace RenderRT {
-	class RenderRTImpl : public IRenderRT,
+	class RenderRTImpl final : public IRenderRT,
 		public SubsystemTemplate<RenderRTImpl,Core::Priority::Low> {
 	public:
 

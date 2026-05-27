@@ -23,7 +23,7 @@ namespace EngineProject {
 		}
 	};
 
-	class ProjectControllerImpl : public IProjectController, public SubsystemTemplate<ProjectControllerImpl,Core::Priority::High>
+	class ProjectControllerImpl final : public IProjectController, public SubsystemTemplate<ProjectControllerImpl,Core::Priority::High>
 	{
 	public:
 		virtual bool Init();

@@ -89,7 +89,7 @@ namespace RenderCore //RenderCore
     * 在注册与更新大小时我们使用线程锁确保在多线程加载时的稳定性，
     * 在获取Texture时我们应该在同一渲染线程中使用这个鞋Get函数来确保不会出现线程问题。
     */
-	class BufferManagerImpl : public IBufferManagerUser, public IBufferManagerAdmin,
+	class BufferManagerImpl final : public IBufferManagerUser, public IBufferManagerAdmin,
         public SubsystemTemplate<BufferManagerImpl,Core::Priority::Core>
     {
     public:

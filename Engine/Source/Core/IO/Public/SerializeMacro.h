@@ -2,8 +2,7 @@
 
 /*
 * 这个序列化宏定义了使用IO模块系统来进行加载与创建序列化数据，这也要求必须传入支持cereal序列化的类
-* #include <AbsolutePath.h>
-* #include <FileManager.h>
+* #include <IO.h>
 * #include <fstream>
 * #include <ILog.h>
 */
