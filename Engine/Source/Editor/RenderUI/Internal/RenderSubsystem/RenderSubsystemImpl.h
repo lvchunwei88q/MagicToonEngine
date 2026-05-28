@@ -13,7 +13,9 @@ namespace RenderUI {
 	{
 		RSubsystem* Subsystem;
 		std::string Name;
-		std::unordered_map<std::string, Function> Functions; // 你可以在这里存储每个子系统的函数指针或回调
+		// 并行数组加快访问
+		std::vector<std::string> FunctionNames; // 存储函数名称
+		std::vector<Function> FunctionArray; // 存储函数指针
 	};
 
 	class RenderSubsystemImpl final : public Singleton<RenderSubsystemImpl> , public IRSubsystem
