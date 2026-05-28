@@ -1,6 +1,7 @@
 #include "Main.h"
 #include "Win32Application.h"
 #include <IRenderRT.h> // Get RT interface for resizing
+#include <Window/WindowAppointment.hpp>
 
 namespace EngineLauncher
 {
@@ -25,6 +26,15 @@ namespace EngineLauncher
             }
             break;
         }
+
+        case WM_COPYDATA: {
+            PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
+            if (pcds->dwData == MessageTypeNumber_0 && pcds->cbData > 0) {
+                const char* pData = (const char*)pcds->lpData;
+                Core::GetSubsystemContext()->Notification("LAUNCHERDATA", { encodeToSizeT("LOADVALUE"),pData });
+                return TRUE;
+            }
+        }break;
 		default:
 			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}

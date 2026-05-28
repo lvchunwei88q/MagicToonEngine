@@ -1,5 +1,6 @@
 #include "LauncherGeneralLayout.h"
 #include <RenderUIWarehouse.h>
+#include <Theme.h>
 
 namespace RenderLauncher {
 
@@ -157,10 +158,43 @@ namespace RenderLauncher {
     void Loading(LauncherGeneralLayout* This) {
         CreateIMGUIWindows("Launcher");
 
-        LoadingDots("Loading");
+        float windowWidth = ImGui::GetWindowWidth();
+        float windowHeight = ImGui::GetWindowHeight();
+        ImVec2 windowPos = ImGui::GetWindowPos();  // 获取窗口屏幕位置
+
+        float progressBarWidth = windowWidth + 5.0f;
+        float progressBarHeight = 8.0f;
+
+        // 进度条位于窗口下方
+        float progressBarY = windowHeight - progressBarHeight;
+        float progressBarX = (windowWidth - progressBarWidth) * 0.5f;
+
+        // 转换为屏幕坐标
+        ImVec2 bgPos = ImVec2(windowPos.x + progressBarX, windowPos.y + progressBarY);
+        ImVec2 bgSize = ImVec2(progressBarWidth, progressBarHeight);
+
+        // 绘制背景轨道
+        ImGui::GetWindowDrawList()->AddRectFilled(bgPos,
+            ImVec2(bgPos.x + bgSize.x, bgPos.y + bgSize.y),
+            IM_COL32(60, 60, 60, 255), progressBarHeight * 0.5f);
+
+        // 绘制进度前景
+        float progressValue = LauncherDataContext::Get().percent;
+        float filledWidth = progressBarWidth * std::clamp(progressValue, 0.0f, 1.0f);
+        if (filledWidth > 0.0f) {
+            ImGui::GetWindowDrawList()->AddRectFilled(bgPos,
+                ImVec2(bgPos.x + filledWidth, bgPos.y + bgSize.y),
+                IM_COL32(110, 70, 155, 255), progressBarHeight * 0.5f);
+        }
+
+        // 绘制 "Loading" 文本
+        float loadingTextY = progressBarY - 30.0f;
+        float loadingTextX = 10.0f;
+        ImGui::SetCursorPos(ImVec2(loadingTextX, loadingTextY));
+        LoadingDots(LauncherDataContext::Get().current_subsystem.c_str());
 
         ImGui::End();
-	}
+    }
     
     void LauncherGeneralLayout::Tick()
     {

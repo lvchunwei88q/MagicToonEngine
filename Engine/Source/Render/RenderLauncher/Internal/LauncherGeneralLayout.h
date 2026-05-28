@@ -1,5 +1,6 @@
 #pragma once
 #include <RenderSubsystem/RenderSubsystem.h>
+#include <Subsystem/SubsystemTemplate.h>
 #include "AssetStruct.h"
 #include <RenderUIWarehouse.h>
 #include <cereal/cereal.hpp>
@@ -24,6 +25,13 @@ namespace RenderLauncher {
 		OpenProject,
 
 		Exit,
+	};
+
+	struct LauncherDataContext : public Singleton<LauncherDataContext>
+	{
+		// loading data
+		std::string current_subsystem = "Loading";
+		float percent = 0.0f;
 	};
 
 	class MenuButton {
@@ -59,6 +67,16 @@ namespace RenderLauncher {
 
 	private:
 		std::string m_label;
+	};
+
+	class LauncherData final : public SubsystemTemplate<LauncherData,Core::Priority::Normal>
+	{
+	public:
+		virtual bool Init();
+		virtual void Uninstall();
+		virtual void Notification(Core::NotificationContext Context);
+
+	private:
 	};
 
 	class LauncherGeneralLayout final : public RSubsystemTemplate<LauncherGeneralLayout, ModeType::ImGui>, public ImGuiMode

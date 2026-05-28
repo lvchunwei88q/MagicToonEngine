@@ -7,6 +7,7 @@
 
 namespace RenderLauncher {
 	RENDERUI_REGISTER(LauncherGeneralLayout);
+	AUTO_REGISTER_NOTIFICATION(LauncherData, "LAUNCHERDATA");
 
 	const char* testJson = R"([
                 {"name":"GameTEST","path":"D:\\Test\\MTE","version":"0.0.1.8"},
@@ -46,6 +47,44 @@ namespace RenderLauncher {
 	void* LauncherGeneralLayout::PublicData(uint8_t type)
 	{
 		return nullptr;
+	}
+
+	bool LauncherData::Init()
+	{
+		return true;
+	}
+
+	void LauncherData::Uninstall()
+	{
+	}
+
+	void LauncherData::Notification(Core::NotificationContext Context)
+	{
+		switch (Context.tags)
+		{
+		case encodeToSizeT("LOADVALUE"): {
+			const char* pData = Context.msg;
+			// 先读 int：字符串长度
+			int nameLen = *(int*)pData;
+			pData += sizeof(int);
+			// 再读 float：进度
+			float percent = *(float*)pData;
+			pData += sizeof(float);
+			// 最后读字符串
+			std::string name((char*)pData, nameLen);
+
+			LauncherDataContext::Get().current_subsystem = name;
+			LauncherDataContext::Get().percent = percent;
+
+			if (percent >= 0.99f) {
+				// End
+				//Sleep(300);
+				//PostQuitMessage(0);
+			}
+		}break;
+		default:LOG_ERROR("Unknown type");
+			break;
+		}
 	}
 
 	size_t LauncherGeneralLayout::ComputeJSONHash(const JSON& data) {

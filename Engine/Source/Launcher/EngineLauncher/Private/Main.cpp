@@ -41,6 +41,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
         std::stringstream ss;
         ss << "There was a problem during engine initialization!\n";
         ss << "Problem Subsystem: " << error.target << "\n";
+#ifdef _DEBUG
+        __debugbreak();
+#endif // _DEBUG
+
         OutputDebugStringA(ss.str().c_str());
         return 0;
     }

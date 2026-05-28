@@ -17,6 +17,9 @@ int main(int argc, char* argv[])// exe -p path
         //每个进程有独立的虚拟地址空间，泄漏只影响自己的进程，不会污染其他程序或系统 所以不需要释放了
         std::cout << "There was a problem during engine initialization!" << std::endl;
         std::cout << "Problem Subsystem:" << error.target << std::endl;
+#ifdef _DEBUG
+        __debugbreak();
+#endif // _DEBUG
         std::cin.get();
         return 0;
     }
