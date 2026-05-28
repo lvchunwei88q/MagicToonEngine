@@ -9,7 +9,7 @@
 
 #include <filesystem>
 #include <IBufferManager.h>
-#include <SceneAsset/EngineAsset.h>
+#include <AssetPipeline.h>
 
 #define literal_root L"Game\\"
 
@@ -18,7 +18,7 @@ using namespace RenderUI;
 namespace RenderEditor {
 	namespace fs = std::filesystem;
 
-	using namespace RuntimeAssets;
+	using namespace AssetPipeline;
 
 	struct FileBrowserConfig {
 		float Zoom = 1.0f;
@@ -64,8 +64,8 @@ namespace RenderEditor {
 		void RightClickMenuBar();
 		void RightClickMenuBar_File(FileTypeContext Context);
 
-		EngineAssetType GetFileType(const fs::directory_entry& entry);
-		ID3D11ShaderResourceView* GetFileIcon(EngineAssetType filetype);
+		UIAssetType GetFileType(const fs::directory_entry& entry);
+		ID3D11ShaderResourceView* GetFileIcon(UIAssetType filetype);
 
 		void FileContentAreaInput(); // 控制文件内容区域输入
 

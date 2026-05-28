@@ -1,21 +1,21 @@
-#include "SceneAsset/EngineAssetImpl.h"
+#include "Loaders/UIAssetLoaderImpl.h"
 #include <IBufferManager.h>
 #include <IO.h>
 
-namespace RuntimeAssets {
+namespace AssetPipeline {
 
-	EngineAsset* GetEngineAsset()
+	UIAsset* GetUIAsset()
 	{
-		return &EngineAssetImpl::Get();
+		return &UIAssetImpl::Get();
 	}
 
-	const char* EngineAssetImpl::GetIcon(EngineAssetType type) const
+	const char* UIAssetImpl::GetIcon(UIAssetType type) const
 	{
 		const auto& pair = m_Icons.at(type);
 		return pair.src;
 	}
 
-	void EngineAssetImpl::LoadAsset()
+	void UIAssetImpl::LoadAsset()
 	{
 		const std::wstring content = IO::AbsolutePath::Get().GetContentPath();
 

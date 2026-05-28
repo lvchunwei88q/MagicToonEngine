@@ -1,10 +1,26 @@
-#include "FBXImport.h"
+#include "Importers/FBXAssetImportImpl.h"
 #include <ufbx.h>
 #include <IO.h> 
 #include <ILog.h>
 
-namespace RuntimeAssets {
-	void FBXAssetImport::Import(FBXImportSettings settings)
+namespace AssetPipeline {
+	AUTO_REGISTER(FBXAssetImportImpl);
+
+	FBXAssetImport* AssetPipeline::GetFBXAssetImport()
+	{
+		return &FBXAssetImportImpl::Get();
+	}
+
+	bool FBXAssetImportImpl::Init()
+	{
+		return true;
+	}
+
+	void FBXAssetImportImpl::Uninstall()
+	{
+	}
+
+	void FBXAssetImportImpl::Import(FBXImportSettings settings)
 	{
 		// TODO: Import FBX Function
 

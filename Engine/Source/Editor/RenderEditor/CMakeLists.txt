@@ -23,6 +23,6 @@ target_link_libraries(RenderEditor PRIVATE RenderUI)
 target_link_libraries(RenderEditor PRIVATE RenderCore)
 target_link_libraries(RenderEditor PRIVATE Logger)
 target_link_libraries(RenderEditor PRIVATE IO)
-target_link_libraries(RenderEditor PRIVATE RuntimeAssets)
+target_link_libraries(RenderEditor PRIVATE AssetPipeline)
 
 target_link_libraries(RenderEditor PUBLIC RenderRT)

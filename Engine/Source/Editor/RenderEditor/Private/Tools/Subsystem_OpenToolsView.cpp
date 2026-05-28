@@ -1,7 +1,7 @@
 #include "Tools/OpenToolsView.h"
 #include <ILog.h>
 
-#include <FBXImport.h> // fbx import 
+#include <AssetPipeline.h> // fbx import 
 #include "Editor/FileBrowserUI.h"
 
 ///////////////////////
@@ -36,9 +36,9 @@ namespace RenderEditor {
 
 	void OpenToolsView::FBXImport(const char* Src)
 	{
-		RuntimeAssets::FBXImportSettings settings;
+		AssetPipeline::FBXImportSettings settings;
 		settings.path = std::string(Src);
-		RuntimeAssets::FBXAssetImport::Get().Import(settings);
+		AssetPipeline::GetFBXAssetImport()->Import(settings);
 	}
 
 	void OpenToolsView::CreateFolder(const char* Src)

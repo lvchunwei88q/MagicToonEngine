@@ -41,4 +41,4 @@ target_link_libraries(RenderUI PRIVATE IO)
 target_link_libraries(RenderUI PUBLIC IMGUI)
 target_link_libraries(RenderUI PUBLIC liblua)
 
-target_link_libraries(RenderUI PRIVATE RuntimeAssets)
+target_link_libraries(RenderUI PRIVATE AssetPipeline)

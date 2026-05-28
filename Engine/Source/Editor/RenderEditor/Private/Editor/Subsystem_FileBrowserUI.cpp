@@ -42,23 +42,23 @@ namespace RenderEditor {
 
     // --------------------------------------------------- Operation ------------------------------------------------------- //
 
-    EngineAssetType FileBrowserUI::GetFileType(const fs::directory_entry& entry)
+    UIAssetType FileBrowserUI::GetFileType(const fs::directory_entry& entry)
     {
         if (entry.is_directory())
-            return EngineAssetType::Folder;
+            return UIAssetType::Folder;
 
         std::string ext = entry.path().extension().string();
         // TODO file type
         if (ext == ".json") {
-            return EngineAssetType::JSON;
+            return UIAssetType::JSON;
         }
 
-        return EngineAssetType::File;
+        return UIAssetType::File;
     }
 
-    ID3D11ShaderResourceView* FileBrowserUI::GetFileIcon(EngineAssetType filetype)
+    ID3D11ShaderResourceView* FileBrowserUI::GetFileIcon(UIAssetType filetype)
     {
-        return RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(GetEngineAsset()->GetIcon(filetype));
+        return RenderCore::GetBufferManagerUserInterface()->GetRTextureSRV(GetUIAsset()->GetIcon(filetype));
     }
 
     void FileBrowserUI::FileContentAreaInput()

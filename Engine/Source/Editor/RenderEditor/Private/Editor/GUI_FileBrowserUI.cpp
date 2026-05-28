@@ -75,7 +75,7 @@ namespace RenderEditor {
                 ImGui::InvisibleButton("##Return-Navigation-bar", ImVec2(25, 25));
 
                 bool isHovered = ImGui::IsItemHovered();
-                ID3D11ShaderResourceView* Icon = GetFileIcon(EngineAssetType::Return);
+                ID3D11ShaderResourceView* Icon = GetFileIcon(UIAssetType::Return);
 
                 ImGui::SetCursorScreenPos(cursorPos);
                 ImGui::Image(
@@ -260,11 +260,11 @@ namespace RenderEditor {
 
             std::string name = IO::ToNarrowString(entry.path().filename().wstring());
 
-            EngineAssetType FileType = GetFileType(entry);
+            UIAssetType FileType = GetFileType(entry);
 
             FileTypeContext context;
             context.entry_path = entry.path();
-            context.IsFolder = FileType == EngineAssetType::Folder;
+            context.IsFolder = FileType == UIAssetType::Folder;
 
             // New Line
             if (itemIndex % columns != 0) ImGui::SameLine(0, Zspacing);
