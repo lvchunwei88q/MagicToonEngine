@@ -17,7 +17,6 @@ target_sources(MagicEditor PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/reso
 
 target_link_libraries(MagicEditor PRIVATE 
     Core
-    IO
     Editor
     EngineProject
 )

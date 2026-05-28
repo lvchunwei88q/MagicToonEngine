@@ -21,7 +21,6 @@ target_compile_definitions(RenderLauncher PRIVATE RENDERLAUNCHER_EXPORTS)
 
 target_link_libraries(RenderLauncher PRIVATE RenderUI)
 target_link_libraries(RenderLauncher PRIVATE Logger)
-target_link_libraries(RenderLauncher PRIVATE IO)
 target_link_libraries(RenderLauncher PRIVATE EngineProject)
 
 target_link_libraries(RenderLauncher PUBLIC RenderRT)

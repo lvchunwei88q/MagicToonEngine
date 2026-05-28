@@ -25,7 +25,6 @@ target_link_libraries(EngineLauncher PRIVATE # windows
 )
 
 target_link_libraries(EngineLauncher PRIVATE Core)
-target_link_libraries(EngineLauncher PRIVATE IO)
 target_link_libraries(EngineLauncher PRIVATE EngineProject)
 target_link_libraries(EngineLauncher PRIVATE RenderCore)
 target_link_libraries(EngineLauncher PRIVATE RenderLauncher)

@@ -18,7 +18,6 @@ ThirdPartyModule(lua)
 
 RuntimeModule(Core)
 RuntimeModule(RenderCore)
-RuntimeModule(IO)
 RuntimeModule(Logger)
 RuntimeModule(RenderRT)
 

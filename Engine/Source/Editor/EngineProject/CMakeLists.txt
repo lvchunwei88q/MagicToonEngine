@@ -23,5 +23,4 @@ target_include_directories(EngineProject
 target_compile_definitions(EngineProject PRIVATE ENGINEPROJECT_EXPORTS)
 
 target_link_libraries(EngineProject PRIVATE Core)
-target_link_libraries(EngineProject PRIVATE IO)
 target_link_libraries(EngineProject PRIVATE Logger)

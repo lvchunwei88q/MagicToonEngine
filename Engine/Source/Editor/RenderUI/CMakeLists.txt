@@ -36,7 +36,6 @@ target_link_libraries(RenderUI PRIVATE RenderCore)
 target_link_libraries(RenderUI PUBLIC RenderRT)
 
 target_link_libraries(RenderUI PRIVATE Logger)
-target_link_libraries(RenderUI PRIVATE IO)
 
 target_link_libraries(RenderUI PUBLIC IMGUI)
 target_link_libraries(RenderUI PUBLIC liblua)

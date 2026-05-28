@@ -19,5 +19,3 @@ target_include_directories(Logger
 target_compile_definitions(Logger PRIVATE LOG_EXPORTS)
 
 target_link_libraries(Logger PRIVATE Core)
-
-target_link_libraries(Logger PRIVATE IO)

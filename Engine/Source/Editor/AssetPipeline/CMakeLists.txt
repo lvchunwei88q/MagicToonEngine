@@ -23,7 +23,6 @@ target_compile_definitions(AssetPipeline PRIVATE ASSETPIPELINE_EXPORTS)
 
 target_link_libraries(AssetPipeline PUBLIC Core)
 target_link_libraries(AssetPipeline PRIVATE RenderCore)
-target_link_libraries(AssetPipeline PRIVATE IO)
 target_link_libraries(AssetPipeline PRIVATE Logger)
 
 target_link_libraries(AssetPipeline PRIVATE ufbx) # 使用FBX 导入器
