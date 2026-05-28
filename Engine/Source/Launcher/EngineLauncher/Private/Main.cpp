@@ -21,6 +21,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     int x = (screenW - winW) / 2;
     int y = (screenH - winH) / 2;
 
+    Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("SetDpi"),nullptr }); // Set Imgui Dpi Scale
     EngineLauncher::WindowsContext::Get().hWnd = CreateWindowW(CLASS, L"Engine Launcher",
         WS_POPUP,
         x, y, winW, winH,

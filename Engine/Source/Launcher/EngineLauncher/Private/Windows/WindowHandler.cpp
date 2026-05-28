@@ -30,4 +30,33 @@ namespace EngineLauncher
 		}
 		return 0;
 	}
+
+    void Win32Application::Notification(Core::NotificationContext context)
+    {
+        if (context.tags == encodeToSizeT("SETWINDOW")) {
+			HWND hWnd = WindowsContext::Get().hWnd;
+
+            int winWidth = 720; int winHeight = 430;
+
+            MINMAXINFO mmi = { 0 };
+            mmi.ptMinTrackSize.x = winWidth;
+            mmi.ptMinTrackSize.y = winHeight;
+            mmi.ptMaxTrackSize.x = winWidth;
+            mmi.ptMaxTrackSize.y = winHeight;
+            SetWindowPos(hWnd, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+            int screenW = GetSystemMetrics(SM_CXSCREEN);
+            int screenH = GetSystemMetrics(SM_CYSCREEN);
+            int posX = (screenW - winWidth) / 2;
+            int posY = (screenH - winHeight) / 2;
+
+            SetWindowPos(
+                hWnd,
+                HWND_TOPMOST,   // 置顶
+                posX, posY,     // 居中坐标
+                winWidth, winHeight,
+                SWP_SHOWWINDOW
+            );
+        }
+    }
 }

@@ -1,5 +1,6 @@
 # MagicToonEngine
 
+`Windows 10/11 only. Other operating systems (including Linux, macOS, Android, iOS) are not supported.`
 使用C++ 编写的一个简单的卡通渲染验证引擎
 
 ## 🔧 构建指南

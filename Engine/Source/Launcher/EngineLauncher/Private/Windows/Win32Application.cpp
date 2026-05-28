@@ -5,13 +5,13 @@
 
 namespace EngineLauncher
 {
-	AUTO_REGISTER(Win32Application);
+	AUTO_REGISTER_NOTIFICATION(Win32Application,"Application");
 
 	bool Win32Application::Init() {
 		// 设置窗口句柄
 		char buffer[sizeof(HWND)];
 		memcpy(buffer, &WindowsContext::Get().hWnd, sizeof(HWND));
-		Core::SubsystemControl::NotificationSubsystem("IMGUI", { 2,buffer });
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("HWND"),buffer });
 		// 创建D3D设备
 		RenderCore::GetRenderInterface()->CreateDeviceD3D(WindowsContext::Get().hWnd);
 

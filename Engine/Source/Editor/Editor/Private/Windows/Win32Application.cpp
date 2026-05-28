@@ -64,7 +64,7 @@ namespace Editor
 		wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
 		::RegisterClassEx(&wc);
 
-		Core::SubsystemControl::NotificationSubsystem("IMGUI", { 3,nullptr }); // Set Imgui Dpi Scale
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("SetDpi"),nullptr }); // Set Imgui Dpi Scale
 		HWND hwnd = CreateWindowEx(
 			0, wc.lpszClassName, L"Magic Editor",
 			WS_OVERLAPPEDWINDOW,
@@ -84,7 +84,7 @@ namespace Editor
 
 		char buffer[sizeof(HWND)];
 		memcpy(buffer, &hwnd, sizeof(HWND));
-		Core::SubsystemControl::NotificationSubsystem("IMGUI", { 2,buffer });
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("HWND"),buffer });
 	}
 
 	void Win32Application::CreateDeviceD3D()

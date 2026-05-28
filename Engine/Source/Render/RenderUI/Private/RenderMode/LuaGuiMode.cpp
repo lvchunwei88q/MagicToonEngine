@@ -12,6 +12,20 @@
 #include "MagicUIContext.h"
 
 namespace RenderUI {
+    namespace {
+        class RAIIAtomicBool {
+        public:
+            std::atomic<bool>& src;
+            bool target;
+            RAIIAtomicBool(std::atomic<bool>& src,bool target) : src(src) {
+                this->target = target;
+            }
+            ~RAIIAtomicBool() {
+				src = target;
+            }
+        };
+    }
+
     ILuaUIMember* GetLuaUIMember() {
         return &LuaUIMember::Get();
     }
@@ -92,6 +106,7 @@ namespace RenderUI {
             Core::JobHandle handle = Core::JobSystem::Get().Schedule([this]() {
                 LOG_INFO("Task Lua completed");
                 {
+                    RAIIAtomicBool _isLoading(AllowDraw.isLoading, false);
                     // lua_load
                     sol::load_result result = lua.load_file(this->lua_path);
                     if (!result.valid()) {
@@ -111,7 +126,6 @@ namespace RenderUI {
                     AllowDraw.isError = false;
                     LOG_INFO("Lua script compilation completed");
                 }
-                AllowDraw.isLoading = false;
             });
         }
         else {

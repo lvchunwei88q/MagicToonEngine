@@ -271,16 +271,16 @@ namespace RenderUI {
 	{
         switch (Context.tags)
         {
-        case 1: { // IMGUI - Window Error
+        case encodeToSizeT("WindowMSG"): { // IMGUI - Window Error
             GetSubsystem()->Notification(Context.msg);
         }break;
-		case 2: { // RenderUIContext - Window Handle
+		case encodeToSizeT("HWND"): { // RenderUIContext - Window Handle
 			HWND Hwnd;
 			memcpy(&Hwnd, Context.msg, sizeof(HWND));
             RenderUIContext& UIContext = GetSubsystem()->SetRenderUIContext();
             UIContext.hwnd = reinterpret_cast<uintptr_t>(Hwnd);
         }break;
-        case 3: { // RenderUIContext - EnableDpiAwareness
+        case encodeToSizeT("SetDpi"): { // RenderUIContext - EnableDpiAwareness
             // 启用DPI感知
             ImGui_ImplWin32_EnableDpiAwareness();
             main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));

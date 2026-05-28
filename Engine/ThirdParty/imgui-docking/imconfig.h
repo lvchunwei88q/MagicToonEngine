@@ -15,6 +15,7 @@
 #pragma once
 #include <ILog.h>
 #include <Subsystem/Subsystem.h>
+#include <Subsystem/SubsystemTemplate.h>
 
 //---- Define assertion handler. Defaults to calling assert().
 // - If your macro uses multiple statements, make sure is enclosed in a 'do { .. } while (0)' block so it can be used as a single statement.
@@ -149,7 +150,8 @@ ImGui::GetCurrentWindow()->Name : "Unknown";            \
         if (!(_EXPR)) {                                                                         \
             GET_CURRENT_WINDOWS_NAME                                                            \
             LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
-            Core::SubsystemControl::NotificationSubsystem("IMGUI",{1,WindowName});              \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",                              \
+                                                {encodeToSizeT("WindowMSG"),WindowName});       \
         }                                                                                       \
     } while(0)
 
@@ -158,7 +160,8 @@ ImGui::GetCurrentWindow()->Name : "Unknown";            \
         if (!(_EXPR)) {                                                                         \
             GET_CURRENT_WINDOWS_NAME                                                            \
             LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
-            Core::SubsystemControl::NotificationSubsystem("IMGUI",{1,WindowName});              \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",                              \
+                                                {encodeToSizeT("WindowMSG"),WindowName});       \
             return;                                                                             \
         }                                                                                       \
     } while(0)
@@ -168,7 +171,8 @@ ImGui::GetCurrentWindow()->Name : "Unknown";            \
         if (!(_EXPR)) {                                                                         \
             GET_CURRENT_WINDOWS_NAME                                                            \
             LOG_ERROR(stderr, "[ImGui User Error]: \n", #_MSG);                                 \
-            Core::SubsystemControl::NotificationSubsystem("IMGUI",{1,WindowName});              \
+            Core::SubsystemControl::NotificationSubsystem("IMGUI",                              \
+                                                {encodeToSizeT("WindowMSG"),WindowName});       \
             return _RETV;                                                                       \
         }                                                                                       \
     } while(0)
