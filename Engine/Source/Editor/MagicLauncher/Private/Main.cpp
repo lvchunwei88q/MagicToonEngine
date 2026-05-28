@@ -10,7 +10,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // 初始化 COM
 
     WNDCLASSW wc = {};
-    wc.lpfnWndProc = EngineLauncher::WndProc;
+    wc.lpfnWndProc = MagicLauncher::WndProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = CLASS;
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
@@ -22,12 +22,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     int y = (screenH - winH) / 2;
 
     Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("SetDpi"),nullptr }); // Set Imgui Dpi Scale
-    EngineLauncher::WindowsContext::Get().hWnd = CreateWindowW(CLASS, L"Engine Launcher",
+    MagicLauncher::WindowsContext::Get().hWnd = CreateWindowW(CLASS, L"Engine Launcher",
         WS_POPUP,
         x, y, winW, winH,
         nullptr, nullptr, hInstance, nullptr);
 
-    HWND hwnd = EngineLauncher::WindowsContext::Get().hWnd;
+    HWND hwnd = MagicLauncher::WindowsContext::Get().hWnd;
     HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
     if (hIcon)
     {
@@ -49,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
         return 0;
     }
 
-    EngineLauncher::Win32Application::Get().InitializeUI(); // UI初始化
+    MagicLauncher::Win32Application::Get().InitializeUI(); // UI初始化
     ShowWindow(hwnd, SW_SHOW);
 
 
@@ -64,17 +64,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
             DispatchMessage(&msg);
         }
 
-        EngineLauncher::Tick();
+        MagicLauncher::Tick();
     }
     exit_loop:
 
-	EngineLauncher::Win32Application::Get().EndUI(); // 结束UI
+    MagicLauncher::Win32Application::Get().EndUI(); // 结束UI
 	Core::SubsystemControl::Uninstall(); // 卸载子系统
     CoUninitialize();
     return 0;
 }
 
-namespace EngineLauncher {
+namespace MagicLauncher {
     void Tick()
     {
 		Win32Application::Get().Tick();

@@ -21,6 +21,7 @@ RuntimeModule(RenderCore)
 RuntimeModule(Logger)
 RuntimeModule(RenderRT)
 
+EditorModule(EditorCore)
 EditorModule(AssetPipeline)
 EditorModule(RenderUI)
 EditorModule(RenderEditor)
@@ -28,7 +29,7 @@ EditorModule(RenderLauncher)
 EditorModule(EngineProject)
 EditorModule(Editor)
 EditorModule(MagicEditor)
-EditorModule(EngineLauncher)
+EditorModule(MagicLauncher)
 
 # 设置启动项目为 Launcher
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MagicEditor)

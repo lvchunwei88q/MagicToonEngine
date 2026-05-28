@@ -8,7 +8,7 @@
 
 using namespace RenderLauncher;
 
-namespace EngineLauncher {
+namespace MagicLauncher {
 	struct WindowsContext : public Singleton<WindowsContext>
 	{
 	public:

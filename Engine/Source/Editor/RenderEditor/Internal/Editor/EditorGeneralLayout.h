@@ -4,6 +4,7 @@
 #include <cereal/cereal.hpp>
 #include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
+#include <Command/ICommandManager.h>
 
 using namespace RenderUI;
 

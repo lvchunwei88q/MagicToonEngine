@@ -14,7 +14,7 @@ using JSON = nlohmann::json;
 
 #define PTAH_JSON CONFIG L"Project\\project.list.json"
 
-namespace EngineLauncher
+namespace MagicLauncher
 {
     struct ProjectInfo {
         std::string path;

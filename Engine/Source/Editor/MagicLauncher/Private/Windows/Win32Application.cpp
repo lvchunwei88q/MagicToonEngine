@@ -3,7 +3,7 @@
 #include <IRender.h>
 #include <IRenderRT.h>
 
-namespace EngineLauncher
+namespace MagicLauncher
 {
 	AUTO_REGISTER_NOTIFICATION(Win32Application,"Application");
 
