@@ -51,8 +51,8 @@ namespace RenderEditor {
             {
                 ImGui::MenuItem(Lang::Get("editor.menu.editor_settings").c_str(), nullptr, &Switch.EditorSettingsView);
                 ImGui::Separator();
-                if (ImGui::MenuItem(Lang::Get("editor.menu.undo").c_str())) { /* TODO */ }
-                if (ImGui::MenuItem(Lang::Get("editor.menu.redo").c_str())) { /* TODO */ }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.undo").c_str())) { Core::GetSubsystemContext()->Notification("COMMAND", { encodeToSizeT("Undo"), nullptr }); }
+                if (ImGui::MenuItem(Lang::Get("editor.menu.redo").c_str())) { Core::GetSubsystemContext()->Notification("COMMAND", { encodeToSizeT("Redo"), nullptr }); }
                 ImGui::EndMenu();
             }
 
