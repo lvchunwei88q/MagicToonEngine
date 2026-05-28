@@ -77,8 +77,8 @@ namespace RenderEditor {
 
                             const char* languages[] = { english.c_str(),chinese.c_str() };
                             if (ImGui::Combo(Lang::Get("editor.setting.language").c_str(), &language, languages, IM_ARRAYSIZE(languages))) {
-                                Setting.language = static_cast<Languages>(language);
-                                LoadLanguageFile();
+                                OnUserSelectLanguage(static_cast<Languages>(language));
+                                LoadLanguageFile(nullptr);
                             }
                         }
                     }

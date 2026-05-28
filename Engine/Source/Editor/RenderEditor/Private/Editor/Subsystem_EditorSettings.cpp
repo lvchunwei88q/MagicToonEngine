@@ -61,7 +61,7 @@ namespace RenderEditor {
         return nullptr;
     }
 
-    void EditorSettings::LoadLanguageFile()
+    void EditorSettings::LoadLanguageFile(void*)
     {
         RenderUIManager::Get().AddTask([this]() {
             RenderUIContext& UIContext = GetSubsystem()->SetRenderUIContext();

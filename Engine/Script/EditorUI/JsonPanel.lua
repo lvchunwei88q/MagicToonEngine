@@ -43,7 +43,7 @@ end
 -- ----------------------------------------------------
 local function DrawConfiguration(data)
     if GUI:TreeNode("Configuration") then
-        GUI:DragFloat("Speed", data, "speed", 0.1, 0.0, 100.0, "%.2f", 1.0)
+        GUI:DragFloat("Speed", data, "speed", 0.1, 0.0, 100.0, "%.2f", 1)
 
         -- 下拉框选择类型
         local type_items = { "Static", "Dynamic", "Player" }

@@ -10,6 +10,7 @@
 
 namespace RenderUI {
 	class RSubsystem;
+	using Function = std::function<void(void*)>;
 
 	struct RegisterSubsystemContext
 	{
@@ -28,7 +29,8 @@ namespace RenderUI {
 		virtual void Tick() = 0;
 		virtual void Notification(const char* msg) = 0;
 
-		virtual void* GetSubsystemPublicData(std::string Target,uint8_t Type) = 0;
+		virtual void* GetSubsystemPublicData(std::string Target, uint8_t Type) = 0;
+		virtual void CallSubsystemFunction(std::string Target, std::string Func, void* data) = 0;
 
 		virtual [[nodiscard]] const RenderUIContext& GetRenderUIContext() const = 0;
 		virtual [[nodiscard]] RenderUIContext& SetRenderUIContext() = 0;
@@ -49,21 +51,34 @@ namespace RenderUI {
 		virtual void* PublicData(uint8_t type) = 0;
 
 		template<typename Derived, ModeType type>
-		void Register() {
+		void Register(const char* name) {
 			// Register the subsystem in the system manager
-			const char* name = typeid(Derived).name();
 
 			RegisterSubsystemContext context{};
 			context.Name = name;
 			context.Subsystem = this;
 			this->Type = type;
 
+			this->RegisterFunctions();		// 注册函数指针到FunctionArray
 			IRSubsystem* Subsystemcontext = GetSubsystem();
 			Subsystemcontext->RegisterSubsystem(context);
 		}
 
 	protected:
 		ModeType Type;
+	public:
+		struct FunctionArray {
+			// 注册函数数组
+			std::vector<Function> FunctionArray;
+			std::vector<std::string> FunctionNames;
+			size_t FunctionArraySize = 0;
+		};
+		FunctionArray* Array = nullptr;
+		void SetFunctionArray(FunctionArray* array) {
+			Array = array;
+			Array->FunctionArraySize = Array->FunctionArray.size();
+		}
+		virtual void RegisterFunctions() {};
 	public:
 		[[nodiscard]] ModeType GetModeType() const {
 			return Type;
@@ -78,16 +93,28 @@ namespace RenderUI {
 	class RSubsystemTemplate : public RSubsystem, public Singleton<T>
 	{
 	public:
-		static void RegisterStatic() {
-			RSubsystemTemplate::Get().template Register<T, type>();
+		static void RegisterStatic(const char* name) {
+			RSubsystemTemplate::Get().template Register<T, type>(name);
 		}
 	};
 
 	#define CAT(a, b) a##b
 	#define RENDERUI_REGISTER(T) \
 		inline static bool CAT(T, _registered) = []() { \
-			T::RegisterStatic(); \
+			T::RegisterStatic(#T); \
 			return true; \
 		}(); \
 		inline bool CAT(T, _dummy) = CAT(T, _registered);
+
+	// 注册成员函数为函数指针到FunctionArray，使用宏简化注册过程
+	#define RS_REGISTER_METHODS(...)												\
+		void RegisterFunctions() override {										\
+			FunctionArray* Array = new FunctionArray();							\
+			__VA_ARGS__															\
+			this->SetFunctionArray(Array);										\
+		}
+
+	#define RS_METHOD(MethodName)																\
+		Array->FunctionArray.push_back([this](void* data) { this->MethodName(data); });		\
+		Array->FunctionNames.push_back(#MethodName);
 }
