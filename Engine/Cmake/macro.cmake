@@ -1,5 +1,8 @@
-macro(EngineModule)
-    add_subdirectory("Engine/Source/${ARGV}")
+macro(EditorModule)
+    add_subdirectory("Engine/Source/Editor/${ARGV}")
+endmacro()
+macro(RuntimeModule)
+    add_subdirectory("Engine/Source/Runtime/${ARGV}")
 endmacro()
 
 macro(ThirdPartyModule)
