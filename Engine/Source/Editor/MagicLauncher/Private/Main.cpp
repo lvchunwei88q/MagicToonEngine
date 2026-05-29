@@ -13,7 +13,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     wc.lpfnWndProc = MagicLauncher::WndProc;
     wc.hInstance = hInstance;
     wc.lpszClassName = CLASS;
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.hbrBackground = CreateSolidBrush(RGB(25, 25, 25));
     RegisterClassW(&wc);
 
     int screenW = GetSystemMetrics(SM_CXSCREEN);

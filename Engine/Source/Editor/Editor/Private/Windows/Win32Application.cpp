@@ -29,6 +29,7 @@ namespace Editor
 	bool Win32Application::Init()
 	{
 		LOG_INFO("Editor subsystem created.");
+		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // 初始化 COM
 
 		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
 		FILE_SERIALIZATION_LOADING(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
@@ -52,6 +53,7 @@ namespace Editor
 	void Win32Application::Uninstall()
 	{
 		CleanupWindows();
+		CoUninitialize();
 	}
 
 	void Win32Application::CreateWindows()
@@ -61,7 +63,7 @@ namespace Editor
 		// init windows
 		WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_CLASSDC, WindowsProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
 				ENGINE_CLASS, nullptr }; // 使用约定名称
-		wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
+		wc.hbrBackground = CreateSolidBrush(RGB(25, 25, 25));
 		::RegisterClassEx(&wc);
 
 		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("SetDpi"),nullptr }); // Set Imgui Dpi Scale
