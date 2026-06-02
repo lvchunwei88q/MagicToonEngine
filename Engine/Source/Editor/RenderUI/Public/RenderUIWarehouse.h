@@ -4,6 +4,7 @@
 
 // imgui
 #include <imgui.h> // 支持停靠布局
+#include <Tools/ImGuiNotify.h> // 通知系统
 #include <backends/imgui_impl_win32.h> // 适配windows
 #include <backends/imgui_impl_dx11.h> // 使用DX11
 

@@ -12,6 +12,8 @@ local json_data = {
     tags = "player,hero,important!",  -- 字符串模拟数组
     description = "This is a sample actor."
 }
+-- 全局变量
+index = 0
 
 -- ----------------------------------------------------
 -- 绘制 Transform 折叠块
@@ -83,42 +85,47 @@ local function DrawInputArea()
         GUI:Spacing()
         GUI:Separator()
     
-        -- 创建按钮（调用 Print）
+        -- 创建按钮
         GUI:Button("Update", function()
             if input_name ~= "" then
                 -- 创建新的 LuaMemberClass 对象
                 local new_member = CreateNewMember(input_name, input_type)
             
                 -- 调用 Print 函数
-                new_member:Print()
+                new_member:Print(index)
+                index = index + 1
             
                 -- 可选：清空输入框
                 input_name = ""
                 input_type = "string"
-            
-                GUI:OpenPopup("SuccessPopup")
-            else
-                GUI:OpenPopup("ErrorPopup")
             end
         end, 100, 30)
-    
-        -- 成功弹窗
-        if GUI:BeginPopupModal("SuccessPopup",0) then
-            GUI:Label("Member created and Print() called successfully!")
-            GUI:Button("OK", function()
-                GUI:CloseCurrentPopup()
-            end, 100, 0)
-            GUI:EndPopup()
-        end
-    
-        -- 错误弹窗
-        if GUI:BeginPopupModal("ErrorPopup",0) then
-            GUI:Label("Error: Member name cannot be empty!")
-            GUI:Button("OK", function()
-                GUI:CloseCurrentPopup()
-            end, 100, 0)
-            GUI:EndPopup()
-        end
+
+        GUI:SameLine(0.0, -1.0)
+
+        GUI:Button("UpdateInfo", function()
+            -- 调用 ShowToast 函数
+            ShowToast(1)
+        end, 100, 30)
+
+        GUI:SameLine(0.0, -1.0)
+
+        GUI:Button("UpdateWarning", function()
+            -- 调用 ShowToast 函数
+            ShowToast(2)
+        end, 100, 30)
+
+        GUI:Button("UpdateError", function()
+            -- 调用 ShowToast 函数
+            ShowToast(3)
+        end, 100, 30)
+
+        GUI:SameLine(0.0, -1.0)
+
+        GUI:Button("UpdateNone", function()
+            -- 调用 ShowToast 函数
+            ShowToast(4)
+        end, 100, 30)
 
         GUI:TreePop()
     end

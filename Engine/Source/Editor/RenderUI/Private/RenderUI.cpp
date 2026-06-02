@@ -266,6 +266,7 @@ namespace RenderUI {
         }
 
         // Rendering
+        Notify::RenderNotifications(); // 绘制通知系统
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

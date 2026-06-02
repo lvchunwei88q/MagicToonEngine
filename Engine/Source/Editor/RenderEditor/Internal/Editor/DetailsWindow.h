@@ -19,8 +19,8 @@ namespace RenderEditor {
         std::string member_name;
         std::string lua_type;
 
-        void Print() const {
-			LOG_INFO("Name: ", member_name, ", Type: ", lua_type);
+        void Print(int i) const {
+			LOG_INFO("Name: ", member_name, ", Type: ", lua_type , "Index: " , i);
         }
     };
 

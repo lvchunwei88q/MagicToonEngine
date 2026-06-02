@@ -1,5 +1,6 @@
 #include "Editor/DetailsWindow.h"
 #include <MagicUIContext.h>
+#include <RenderUIWarehouse.h>
 #include <ILog.h>
 
 #include "Editor/EditorGeneralLayout.h"
@@ -30,8 +31,18 @@ namespace RenderEditor {
             "member_name", & LuaMemberClass::member_name,
             "lua_type", & LuaMemberClass::lua_type,
 
-            "Print", & LuaMemberClass::Print
+            "Print", &LuaMemberClass::Print
         );
+
+        lua.set_function("ShowToast", [](int i) {
+            switch (i) {
+            case 1: Notify::InsertNotification(ImGuiToast(ImGuiToastType::Info, "This is a message")); break;
+            case 2: Notify::InsertNotification(ImGuiToast(ImGuiToastType::Warning, "This is a message")); break;
+            case 3: Notify::InsertNotification(ImGuiToast(ImGuiToastType::Error, "This is a message")); break;
+            case 4: Notify::InsertNotification(ImGuiToast(ImGuiToastType::None, "This is a message")); break;
+            default: LOG_ERROR("Undefined type"); break;
+            }
+        });
 
         lua.set_function("CreateNewMember", CreateNewMember);
     }

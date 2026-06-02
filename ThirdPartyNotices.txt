@@ -40,3 +40,7 @@ Licensed under the MIT License or Unlicense.
 ## WICTextureLoader
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT License.
+
+Copyright (c) Microsoft Corporation.
+Licensed under the Microsoft Software License Terms.
+详见 ThirdParty/DirectXShaderCompiler/LICENSE-MS.txt
