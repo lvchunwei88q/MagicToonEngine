@@ -28,21 +28,22 @@ namespace RenderEditor {
 
     void FileBrowserUI::Tick()
     {
-        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        ViewSwitch& Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.ContentBrowserWindow) {
+            SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
+            ImGui::Begin("Content Browser",&Switch.ContentBrowserWindow);
+
             // render
             DrawLayout();
             //DirTree
             //File
+
+            ImGui::End();
         }
     }
 
     void FileBrowserUI::DrawLayout()
     {
-        SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
-
-        ImGui::Begin("Content Browser");
-
         // path
         {
             std::string curPath = IO::ToNarrowString(state.currentPath);
@@ -155,7 +156,6 @@ namespace RenderEditor {
                 ImGui::EndChild();
             }
         }
-        ImGui::End();
     }
 
     void FileBrowserUI::DirTree()

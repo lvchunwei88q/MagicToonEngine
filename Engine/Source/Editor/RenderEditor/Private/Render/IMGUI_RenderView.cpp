@@ -19,7 +19,7 @@ namespace RenderEditor {
 
     void RenderView::Tick()
     {
-        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        ViewSwitch& Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.RenderViewWindow) {
             // Set style
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -28,7 +28,7 @@ namespace RenderEditor {
             ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar |
                 ImGuiWindowFlags_NoScrollWithMouse;
 
-            ImGui::Begin("Render View", nullptr, windowFlags);
+            ImGui::Begin("Render View", &Switch.RenderViewWindow, windowFlags);
             ImVec2 windowSize = ImGui::GetContentRegionAvail();
 
             RenderRT::GetRenderRTInterface()->UpdateBufferManagerViewSize((int)windowSize.x, (int)windowSize.y);

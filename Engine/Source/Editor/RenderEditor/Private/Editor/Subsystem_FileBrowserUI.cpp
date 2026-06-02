@@ -71,7 +71,8 @@ namespace RenderEditor {
             });
 
         if (isHovered) {
-            if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && io.MouseWheel != 0.0f) {
+            if ((ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl)) &&
+                io.MouseWheel != 0.0f) {
                 float wheelDelta = io.MouseWheel;
                 float& Zoom = Config.Zoom; // 获取缩放
                 if (wheelDelta != 0.0f) {

@@ -8,7 +8,7 @@ namespace RenderEditor {
 
     void EditorSettings::Tick()
     {
-        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        ViewSwitch& Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.EditorSettingsView) {
             // Set style
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(7.0f, 7.0f));
@@ -17,7 +17,7 @@ namespace RenderEditor {
             ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar |
                 ImGuiWindowFlags_NoScrollWithMouse;
 
-            ImGui::Begin(Lang::Get("editor.setting.title").c_str(), nullptr, windowFlags);
+            ImGui::Begin(Lang::Get("editor.setting.title").c_str(), &Switch.EditorSettingsView, windowFlags);
             {
                 // Model
                 ImGui::BeginChild("SettingsModules", ImVec2(ModulesWidth, 0), ImGuiChildFlags_Borders, ImGuiWindowFlags_None);

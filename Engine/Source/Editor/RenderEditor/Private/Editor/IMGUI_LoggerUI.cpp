@@ -60,14 +60,14 @@ namespace RenderEditor {
 
     void LoggerUI::Tick()
     {
-        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        ViewSwitch& Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.LoggerWindow) {
 
             LoggerSwitch& LogSwitch = this->Switch;
 
             SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
 
-            ImGui::Begin("Engine Log");
+            ImGui::Begin("Engine Log",&Switch.LoggerWindow);
 
             // ---- 工具栏 ----
             {

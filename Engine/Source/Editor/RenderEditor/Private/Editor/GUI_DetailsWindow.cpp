@@ -5,11 +5,11 @@
 namespace RenderEditor {
     void DetailsPanel::Tick()
     {
-        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        ViewSwitch& Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.DetailsWindow)
         {
             ImGuiIO& io = ImGui::GetIO();
-            ImGui::Begin(WINDOWS_NAME);
+            ImGui::Begin(WINDOWS_NAME, &Switch.DetailsWindow);
             {
                 DetailsPanel::Get().Draw();
             }

@@ -51,11 +51,11 @@ namespace RenderEditor {
 
     void LuaUIControlWindows::Tick()
     {
-        ViewSwitch Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
+        ViewSwitch& Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.LuaControl)
         {
             ImGuiIO& io = ImGui::GetIO();
-            ImGui::Begin(WINDOWS_NAME);
+            ImGui::Begin(WINDOWS_NAME, &Switch.LuaControl);
             {
                 Draw();
             }
