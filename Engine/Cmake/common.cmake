@@ -19,6 +19,8 @@ endif()
 
 # 定义第三方库的根目录
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/Engine/Thirdparty)
+# 定义内容根目录
+set(CONTENT_DIR ${CMAKE_SOURCE_DIR}/Engine/Content)
 
 # 设置输出目录为项目根目录下的 /Binary/BUILD_TYPE
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Binary/$<CONFIG>)

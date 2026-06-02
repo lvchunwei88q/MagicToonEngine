@@ -11,9 +11,9 @@ add_engine_library(RenderEditor SHARED
 target_include_directories(RenderEditor
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/Public # 别的项目也可以访问
-        ${THIRD_PARTY_DIR} # 使用反射库
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
+        ${THIRD_PARTY_DIR} # 使用反射库
 )
 
 target_compile_definitions(RenderEditor PRIVATE RENDEREDITOR_EXPORTS)

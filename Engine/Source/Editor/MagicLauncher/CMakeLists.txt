@@ -14,10 +14,10 @@ target_include_directories(MagicLauncher
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
         ${THIRD_PARTY_DIR} # 使用WebView2JSON HTTP 库 
-        ${CMAKE_SOURCE_DIR}/Engine/Content # 内容目录
+        ${CONTENT_DIR} # 内容目录
 )
 
-target_sources(MagicLauncher PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/resources.rc")
+target_sources(MagicLauncher PRIVATE "${CONTENT_DIR}/Logo/resources.rc")
 
 target_link_libraries(MagicLauncher PRIVATE # windows
     user32

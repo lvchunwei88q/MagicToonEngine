@@ -10,10 +10,10 @@ add_executable(MagicEditor
 
 target_include_directories(MagicEditor
     PRIVATE
-        ${CMAKE_SOURCE_DIR}/Engine/Content
+        ${CONTENT_DIR} # 使用内容目录
 )
 
-target_sources(MagicEditor PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Content/Logo/resources.rc")
+target_sources(MagicEditor PRIVATE "${CONTENT_DIR}/Logo/resources.rc")
 
 target_link_libraries(MagicEditor PRIVATE 
     Core

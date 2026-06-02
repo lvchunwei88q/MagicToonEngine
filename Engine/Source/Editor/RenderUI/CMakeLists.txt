@@ -12,7 +12,7 @@ target_include_directories(RenderUI
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/Public # 别的项目也可以访问
         ${THIRD_PARTY_DIR} # 使用反射库 使用Lua 库与Sol库
-
+        ${CONTENT_DIR} # 使用内容目录
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
 )

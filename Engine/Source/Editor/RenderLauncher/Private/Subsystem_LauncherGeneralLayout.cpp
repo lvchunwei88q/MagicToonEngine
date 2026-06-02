@@ -33,9 +33,9 @@ namespace RenderLauncher {
 		UIContext.EditorLanguageHash = ComputeStringHash(JsonDump);
 
 		// 加载 UI 相关资源
-		new_btn  = new MenuButton( Lang::Get("launcher.menu.new")  );
-		open_btn = new MenuButton( Lang::Get("launcher.menu.open") );
-		exit_btn = new MenuButton( Lang::Get("launcher.menu.exit") );
+		new_btn  = new MenuButton(std::string(ICON_FA_FILE)        , Lang::Get("launcher.menu.new") );
+		open_btn = new MenuButton(std::string(ICON_FA_FOLDER_OPEN) , Lang::Get("launcher.menu.open"));
+		exit_btn = new MenuButton(std::string(ICON_FA_DOOR_OPEN)   , Lang::Get("launcher.menu.exit"));
 
 		this->LoadProjectList();
 	}

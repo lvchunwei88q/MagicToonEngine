@@ -9,7 +9,9 @@
 
 #include <RenderContext.h>
 #include <IO.h>
+
 #include <front/Roboto_Regular_front.h> // 加载字体
+
 #include <mutex>
 
 namespace RenderUI {
@@ -191,7 +193,7 @@ namespace RenderUI {
         ifc.FontDataOwnedByAtlas = false;
 
         // Load a font from TTF font data in memory and add it to the font atlas
-        ImFont* front = io.Fonts->AddFontFromMemoryTTF( // base front
+        ImFont* basefront = io.Fonts->AddFontFromMemoryTTF( // base front
             (void*)front_data_data,
             front_data_size,
             18.0f,
@@ -199,8 +201,21 @@ namespace RenderUI {
             io.Fonts->GetGlyphRangesChineseFull()
         );
 
+        // Set merge mode to true to indicate that the new font should be merged with the existing font atlas instead of creating a new one
+        ifc.MergeMode = true;
+
+        // 定义 Font Awesome 的 Unicode 范围
+        static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+		std::string ContentPath = IO::ToNarrowString(IO::AbsolutePath::Get().GetContentPath());
+        std::string fullPath = ContentPath + "\\Editor\\font_icon\\Font Awesome 7 Free-Solid-900.otf";
+        io.Fonts->AddFontFromFileTTF(
+            fullPath.c_str(),
+            16.0f,
+            &ifc,
+            icons_ranges
+        );
+
         if (IO::Exists(L"c:\\Windows\\Fonts\\msyh.ttc")) {
-            ifc.MergeMode = true; // add for front
             ImGui::GetIO().Fonts->AddFontFromFileTTF(
                 "c:\\Windows\\Fonts\\msyh.ttc", 18.0f, &ifc, // windows default front path
                 ImGui::GetIO().Fonts->GetGlyphRangesChineseSimplifiedCommon());
@@ -210,7 +225,7 @@ namespace RenderUI {
         }
 
         // Set Default Front
-        ImGui::GetIO().FontDefault = front;
+        ImGui::GetIO().FontDefault = basefront;
 
         // Setup Platform/Renderer backends
         const RenderUIContext& UIContext = GetSubsystem()->GetRenderUIContext();

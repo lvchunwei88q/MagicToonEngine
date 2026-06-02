@@ -36,8 +36,8 @@ namespace RenderLauncher {
 
 	class MenuButton {
 	public:
-		MenuButton(std::string label)
-			: m_label(label) {
+		MenuButton(std::string icon,std::string label)
+			: m_label(icon + " " + label) {
 		}
 
 		bool Draw(const ImVec2& size, bool is_selected) {
