@@ -91,11 +91,17 @@ namespace MBT{
 
 	bool MagicBuildTool::RunBuildPipeline()
 	{
-		if (!Pipeline::FindClass()) {
+		if (!Pipeline::FindEngineClass()) {
 			Log::Error("An error occurred during the Class-finding phase of the build pipeline");
 			return false;
 		}
 		Log::Info("Pipeline construction successfully found Class stage");
+
+		if (!Pipeline::FindClassMember()) {
+			Log::Error("An error occurred during the Class Member-finding phase of the build pipeline");
+			return false;
+		}
+		Log::Info("Pipeline construction successfully found Class Member stage");
 
 		return true;
 	}

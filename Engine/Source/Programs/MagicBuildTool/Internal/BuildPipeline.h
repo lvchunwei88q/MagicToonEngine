@@ -49,6 +49,7 @@ namespace MBT {
 	};
 
 	namespace Pipeline {
-		bool FindClass();
+		bool FindEngineClass();
+		bool FindClassMember();
 	}
 };

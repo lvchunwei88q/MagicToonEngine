@@ -38,7 +38,6 @@ namespace MBT {
 
         // 检测固定字符串 GENERATE_BODY();
         bool HasGenerateBody(const std::string& line) {
-            // 精确匹配 GENERATE_BODY();
             std::regex pattern(R"(^\s*GENERATE_BODY\s*\(\s*\)\s*;?\s*$)");
             return std::regex_search(line, pattern);
         }
@@ -55,7 +54,7 @@ namespace MBT {
     }
 
     namespace Pipeline {
-        bool FindClass()
+        bool FindEngineClass()
         {
             std::vector<MagicEngineHeader> magicEngineHeaders = MagicBuildData::Get().GetMagicEngineHeaders();
 
