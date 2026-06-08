@@ -10,7 +10,11 @@ project ("MagicToonEngine")
 include(Engine/Cmake/common.cmake)
 include(Engine/Cmake/macro.cmake)
 
-# 包含子项目。
+# Tools 项目 包含子项目。
+BuildToolsModule(MagicBuildTool)
+
+
+# Engine 项目 包含子项目。
 ThirdPartyModule(imgui-docking)
 ThirdPartyModule(ufbx)
 ThirdPartyModule(WICTextureLoader)
