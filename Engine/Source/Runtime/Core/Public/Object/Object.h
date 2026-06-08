@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 
-#define MAGICMEMBER	()		// 你要序列化的成员
-#define MAGICCLASS	(tags)	// 你要序列化的类，必须放在类定义的开头
-#define MAGICBODY	()		// 你要序列化的类的成员函数实现，必须放在类定义的结尾
+#define MMEMBER(...)				// 你要序列化的成员
+#define MCLASS(...)					// 你要序列化的类，必须放在类定义的开头
+#define GENERATE_BODY()				// 你要序列化的类的成员函数实现，必须放在类定义的结尾
 
 namespace Core {
 	/*
@@ -16,7 +16,8 @@ namespace Core {
 		virtual ~Object();
 		Object();
 
-		uint64_t GetClassId() const { return class_id; }
+		virtual uint64_t GetClassId() const = 0; // 使用MagicBuildTool生成的类ID
+		uint64_t GetInstanceId() const { return instance_id; }; // 为每个对象实例分配一个唯一的ID
 
 		template<class Archive>
 		void serialize(Archive& archive) {
@@ -28,7 +29,7 @@ namespace Core {
 			return ++counter;
 		}
 
-		uint64_t class_id;
+		uint64_t instance_id;
 	};
 
 }

@@ -22,7 +22,7 @@ namespace Core {
 		}
 	}
 
-	Object::Object() : class_id(GetNextId())
+	Object::Object() : instance_id(GetNextId())
 	{
 		try {
 			std::vector<uint8_t> binaryData = {1,2,3};

@@ -11,9 +11,7 @@ namespace MBT{
 				line.erase(0, line.find_first_not_of(" \t\r\n"));
 				line.erase(line.find_last_not_of(" \t\r\n") + 1);
 
-				if (!line.empty()) {
-					lines.push_back(line);
-				}
+				lines.push_back(line); // 不要去除空行因为我们需要告诉用户具体行数
 			}
 		}
 	}
@@ -47,23 +45,38 @@ namespace MBT{
 	bool MagicBuildTool::readHeaderFiles()
 	{
 		size_t JobNum = (headers_.size() / 20) + (headers_.size() % 20 > 0 ? 1 : 0); // 每20个文件分成一组
+		std::vector<MagicEngineHeader> MagicEngineHeaders;
 		Log::Info("Start reading header files with " + std::to_string(JobNum) + " jobs");
+
 		for (size_t i = 0; i < headers_.size(); i++)
 		{
 			std::wstring HeaderPath = IO::ToWideString(headers_[i]);
 			if (IO::Exists(HeaderPath)) {
-				MagicEngineHeaders magicHeader;
+				MagicEngineHeader magicHeader;
 				std::string headerContent = IO::ReadAllText(HeaderPath);
 				GetLine(headerContent, magicHeader.lines);
-				magicHeader.headerName = headers_[i];
 
-				magicEngineHeaders.push_back(std::move(magicHeader));
+				magicHeader.headerName = headers_[i];
+				MagicEngineHeaders.push_back(std::move(magicHeader));
 			}
 			else {
 				Log::Error("Header file not found at: " + headers_[i]);
 				return false;
 			}
 		}
-		return false;
+
+		MagicBuildData::Get().SetMagicEngineHeaders(MagicEngineHeaders);
+		return true;
+	}
+
+	bool MagicBuildTool::RunBuildPipeline()
+	{
+		if (!Pipeline::FindClass()) {
+			Log::Error("An error occurred during the Class-finding phase of the build pipeline");
+			return false;
+		}
+		Log::Info("Pipeline construction successfully found Class stage");
+
+		return true;
 	}
 }

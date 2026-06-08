@@ -1,7 +1,8 @@
 #include <Subsystem/SubsystemTemplate.h>
+#include <Object/Object.h>
 #include <synchapi.h>
 
-class CLASS_A : public SubsystemTemplate<CLASS_A, Core::SubsystemContext::Priority::Low>
+class CLASS_A : public SubsystemTemplate<CLASS_A, Core::Priority::Low>
 {
 public:
 	virtual bool Init() {
@@ -12,28 +13,13 @@ public:
 
 private:
 };
-class CLASS_B : public SubsystemTemplate<CLASS_B, Core::SubsystemContext::Priority::Normal>
-{
-public:
-	virtual bool Init() {
-		Sleep(2000);
-		return true;
-	}
-	virtual void Uninstall() {}
 
-private:
-};
-class CLASS_C : public SubsystemTemplate<CLASS_C, Core::SubsystemContext::Priority::High>
+MCLASS();
+class CLASS_B : public Core::Object
 {
+	GENERATE_BODY();
 public:
-	virtual bool Init() {
-		Sleep(2000);
-		return true;
-	}
-	virtual void Uninstall() {}
 
-private:
+	MMEMBER();
+	int x;
 };
-AUTO_REGISTER(CLASS_A)
-AUTO_REGISTER(CLASS_B)
-AUTO_REGISTER(CLASS_C)

@@ -1,4 +1,4 @@
-#include "cmdline.h" // 参数解析库
+#include "Tools/cmdline.h" // 参数解析库
 #include "MagicBuildTool.h"
 
 #include <IO.h>
@@ -22,9 +22,13 @@ int main(int argc, char* argv[]) {
     if (MagicBT.readGenerateInfoFile(generateDirW)) {
         Log::Info("Start reading all engine header file contents");
         if (MagicBT.readHeaderFiles()) {
-
+            Log::Info("Start building code");
+            if (MagicBT.RunBuildPipeline()) {
+				Log::Info("Code generation completed successfully");
+                return 0; // success
+            }
         }
     }
 
-    return 0;
+    return 1; // error
 }

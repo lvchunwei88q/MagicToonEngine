@@ -1,16 +1,11 @@
 #pragma once
 
-#include "Common/MBT_API.h"
-#include "Logger.h" // 使用自己的日志系统
-#include "IO.h"
+#include "Tools/Logger.h" // 使用自己的日志系统
+#include "Tools/IO.h"
+
+#include "BuildPipeline.h"
 
 namespace MBT {
-	struct MagicEngineHeaders
-	{
-		std::string headerName;
-		std::vector<std::string> lines;
-	};
-
 	class MagicBuildTool
 	{
 	public:
@@ -20,9 +15,9 @@ namespace MBT {
 		bool readGenerateInfoFile(const std::wstring& generateInfoPath);
 		bool readHeaderFiles();
 
+		bool RunBuildPipeline();
 	private:
 		std::wstring generateInfoFile;
 		std::vector<std::string> headers_;
-		std::vector<MagicEngineHeaders> magicEngineHeaders;
 	};
 }
