@@ -1,5 +1,6 @@
 #include "MagicBuildTool.h"
 #include <sstream>
+#include <utility>
 
 namespace MBT{
 	namespace {
@@ -13,6 +14,16 @@ namespace MBT{
 
 				lines.push_back(line); // 不要去除空行因为我们需要告诉用户具体行数
 			}
+		}
+
+		std::pair<std::string, std::string> SplitInput(const std::string& input) {
+			size_t pos = input.find(" || ");
+			if (pos != std::string::npos) {
+				std::string first = input.substr(0, pos);
+				std::string second = input.substr(pos + 4); // 4 是 " || " 的长度
+				return { first, second };
+			}
+			return { input, "" };
 		}
 	}
 
@@ -30,6 +41,14 @@ namespace MBT{
 			generateInfoFile = generateInfoPath;
 			std::string GenerateInfo = IO::ReadAllText(generateInfoFile);
 			GetLine(GenerateInfo, headers_);
+
+			headerForMoudel_.resize(headers_.size());
+			for (size_t i = 0; i < headers_.size(); i++)
+			{
+				auto [path, moudel] = SplitInput(headers_[i]);
+				headers_[i] = path;
+				headerForMoudel_[i] = moudel;
+			}
 
 			Log::Info("MagicEngine Header Num: " + std::to_string(headers_.size()));
 
@@ -57,6 +76,7 @@ namespace MBT{
 				GetLine(headerContent, magicHeader.lines);
 
 				magicHeader.headerName = headers_[i];
+				magicHeader.moudelName = headerForMoudel_[i];
 				MagicEngineHeaders.push_back(std::move(magicHeader));
 			}
 			else {

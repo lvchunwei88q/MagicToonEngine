@@ -21,17 +21,21 @@ namespace MBT {
 	struct MagicEngineHeader
 	{
 		std::string headerName;
+		std::string moudelName;
 		std::vector<std::string> lines;
 
 		MagicEngineHeader(const std::string& headerName,const std::vector<std::string>& lines) :headerName(headerName), lines(lines) {}
+		MagicEngineHeader(){}
 	};
 
 	struct MagicEngineClass {
 		std::string headerName;				// src
+		std::string moudelName;				// model
 		std::string className;				// class
 		std::vector<std::string> members;	// members
 
-		MagicEngineClass(const std::string& headerName,const std::string& className) :headerName(headerName), className(className){}
+		MagicEngineClass(const std::string& headerName, const std::string& moudelName, const std::string& className) : headerName(headerName), moudelName(moudelName), className(className){}
+		MagicEngineClass(){}
 	};
 
 	class MagicBuildData : public Singleton<MagicBuildData>

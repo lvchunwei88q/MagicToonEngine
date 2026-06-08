@@ -19,5 +19,6 @@ namespace MBT {
 	private:
 		std::wstring generateInfoFile;
 		std::vector<std::string> headers_;
+		std::vector<std::string> headerForMoudel_;
 	};
 }

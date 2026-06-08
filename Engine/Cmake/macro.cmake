@@ -48,7 +48,7 @@ file(GLOB_RECURSE ${ModuleName}_HEADERS
 
 # 将源文件列表写入到一个文本文件中
 foreach(HEADER ${${ModuleName}_HEADERS})
-    file(APPEND ${HEADER_LIST_FILE} "${HEADER}\n")
+    file(APPEND ${HEADER_LIST_FILE} "${HEADER} || ${ModuleName}\n")
 endforeach()
 
 endmacro()

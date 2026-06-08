@@ -92,7 +92,7 @@ namespace MBT {
                         if (HasGenerateBody(line)) {
                             NeedtoFindGenerator = false; // 找到 GENERATE_BODY 了，重置状态
 
-                            magicEngineClasss.push_back({EngineHeader.headerName,currentClassName });
+                            magicEngineClasss.push_back({EngineHeader.headerName,EngineHeader.moudelName,currentClassName });
                         }
                     }
                 }

@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     std::string generateDir = parser.get<std::string>("generate-dir");
 
 	std::wstring generateDirW = IO::ToWideString(generateDir);
-    generateDirW += L"\\engine_info\\engine_headers.txt";
+    generateDirW += L"\\engine_info\\engine_headers.buildmeta";
 
 	MagicBuildTool MagicBT;
     if (MagicBT.readGenerateInfoFile(generateDirW)) {
