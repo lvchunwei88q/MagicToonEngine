@@ -1,5 +1,30 @@
+#include "cmdline.h" // 参数解析库
+#include "MagicBuildTool.h"
 
-int main()
-{
-	return 0;
+#include <IO.h>
+
+using namespace MBT;
+
+int main(int argc, char* argv[]) {
+    cmdline::parser parser;
+
+    parser.add<std::string>("generate-dir", 'g', "File directory for generating code", true, "");
+    parser.add("help", '?', "Print help");
+
+    parser.parse_check(argc, argv);
+
+    std::string generateDir = parser.get<std::string>("generate-dir");
+
+	std::wstring generateDirW = IO::ToWideString(generateDir);
+    generateDirW += L"\\engine_info\\engine_headers.txt";
+
+	MagicBuildTool MagicBT;
+    if (MagicBT.readGenerateInfoFile(generateDirW)) {
+        Log::Info("Start reading all engine header file contents");
+        if (MagicBT.readHeaderFiles()) {
+
+        }
+    }
+
+    return 0;
 }

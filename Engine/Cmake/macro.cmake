@@ -1,9 +1,13 @@
 macro(BuildToolsModule)
     set(ModuleName ${ARGV0})
+    set(ModuleArgs "")
+    if(${ARGC} GREATER 1)
+        set(ModuleArgs ${ARGN})
+    endif()
 
     add_subdirectory("Engine/Source/Programs/${ModuleName}")
     add_custom_target(Run${ModuleName} ALL
-        COMMAND $<TARGET_FILE:${ModuleName}>
+        COMMAND $<TARGET_FILE:${ModuleName}> ${ModuleArgs}
         DEPENDS ${ModuleName}
         COMMENT "Running ${ModuleName}..."
     )
@@ -11,13 +15,16 @@ endmacro()
 
 macro(ProgramModule)
     add_subdirectory("Engine/Source/Programs/${ARGV}")
+    add_dependencies(${ARGV} ${MAGIC_BUILD_TOOL_RUN})
 endmacro()
 
 macro(EditorModule)
     add_subdirectory("Engine/Source/Editor/${ARGV}")
+    add_dependencies(${ARGV} ${MAGIC_BUILD_TOOL_RUN})
 endmacro()
 macro(RuntimeModule)
     add_subdirectory("Engine/Source/Runtime/${ARGV}")
+    add_dependencies(${ARGV} ${MAGIC_BUILD_TOOL_RUN})
 endmacro()
 
 macro(ThirdPartyModule)

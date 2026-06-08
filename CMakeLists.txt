@@ -11,15 +11,15 @@ include(Engine/Cmake/common.cmake)
 include(Engine/Cmake/macro.cmake)
 
 # Tools 项目 包含子项目。
-BuildToolsModule(MagicBuildTool)
+BuildToolsModule(${MAGIC_BUILD_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
 
-
-# Engine 项目 包含子项目。
+# 第三方项目
 ThirdPartyModule(imgui-docking)
 ThirdPartyModule(ufbx)
 ThirdPartyModule(WICTextureLoader)
 ThirdPartyModule(lua)
 
+# Engine 项目 包含子项目。
 RuntimeModule(Core)
 RuntimeModule(RenderCore)
 RuntimeModule(Logger)

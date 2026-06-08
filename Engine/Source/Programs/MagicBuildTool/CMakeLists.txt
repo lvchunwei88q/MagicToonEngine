@@ -17,6 +17,3 @@ target_include_directories(MagicBuildTool
 )
 
 target_compile_definitions(MagicBuildTool PRIVATE MBT_EXPORTS)
-
-target_link_libraries(MagicBuildTool PRIVATE Core)
-target_link_libraries(MagicBuildTool PRIVATE Logger)
