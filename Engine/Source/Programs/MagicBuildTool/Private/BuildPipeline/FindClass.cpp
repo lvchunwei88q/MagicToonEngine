@@ -42,6 +42,16 @@ namespace MBT {
             std::regex pattern(R"(^\s*GENERATE_BODY\s*\(\s*\)\s*;?\s*$)");
             return std::regex_search(line, pattern);
         }
+
+		// 获取到类名 class a or class XXX_API a
+        std::string ExtractClassName(const std::string& line) {
+            std::regex pattern(R"(^\s*class\s+(?:\w+_API\s+)?(\w+))");
+            std::smatch match;
+            if (std::regex_search(line, match, pattern) && match.size() > 1) {
+                return match[1].str();
+            }
+            return "";
+        }
     }
 
     namespace Pipeline {
@@ -49,13 +59,13 @@ namespace MBT {
         {
             std::vector<MagicEngineHeader> magicEngineHeaders = MagicBuildData::Get().GetMagicEngineHeaders();
 
+            std::vector<MagicEngineClass> magicEngineClasss;
             for (size_t i = 0; i < magicEngineHeaders.size(); i++)
             {
                 auto& EngineHeader = magicEngineHeaders[i];
 
                 bool NeedtoFindGenerator = false; // 默认不需要找
-                std::vector<std::string> Members; // 注册的成员列表
-
+				std::string currentClassName; // 当前正在处理的类名
                 for (size_t i = 0; i < EngineHeader.lines.size(); i++)
                 {
                     std::string& line = EngineHeader.lines[i];
@@ -73,21 +83,26 @@ namespace MBT {
                             return false;
                         }
 
+                        currentClassName = ExtractClassName(next_line);
+
                         NeedtoFindGenerator = true; // 找到 MCLASS 了，接下来需要找 GENERATE_BODY
                     }
 
                     if (NeedtoFindGenerator) {
                         if (HasGenerateBody(line)) {
                             NeedtoFindGenerator = false; // 找到 GENERATE_BODY 了，重置状态
+
+                            magicEngineClasss.push_back({EngineHeader.headerName,currentClassName });
                         }
                     }
-
                 }
                 if (NeedtoFindGenerator) { // 如果找到了 MCLASS 但是没有找到 GENERATE_BODY 就报错
                     Log::Error("No GENERATE_BODY corresponding to MCLASS was found:" + EngineHeader.headerName);
                     return false;
                 }
             }
+
+			MagicBuildData::Get().SetMagicEngineClasss(magicEngineClasss);
 
             return true;
         }

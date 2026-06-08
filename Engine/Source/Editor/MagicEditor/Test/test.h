@@ -23,3 +23,13 @@ public:
 	MMEMBER();
 	int x;
 };
+
+MCLASS();
+class CLASS_X : public Core::Object
+{
+	GENERATE_BODY();
+public:
+
+	MMEMBER();
+	float x;
+};
