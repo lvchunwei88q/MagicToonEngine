@@ -7,6 +7,17 @@ namespace MBT {
         // 检测 MCLASS(...); 并提取括号内的参数
         bool ParseMClass(const std::string& line, std::vector<std::string>& outParams) {
             outParams.clear();
+            size_t pos = 0;
+            // 跳过前导空格
+            while (pos < line.size() && (line[pos] == ' ' || line[pos] == '\t')) {
+                ++pos;
+            }
+            // 检查是否以 MCLASS 开头
+            if (line.size() - pos < 6 || line[pos] != 'M' || line[pos + 1] != 'C' ||
+                line[pos + 2] != 'L' || line[pos + 3] != 'A' || line[pos + 4] != 'S' || line[pos + 5] != 'S') {
+                return false;
+            }
+
             // 匹配 MCLASS( ... ); 允许前后空格，括号内任意字符
             std::regex pattern(R"(^\s*MCLASS\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)");
             std::smatch match;

@@ -70,7 +70,8 @@ namespace MBT{
 	{
 		timer.reset();
 
-		size_t JobNum = (headers_.size() / 20) + (headers_.size() % 20 > 0 ? 1 : 0); // 每20个文件分成一组
+		constexpr int JobSize = 100;
+		size_t JobNum = (headers_.size() / JobSize) + (headers_.size() % JobSize > 0 ? 1 : 0); // 每20个文件分成一组
 		std::vector<MagicEngineHeader> MagicEngineHeaders;
 		TOOL::Log::Info("Start reading header files with " + std::to_string(JobNum) + " jobs");
 
