@@ -65,6 +65,7 @@ namespace MBT {
 
                 bool NeedtoFindGenerator = false; // 默认不需要找
 				std::string currentClassName; // 当前正在处理的类名
+				size_t currentClassLineNum = 0; // 当前正在处理的类所在行数
                 for (size_t i = 0; i < EngineHeader.lines.size(); i++)
                 {
                     std::string& line = EngineHeader.lines[i];
@@ -83,6 +84,7 @@ namespace MBT {
                         }
 
                         currentClassName = ExtractClassName(next_line);
+						currentClassLineNum = i; // 记录类宏定义所在行数
 
                         NeedtoFindGenerator = true; // 找到 MCLASS 了，接下来需要找 GENERATE_BODY
                     }
@@ -91,7 +93,7 @@ namespace MBT {
                         if (HasGenerateBody(line)) {
                             NeedtoFindGenerator = false; // 找到 GENERATE_BODY 了，重置状态
 
-                            magicEngineClasss.push_back({EngineHeader.headerName,EngineHeader.moudelName,currentClassName });
+                            magicEngineClasss.push_back({EngineHeader.headerName,EngineHeader.moudelName,currentClassName,currentClassLineNum });
                         }
                     }
                 }

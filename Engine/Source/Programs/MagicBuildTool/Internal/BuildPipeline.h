@@ -7,13 +7,17 @@
 #define GENERATE_GET(name, type) \
     type Get##name() const { return m_##name; }
 
-// 生成 Set 函数
+#define GENERATE_GET_REF(name, type) \
+    const type& GetRef##name() const { return m_##name; } \
+    type& GetRef##name() { return m_##name; }
+
 #define GENERATE_SET(name, type) \
     void Set##name(const type& val) { m_##name = val; }
 
 // 同时生成 Get 和 Set
-#define GENERATE_PROPERTY(name, type) \
-    GENERATE_GET(name, type) \
+#define GENERATE_PROPERTY(name, type)	\
+    GENERATE_GET(name, type)			\
+	GENERATE_GET_REF(name, type)		\
     GENERATE_SET(name, type)
 
 namespace MBT {
@@ -24,17 +28,31 @@ namespace MBT {
 		std::string moudelName;
 		std::vector<std::string> lines;
 
-		MagicEngineHeader(const std::string& headerName,const std::vector<std::string>& lines) :headerName(headerName), lines(lines) {}
+		MagicEngineHeader(const std::string& headerName,const std::vector<std::string>& lines)
+																: headerName(headerName), lines(lines) {}
 		MagicEngineHeader(){}
 	};
 
-	struct MagicEngineClass {
-		std::string headerName;				// src
-		std::string moudelName;				// model
-		std::string className;				// class
-		std::vector<std::string> members;	// members
+	// 所有用于记录行数的值我们默认都是从0开始的，方便计算和使用
 
-		MagicEngineClass(const std::string& headerName, const std::string& moudelName, const std::string& className) : headerName(headerName), moudelName(moudelName), className(className){}
+	struct MemberVariable {
+		std::string name;			// 名称
+		std::string type;			// 类型
+		size_t lineNum;				// 在头文件中的行数
+
+		MemberVariable(std::string name, std::string type,size_t lineNum) : name(name), type(type), lineNum(lineNum) {}
+		MemberVariable() {}
+	};
+
+	struct MagicEngineClass {
+		std::vector<MemberVariable> members;	// members
+		std::string headerName;					// src
+		std::string moudelName;					// model
+		std::string className;					// class
+		size_t lineNum;							// line number in header file
+
+		MagicEngineClass(const std::string& headerName, const std::string& moudelName, const std::string& className,size_t lineNum)
+												: headerName(headerName), moudelName(moudelName), className(className), lineNum(lineNum){}
 		MagicEngineClass(){}
 	};
 

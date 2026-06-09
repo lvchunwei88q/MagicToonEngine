@@ -1,6 +1,7 @@
 #include "MagicBuildTool.h"
 #include <sstream>
 #include <utility>
+#include "Tools/Timer.h"
 
 namespace MBT{
 	namespace {
@@ -25,6 +26,7 @@ namespace MBT{
 			}
 			return { input, "" };
 		}
+
 	}
 
 	MagicBuildTool::MagicBuildTool() {
@@ -91,17 +93,21 @@ namespace MBT{
 
 	bool MagicBuildTool::RunBuildPipeline()
 	{
+		Timer timer; // 计时器
+
 		if (!Pipeline::FindEngineClass()) {
 			Log::Error("An error occurred during the Class-finding phase of the build pipeline");
 			return false;
 		}
-		Log::Info("Pipeline construction successfully found Class stage");
+		Log::Info("Pipeline construction successfully found Class stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
+		timer.reset(); // 重置计时器
 
 		if (!Pipeline::FindClassMember()) {
 			Log::Error("An error occurred during the Class Member-finding phase of the build pipeline");
 			return false;
 		}
-		Log::Info("Pipeline construction successfully found Class Member stage");
+		Log::Info("Pipeline construction successfully found Class Member stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
+		timer.reset(); // 重置计时器
 
 		return true;
 	}

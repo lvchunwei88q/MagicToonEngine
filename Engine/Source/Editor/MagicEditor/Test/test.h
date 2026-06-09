@@ -1,6 +1,7 @@
 #include <Subsystem/SubsystemTemplate.h>
 #include <Object/Object.h>
 #include <synchapi.h>
+#define XXX_API
 
 class CLASS_A : public SubsystemTemplate<CLASS_A, Core::Priority::Low>
 {
@@ -22,14 +23,29 @@ public:
 
 	MMEMBER();
 	int x;
+
+	MMEMBER();
+	float f;
 };
 
 MCLASS();
-class CLASS_X : public Core::Object
+class XXX_API CLASS_X : public Core::Object
 {
 	GENERATE_BODY();
 public:
 
 	MMEMBER();
-	float x;
+	float o;
+
+	MMEMBER();
+	static const CLASS_A Test;
+
+	MMEMBER();
+	const CLASS_A TestA = {};
+
+	MMEMBER();
+	const CLASS_A TestB{};
+
+	MMEMBER();
+	CLASS_A TestC{};
 };

@@ -2,11 +2,12 @@
 #pragma once
 
 #include <iostream>
+#define DETAILED 1
 
 class Log {
 public:
     static void Info(const std::string& msg) {
-#ifdef _DEBUG
+#if defined(_DEBUG) || defined(DETAILED)
         std::cout << "[MagicBuildTool][INFO] " << msg << "\n";
 #endif
     }
