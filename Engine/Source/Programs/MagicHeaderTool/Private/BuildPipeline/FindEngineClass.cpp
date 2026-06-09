@@ -88,6 +88,7 @@ namespace MHT {
 
                 bool NeedtoFindGenerator = false; // 默认不需要找
                 MagicClassInfo Info;
+
                 for (size_t y = 0; y < EngineHeader.lines.size(); y++)
                 {
                     std::string& line = EngineHeader.lines[y];
@@ -95,22 +96,27 @@ namespace MHT {
                     std::vector<std::string> mclassParams;
                     if (ParseMClass(line, mclassParams)) {
                         if (mclassParams.size() <= 0) {
-                            TOOL::Log::Error("Cannot determine the generation type without filling in the corresponding MCLASS parameter:" + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                            TOOL::Log::Error("Cannot determine the generation type without filling in the corresponding MCLASS parameter:"
+                                                                        + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                            Info.clear();
                             return false;
                         }
 
                         if (NeedtoFindGenerator) { // 此时是在寻找ClassBody
                             TOOL::Log::Error("No body corresponding to the Class was found:" + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                            Info.clear();
                             return false;
                         }
                         
                         if (y + 1 >= EngineHeader.lines.size()) {
                             TOOL::Log::Error("MCLASS at end of file without class: " + EngineHeader.headerName);
+                            Info.clear();
                             return false;
                         }
                         std::string& next_line = EngineHeader.lines[y + 1];
                         if (!IsClassSignature(next_line)) {
                             TOOL::Log::Error("No CLASS corresponding to MCLASS was found:" + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                            Info.clear();
                             return false;
                         }
 
@@ -134,6 +140,7 @@ namespace MHT {
                 }
                 if (NeedtoFindGenerator) { // 如果找到了 MCLASS 但是没有找到 GENERATE_BODY 就报错
                     TOOL::Log::Error("No GENERATE_BODY corresponding to MCLASS was found:" + EngineHeader.headerName);
+                    Info.clear();
                     return false;
                 }
             }

@@ -73,7 +73,7 @@ namespace MHT{
 				}
 			}
 
-			TOOL::Log::Info("MagicEngine Header Num: " + std::to_string(headers_.size()));
+			TOOL::Log::Info("MagicEngine Header Job Num: " + std::to_string(headers_.size()));
 
 			return true;
 		}
