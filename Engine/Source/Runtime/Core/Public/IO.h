@@ -9,6 +9,10 @@
 #define CACHE L"Cache\\"
 #define CONFIG L"Config\\"
 
+#ifdef MoveFile
+#undef MoveFile 
+#endif
+
 DISABLE_DLL_WARNINGS_PUSH;
 
 namespace IO {

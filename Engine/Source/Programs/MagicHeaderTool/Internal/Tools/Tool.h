@@ -19,6 +19,10 @@ extern size_t MHT_CurrentJob;
 /////////////////////////////
 }
 
+#ifdef MoveFile
+#undef MoveFile 
+#endif
+
 DISABLE_DLL_WARNINGS_PUSH;
 
 namespace TOOL {
