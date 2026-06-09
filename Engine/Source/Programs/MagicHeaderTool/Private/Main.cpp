@@ -8,7 +8,6 @@ using namespace MHT;
 
 int main(int argc, char* argv[]) {
     cmdline::parser parser;
-    JobSystem::Get().Init();
 
     parser.add<std::string>("generate-dir", 'g', "File directory for generating code", true, "");
     parser.add("help", '?', "Print help");
@@ -20,16 +19,15 @@ int main(int argc, char* argv[]) {
 	std::wstring generateDirW = TOOL::ToWideString(generateDir);
     generateDirW += L"\\engine_info\\engine_headers.buildmeta";
 
-    MagicHeaderTool MagicBT;
-    if (MagicBT.readGenerateInfoFile(generateDirW)) {
+    JobSystem::Get().Init();
+
+    MagicHeaderTool MagicHT;
+    if (MagicHT.readGenerateInfoFile(generateDirW)) {
         TOOL::Log::Info("Start reading all engine header file contents");
-        if (MagicBT.readHeaderFiles()) {
-            TOOL::Log::Info("Start building code");
-            if (MagicBT.RunBuildPipeline()) {
-                TOOL::Log::Info("Code generation completed successfully");
-                JobSystem::Get().Uninstall();
-                return 0; // success
-            }
+        if (MagicHT.Run()) {
+            TOOL::Log::Info("Code generation completed successfully");
+            JobSystem::Get().Uninstall();
+            return 0; // success
         }
     }
 

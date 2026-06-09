@@ -16,15 +16,18 @@ endmacro()
 macro(ProgramModule)
     add_subdirectory("Engine/Source/Programs/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
+    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
 endmacro()
 
 macro(EditorModule)
     add_subdirectory("Engine/Source/Editor/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
+    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
 endmacro()
 macro(RuntimeModule)
     add_subdirectory("Engine/Source/Runtime/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
+    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
 endmacro()
 
 macro(ThirdPartyModule)
@@ -59,4 +62,13 @@ function(add_engine_library name)
     set_target_properties(${name} PROPERTIES 
         PREFIX "Magic-"
     )
+endfunction()
+
+function(apply_mht_generate_path)
+    foreach(module ${GENERATE_HEADER_MODEL})
+        message(STATUS " This module will use the MHT tool: ${module}")
+        target_include_directories(${module} PRIVATE
+            ${CMAKE_GENERATE_OUTPUT_DIRECTORY}/${module}
+        )
+    endforeach()
 endfunction()

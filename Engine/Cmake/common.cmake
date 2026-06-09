@@ -37,6 +37,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # 写入所有头文件列表的文件路径
 set(HEADER_LIST_FILE "${CMAKE_GENERATE_OUTPUT_DIRECTORY}/engine_info/engine_headers.buildmeta")
+set(GENERATE_HEADER_MODEL "")
 file(WRITE ${HEADER_LIST_FILE} "")
 
 # Windows API 用宽字符版本

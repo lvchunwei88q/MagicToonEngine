@@ -45,17 +45,34 @@ namespace MHT{
 			std::string GenerateInfo = TOOL::ReadAllText(generateInfoFile);
 			std::vector<std::string> headers_lines;
 			GetLine(GenerateInfo, headers_lines);
+			CF::MHT_JobNum = (headers_lines.size() + CF::SingleJobCapacity - 1) / CF::SingleJobCapacity;
 
-			headerForMoudel_.resize(headers_lines.size());
-			headers_.resize(headers_lines.size());
-			for (size_t i = 0; i < headers_lines.size(); i++)
+			headers_.resize(CF::MHT_JobNum);
+			for (size_t i = 0; i < CF::MHT_JobNum; i++)
 			{
-				auto [path, moudel] = SplitInput(headers_lines[i]);
-				headers_[i] = TOOL::ToWideString(path);
-				headerForMoudel_[i] = moudel;
+				if (i + 1 < CF::MHT_JobNum) {
+					headers_[i].headers_array.resize(CF::SingleJobCapacity);
+					headers_[i].headerForMoudel_.resize(CF::SingleJobCapacity);
+				}
+				else {
+					size_t Remaining = headers_lines.size() - i * CF::SingleJobCapacity;
+					headers_[i].headers_array.resize(Remaining);
+					headers_[i].headerForMoudel_.resize(Remaining);
+				}
 			}
 
-			CF::MHT_JobNum = (headers_.size() / CF::SingleJobCapacity) + (headers_.size() % CF::SingleJobCapacity > 0 ? 1 : 0); // 每100个文件分成一组
+			for (size_t i = 0; i < CF::MHT_JobNum; i++) {
+				auto& headers = headers_[i];
+
+				for (size_t y = 0; y < headers.headers_array.size(); y++)
+				{
+					size_t startindex = i * CF::SingleJobCapacity;
+					auto [path, moudel] = SplitInput(headers_lines[startindex + y]);
+					headers.headers_array[y] = TOOL::ToWideString(path);
+					headers.headerForMoudel_[y] = moudel;
+				}
+			}
+
 			TOOL::Log::Info("MagicEngine Header Num: " + std::to_string(headers_.size()));
 
 			return true;
@@ -67,21 +84,43 @@ namespace MHT{
 		}
 	}
 
-	bool MagicHeaderTool::readHeaderFiles()
+	bool MagicHeaderTool::Run() {
+		for (size_t i = 0; i < CF::MHT_JobNum; i++)
+		{
+			// Set Current Job
+			CF::MHT_CurrentJob = i + 1;
+
+			auto& headers = headers_[i];
+			TOOL::Log::Info("Current number of tasks being processed: " + std::to_string(headers.headers_array.size()));
+
+			MagicBuildData::Get().clear();
+			if (!readHeaderFiles(i)) {
+				return false;
+			}
+			if (!RunBuildPipeline()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool MagicHeaderTool::readHeaderFiles(size_t index)
 	{
 		timer.reset();
 
-		std::vector<MagicEngineHeader> MagicEngineHeaders;
-		TOOL::Log::Info("Start reading header files");
+		auto& headers = headers_[index];
 
-		std::vector<std::string> AllHeadersContent = TOOL::ReadFilesParallel(headers_);
+		std::vector<MagicEngineHeader> MagicEngineHeaders;
+
+		std::vector<std::string> AllHeadersContent = TOOL::ReadFilesParallel(headers.headers_array);
 		for (size_t i = 0; i < AllHeadersContent.size(); i++)
 		{
 			MagicEngineHeader magicHeader;
 			GetLine(AllHeadersContent[i], magicHeader.lines);
 
-			magicHeader.headerName = TOOL::ToNarrowString(headers_[i]);
-			magicHeader.moudelName = headerForMoudel_[i];
+			magicHeader.headerName = TOOL::ToNarrowString(headers.headers_array[i]);
+			magicHeader.moudelName = headers.headerForMoudel_[i];
 			MagicEngineHeaders.push_back(std::move(magicHeader));
 		}
 

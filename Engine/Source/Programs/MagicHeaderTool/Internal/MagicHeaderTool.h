@@ -5,6 +5,12 @@
 #include "BuildPipeline.h"
 
 namespace MHT {
+
+	struct HeadersData {
+		std::vector<std::wstring > headers_array;
+		std::vector<std::string> headerForMoudel_;
+	};
+
 	class MagicHeaderTool
 	{
 	public:
@@ -12,12 +18,13 @@ namespace MHT {
 		~MagicHeaderTool();
 
 		bool readGenerateInfoFile(const std::wstring& generateInfoPath);
-		bool readHeaderFiles();
 
-		bool RunBuildPipeline();
+		bool Run();
 	private:
+		bool readHeaderFiles(size_t index);
+		bool RunBuildPipeline();
+
 		std::wstring generateInfoFile;
-		std::vector<std::wstring> headers_;
-		std::vector<std::string> headerForMoudel_;
+		std::vector <HeadersData> headers_;
 	};
 }

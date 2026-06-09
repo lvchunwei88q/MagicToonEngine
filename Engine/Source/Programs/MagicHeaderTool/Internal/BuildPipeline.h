@@ -46,13 +46,14 @@ namespace MHT {
 
 	struct MagicEngineClass {
 		std::vector<MemberVariable> members;	// members
+		std::vector<std::string> ClassType;		// class Required function
 		std::string headerName;					// src
 		std::string moudelName;					// model
 		std::string className;					// class
 		size_t lineNum;							// line number in header file
 
-		MagicEngineClass(const std::string& headerName, const std::string& moudelName, const std::string& className,size_t lineNum)
-												: headerName(headerName), moudelName(moudelName), className(className), lineNum(lineNum){}
+		MagicEngineClass(const std::vector<std::string>& ClassType, const std::string& headerName, const std::string& moudelName, const std::string& className,size_t lineNum)
+												: ClassType(ClassType), headerName(headerName), moudelName(moudelName), className(className), lineNum(lineNum){}
 		MagicEngineClass(){}
 	};
 
@@ -63,6 +64,11 @@ namespace MHT {
 	public:
 		GENERATE_PROPERTY(MagicEngineHeaders, std::vector<MagicEngineHeader>);
 		GENERATE_PROPERTY(MagicEngineClasss, std::vector<MagicEngineClass>);
+
+		void clear() {
+			m_MagicEngineHeaders.clear();
+			m_MagicEngineClasss.clear();
+		}
 
 	};
 

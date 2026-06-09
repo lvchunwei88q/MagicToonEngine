@@ -37,3 +37,5 @@ EditorModule(MagicLauncher)
 
 # 设置启动项目为 Launcher
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MagicEditor)
+# 给模块MHT生成文件的路径
+apply_mht_generate_path()

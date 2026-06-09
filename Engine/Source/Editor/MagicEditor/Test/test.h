@@ -15,7 +15,7 @@ public:
 private:
 };
 
-MCLASS();
+MCLASS(MSERIALIZATION);
 class CLASS_B : public Core::Object
 {
 	GENERATE_BODY();
@@ -28,7 +28,7 @@ public:
 	float f;
 };
 
-MCLASS();
+MCLASS(MSERIALIZATION);
 class XXX_API CLASS_X : public Core::Object
 {
 	GENERATE_BODY();

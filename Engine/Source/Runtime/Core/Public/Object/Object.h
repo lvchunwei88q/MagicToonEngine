@@ -1,6 +1,11 @@
 #pragma once
 #include <string>
 
+enum {
+	MREFLECTION,
+	MSERIALIZATION,
+};
+
 #define MMEMBER(...)				// 你要序列化的成员
 #define MCLASS(...)					// 你要序列化的类，必须放在类定义的开头
 #define GENERATE_BODY()				// 你要序列化的类的成员函数实现，必须放在类定义的结尾
