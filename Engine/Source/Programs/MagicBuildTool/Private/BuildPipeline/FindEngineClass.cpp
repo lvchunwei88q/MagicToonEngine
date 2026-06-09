@@ -73,13 +73,13 @@ namespace MBT {
                     std::vector<std::string> mclassParams;
                     if (ParseMClass(line, mclassParams)) {
                         if (mclassParams.size() > 0) {
-                            Log::Error("Position class definition parameters:" + EngineHeader.headerName + " Line:" + std::to_string(i + 1));
+                            TOOL::Log::Error("Position class definition parameters:" + EngineHeader.headerName + " Line:" + std::to_string(i + 1));
                             return false;
                         }
 
                         std::string& next_line = EngineHeader.lines[i + 1];
                         if (!IsClassSignature(next_line)) {
-                            Log::Error("No CLASS corresponding to MCLASS was found:" + EngineHeader.headerName + " Line:" + std::to_string(i + 1));
+                            TOOL::Log::Error("No CLASS corresponding to MCLASS was found:" + EngineHeader.headerName + " Line:" + std::to_string(i + 1));
                             return false;
                         }
 
@@ -98,7 +98,7 @@ namespace MBT {
                     }
                 }
                 if (NeedtoFindGenerator) { // 如果找到了 MCLASS 但是没有找到 GENERATE_BODY 就报错
-                    Log::Error("No GENERATE_BODY corresponding to MCLASS was found:" + EngineHeader.headerName);
+                    TOOL::Log::Error("No GENERATE_BODY corresponding to MCLASS was found:" + EngineHeader.headerName);
                     return false;
                 }
             }

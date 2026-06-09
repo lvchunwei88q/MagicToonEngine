@@ -88,7 +88,7 @@ namespace MBT {
 				std::vector<std::string> params;
 				if (ParseMMember(line, params)) {	// 找到成员变量进入
 					if (params.size() > 0) {
-						Log::Error("Unknown member parameter:" + header.headerName + " Line:" + std::to_string(i + 1));
+						TOOL::Log::Error("Unknown member parameter:" + header.headerName + " Line:" + std::to_string(i + 1));
 						return false;
 					}
 
@@ -99,7 +99,7 @@ namespace MBT {
 						InHeaderMemberVariables.push_back({ result.name, result.type,VariableLineNum });
 					}
 					else {
-						Log::Error("Undefined member parameter:" + header.headerName + " Line:" + std::to_string(i + 2));
+						TOOL::Log::Error("Undefined member parameter:" + header.headerName + " Line:" + std::to_string(i + 2));
 						return false;
 					}
 				}
