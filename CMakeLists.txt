@@ -11,7 +11,7 @@ include(Engine/Cmake/common.cmake)
 include(Engine/Cmake/macro.cmake)
 
 # Tools 项目 包含子项目。
-BuildToolsModule(${MAGIC_BUILD_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
+BuildToolsModule(${MAGIC_HEADER_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
 
 # 第三方项目
 ThirdPartyModule(imgui-docking)

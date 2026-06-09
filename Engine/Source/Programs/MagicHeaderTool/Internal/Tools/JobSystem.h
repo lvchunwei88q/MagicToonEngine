@@ -14,7 +14,7 @@
 #include <vector>
 #include <condition_variable>
 
-namespace MBT
+namespace MHT
 {
     DISABLE_DLL_WARNINGS_PUSH;
     /**

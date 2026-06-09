@@ -8,7 +8,7 @@
 #include <cassert>
 #include "Tools/Tool.h"
 
-namespace MBT
+namespace MHT
 {
     namespace
     {
@@ -44,8 +44,8 @@ namespace MBT
             m_pool->workers.emplace_back([] { JobSystem::Get().WorkerLoop(); });
         }
 
-        TOOL::Log::Info("JobSystem online with " + std::to_string(resolved) + " worker thread(s) (hw_concurrency="
-        + std::to_string(std::thread::hardware_concurrency()) + ")");
+        //TOOL::Log::Info("JobSystem online with " + std::to_string(resolved) + " worker thread(s) (hw_concurrency="
+        //+ std::to_string(std::thread::hardware_concurrency()) + ")");
 
         return true;
     }

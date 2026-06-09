@@ -20,7 +20,7 @@
 	GENERATE_GET_REF(name, type)		\
     GENERATE_SET(name, type)
 
-namespace MBT {
+namespace MHT {
 	// 所有数据都保存在这个单例中，方便在不同的阶段访问和修改
 	struct MagicEngineHeader
 	{

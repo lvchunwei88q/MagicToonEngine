@@ -2,7 +2,7 @@
 #include <vector>
 #include <regex>
 
-namespace MBT {
+namespace MHT {
 	namespace {
 		struct Result : public MemberVariable {
 			bool success = false;
@@ -259,7 +259,7 @@ namespace MBT {
 			}
 			MagicBuildData::Get().SetMagicEngineClasss(order_magicEngineClasss);
 
-#if 1
+#if 0
 			for (size_t a = 0; a < order_magicEngineClasss.size(); a++) {
 				auto& OrderClass = order_magicEngineClasss[a];
 				std::cout << OrderClass.className << std::endl;

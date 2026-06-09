@@ -6,12 +6,18 @@
 #include "Tools/JobSystem.h"
 
 namespace fs = std::filesystem;
+
+namespace CF {
+size_t MHT_JobNum = -1;
+size_t MHT_CurrentJob = 0;
+}
+
 namespace TOOL {
     std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths) {
         std::vector<std::string> contents(filePaths.size());
 
         // 使用 JobSystem 的 ParallelFor 并行读取文件
-        MBT::JobSystem::Get().ParallelFor(
+        MHT::JobSystem::Get().ParallelFor(
             static_cast<uint32_t>(filePaths.size()),
             [&](uint32_t index) {
                 // 打开文件

@@ -1,10 +1,10 @@
 #include "Tools/cmdline.h" // 参数解析库
-#include "MagicBuildTool.h"
+#include "MagicHeaderTool.h"
 
 #include "Tools/Tool.h"
 #include "Tools/JobSystem.h"
 
-using namespace MBT;
+using namespace MHT;
 
 int main(int argc, char* argv[]) {
     cmdline::parser parser;
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
 	std::wstring generateDirW = TOOL::ToWideString(generateDir);
     generateDirW += L"\\engine_info\\engine_headers.buildmeta";
 
-	MagicBuildTool MagicBT;
+    MagicHeaderTool MagicBT;
     if (MagicBT.readGenerateInfoFile(generateDirW)) {
         TOOL::Log::Info("Start reading all engine header file contents");
         if (MagicBT.readHeaderFiles()) {

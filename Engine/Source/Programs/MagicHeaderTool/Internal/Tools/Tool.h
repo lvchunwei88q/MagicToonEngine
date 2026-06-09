@@ -8,9 +8,16 @@
 
 #include <string>
 #include <vector>
+
+namespace CF {
 ///////////////////////////// Config
 #define DETAILED 1
+constexpr int SingleJobCapacity = 100; // 数量
+
+extern size_t MHT_JobNum;
+extern size_t MHT_CurrentJob;
 /////////////////////////////
+}
 
 DISABLE_DLL_WARNINGS_PUSH;
 
@@ -43,16 +50,16 @@ namespace TOOL {
 	public:
 		static void Info(const std::string& msg) {
 	#if defined(_DEBUG) || defined(DETAILED)
-			std::cout << "[MagicBuildTool][INFO] " << msg << "\n";
+			std::cout << "[" + std::to_string(CF::MHT_CurrentJob) + "/" + std::to_string(CF::MHT_JobNum) + "][INFO] " << msg << "\n";
 	#endif
 		}
 
 		static void Warning(const std::string& msg) {
-			std::cout << "[MagicBuildTool][WARNING] " << msg << "\n";
+			std::cout << "[" + std::to_string(CF::MHT_CurrentJob) + "/" + std::to_string(CF::MHT_JobNum) + "][WARNING] " << msg << "\n";
 		}
 
 		static void Error(const std::string& msg) {
-			std::cerr << "[MagicBuildTool][ERROR] " << msg << "\n";
+			std::cout << "[" + std::to_string(CF::MHT_CurrentJob) + "/" + std::to_string(CF::MHT_JobNum) + "][ERROR] " << msg << "\n";
 		}
 	};
 

@@ -1,9 +1,9 @@
-#include "MagicBuildTool.h"
+#include "MagicHeaderTool.h"
 #include <sstream>
 #include <utility>
 #include "Tools/Tool.h"
 
-namespace MBT{
+namespace MHT{
 	namespace {
 		TOOL::Timer timer; // 计时器
 
@@ -30,15 +30,15 @@ namespace MBT{
 		}
 	}
 
-	MagicBuildTool::MagicBuildTool() {
+	MagicHeaderTool::MagicHeaderTool() {
 
 	}
 
-	MagicBuildTool::~MagicBuildTool() {
+	MagicHeaderTool::~MagicHeaderTool() {
 
 	}
 
-	bool MagicBuildTool::readGenerateInfoFile(const std::wstring& generateInfoPath)
+	bool MagicHeaderTool::readGenerateInfoFile(const std::wstring& generateInfoPath)
 	{
 		if (TOOL::Exists(generateInfoPath)) {
 			generateInfoFile = generateInfoPath;
@@ -55,6 +55,7 @@ namespace MBT{
 				headerForMoudel_[i] = moudel;
 			}
 
+			CF::MHT_JobNum = (headers_.size() / CF::SingleJobCapacity) + (headers_.size() % CF::SingleJobCapacity > 0 ? 1 : 0); // 每100个文件分成一组
 			TOOL::Log::Info("MagicEngine Header Num: " + std::to_string(headers_.size()));
 
 			return true;
@@ -66,14 +67,12 @@ namespace MBT{
 		}
 	}
 
-	bool MagicBuildTool::readHeaderFiles()
+	bool MagicHeaderTool::readHeaderFiles()
 	{
 		timer.reset();
 
-		constexpr int JobSize = 100;
-		size_t JobNum = (headers_.size() / JobSize) + (headers_.size() % JobSize > 0 ? 1 : 0); // 每20个文件分成一组
 		std::vector<MagicEngineHeader> MagicEngineHeaders;
-		TOOL::Log::Info("Start reading header files with " + std::to_string(JobNum) + " jobs");
+		TOOL::Log::Info("Start reading header files");
 
 		std::vector<std::string> AllHeadersContent = TOOL::ReadFilesParallel(headers_);
 		for (size_t i = 0; i < AllHeadersContent.size(); i++)
@@ -92,7 +91,7 @@ namespace MBT{
 		return true;
 	}
 
-	bool MagicBuildTool::RunBuildPipeline()
+	bool MagicHeaderTool::RunBuildPipeline()
 	{
 		timer.reset(); // 重置计时器
 

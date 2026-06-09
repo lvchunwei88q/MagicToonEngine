@@ -4,12 +4,12 @@
 
 #include "BuildPipeline.h"
 
-namespace MBT {
-	class MagicBuildTool
+namespace MHT {
+	class MagicHeaderTool
 	{
 	public:
-		MagicBuildTool();
-		~MagicBuildTool();
+		MagicHeaderTool();
+		~MagicHeaderTool();
 
 		bool readGenerateInfoFile(const std::wstring& generateInfoPath);
 		bool readHeaderFiles();

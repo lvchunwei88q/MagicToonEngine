@@ -27,8 +27,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Binary/$<CONFIG>)
 # 设置生成文件的输出目录
 set(CMAKE_GENERATE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/Generate)
 
-set(MAGIC_BUILD_TOOL_TARGET "MagicBuildTool"    CACHE INTERNAL "MagicBuildTool target name")
-set(MAGIC_BUILD_TOOL_RUN    "RunMagicBuildTool" CACHE INTERNAL "MagicBuildTool run name")
+set(MAGIC_HEADER_TOOL_TARGET "MagicHeaderTool"    CACHE INTERNAL "MagicHeaderTool target name")
+set(MAGIC_HEADER_TOOL_RUN    "RunMagicHeaderTool" CACHE INTERNAL "MagicHeaderTool run name")
 
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 20)

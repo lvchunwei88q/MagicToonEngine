@@ -2,7 +2,7 @@
 #include <vector>
 #include <regex>
 
-namespace MBT {
+namespace MHT {
     namespace {
         // 检测 MCLASS(...); 并提取括号内的参数
         bool ParseMClass(const std::string& line, std::vector<std::string>& outParams) {
