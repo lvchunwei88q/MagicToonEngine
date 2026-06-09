@@ -5,6 +5,8 @@
 
 namespace MBT{
 	namespace {
+		Timer timer; // 计时器
+
 		void GetLine(std::string& Content,std::vector<std::string>& lines) {
 			std::istringstream stream(Content);
 			std::string line;
@@ -26,7 +28,6 @@ namespace MBT{
 			}
 			return { input, "" };
 		}
-
 	}
 
 	MagicBuildTool::MagicBuildTool() {
@@ -42,13 +43,15 @@ namespace MBT{
 		if (IO::Exists(generateInfoPath)) {
 			generateInfoFile = generateInfoPath;
 			std::string GenerateInfo = IO::ReadAllText(generateInfoFile);
-			GetLine(GenerateInfo, headers_);
+			std::vector<std::string> headers_lines;
+			GetLine(GenerateInfo, headers_lines);
 
-			headerForMoudel_.resize(headers_.size());
-			for (size_t i = 0; i < headers_.size(); i++)
+			headerForMoudel_.resize(headers_lines.size());
+			headers_.resize(headers_lines.size());
+			for (size_t i = 0; i < headers_lines.size(); i++)
 			{
-				auto [path, moudel] = SplitInput(headers_[i]);
-				headers_[i] = path;
+				auto [path, moudel] = SplitInput(headers_lines[i]);
+				headers_[i] = IO::ToWideString(path);
 				headerForMoudel_[i] = moudel;
 			}
 
@@ -65,35 +68,32 @@ namespace MBT{
 
 	bool MagicBuildTool::readHeaderFiles()
 	{
+		timer.reset();
+
 		size_t JobNum = (headers_.size() / 20) + (headers_.size() % 20 > 0 ? 1 : 0); // 每20个文件分成一组
 		std::vector<MagicEngineHeader> MagicEngineHeaders;
 		Log::Info("Start reading header files with " + std::to_string(JobNum) + " jobs");
 
-		for (size_t i = 0; i < headers_.size(); i++)
+		std::vector<std::string> AllHeadersContent = IO::ReadFilesParallel(headers_);
+		for (size_t i = 0; i < AllHeadersContent.size(); i++)
 		{
-			std::wstring HeaderPath = IO::ToWideString(headers_[i]);
-			if (IO::Exists(HeaderPath)) {
-				MagicEngineHeader magicHeader;
-				std::string headerContent = IO::ReadAllText(HeaderPath);
-				GetLine(headerContent, magicHeader.lines);
+			MagicEngineHeader magicHeader;
+			GetLine(AllHeadersContent[i], magicHeader.lines);
 
-				magicHeader.headerName = headers_[i];
-				magicHeader.moudelName = headerForMoudel_[i];
-				MagicEngineHeaders.push_back(std::move(magicHeader));
-			}
-			else {
-				Log::Error("Header file not found at: " + headers_[i]);
-				return false;
-			}
+			magicHeader.headerName = IO::ToNarrowString(headers_[i]);
+			magicHeader.moudelName = headerForMoudel_[i];
+			MagicEngineHeaders.push_back(std::move(magicHeader));
 		}
 
 		MagicBuildData::Get().SetMagicEngineHeaders(MagicEngineHeaders);
+
+		Log::Info("Time taken to read engine file: " + std::to_string(timer.elapsed_ms()) + "ms");
 		return true;
 	}
 
 	bool MagicBuildTool::RunBuildPipeline()
 	{
-		Timer timer; // 计时器
+		timer.reset(); // 重置计时器
 
 		if (!Pipeline::FindEngineClass()) {
 			Log::Error("An error occurred during the Class-finding phase of the build pipeline");

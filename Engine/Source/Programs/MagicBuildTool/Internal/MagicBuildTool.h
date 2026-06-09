@@ -18,7 +18,7 @@ namespace MBT {
 		bool RunBuildPipeline();
 	private:
 		std::wstring generateInfoFile;
-		std::vector<std::string> headers_;
+		std::vector<std::wstring> headers_;
 		std::vector<std::string> headerForMoudel_;
 	};
 }

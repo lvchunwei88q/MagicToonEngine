@@ -3,9 +3,36 @@
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
+#include "Tools/JobSystem.h"
 
 namespace fs = std::filesystem;
 namespace IO {
+    std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths) {
+        std::vector<std::string> contents(filePaths.size());
+
+        // 使用 JobSystem 的 ParallelFor 并行读取文件
+        MBT::JobSystem::Get().ParallelFor(
+            static_cast<uint32_t>(filePaths.size()),
+            [&](uint32_t index) {
+                // 打开文件
+                std::ifstream file(filePaths[index], std::ios::binary);
+                if (file.is_open()) {
+                    // 获取文件大小
+                    file.seekg(0, std::ios::end);
+                    size_t size = static_cast<size_t>(file.tellg());
+                    file.seekg(0, std::ios::beg);
+
+                    // 预分配空间并读取
+                    contents[index].resize(size);
+                    file.read(&contents[index][0], size);
+                }
+                else {
+                    throw std::runtime_error("Failed to open file: " + ToNarrowString(filePaths[index]));
+                }
+            }
+        );
+        return contents;
+    }
 
     std::string ReadAllText(const std::wstring& path) {
         fs::path p(path);

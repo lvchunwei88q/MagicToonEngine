@@ -8,6 +8,9 @@
 DISABLE_DLL_WARNINGS_PUSH;
 
 namespace IO {
+	// 并行读取文件
+	std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths);
+
 	// 读取整个文件（文本模式，返回字符串）
 	std::string ReadAllText(const std::wstring& path);
 

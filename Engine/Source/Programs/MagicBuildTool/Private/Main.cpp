@@ -1,12 +1,14 @@
 #include "Tools/cmdline.h" // 参数解析库
 #include "MagicBuildTool.h"
 
-#include <IO.h>
+#include "Tools/IO.h"
+#include "Tools/JobSystem.h"
 
 using namespace MBT;
 
 int main(int argc, char* argv[]) {
     cmdline::parser parser;
+    JobSystem::Get().Init();
 
     parser.add<std::string>("generate-dir", 'g', "File directory for generating code", true, "");
     parser.add("help", '?', "Print help");
@@ -25,10 +27,12 @@ int main(int argc, char* argv[]) {
             Log::Info("Start building code");
             if (MagicBT.RunBuildPipeline()) {
 				Log::Info("Code generation completed successfully");
+                JobSystem::Get().Uninstall();
                 return 0; // success
             }
         }
     }
 
+    JobSystem::Get().Uninstall();
     return 1; // error
 }
