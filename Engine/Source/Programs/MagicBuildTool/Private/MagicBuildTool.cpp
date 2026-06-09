@@ -1,11 +1,11 @@
 #include "MagicBuildTool.h"
 #include <sstream>
 #include <utility>
-#include "Tools/Timer.h"
+#include "Tools/Tool.h"
 
 namespace MBT{
 	namespace {
-		Timer timer; // 计时器
+		TOOL::Timer timer; // 计时器
 
 		void GetLine(std::string& Content,std::vector<std::string>& lines) {
 			std::istringstream stream(Content);
@@ -40,9 +40,9 @@ namespace MBT{
 
 	bool MagicBuildTool::readGenerateInfoFile(const std::wstring& generateInfoPath)
 	{
-		if (IO::Exists(generateInfoPath)) {
+		if (TOOL::Exists(generateInfoPath)) {
 			generateInfoFile = generateInfoPath;
-			std::string GenerateInfo = IO::ReadAllText(generateInfoFile);
+			std::string GenerateInfo = TOOL::ReadAllText(generateInfoFile);
 			std::vector<std::string> headers_lines;
 			GetLine(GenerateInfo, headers_lines);
 
@@ -51,16 +51,16 @@ namespace MBT{
 			for (size_t i = 0; i < headers_lines.size(); i++)
 			{
 				auto [path, moudel] = SplitInput(headers_lines[i]);
-				headers_[i] = IO::ToWideString(path);
+				headers_[i] = TOOL::ToWideString(path);
 				headerForMoudel_[i] = moudel;
 			}
 
-			Log::Info("MagicEngine Header Num: " + std::to_string(headers_.size()));
+			TOOL::Log::Info("MagicEngine Header Num: " + std::to_string(headers_.size()));
 
 			return true;
 		}
 		else {
-			Log::Error("Header list file not found at: " + IO::ToNarrowString(generateInfoPath)
+			TOOL::Log::Error("Header list file not found at: " + TOOL::ToNarrowString(generateInfoPath)
 																+ "\\engine_info\\engine_headers.txt");
 			return false;
 		}
@@ -72,22 +72,22 @@ namespace MBT{
 
 		size_t JobNum = (headers_.size() / 20) + (headers_.size() % 20 > 0 ? 1 : 0); // 每20个文件分成一组
 		std::vector<MagicEngineHeader> MagicEngineHeaders;
-		Log::Info("Start reading header files with " + std::to_string(JobNum) + " jobs");
+		TOOL::Log::Info("Start reading header files with " + std::to_string(JobNum) + " jobs");
 
-		std::vector<std::string> AllHeadersContent = IO::ReadFilesParallel(headers_);
+		std::vector<std::string> AllHeadersContent = TOOL::ReadFilesParallel(headers_);
 		for (size_t i = 0; i < AllHeadersContent.size(); i++)
 		{
 			MagicEngineHeader magicHeader;
 			GetLine(AllHeadersContent[i], magicHeader.lines);
 
-			magicHeader.headerName = IO::ToNarrowString(headers_[i]);
+			magicHeader.headerName = TOOL::ToNarrowString(headers_[i]);
 			magicHeader.moudelName = headerForMoudel_[i];
 			MagicEngineHeaders.push_back(std::move(magicHeader));
 		}
 
 		MagicBuildData::Get().SetMagicEngineHeaders(MagicEngineHeaders);
 
-		Log::Info("Time taken to read engine file: " + std::to_string(timer.elapsed_ms()) + "ms");
+		TOOL::Log::Info("Time taken to read engine file: " + std::to_string(timer.elapsed_ms()) + "ms");
 		return true;
 	}
 
@@ -96,17 +96,17 @@ namespace MBT{
 		timer.reset(); // 重置计时器
 
 		if (!Pipeline::FindEngineClass()) {
-			Log::Error("An error occurred during the Class-finding phase of the build pipeline");
+			TOOL::Log::Error("An error occurred during the Class-finding phase of the build pipeline");
 			return false;
 		}
-		Log::Info("Pipeline construction successfully found Class stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
+		TOOL::Log::Info("Pipeline construction successfully found Class stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
 		timer.reset(); // 重置计时器
 
 		if (!Pipeline::FindClassMember()) {
-			Log::Error("An error occurred during the Class Member-finding phase of the build pipeline");
+			TOOL::Log::Error("An error occurred during the Class Member-finding phase of the build pipeline");
 			return false;
 		}
-		Log::Info("Pipeline construction successfully found Class Member stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
+		TOOL::Log::Info("Pipeline construction successfully found Class Member stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
 		timer.reset(); // 重置计时器
 
 		return true;

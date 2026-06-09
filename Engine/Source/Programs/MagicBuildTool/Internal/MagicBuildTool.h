@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Tools/Logger.h" // 使用自己的日志系统
-#include "Tools/IO.h"
+#include "Tools/Tool.h"
 
 #include "BuildPipeline.h"
 

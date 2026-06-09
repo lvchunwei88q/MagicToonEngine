@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include "Tools/Singleton.h"
-#include "Tools/Logger.h" 
+#include "Tools/Tool.h" 
 
 #define GENERATE_GET(name, type) \
     type Get##name() const { return m_##name; }

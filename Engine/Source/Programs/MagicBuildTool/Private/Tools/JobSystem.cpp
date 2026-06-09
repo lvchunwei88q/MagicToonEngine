@@ -6,7 +6,7 @@
 #include "Tools/JobSystem.h"
 #include <algorithm>
 #include <cassert>
-#include "Tools/Logger.h"
+#include "Tools/Tool.h"
 
 namespace MBT
 {
@@ -44,7 +44,7 @@ namespace MBT
             m_pool->workers.emplace_back([] { JobSystem::Get().WorkerLoop(); });
         }
 
-        Log::Info("JobSystem online with "+ std::to_string(resolved)+ " worker thread(s) (hw_concurrency="
+        TOOL::Log::Info("JobSystem online with " + std::to_string(resolved) + " worker thread(s) (hw_concurrency="
         + std::to_string(std::thread::hardware_concurrency()) + ")");
 
         return true;

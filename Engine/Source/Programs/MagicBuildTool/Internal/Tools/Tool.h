@@ -2,12 +2,60 @@
 
 #include "Common/Compiler.h"
 #include "Tools/Singleton.h"
+
+#include <iostream>
+#include <chrono>
+
 #include <string>
 #include <vector>
+///////////////////////////// Config
+#define DETAILED 1
+/////////////////////////////
 
 DISABLE_DLL_WARNINGS_PUSH;
 
-namespace IO {
+namespace TOOL {
+	class Timer {
+	private:
+		std::chrono::steady_clock::time_point startTime;
+
+	public:
+		Timer() {
+			start();
+		}
+
+		void start() {
+			startTime = std::chrono::steady_clock::now();
+		}
+
+		// 返回经过的毫秒数
+		long long elapsed_ms() const {
+			auto endTime = std::chrono::steady_clock::now();
+			return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+		}
+
+		void reset() {
+			start();
+		}
+	};
+
+	class Log {
+	public:
+		static void Info(const std::string& msg) {
+	#if defined(_DEBUG) || defined(DETAILED)
+			std::cout << "[MagicBuildTool][INFO] " << msg << "\n";
+	#endif
+		}
+
+		static void Warning(const std::string& msg) {
+			std::cout << "[MagicBuildTool][WARNING] " << msg << "\n";
+		}
+
+		static void Error(const std::string& msg) {
+			std::cerr << "[MagicBuildTool][ERROR] " << msg << "\n";
+		}
+	};
+
 	// 并行读取文件
 	std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths);
 

@@ -1,4 +1,4 @@
-#include "Tools/IO.h"
+#include "Tools/Tool.h"
 #include <windows.h>
 #include <filesystem>
 #include <fstream>
@@ -6,7 +6,7 @@
 #include "Tools/JobSystem.h"
 
 namespace fs = std::filesystem;
-namespace IO {
+namespace TOOL {
     std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths) {
         std::vector<std::string> contents(filePaths.size());
 
