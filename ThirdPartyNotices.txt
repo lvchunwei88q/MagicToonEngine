@@ -27,6 +27,11 @@ Copyright (c) 2014-2024 Randolph Voorhies, Shane Grant
 Licensed under the MIT License.
 详见 ThirdParty/cereal/LICENSE.txt
 
+## ctre
+Copyright (c) 1994–2025 Lua.org, PUC-Rio.
+Licensed under the Apache License.
+详见 ThirdParty/ctre/LICENSE.txt
+
 ## magic_enum
 Copyright (c) 2019-2024 Neargye
 Licensed under the MIT License.

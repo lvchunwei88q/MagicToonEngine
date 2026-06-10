@@ -1,6 +1,7 @@
 #include "BuildPipeline.h"
 #include <vector>
-#include <regex>
+#include <ctre/ctre.hpp>
+#include <algorithm>
 
 namespace MHT {
 	namespace {
@@ -24,32 +25,57 @@ namespace MHT {
 
 		private:
 			static std::string ExtractName(const std::string& decl) {
-				// 找最后一个标识符
-				std::regex namePattern(R"(\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:[=;{]|$))");
-				std::smatch match;
-				std::string::const_iterator searchStart(decl.cbegin());
-
+				std::string_view view(decl);
 				std::string lastMatch;
-				while (std::regex_search(searchStart, decl.cend(), match, namePattern)) {
-					lastMatch = match[1].str();
-					searchStart = match[0].second;
+
+				// 使用 CTRE 的 search 获取匹配
+				auto matches = ctre::search_all<R"(\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:[=;{]|$))">(view);
+				for (auto& match : matches) {
+					// 获取第一个捕获组的内容
+					if (match.get<1>().size() > 0) {
+						lastMatch = match.get<1>().to_string();
+					}
 				}
 
 				return lastMatch;
 			}
 
 			static std::string ExtractType(const std::string& decl, const std::string& name) {
-				// 查找变量名，但确保它是一个独立的单词
-				std::string searchPattern = "\\b" + name + "\\b";
-				std::regex nameRegex(searchPattern);
-				std::smatch match;
+				// 使用 CTRE 查找变量名
+				std::string pattern = "\\b" + name + "\\b";
+				// CTRE 要求编译期确定的字符串，所以不能使用运行时拼接的 pattern 用 string_view 手动查找
+				std::string_view view(decl);
+				size_t pos = 0;
+				while (pos < view.size()) {
+					// 查找 name 字符串
+					size_t name_pos = view.find(name, pos);
+					if (name_pos == std::string_view::npos) break;
+					// 检查是否为独立单词
+					bool is_word_boundary = true;
+					// 检查前一个字符
+					if (name_pos > 0) {
+						char prev = view[name_pos - 1];
+						if (std::isalnum(static_cast<unsigned char>(prev)) || prev == '_') {
+							is_word_boundary = false;
+						}
+					}
+					// 检查后一个字符
+					if (is_word_boundary && name_pos + name.size() < view.size()) {
+						char next = view[name_pos + name.size()];
+						if (std::isalnum(static_cast<unsigned char>(next)) || next == '_') {
+							is_word_boundary = false;
+						}
+					}
 
-				if (std::regex_search(decl, match, nameRegex)) {
-					size_t namePos = match.position(0);
-					std::string typePart = decl.substr(0, namePos);
-					// 去除末尾空格
-					typePart.erase(typePart.find_last_not_of(" \t") + 1);
-					return typePart;
+					if (is_word_boundary) {
+						std::string typePart = std::string(view.substr(0, name_pos));
+						while (!typePart.empty() && (typePart.back() == ' ' || typePart.back() == '\t')) {
+							typePart.pop_back();
+						}
+						return typePart;
+					}
+
+					pos = name_pos + name.size();
 				}
 
 				return "";
@@ -59,29 +85,44 @@ namespace MHT {
 		// 检测 MMEMBER(...); 并提取括号内的参数
 		bool ParseMMember(const std::string& line, std::vector<std::string>& outParams) {
 			outParams.clear();
+
 			// 匹配 MMEMBER( ... ); 允许前后空格，括号内任意字符
-			std::regex pattern(R"(^\s*MMEMBER\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)");
-			std::smatch match;
-			if (std::regex_search(line, match, pattern) && match.size() >= 2) {
-				std::string args = match[1].str();
-				// 按逗号分割
-				std::regex comma(R"(\s*,\s*)");
-				std::sregex_token_iterator it(args.begin(), args.end(), comma, -1);
-				std::sregex_token_iterator end;
-				for (; it != end; ++it) {
-					std::string param = it->str();
-					// 去除首尾空白
-					param = std::regex_replace(param, std::regex(R"(^\s+|\s+$)"), "");
-					if (!param.empty()) {
-						outParams.push_back(param);
+			if (auto match = ctre::match<R"(^\s*MMEMBER\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)">(line)) {
+				std::string_view args = match.get<1>();
+
+				std::string_view remaining = args;
+				while (!remaining.empty()) {
+					// 查找逗号位置
+					size_t comma_pos = remaining.find(',');
+					std::string_view param = (comma_pos == std::string_view::npos)
+						? remaining
+						: remaining.substr(0, comma_pos);
+
+					size_t start = param.find_first_not_of(" \t");
+					if (start == std::string_view::npos) {
+						// 全是空白，跳过这个参数
+						remaining = (comma_pos == std::string_view::npos)
+							? std::string_view()
+							: remaining.substr(comma_pos + 1);
+						continue;
 					}
+					size_t end = param.find_last_not_of(" \t");
+					param = param.substr(start, end - start + 1);
+
+					if (!param.empty()) {
+						outParams.emplace_back(param);
+					}
+					remaining = (comma_pos == std::string_view::npos)
+						? std::string_view()
+						: remaining.substr(comma_pos + 1);
 				}
 				return true;
 			}
 			return false;
 		}
 
-		bool FindClassMemberInHeader(const MagicEngineHeader& header,std::vector<MemberVariable>& InHeaderMemberVariables) {
+		bool FindClassMemberInHeader(const MagicEngineHeader& header,std::vector<MemberVariable>& InHeaderMemberVariables) 
+		{
 			for (size_t i = 0; i < header.lines.size(); i++)
 			{
 				auto& line = header.lines[i];
@@ -89,6 +130,11 @@ namespace MHT {
 				if (ParseMMember(line, params)) {	// 找到成员变量进入
 					if (params.size() > 0) {
 						TOOL::Log::Error("Unknown member parameter:" + header.headerName + " Line:" + std::to_string(i + 1));
+						return false;
+					}
+
+					if (i + 1 >= header.lines.size()) {
+						TOOL::Log::Error("MMEMBER at end of file without declaration: " + header.headerName + " Line:" + std::to_string(i + 1));
 						return false;
 					}
 
@@ -259,7 +305,7 @@ namespace MHT {
 			}
 			MagicBuildData::Get().SetMagicEngineClasss(order_magicEngineClasss);
 
-#if 0
+#if 1
 			for (size_t a = 0; a < order_magicEngineClasss.size(); a++) {
 				auto& OrderClass = order_magicEngineClasss[a];
 				std::cout << OrderClass.className << std::endl;

@@ -7,15 +7,25 @@ namespace MHT{
 	namespace {
 		TOOL::Timer timer; // 计时器
 
-		void GetLine(std::string& Content,std::vector<std::string>& lines) {
+		void GetLine(std::string& Content, std::vector<std::string>& lines) {
 			std::istringstream stream(Content);
 			std::string line;
 			while (std::getline(stream, line)) {
-				// 去除行首行尾的空白字符
-				line.erase(0, line.find_first_not_of(" \t\r\n"));
-				line.erase(line.find_last_not_of(" \t\r\n") + 1);
+				// 使用 trim 函数
+				auto trim = [](std::string& s) {
+					// 去除行首
+					size_t start = s.find_first_not_of(" \t\r\n");
+					if (start == std::string::npos) {
+						s.clear();
+						return;
+					}
+					// 去除行尾
+					size_t end = s.find_last_not_of(" \t\r\n");
+					s = s.substr(start, end - start + 1);
+					};
 
-				lines.push_back(line); // 不要去除空行因为我们需要告诉用户具体行数
+				trim(line);
+				lines.push_back(line);  // 空行也会被保留（空字符串）
 			}
 		}
 

@@ -52,8 +52,15 @@ namespace MHT {
 		std::string className;					// class
 		size_t lineNum;							// line number in header file
 
-		MagicEngineClass(const std::vector<std::string>& ClassType, const std::string& headerName, const std::string& moudelName, const std::string& className,size_t lineNum)
-												: ClassType(ClassType), headerName(headerName), moudelName(moudelName), className(className), lineNum(lineNum){}
+		MagicEngineClass(const std::vector<std::string>& ClassType,
+						 const std::string& headerName,
+						 const std::string& moudelName,
+						 const std::string& className,
+						 size_t lineNum)
+			: members(),ClassType(ClassType),
+			headerName(headerName), moudelName(moudelName),
+			className(className), lineNum(lineNum){}
+
 		MagicEngineClass(){}
 	};
 
