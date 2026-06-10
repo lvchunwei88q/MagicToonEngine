@@ -15,6 +15,7 @@ enum {
 namespace Core {
 	/*
 	* The base class for MagicHeaderTool services. Any class that wants to use advanced C features should inherit from this class.
+	* Note that all Objects will be automatically serialized, but they can only be initialized after the SubsystemCore has completed initialization.
 	*/
 	class CORE_API Object
 	{
@@ -40,7 +41,9 @@ namespace Core {
 
 	class CORE_API IObjectSystem {
 	public:
-		virtual size_t GetObjectNum() = 0;
+		virtual size_t GetObjectNum() = 0;					// Get Current ObjectNum
+		virtual size_t RegisterObject(Object* ptr) = 0;		// Register This Object For ObjectSystem Return Index
+		virtual void RemoveObject(size_t index) = 0;		// Delete This Object Input this Index 
 	};
 
 	CORE_API IObjectSystem* GetObjectSystem();

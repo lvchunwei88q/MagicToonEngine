@@ -3,6 +3,7 @@
 #include "Object.h"
 #include <vector>
 #include <string>
+#include <mutex>
 
 namespace Core {
 
@@ -14,8 +15,12 @@ namespace Core {
 		virtual void Uninstall() override;
 
 		virtual size_t GetObjectNum() override;
+		virtual size_t RegisterObject(Object* ptr) override;
+		virtual void RemoveObject(size_t index) override;
 	private:
-		// 我们需要在这里管理Object的序列化数据
-		std::vector<std::string> ObjectTags;
+		// There is absolutely no management of their deletions here.
+		std::vector<Object*> Objects;
+
+		mutable std::mutex m_mutex;
 	};
 }
