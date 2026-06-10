@@ -44,9 +44,49 @@ namespace MHT {
             return code.str();
         }
 
+         /**
+          * 生成 GetClassId 函数
+          * @param classIdMap 类名和类ID的映射表
+          * @param indent 缩进空格数
+          * @return 格式化的函数代码
+          */
+        std::string GenerateGetClassIdFunctionFormatted(
+            const std::map<std::string, size_t>& classIdMap,
+            int indent = 4
+        ) {
+            std::ostringstream code;
+            std::string indentStr(indent, ' ');
+            std::string innerIndent = indentStr + "    ";
+
+            code << "uint64_t GetClassId() const {\n";
+            code << indentStr << "    using ThisType = std::decay_t<decltype(*this)>;\n";
+            code << indentStr << "    \n";
+
+            bool firstClass = true;
+            for (const auto& [className, classId] : classIdMap) {
+                if (!firstClass) {
+                    code << indentStr << "    } else ";
+                }
+                code << "if constexpr (std::is_same_v<ThisType, " << className << ">) {\n";
+                code << indentStr << "        return " << classId << "ULL;\n";
+                firstClass = false;
+            }
+
+            if (!classIdMap.empty()) {
+                code << indentStr << "    }\n";
+            }
+
+            // 添加默认返回值（如果没有匹配的类）
+            code << indentStr << "    return 0ULL;\n";
+            code << "}\n";
+
+            return code.str();
+        }
+
         std::string ConvertFunctionToMacro(const std::vector<std::string>& funcStrings, const std::string& macroName = "GENERATE_BODY") {
             std::ostringstream result;
             result << "#define " << macroName << "() \\\n";
+            result << "public: " << " \\\n";                // 这里我们默认使用公开区域设置
 
             bool firstLine = true;
 
@@ -103,15 +143,20 @@ namespace MHT {
 
             return result.str();
         }
+
+        uint64_t GlobalAutoincrementedValue() {
+            static uint64_t value = 0; // 初始化为0
+            return value++;
+        }
 	}
 
 	namespace Pipeline {
         struct MetaData {
             std::string headerName;
-            std::string MetadataSrc;
+            std::vector<std::string> MetadataSrc;
             std::string Metadata;
 
-            void SetMetadataSrc(const std::string& MetadataSrc, const std::string& headerName)
+            void SetMetadataSrc(const std::vector<std::string>& MetadataSrc, const std::string& headerName)
             {
                 this->MetadataSrc = MetadataSrc;
                 this->headerName  = headerName;
@@ -135,24 +180,27 @@ namespace MHT {
             // 为每个文件生成对应的生成信息 之后生成元数据
             for (const auto& Area : AllArea) 
             {
-                std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap;
+                std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Serialize;
+                std::map<std::string, size_t> GenerateInformationMap_GetClassId;
                 for (size_t y = 0; y < MagicEngineClasss.size(); y++)
                 {
                     auto& MagicEngineClass = MagicEngineClasss[y];
                     if (Area == MagicEngineClass.headerName) {
-                        GenerateInformationMap[MagicEngineClass.className] = MagicEngineClass.members;
+                        GenerateInformationMap_Serialize[MagicEngineClass.className] = MagicEngineClass.members;
+                        GenerateInformationMap_GetClassId[MagicEngineClass.className] = GlobalAutoincrementedValue();
                     }
                 }
                 // 生成元数据
-                std::string src = GenerateSerializeFunctionFormatted(GenerateInformationMap);
-                MetaDatas.emplace_back().SetMetadataSrc(src, Area);
+                std::string src_Serialize = GenerateSerializeFunctionFormatted(GenerateInformationMap_Serialize);
+                std::string src_GetClassId = GenerateGetClassIdFunctionFormatted(GenerateInformationMap_GetClassId);
+                MetaDatas.emplace_back().SetMetadataSrc({ src_Serialize,src_GetClassId }, Area);
             }
 
             // 之后将我们生成的元数据使用宏包裹
             for (size_t i = 0; i < MetaDatas.size(); i++)
             {
                 auto& MetaData = MetaDatas[i];
-                std::string MetaDataScript = ConvertFunctionToMacro({ MetaData.MetadataSrc });
+                std::string MetaDataScript = ConvertFunctionToMacro(MetaData.MetadataSrc);
                 MetaData.SetMetadata(MetaDataScript);
             }
 
