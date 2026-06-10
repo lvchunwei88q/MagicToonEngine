@@ -51,10 +51,13 @@ namespace MHT{
 
 	}
 
-	bool MagicHeaderTool::readGenerateInfoFile(const std::wstring& generateInfoPath)
+	bool MagicHeaderTool::readGenerateInfoFile(const std::wstring& generateInfoPath,const std::wstring& generateDir)
 	{
 		if (TOOL::Exists(generateInfoPath)) {
 			generateInfoFile = generateInfoPath;
+			this->generateDir = generateDir;
+			MagicBuildData::Get().SetGeneratePath(generateDir);
+
 			std::string GenerateInfo = TOOL::ReadAllText(generateInfoFile);
 			std::vector<std::string> headers_lines;
 			GetLine(GenerateInfo, headers_lines);

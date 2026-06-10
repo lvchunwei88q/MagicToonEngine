@@ -17,12 +17,12 @@ int main(int argc, char* argv[]) {
     std::string generateDir = parser.get<std::string>("generate-dir");
 
 	std::wstring generateDirW = TOOL::ToWideString(generateDir);
-    generateDirW += L"\\engine_info\\engine_headers.buildmeta";
+    std::wstring generateFilePath = generateDirW + L"\\engine_info\\engine_headers.buildmeta";
 
     JobSystem::Get().Init();
 
     MagicHeaderTool MagicHT;
-    if (MagicHT.readGenerateInfoFile(generateDirW)) {
+    if (MagicHT.readGenerateInfoFile(generateFilePath, generateDirW)) {
         TOOL::Log::Info("Start reading all engine header file contents");
         if (MagicHT.Run()) {
             TOOL::Log::Info("Code generation completed successfully");

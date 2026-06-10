@@ -17,7 +17,7 @@ namespace MHT {
 		MagicHeaderTool();
 		~MagicHeaderTool();
 
-		bool readGenerateInfoFile(const std::wstring& generateInfoPath);
+		bool readGenerateInfoFile(const std::wstring& generateInfoPath, const std::wstring& generateDir);
 
 		bool Run();
 	private:
@@ -25,6 +25,7 @@ namespace MHT {
 		bool RunBuildPipeline();
 
 		std::wstring generateInfoFile;
+		std::wstring generateDir;
 		std::vector <HeadersData> headers_;
 	};
 }

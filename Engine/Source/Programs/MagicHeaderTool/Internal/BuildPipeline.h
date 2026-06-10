@@ -67,10 +67,12 @@ namespace MHT {
 	struct MagicObjectMetadata {
 		std::string headerName;
 		std::string Metadata;
+		std::string moudelName;
 
 		MagicObjectMetadata(const std::string& headerName,
-						 const std::string& Metadata)
-			: headerName(headerName), Metadata(Metadata) {}
+							const std::string& Metadata,
+							const std::string& moudelName)
+			: headerName(headerName), Metadata(Metadata), moudelName(moudelName){}
 
 		MagicObjectMetadata() {}
 	};
@@ -80,10 +82,13 @@ namespace MHT {
 		std::vector<MagicEngineHeader>		m_MagicEngineHeaders;
 		std::vector<MagicEngineClass>		m_MagicEngineClasss;
 		std::vector<MagicObjectMetadata>	m_MagicObjectMetadatas;
+
+		std::wstring m_GeneratePath;
 	public:
 		GENERATE_PROPERTY(MagicEngineHeaders,	std::vector<MagicEngineHeader>		);
 		GENERATE_PROPERTY(MagicEngineClasss,	std::vector<MagicEngineClass>		);
-		GENERATE_PROPERTY(MagicObjectMetadatas,	std::vector<MagicObjectMetadata>	);
+		GENERATE_PROPERTY(MagicObjectMetadatas, std::vector<MagicObjectMetadata>	);
+		GENERATE_PROPERTY(GeneratePath,			std::wstring						);
 
 		void clear() {
 			m_MagicEngineHeaders.clear();
