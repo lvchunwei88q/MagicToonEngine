@@ -64,23 +64,48 @@ namespace MHT {
 		MagicEngineClass(){}
 	};
 
+	struct MagicObjectMetadata {
+		std::string headerName;
+		std::string Metadata;
+
+		MagicObjectMetadata(const std::string& headerName,
+						 const std::string& Metadata)
+			: headerName(headerName), Metadata(Metadata) {}
+
+		MagicObjectMetadata() {}
+	};
+
 	class MagicBuildData : public Singleton<MagicBuildData>
 	{
-		std::vector<MagicEngineHeader>	m_MagicEngineHeaders;
-		std::vector<MagicEngineClass>	m_MagicEngineClasss;
+		std::vector<MagicEngineHeader>		m_MagicEngineHeaders;
+		std::vector<MagicEngineClass>		m_MagicEngineClasss;
+		std::vector<MagicObjectMetadata>	m_MagicObjectMetadatas;
 	public:
-		GENERATE_PROPERTY(MagicEngineHeaders, std::vector<MagicEngineHeader>);
-		GENERATE_PROPERTY(MagicEngineClasss, std::vector<MagicEngineClass>);
+		GENERATE_PROPERTY(MagicEngineHeaders,	std::vector<MagicEngineHeader>		);
+		GENERATE_PROPERTY(MagicEngineClasss,	std::vector<MagicEngineClass>		);
+		GENERATE_PROPERTY(MagicObjectMetadatas,	std::vector<MagicObjectMetadata>	);
 
 		void clear() {
 			m_MagicEngineHeaders.clear();
 			m_MagicEngineClasss.clear();
+			m_MagicObjectMetadatas.clear();
 		}
 
 	};
 
 	namespace Pipeline {
+		enum GenerationState {
+			Pending,       // 有待生成的数据
+			Completed      // 已无待生成数据
+		};
+		extern GenerationState GenerationState_;
+		inline bool NeedGenerate()			{ return GenerationState_ == GenerationState::Pending;	}
+		inline void SetGenerateCompleted()	{ GenerationState_ = GenerationState::Completed;		}
+		inline void ResetStatus()			{ GenerationState_ = GenerationState::Pending;			}
+
 		bool FindEngineClass();
 		bool FindClassMember();
+		bool GenerateObjectMetadata();
+		bool GenerateMetadataFile();
 	}
 };

@@ -4,7 +4,7 @@
 
 namespace MHT {
     namespace {
-        // 检测 MCLASS(...); 并提取括号内的参数        // TODO 修复Bug
+        // 检测 MCLASS(...); 并提取括号内的参数        // TODO 修复Bug 关于MBT处理错误时的内存索引错误
         bool ParseMClass(const std::string& line, std::vector<std::string>& outParams) {
             outParams.clear();
 
@@ -146,6 +146,7 @@ namespace MHT {
                 }
             }
 
+            if (magicEngineClasss.size() <= 0)SetGenerateCompleted();
 			MagicBuildData::Get().SetMagicEngineClasss(magicEngineClasss);
 
             return true;
