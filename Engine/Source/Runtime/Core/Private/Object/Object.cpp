@@ -1,6 +1,6 @@
-#include "Object/Object.h"
+#include "Object.h"
 #include "CoreLogCapture/CoreLogCapture.h"
-//////////////////// 序列化
+//////////////////// Serialization library
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>
 
