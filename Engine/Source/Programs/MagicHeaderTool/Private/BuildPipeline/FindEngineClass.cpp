@@ -154,7 +154,6 @@ namespace MHT {
                 }
                 if (NeedtoFindGenerator) { // 如果找到了 MCLASS 但是没有找到 GENERATE_BODY 就报错
                     TOOL::Log::Error("No GENERATE_BODY corresponding to MCLASS was found:" + EngineHeader.headerName);
-                    Info.clear();
                     return false;
                 }
             }

@@ -8,8 +8,7 @@ add_executable(MagicHeaderTool
     ${MagicHeaderTool_HEADERS}
 )
 
-
-if(ON)
+if(OFF)
     target_compile_options(MagicHeaderTool PRIVATE
         "$<$<CONFIG:Debug>:/fsanitize=address>"
         "$<$<CONFIG:Debug>:/Zi>"
