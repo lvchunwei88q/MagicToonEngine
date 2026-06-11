@@ -7,7 +7,7 @@ template<typename To, typename From>
 inline To* SafeCast(From* ptr) {
     if (!ptr) return nullptr;
     
-    // 编译时检查类型关系
+    // Check type relationships at compile time
     constexpr bool is_upcast = std::is_base_of_v<To, From>;
     constexpr bool is_downcast = std::is_base_of_v<From, To>;
     
@@ -32,3 +32,18 @@ inline To* SafeCast(From* ptr) {
     
     return nullptr;
 }
+
+// TODO 完善
+#define DEFINE_MEMBER_CHECKER_BEGIN(CheckerName)      \
+    template<typename T>                              \
+    concept Has##CheckerName = 
+
+#define DEFINE_MEMBER_CHECKER_ADD(Member)             \
+    requires { &T::Member; } ||                       \
+
+#define DEFINE_MEMBER_CHECKER_END(Member)             \
+    requires { &T::Member; };                         \
+
+#define CHECK_NO_MEMBER(ClassName, CheckerName) \
+    static_assert(!Has##CheckerName<ClassName>, \
+        "ERROR: " #ClassName " has conflicting member functions for " #CheckerName)

@@ -47,17 +47,19 @@ namespace MHT {
 	struct MagicEngineClass {
 		std::vector<MemberVariable> members;	// members
 		std::vector<std::string> ClassType;		// class Required function
+		std::vector<std::string> GenerateBody;	// class Required function
 		std::string headerName;					// src
 		std::string moudelName;					// model
 		std::string className;					// class
 		size_t lineNum;							// line number in header file
 
 		MagicEngineClass(const std::vector<std::string>& ClassType,
+						 const std::vector<std::string>& GenerateBody,
 						 const std::string& headerName,
 						 const std::string& moudelName,
 						 const std::string& className,
 						 size_t lineNum)
-			: members(),ClassType(ClassType),
+			: members(),ClassType(ClassType), GenerateBody(GenerateBody),
 			headerName(headerName), moudelName(moudelName),
 			className(className), lineNum(lineNum){}
 

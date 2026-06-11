@@ -2,7 +2,8 @@
 #include "Main.h"
 #include <Editor.h>
 
-//#include "../Test/test.h" // 测试用文件
+#include "../Test/test.h" // 测试用文件
+
 
 int main(int argc, char* argv[])// exe -p path
 {

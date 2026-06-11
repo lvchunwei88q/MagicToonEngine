@@ -1,6 +1,7 @@
 #pragma once
 #include "Common/Core_API.h"
 #include <string>
+#include "Tools/Check.h"
 
 // Enumerates the features you can use
 enum {
@@ -11,6 +12,11 @@ enum {
 #define MMEMBER(...)				// 你要序列化的成员
 #define MCLASS(...)					// 你要序列化的类，必须放在类定义的开头
 #define GENERATE_BODY()				// 你要序列化的类的成员函数实现，必须放在类定义的结尾
+
+DEFINE_MEMBER_CHECKER_BEGIN(Object)
+	DEFINE_MEMBER_CHECKER_ADD(GetClassId)
+	DEFINE_MEMBER_CHECKER_ADD(GetInstanceId)
+DEFINE_MEMBER_CHECKER_END(GetNextId)
 
 namespace Core {
 	/*
@@ -47,4 +53,5 @@ namespace Core {
 	};
 
 	CORE_API IObjectSystem* GetObjectSystem();
+
 }

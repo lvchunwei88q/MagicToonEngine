@@ -4,47 +4,45 @@
 
 namespace MHT {
     namespace {
-        // 检测 MCLASS(...); 并提取括号内的参数        // TODO 修复Bug 关于MBT处理错误时的内存索引错误
-        bool ParseMClass(const std::string& line, std::vector<std::string>& outParams) {
-            outParams.clear();
+        void SplitParams(std::string_view args, std::vector<std::string>& outParams) {
+            std::string_view remaining = args;
+            while (!remaining.empty()) {
+                size_t comma_pos = remaining.find(',');
+                std::string_view param = (comma_pos == std::string_view::npos)
+                    ? remaining
+                    : remaining.substr(0, comma_pos);
 
-            // 匹配 MCLASS( ... ); 允许前后空格，括号内任意字符
-            if (auto match = ctre::match<R"(^\s*MCLASS\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)">(line)) {
-                std::string_view args = match.get<1>();
-
-                // 按逗号分割参数
-                std::string_view remaining = args;
-                while (!remaining.empty()) {
-                    // 查找逗号位置
-                    size_t comma_pos = remaining.find(',');
-                    std::string_view param = (comma_pos == std::string_view::npos)
-                        ? remaining
-                        : remaining.substr(0, comma_pos);
-
-                    // 去除首尾空白
-                    // 去除前导空白
-                    size_t start = param.find_first_not_of(" \t");
-                    if (start == std::string_view::npos) {
-                        // 全是空白，跳过这个参数
-                        remaining = (comma_pos == std::string_view::npos)
-                            ? std::string_view()
-                            : remaining.substr(comma_pos + 1);
-                        continue;
-                    }
-
-                    // 去除尾部空白
-                    size_t end = param.find_last_not_of(" \t");
-                    param = param.substr(start, end - start + 1);
-
-                    if (!param.empty()) {
-                        outParams.emplace_back(param.data(), param.size());
-                    }
-
-                    // 移动到下一个参数
+                // 去除前导空白
+                size_t start = param.find_first_not_of(" \t");
+                if (start == std::string_view::npos) {
                     remaining = (comma_pos == std::string_view::npos)
                         ? std::string_view()
                         : remaining.substr(comma_pos + 1);
+                    continue;
                 }
+                // 去除尾部空白
+                size_t end = param.find_last_not_of(" \t");
+                param = param.substr(start, end - start + 1);
+
+                if (!param.empty()) {
+                    std::string paramString = std::string(param);
+                    outParams.push_back(paramString);
+                }
+
+                // 移动到下一个参数
+                remaining = (comma_pos == std::string_view::npos)
+                    ? std::string_view()
+                    : remaining.substr(comma_pos + 1);
+            }
+        }
+
+        // 检测 MCLASS(...); 并提取括号内的参数
+        bool ParseMClass(const std::string& line, std::vector<std::string>& outParams) {
+
+            // 匹配 MCLASS( ... );
+            if (auto match = ctre::match<R"(^\s*MCLASS\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)">(line)) {
+                std::string_view args = match.get<1>();
+                SplitParams(args, outParams);
                 return true;
             }
             return false;
@@ -58,9 +56,17 @@ namespace MHT {
         }
 
         // 检测固定字符串 GENERATE_BODY();
-        bool HasGenerateBody(const std::string& line) {
-            return ctre::match<R"(^\s*GENERATE_BODY\s*\(\s*\)\s*;?\s*$)">(line);
+        bool ParseGenerateBody(const std::string& line, std::vector<std::string>& outParams) {
+
+            // 匹配 GENERATE_BODY( ... );
+            if (auto match = ctre::match<R"(^\s*GENERATE_BODY\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)">(line)) {
+                std::string_view args = match.get<1>();
+                SplitParams(args, outParams);
+                return true;
+            }
+            return false;
         }
+
 
         // 获取到类名 class a or class XXX_API a
         std::string ExtractClassName(const std::string& line) {
@@ -72,14 +78,16 @@ namespace MHT {
     }
 
     namespace Pipeline {
-        struct MagicClassInfo {
-            std::vector<std::string> ClassType; // 当前类的期望类型 比如需要序列化与反射
+        struct LocalMagicClassParamsInfo {
+            std::vector<std::string> mclassParams = {};
+            std::vector<std::string> mgeneratebodyParams = {};
             std::string currentClassName;       // 当前正在处理的类名
             size_t currentClassLineNum = 0;     // 当前正在处理的类所在行数
 
             void clear() {
-                ClassType = std::vector<std::string>();
                 currentClassName.clear();
+                mclassParams.clear();
+                mgeneratebodyParams.clear();
             }
         };
 
@@ -93,15 +101,14 @@ namespace MHT {
                 auto& EngineHeader = magicEngineHeaders[i];
 
                 bool NeedtoFindGenerator = false; // 默认不需要找
-                MagicClassInfo Info;
+                LocalMagicClassParamsInfo Info;
 
                 for (size_t y = 0; y < EngineHeader.lines.size(); y++)
                 {
                     std::string& line = EngineHeader.lines[y];
 
-                    std::vector<std::string> mclassParams = {};
-                    if (ParseMClass(line, mclassParams)) {
-                        if (mclassParams.size() <= 0) {
+                    if (ParseMClass(line, Info.mclassParams)) {
+                        if (Info.mclassParams.size() <= 0) {
                             TOOL::Log::Error("Cannot determine the generation type without filling in the corresponding MCLASS parameter:"
                                                                         + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
                             return false;
@@ -122,7 +129,6 @@ namespace MHT {
                             return false;
                         }
 
-                        Info.ClassType = std::move(mclassParams);
                         Info.currentClassName = ExtractClassName(next_line);
                         Info.currentClassLineNum = y; // 记录类宏定义所在行数
 
@@ -130,11 +136,18 @@ namespace MHT {
                     }
 
                     if (NeedtoFindGenerator) {
-                        if (HasGenerateBody(line)) {
+                        if (ParseGenerateBody(line, Info.mgeneratebodyParams)) {
+                            if (Info.mgeneratebodyParams.size() <= 0) {
+                                TOOL::Log::Error("If the corresponding GenerateBody parameter is not filled in, the type cannot be generated.:"
+                                    + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                                return false;
+                            }
                             NeedtoFindGenerator = false; // 找到 GENERATE_BODY 了，重置状态
 
-                            magicEngineClasss.push_back({ std::move(Info.ClassType),EngineHeader.headerName,EngineHeader.moudelName,
-                                                                            Info.currentClassName,Info.currentClassLineNum });
+
+                            magicEngineClasss.push_back({ std::move(Info.mclassParams),std::move(Info.mgeneratebodyParams),
+                                                            EngineHeader.headerName,EngineHeader.moudelName,
+                                                            Info.currentClassName,Info.currentClassLineNum });
                             Info.clear();
                         }
                     }

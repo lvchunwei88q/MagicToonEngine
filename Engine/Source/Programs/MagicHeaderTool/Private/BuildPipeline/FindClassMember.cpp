@@ -156,23 +156,23 @@ namespace MHT {
 	}
 
 	namespace Pipeline {
-		struct ClassMemberInfo {
+		struct LocalClassMemberInfo {
 			std::vector<MemberVariable> InHeaderMemberVariables;
 			std::string headerName;
 
-			ClassMemberInfo(std::vector<MemberVariable>&& InHeaderMemberVariables, std::string headerName)
+			LocalClassMemberInfo(std::vector<MemberVariable>&& InHeaderMemberVariables, std::string headerName)
 				: InHeaderMemberVariables(InHeaderMemberVariables), headerName(headerName){}
 		};
 
-		struct MagicClassInfo {
+		struct LocalMagicClassInfo {
 			std::vector<MagicEngineClass> MagicClasss;
 			std::string headerName;
 
-			MagicClassInfo(std::vector<MagicEngineClass>&& MagicClasss, std::string headerName)
+			LocalMagicClassInfo(std::vector<MagicEngineClass>&& MagicClasss, std::string headerName)
 				: MagicClasss(MagicClasss), headerName(headerName) {
 			}
 
-			MagicClassInfo(){}
+			LocalMagicClassInfo(){}
 		};
 
 		bool FindClassMember()
@@ -182,8 +182,8 @@ namespace MHT {
 			const auto& MagicEngineHeaders = MagicBuildData::Get().GetRefMagicEngineHeaders();
 			// Generate Data
 			std::vector<MagicEngineHeader> MagicClassHeaders;		// 所有类的所在文件
-			std::vector<ClassMemberInfo> MagicClassMemberVariables;	// 存储所有类的成员
-			std::vector<MagicClassInfo> MagicOrderClasss;			// 按照顺序存放
+			std::vector<LocalClassMemberInfo> MagicClassMemberVariables;	// 存储所有类的成员
+			std::vector<LocalMagicClassInfo> MagicOrderClasss;			// 按照顺序存放
 
 			for (size_t i = 0; i < magicEngineClasss.size(); i++)
 			{
@@ -232,7 +232,7 @@ namespace MHT {
 				{
 					auto& headerName = headerNames[i];
 
-					MagicClassInfo Info;
+					LocalMagicClassInfo Info;
 					Info.headerName = headerName;
 					for (size_t x = 0; x < magicEngineClasss.size(); x++)
 					{
