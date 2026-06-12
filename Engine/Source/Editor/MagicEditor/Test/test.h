@@ -20,7 +20,7 @@ private:
 MCLASS(MSERIALIZATION);
 class CLASS_B : public Core::Object
 {
-	GENERATE_BODY(CLASS_B);
+	GENERATE_BODY(CLASS_B, ENGINE, "TEST");
 
 public:
 
@@ -34,7 +34,7 @@ public:
 MCLASS(MSERIALIZATION);
 class XXX_API CLASS_X : public Core::Object
 {
-	GENERATE_BODY(CLASS_X);
+	GENERATE_BODY(CLASS_X, ENGINE, "TEST");
 public:
 
 	MMEMBER();

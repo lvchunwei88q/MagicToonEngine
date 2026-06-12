@@ -47,6 +47,7 @@ namespace Core {
 			return ++counter;
 		}
 
+	protected:
 		uint64_t	instance_id;		// The id of each instance
 		size_t		class_has;			// Which area will this class belong to?
 		ObjectType	type;				// Who does he belong to?

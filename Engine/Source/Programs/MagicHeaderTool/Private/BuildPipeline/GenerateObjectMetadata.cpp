@@ -16,6 +16,11 @@ namespace MHT {
             Sort index = Sort::InBody;
         };
 
+        struct LocalValidateParameter {
+            std::string Parameter;
+            bool consistent = false;
+        };
+
         std::string GenerateEmptyMacros(const std::vector<std::string>& classNames) {
             std::ostringstream code;
 
@@ -45,6 +50,15 @@ namespace MHT {
             // use macros generate class function
             code << "    GENERATE_SERIALIZE_##CLASS_NAME()\n";
             code << "    GENERATE_REFLECTION_##CLASS_NAME()\n";
+
+            // Set constructor parameters
+            code << "    ##CLASS_NAME() : Core::Object() {                          \n";
+            code << "       this->type = ObjectType::##OBJECT_TYPE;                 \n";
+            code << "       this->class_has = GENERATE_OBJECT_TAG_##CLASS_NAME;     \n";
+            code << "    }                                                          \n";
+            code << "                                                               \n";
+            code << "    ~##CLASS_NAME() {                                          \n";
+            code << "    }                                                          \n";
             return code.str();
         }
 
@@ -61,6 +75,19 @@ namespace MHT {
             for (const auto& [className, classId] : classIdMap) {
                 // 生成 GET_CLASS_ID_XXX 宏
                 code << "#define GET_CLASS_ID_" << className << " " << classId << "ULL\n";
+            }
+
+            return code.str();
+        }
+
+        std::string GenerateObjectTagSpecificMacros(
+            const std::map<std::string, size_t>& ObjectTagMap
+        ) {
+            std::ostringstream code;
+
+            for (const auto& [className, Tag] : ObjectTagMap) {
+                // 生成 GENERATE_OBJECT_TAG_XXX 宏
+                code << "#define GENERATE_OBJECT_TAG_" << className << " " << Tag << "\n";
             }
 
             return code.str();
@@ -166,7 +193,7 @@ namespace MHT {
         }
 
         bool ValidateParameters(
-            const std::vector<std::string>& a,
+            const std::vector<LocalValidateParameter>& a,
             const std::vector<std::string>& b
         ) {
             // 检查长度是否一致
@@ -186,10 +213,16 @@ namespace MHT {
 
             // 检查每个参数是否一致
             for (size_t i = 0; i < a.size(); ++i) {
-                if (a[i] != b[i]) {
-                    TOOL::Log::Error("Parameter mismatch at index " + std::to_string(i) +
-                        ": expected \"" + b[i] + "\", but got \"" + a[i] + "\"");
-                    return false;
+                LocalValidateParameter Parameter = a[i];
+                if (Parameter.consistent) {
+                    if (Parameter.Parameter != b[i]) {
+                        TOOL::Log::Error("Parameter mismatch at index " + std::to_string(i) +
+                            ": expected \"" + b[i] + "\", but got \"" + Parameter.Parameter + "\"");
+                        return false;
+                    }
+                }
+                else {
+                    // 没有绝对比配那么只要有这个参数就可以
                 }
             }
 
@@ -251,15 +284,18 @@ namespace MHT {
                 std::vector<std::string> CurrentAreaAllClass;
                 LoaclGenerateOptionalInformationMap OptionalMap;
                 std::map<std::string, size_t> GenerateInformationMap_GetClassId;
+                std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
                 // 校验参数是否正确
                 for (size_t y = 0; y < MagicEngineClasss.size(); y++) {
                     auto& MagicEngineClass = MagicEngineClasss[y];
                     if (Area == MagicEngineClass.headerName) {
-                        std::vector<std::string> TargetParameter = {
-                            MagicEngineClass.className      // 第一个参数是输入class的Name
+                        std::vector<LocalValidateParameter> TargetParameter = {
+                            {MagicEngineClass.className,true},      // 第一个参数是输入class的Name
+                            {"ObjectType",false},                   // 第二个参数是输入Object的属于谁
+                            {"ObjectTag",false},                   // 第三个参数是输入Object的标志
                             // more ...
                         };
-                        if (!ValidateParameters(MagicEngineClass.GenerateBody, TargetParameter)) // 参数校验
+                        if (!ValidateParameters(TargetParameter, MagicEngineClass.GenerateBody)) // 参数校验
                             return false;
 
                         // 记录当前文件的所有使用MHT的Class
@@ -277,6 +313,7 @@ namespace MHT {
                             }
                         }
                         GenerateInformationMap_GetClassId[MagicEngineClass.className] = GlobalAutoincrementedValue();
+                        GenerateInformationMap_ObjectTag[MagicEngineClass.className] = std::hash<std::string>{}(MagicEngineClass.GenerateBody[2]); // 使用第三个参数
                     }
                 }
 
@@ -285,6 +322,7 @@ namespace MHT {
                 std::string src_EmptyMacros               = GenerateEmptyMacros(CurrentAreaAllClass);
                 std::string src_ClassBodyFunction         = GenerateClassBodyFunction();
                 std::string src_ClassGetClassIdMacros     = GenerateClassIdSpecificMacros(GenerateInformationMap_GetClassId);
+                std::string src_ObjectTagMacros           = GenerateObjectTagSpecificMacros(GenerateInformationMap_ObjectTag);
                 // Optional
                 std::string src_ClassSerializeMacros      = GenerateClassSerializationMacros(OptionalMap.GenerateInformationMap_Serialize);
 
@@ -292,6 +330,7 @@ namespace MHT {
                 Sources.push_back({ src_EmptyMacros ,               false });
                 Sources.push_back({ src_ClassBodyFunction ,         true  });
                 Sources.push_back({ src_ClassGetClassIdMacros ,     false });
+                Sources.push_back({ src_ObjectTagMacros ,           false });
                 Sources.push_back({ src_ClassSerializeMacros ,      false });
                 MetaDatas.emplace_back().SetSources(Sources, Area);
             }
@@ -321,7 +360,7 @@ namespace MHT {
                     }
                 };
 
-                std::string Source_GENERATE_BODY = ConvertFunctionToMacro(Sources, "GENERATE_BODY", "CLASS_NAME");
+                std::string Source_GENERATE_BODY = ConvertFunctionToMacro(Sources, "GENERATE_BODY", "CLASS_NAME,OBJECT_TYPE,OBJECT_TAG");
                 std::string Source;
 
                 AssembleMetadata(Source, LocalSourcesIndex::Sort::BeforeBody);
