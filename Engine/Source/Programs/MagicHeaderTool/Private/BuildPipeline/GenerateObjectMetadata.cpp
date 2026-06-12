@@ -5,48 +5,54 @@
 
 namespace MHT {
 	namespace {
-        /**
-         * 生成序列化函数
-         */
-        std::string GenerateClassBodyFunction() {
-            std::ostringstream code;
-            code << "    template<class Archive>\n";
-            code << "    void serialize(Archive& archive) {\n";
-            code << "        GENERATE_SERIALIZE_##CLASS_NAME(archive) \n";
-            code << "    }\n";
+        struct LocalSourcesIndex {
+            enum class Sort : uint8_t {
+                BeforeBody,
+                InBody,
+                AfterBody
+            };
 
-            code << "    virtual uint64_t GetClassId() const {\n";
-            code << "        \n";
-            code << "        return GET_CLASS_ID_##CLASS_NAME;\n";
-            code << "    }\n";
-            return code.str();
-        }
+            std::string Source;
+            Sort index = Sort::InBody;
+        };
 
-        std::string GenerateClassSpecificMacros(
-            const std::map<std::string, std::vector<MemberVariable>>& classParamsMap
-        ) {
+        std::string GenerateEmptyMacros(const std::vector<std::string>& classNames) {
             std::ostringstream code;
 
-            for (const auto& [className, params] : classParamsMap) {
-                // 生成 GENERATE_SERIALIZE_XXX 宏
-                code << "#define GENERATE_SERIALIZE_" << className << "(archive) archive(";
-                for (size_t i = 0; i < params.size(); ++i) {
-                    code << params[i].name;
-                    if (i < params.size() - 1) {
-                        code << ", ";
-                    }
-                }
-                code << ");\n";
+            for (const auto& className : classNames) {
+                // Generate GENERATE_SERIALIZE_XXX() NOT
+                code << "#define GENERATE_SERIALIZE_" << className << "() \\\n";
+                code << "\n";
+
+                // Generate GENERATE_REFLECTION_XXX() NOT
+                code << "#define GENERATE_REFLECTION_" << className << "() \\\n";
+                code << "\n";
             }
 
             return code.str();
         }
 
-         /**
-          * 生成 GetClassId 函数
-          * @param classIdMap 类名和类ID的映射表
-          * @return 宏
-          */
+        /**
+         * 生成序列化函数
+         */
+        std::string GenerateClassBodyFunction() {
+            std::ostringstream code;
+            code << "    virtual uint64_t GetClassId() const {\n";
+            code << "        \n";
+            code << "        return GET_CLASS_ID_##CLASS_NAME;\n";
+            code << "    }\n";
+
+            // use macros generate class function
+            code << "    GENERATE_SERIALIZE_##CLASS_NAME()\n";
+            code << "    GENERATE_REFLECTION_##CLASS_NAME()\n";
+            return code.str();
+        }
+
+        /**
+         * 生成 GetClassId 函数
+         * @param classIdMap 类名和类ID的映射表
+         * @return 宏
+        */
         std::string GenerateClassIdSpecificMacros(
             const std::map<std::string, size_t>& classIdMap
         ) {
@@ -55,6 +61,36 @@ namespace MHT {
             for (const auto& [className, classId] : classIdMap) {
                 // 生成 GET_CLASS_ID_XXX 宏
                 code << "#define GET_CLASS_ID_" << className << " " << classId << "ULL\n";
+            }
+
+            return code.str();
+        }
+
+        std::string GenerateClassSerializationMacros(
+            const std::map<std::string, std::vector<MemberVariable>>& classParamsMap
+        ) {
+            std::ostringstream code;
+
+            for (const auto& [className, params] : classParamsMap) {
+                // 生成 GENERATE_SERIALIZE_XXX 宏
+                code << "#ifdef GENERATE_SERIALIZE_" << className << "\n";
+                code << "#undef GENERATE_SERIALIZE_" << className << "\n";
+                code << "#endif\n\n";
+
+                code << "#define GENERATE_SERIALIZE_" << className << "() \\\n";
+
+                code << "    template<class Archive>                        \\\n";
+                code << "    void serialize(Archive& archive) {             \\\n";
+                code << "        archive(";
+                for (size_t i = 0; i < params.size(); ++i) {
+                    code << params[i].name;
+                    if (i < params.size() - 1) {
+                        code << ", ";
+                    }
+                }
+                code << ");                                                 \\\n";
+                code << "    }                                              \\\n";
+                code << "\n";
             }
 
             return code.str();
@@ -94,7 +130,7 @@ namespace MHT {
             return result.str();
         }
 
-        std::string ConvertFunctionToMacro(const std::vector<std::string>& funcStrings, const std::string& macroName = "GENERATE_BODY", const std::string& macroSignature = "...") {
+        std::string ConvertFunctionToMacro(const std::vector<LocalSourcesIndex>& funcStrings, const std::string& macroName = "GENERATE_BODY", const std::string& macroSignature = "...") {
             std::ostringstream result;
             result << "#define " << macroName << "(" << macroSignature << ") \\\n";
             result << "public: " << " \\\n";                // 这里我们默认使用公开区域设置
@@ -102,7 +138,10 @@ namespace MHT {
             bool firstLine = true;
 
             for (const auto& funcString : funcStrings) {
-                std::stringstream ss(funcString);
+                if (funcString.index != LocalSourcesIndex::Sort::InBody)
+                    continue;   // is no InBody continue
+
+                std::stringstream ss(funcString.Source);
                 std::string line;
 
                 while (std::getline(ss, line)) {
@@ -188,6 +227,11 @@ namespace MHT {
             void SetMetadata(const std::string& Metadata) { this->Metadata = Metadata; }
         };
 
+        struct LoaclGenerateOptionalInformationMap {
+            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Serialize;
+            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Reflection;
+        };
+
 		bool GenerateObjectMetadata() {
             const auto& MagicEngineClasss =     MagicBuildData::Get().GetRefMagicEngineClasss();
             auto& MagicObjectMetadatas =        MagicBuildData::Get().GetRefMagicObjectMetadatas();
@@ -204,7 +248,8 @@ namespace MHT {
             // 为每个文件生成对应的生成信息 之后生成元数据
             for (const auto& Area : AllArea) 
             {
-                std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Serialize;
+                std::vector<std::string> CurrentAreaAllClass;
+                LoaclGenerateOptionalInformationMap OptionalMap;
                 std::map<std::string, size_t> GenerateInformationMap_GetClassId;
                 // 校验参数是否正确
                 for (size_t y = 0; y < MagicEngineClasss.size(); y++) {
@@ -212,27 +257,40 @@ namespace MHT {
                     if (Area == MagicEngineClass.headerName) {
                         std::vector<std::string> TargetParameter = {
                             MagicEngineClass.className      // 第一个参数是输入class的Name
+                            // more ...
                         };
                         if (!ValidateParameters(MagicEngineClass.GenerateBody, TargetParameter)) // 参数校验
                             return false;
-                    }
-                }
 
-                // 填充Map
-                for (size_t y = 0; y < MagicEngineClasss.size(); y++)
-                {
-                    auto& MagicEngineClass = MagicEngineClasss[y];
-                    if (Area == MagicEngineClass.headerName) {
-                        GenerateInformationMap_Serialize[MagicEngineClass.className] = MagicEngineClass.members;
+                        // 记录当前文件的所有使用MHT的Class
+                        CurrentAreaAllClass.push_back(MagicEngineClass.className);
+
+                        // 填充Map
+                        for (size_t i = 0; i < MagicEngineClass.ClassType.size(); i++)
+                        {
+                            auto& ClassType = MagicEngineClass.ClassType[i];
+                            if (ClassType == "MSERIALIZATION") {
+                                OptionalMap.GenerateInformationMap_Serialize[MagicEngineClass.className] = MagicEngineClass.members;
+                            }
+                            else if (ClassType == "MREFLECTION") {
+                                OptionalMap.GenerateInformationMap_Reflection[MagicEngineClass.className] = MagicEngineClass.members;
+                            }
+                        }
                         GenerateInformationMap_GetClassId[MagicEngineClass.className] = GlobalAutoincrementedValue();
                     }
                 }
+
                 // 生成元数据
                 std::vector<LocalMetadataSource> Sources;
-                std::string src_Serialize                 = GenerateClassBodyFunction();
+                std::string src_EmptyMacros               = GenerateEmptyMacros(CurrentAreaAllClass);
+                std::string src_ClassBodyFunction         = GenerateClassBodyFunction();
                 std::string src_ClassGetClassIdMacros     = GenerateClassIdSpecificMacros(GenerateInformationMap_GetClassId);
-                std::string src_ClassSerializeMacros      = GenerateClassSpecificMacros(GenerateInformationMap_Serialize);
-                Sources.push_back({ src_Serialize ,                 true  });
+                // Optional
+                std::string src_ClassSerializeMacros      = GenerateClassSerializationMacros(OptionalMap.GenerateInformationMap_Serialize);
+
+                // 构造原始元数据
+                Sources.push_back({ src_EmptyMacros ,               false });
+                Sources.push_back({ src_ClassBodyFunction ,         true  });
                 Sources.push_back({ src_ClassGetClassIdMacros ,     false });
                 Sources.push_back({ src_ClassSerializeMacros ,      false });
                 MetaDatas.emplace_back().SetSources(Sources, Area);
@@ -242,24 +300,34 @@ namespace MHT {
             for (size_t i = 0; i < MetaDatas.size(); i++)
             {
                 auto& MetaData = MetaDatas[i];
-                std::vector<std::string> NeedMacroSources;
-                std::vector<std::string> NoNeedMacroSources;
+                std::vector<LocalSourcesIndex> Sources;
+                bool AfterBody = false; // 在第一个ClassBodyMacro出现之后的Source我们认为他就是在ClassBodyMacro之后
                 for (size_t y = 0; y < MetaData.Sources.size(); y++)
                 {
                     auto& Source = MetaData.Sources[y];
-                    if (Source.NeedMacro) {
-                        NeedMacroSources.push_back(Source.Source);
-                    }
-                    else {
-                        NoNeedMacroSources.push_back(Source.Source);
-                    }
+                    if (Source.NeedMacro) AfterBody = true;
+                    Sources.push_back({ Source.Source, Source.NeedMacro ? LocalSourcesIndex::Sort::InBody :
+                                        AfterBody ? LocalSourcesIndex::Sort::AfterBody : LocalSourcesIndex::Sort::BeforeBody });
                 }
-                std::string Source = ConvertFunctionToMacro(NeedMacroSources,"GENERATE_BODY","CLASS_NAME");
-                for (size_t y = 0; y < NoNeedMacroSources.size(); y++)
-                {
-                    auto& SourceTemp = NoNeedMacroSources[y];
-                    Source = MergeCode(Source, SourceTemp);
-                }
+
+                auto AssembleMetadata = [&Sources](std::string& target, LocalSourcesIndex::Sort index) {
+                    for (size_t i = 0; i < Sources.size(); i++)
+                    {
+                        auto& SourceTemp = Sources[i];
+
+                        if (SourceTemp.index == index) {
+                            target = MergeCode(target, SourceTemp.Source);
+                        }
+                    }
+                };
+
+                std::string Source_GENERATE_BODY = ConvertFunctionToMacro(Sources, "GENERATE_BODY", "CLASS_NAME");
+                std::string Source;
+
+                AssembleMetadata(Source, LocalSourcesIndex::Sort::BeforeBody);
+                Source = MergeCode(Source, Source_GENERATE_BODY);
+                AssembleMetadata(Source, LocalSourcesIndex::Sort::AfterBody);
+                
                 MetaData.SetMetadata(Source);
             }
 

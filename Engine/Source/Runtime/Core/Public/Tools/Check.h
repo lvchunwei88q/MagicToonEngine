@@ -33,7 +33,7 @@ inline To* SafeCast(From* ptr) {
     return nullptr;
 }
 
-// TODO 完善
+// TODO 完善检测
 #define DEFINE_MEMBER_CHECKER_BEGIN(CheckerName)      \
     template<typename T>                              \
     concept Has##CheckerName = 

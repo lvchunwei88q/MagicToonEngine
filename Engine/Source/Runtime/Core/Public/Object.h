@@ -9,6 +9,11 @@ enum {
 	MSERIALIZATION,
 };
 
+enum class ObjectType : uint8_t {
+	ENGINE,
+	PROJECT
+};
+
 #define MMEMBER(...)				// 你要序列化的成员
 #define MCLASS(...)					// 你要序列化的类，必须放在类定义的开头
 #define GENERATE_BODY()				// 你要序列化的类的成员函数实现，必须放在类定义的结尾
@@ -42,7 +47,9 @@ namespace Core {
 			return ++counter;
 		}
 
-		uint64_t instance_id;
+		uint64_t	instance_id;		// The id of each instance
+		size_t		class_has;			// Which area will this class belong to?
+		ObjectType	type;				// Who does he belong to?
 	};
 
 	class CORE_API IObjectSystem {

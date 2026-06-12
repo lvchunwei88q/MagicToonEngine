@@ -4,6 +4,11 @@
 
 #include "../Test/test.h" // 测试用文件
 
+void TestAdd() {
+    CLASS_B b;
+    b.x++;
+}
+
 
 int main(int argc, char* argv[])// exe -p path
 {
