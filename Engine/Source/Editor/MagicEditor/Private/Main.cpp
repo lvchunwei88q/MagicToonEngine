@@ -1,6 +1,11 @@
+#include "Common.h"
 #include <windows.h>
 #include "Main.h"
 #include <Editor.h>
+
+#if MAGICEDITOR_MODE
+#include <shellapi.h>
+#endif
 
 #include "../Test/test.h" // 测试用文件
 
@@ -9,14 +14,37 @@ void TestAdd() {
     b.x++;
 }
 
+#if MAGICEDITOR_MODE
+static int argc = 0;
+static LPWSTR* argv;
 
-int main(int argc, char* argv[])// exe -p path
-{
+// 初始化命令行参数
+bool InitCommandLine() {
+    argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    return true;
+}
+
+void CleanupCommandLine() {
+    LocalFree(argv);
+}
+
+// GUI 入口
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+    LPSTR lpCmdLine, int nCmdShow) {
+    if (!InitCommandLine()) {
+        return 1;
+    }
 
     std::cout << "Engine Version: " << Core::Core::GetVersion() << std::endl;
-    std::cout << "Engine Init ... " << std::endl;
+    std::cout << "Engine Init (GUI Mode) ... " << std::endl;
 
-    if (!EnginePreInit(argc, argv)) { return 0; }
+#else // MAGICEDITOR_CMD
+int wmain(int argc, wchar_t* argv[]) {
+    std::cout << "Engine Version: " << Core::Core::GetVersion() << std::endl;
+    std::cout << "Engine Init (CMD Mode) ... " << std::endl;
+#endif
+
+    if (!EngineCheck(argc, argv)) { return 0; }
 
     Core::SubsystemError error = Core::SubsystemControl::Init();
     if (!error.error) {
@@ -37,5 +65,10 @@ int main(int argc, char* argv[])// exe -p path
 	Editor::Editor::Get().Run(); // Run Engine Editor
 
 	Core::SubsystemControl::Uninstall();
+
+#if MAGICEDITOR_MODE
+    CleanupCommandLine();
+#endif
+
 	return 0;
 }

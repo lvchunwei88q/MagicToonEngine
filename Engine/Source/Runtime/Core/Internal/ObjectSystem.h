@@ -22,5 +22,8 @@ namespace Core {
 		std::vector<Object*> Objects;
 
 		mutable std::mutex m_mutex;
+
+		std::wstring EngineSerializedDataDir;
+		std::wstring ProjectSerializedDataDir;
 	};
 }

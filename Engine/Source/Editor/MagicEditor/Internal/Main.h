@@ -3,4 +3,4 @@
 #include <Subsystem/Subsystem.h>
 #include <iostream>
 
-bool EnginePreInit(int argc, char* argv[]);
+bool EngineCheck(int argc, wchar_t* argv[]);

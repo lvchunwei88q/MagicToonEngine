@@ -53,9 +53,9 @@ namespace TOOL {
 	class Log {
 	public:
 		static void Info(const std::string& msg) {
-	#if defined(_DEBUG) || defined(DETAILED)
+#ifdef _DEBUG
 			std::cout << "[" + std::to_string(CF::MHT_CurrentJob) + "/" + std::to_string(CF::MHT_JobNum) + "][INFO] " << msg << "\n";
-	#endif
+#endif
 		}
 
 		static void Warning(const std::string& msg) {

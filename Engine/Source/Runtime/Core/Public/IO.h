@@ -15,11 +15,15 @@
 
 DISABLE_DLL_WARNINGS_PUSH;
 
+/*
+* 注意这里的bool不代表操作成功或失败，具体请参考STL源码
+*/
+
 namespace IO {
-	// 读取整个文件（文本模式，返回字符串）
+	// 读取整个文件
 	CORE_API std::string ReadAllText(const std::wstring& path);
 
-	// 读取整个文件（二进制模式，返回字节向量）
+	// 读取整个文件
 	CORE_API std::vector<char> ReadAllBytes(const std::wstring& path);
 
 	// 写入字符串到文件（覆盖）

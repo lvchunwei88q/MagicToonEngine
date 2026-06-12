@@ -27,16 +27,17 @@ OperationType Operation(const std::string& o) {
     }
 }
 
-bool EnginePreInit(int argc, char* argv[]) {
-    std::string Argv = argv[1] ? argv[1] : "NOT";
+bool EngineCheck(int argc, wchar_t* argv[]) {
+    std::wstring wArgv = argv[1] ? argv[1] : L"NOT";
+    std::string Argv = IO::ToNarrowString(wArgv);
     OperationType type = Operation(Argv); // operation
     switch (type)
     {
     case OperationType::SpecifyProJect:
     {
         EngineProject::ProJectConfig config;
-        config.path = argv[2];
-        config.name = argv[3];
+        config.path = IO::ToNarrowString(argv[2]);
+        config.name = IO::ToNarrowString(argv[3]);
         EngineProject::GetProjectControllerInterface()->SpecifyProJect(config);
     }
     break;
