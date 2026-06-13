@@ -60,7 +60,12 @@ namespace LOG {
             << message;
         std::string logLine = oss.str();
 
+#if _DEBUG
         WriteToDebugOutput(logLine);
+#else
+        // 在发布模式仅仅打印 message
+        WriteToDebugOutput(message);
+#endif
         {
             std::lock_guard<std::mutex> lock(Mutex_);
             // 加入缓冲区
