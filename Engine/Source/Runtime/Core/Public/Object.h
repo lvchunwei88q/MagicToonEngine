@@ -1,6 +1,8 @@
 #pragma once
 #include "Common/Core_API.h"
+#include <Common/Compiler.h>
 #include <string>
+#include <vector>
 #include "Tools/Check.h"
 
 // Enumerates the features you can use
@@ -10,6 +12,7 @@ enum {
 };
 
 enum class ObjectType : uint8_t {
+	Unknown,
 	ENGINE,
 	PROJECT
 };
@@ -23,7 +26,42 @@ DEFINE_MEMBER_CHECKER_BEGIN(Object)
 	DEFINE_MEMBER_CHECKER_ADD(GetInstanceId)
 DEFINE_MEMBER_CHECKER_END(GetNextId)
 
+DISABLE_DLL_WARNINGS_PUSH;
 namespace Core {
+	class IObjectSystem;
+	class Object;
+
+	using ObjectRef = Object*;
+
+	/*
+	* Object Handle in System
+	*/
+	class CORE_API ObjectSystemHandle {
+	public:
+		ObjectSystemHandle() = default;
+		ObjectSystemHandle(size_t index) 
+		: index(index) {}
+
+		const size_t GetIndex() const { return index; }
+
+	private:
+		// this object in objectsystem postion
+		size_t index;
+	};
+
+	// ---------------------------------------------------------------------------------- MSERIALIZATION
+	/*
+	* Object Serialization Descriptor
+	*/
+	struct ObjectSerializationDescriptor {
+		uint8_t* SerializationStart;
+		size_t Lenght;
+	};
+	struct ObjectSerializationData {
+		std::vector<uint8_t> data;
+	};
+	// ---------------------------------------------------------------------------------- MSERIALIZATION END
+
 	/*
 	* The base class for MagicHeaderTool services. Any class that wants to use advanced C features should inherit from this class.
 	* Note that all Objects will be automatically serialized, but they can only be initialized after the SubsystemCore has completed initialization.
@@ -31,8 +69,8 @@ namespace Core {
 	class CORE_API Object
 	{
 	public:
-		virtual ~Object();
-		Object();
+		virtual ~Object() = default;
+		Object() : instance_id(GetNextId()) {};
 
 		virtual uint64_t GetClassId() const = 0;					// Class ID generated using MagicHeaderTool
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
@@ -48,18 +86,34 @@ namespace Core {
 		}
 
 	protected:
-		uint64_t	instance_id;		// The id of each instance
-		size_t		class_has;			// Which area will this class belong to?
-		ObjectType	type;				// Who does he belong to?
+		// We need to use helper functions during initialization after the subclass is constructed or before it's destructed.
+		void ObjectInit();
+		void ObjectUninit();
+
+	protected:
+		uint64_t	instance_id;				// The id of each instance
+		size_t		class_has = -1;				// Which area will this class belong to
+		ObjectSystemHandle Handle = {};			// Object Handle
+		ObjectType	type = ObjectType::Unknown;	// Who does he belong to?
+
+		friend class IObjectSystem;
 	};
 
 	class CORE_API IObjectSystem {
 	public:
-		virtual size_t GetObjectNum() = 0;					// Get Current ObjectNum
-		virtual size_t RegisterObject(Object* ptr) = 0;		// Register This Object For ObjectSystem Return Index
-		virtual void RemoveObject(size_t index) = 0;		// Delete This Object Input this Index 
+		virtual size_t GetObjectNum() = 0;								// Get Current ObjectNum
+		virtual ObjectSystemHandle RegisterObject(Object* ptr) = 0;		// Register This Object For ObjectSystem Return Handle
+		virtual void RemoveObject(ObjectSystemHandle Handle) = 0;		// Delete This Object Input this Handle
+
+		// Functions used by the object class
+	private:
+		// ---------------------------------------------------------------------------------- MSERIALIZATION
+		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) = 0;
+		virtual void SaveObjectSerializationData(ObjectSerializationData Descriptor) = 0;
+		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 	};
 
 	CORE_API IObjectSystem* GetObjectSystem();
 
 }
+DISABLE_DLL_WARNINGS_POP;

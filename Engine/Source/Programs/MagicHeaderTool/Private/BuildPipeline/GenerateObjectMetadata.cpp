@@ -55,9 +55,11 @@ namespace MHT {
             code << "    ##CLASS_NAME() : Core::Object() {                          \n";
             code << "       this->type = ObjectType::##OBJECT_TYPE;                 \n";
             code << "       this->class_has = GENERATE_OBJECT_TAG_##CLASS_NAME;     \n";
+            code << "       this->ObjectInit();                                     \n";
             code << "    }                                                          \n";
             code << "                                                               \n";
             code << "    ~##CLASS_NAME() {                                          \n";
+            code << "       this->ObjectUninit()                                    \n";
             code << "    }                                                          \n";
             return code.str();
         }

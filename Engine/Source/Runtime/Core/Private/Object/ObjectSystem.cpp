@@ -33,15 +33,16 @@ namespace Core {
 		return Objects.size();
 	}
 
-	size_t ObjectSystem::RegisterObject(Object* ptr)
+	ObjectSystemHandle ObjectSystem::RegisterObject(Object* ptr)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
 		Objects.push_back(ptr);
-		return Objects.size() - 1; // return current index
+		return ObjectSystemHandle(Objects.size() - 1); // return current index for Object, use Handle Wrapper
 	}
 
-	void ObjectSystem::RemoveObject(size_t index)
+	void ObjectSystem::RemoveObject(ObjectSystemHandle Handle)
 	{
+		size_t index = Handle.GetIndex();
 		std::lock_guard<std::mutex> lock(m_mutex);
 		if (Objects.empty() || index >= Objects.size()) {
 			return;  // Invalid index
@@ -50,5 +51,15 @@ namespace Core {
 			std::swap(Objects[index], Objects.back());  // Swap to the tail
 		}
 		Objects.pop_back();  // delete tail
+	}
+
+	ObjectSerializationDescriptor ObjectSystem::GetObjectSerializationData(ObjectSystemHandle Handle)
+	{
+		return ObjectSerializationDescriptor();
+	}
+
+	void ObjectSystem::SaveObjectSerializationData(ObjectSerializationData Descriptor)
+	{
+
 	}
 }

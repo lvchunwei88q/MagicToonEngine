@@ -15,11 +15,15 @@ namespace Core {
 		virtual void Uninstall() override;
 
 		virtual size_t GetObjectNum() override;
-		virtual size_t RegisterObject(Object* ptr) override;
-		virtual void RemoveObject(size_t index) override;
+		virtual ObjectSystemHandle RegisterObject(Object* ptr) override;
+		virtual void RemoveObject(ObjectSystemHandle Handle) override;
+		// ---------------------------------------------------------------------------------- MSERIALIZATION
+		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) override;
+		virtual void SaveObjectSerializationData(ObjectSerializationData Descriptor) override;
+		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 	private:
 		// There is absolutely no management of their deletions here.
-		std::vector<Object*> Objects;
+		std::vector<ObjectRef> Objects;
 
 		mutable std::mutex m_mutex;
 

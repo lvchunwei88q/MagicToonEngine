@@ -6,8 +6,24 @@
 
 namespace Core {
 
-	Object::~Object()
-	{
+	void Object::ObjectInit() {
+		try {
+			Handle = GetObjectSystem()->RegisterObject(this); // Register This Object
+
+			std::vector<uint8_t> binaryData = { 1,2,3 };
+
+			std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
+			ss.write(reinterpret_cast<const char*>(binaryData.data()), binaryData.size());
+			ss.seekg(0, std::ios::beg);
+
+			cereal::BinaryInputArchive archive(ss);
+			archive(*this);
+		}
+		catch (const std::exception& e) {
+			ErrorCapture::Capture("Object Constructor: " + std::string(e.what()));
+		}
+	}
+	void Object::ObjectUninit() {
 		try {
 			std::vector<uint8_t> BinaryData;
 			std::ostringstream oss;
@@ -16,23 +32,8 @@ namespace Core {
 
 			const std::string& str = oss.str();
 			BinaryData.assign(str.begin(), str.end());
-		}
-		catch (const std::exception& e) {
-			ErrorCapture::Capture("Object Constructor: " + std::string(e.what()));
-		}
-	}
 
-	Object::Object() : instance_id(GetNextId())
-	{
-		try {
-			std::vector<uint8_t> binaryData = {1,2,3};
-
-			std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
-			ss.write(reinterpret_cast<const char*>(binaryData.data()), binaryData.size());
-			ss.seekg(0, std::ios::beg);
-
-			cereal::BinaryInputArchive archive(ss);
-			archive(*this);
+			GetObjectSystem()->RemoveObject(Handle); // delete this object for objectSystem
 		}
 		catch (const std::exception& e) {
 			ErrorCapture::Capture("Object Constructor: " + std::string(e.what()));
