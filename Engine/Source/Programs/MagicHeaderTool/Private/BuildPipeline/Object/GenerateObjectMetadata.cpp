@@ -139,6 +139,27 @@ namespace Object {
             return code.str();
         }
 
+        std::string GenerateIDECheckMacro(const std::string& macroName = "IN_IDE") {
+            std::ostringstream result;
+
+            result << "#if defined(__INTELLISENSE__)\n";
+            result << "    #define " << macroName << " 1  // Visual Studio IntelliSense\n";
+            result << "// JetBrains ReSharper C++\n";
+            result << "#elif defined(__RESHARPER__) || defined(__JETBRAINS_IDE__)\n";
+            result << "    #define " << macroName << " 1\n";
+            result << "// Clang tools\n";
+            result << "#elif defined(__clang_analyzer__)\n";
+            result << "    #define " << macroName << " 1\n";
+            result << "// Other static analysis tools\n";
+            result << "#elif defined(__cppcheck__) || defined(__clang_tidy__)\n";
+            result << "    #define " << macroName << " 1\n";
+            result << "#else\n";
+            result << "    #define " << macroName << " 0\n";
+            result << "#endif\n\n";
+
+            return result.str();
+        }
+
         std::string GenerateFileWithCode(
             const std::vector<std::string>& codeLines,
             const std::string& generatorName = "MagicHeaderTool",
@@ -175,10 +196,15 @@ namespace Object {
 
         std::string ConvertFunctionToMacro(const std::vector<LocalSourcesIndex>& funcStrings, const std::string& macroName = "GENERATE_BODY", const std::string& macroSignature = "...") {
             std::ostringstream result;
-            result << "#define " << macroName << "(" << macroSignature << ") \\\n";
-            // use Check inheritance relationship macros
-            result << "    CHECK_COMBINE_MEMBER(CLASS_NAME, Object);         \\\n";
-            result << "public: " << " \\\n";                // 这里我们默认使用公开区域设置
+            result << "#define " << macroName << "(" << macroSignature << ")                    \\\n";
+            result << "    [[maybe_unused]] static constexpr bool __check = [] {                \\\n";
+            result << "        if constexpr (IN_IDE) {                                          \\\n";
+            result << "            /* IDE/Compiler analysis mode - perform checks */            \\\n";
+            result << "            CHECK_COMBINE_MEMBER(CLASS_NAME,Object);                     \\\n";
+            result << "        }                                                                \\\n";
+            result << "        return true;                                                     \\\n";
+            result << "    }();                                                                 \\\n";
+            result << "public: " << " \\\n";  // Default to public
 
             bool firstLine = true;
 
@@ -352,6 +378,7 @@ namespace Object {
 
                 // 生成元数据
                 std::vector<LocalMetadataSource> Sources;
+                std::string src_IDECheckMacro             = GenerateIDECheckMacro();
                 std::string src_EmptyMacros               = GenerateEmptyMacros(CurrentAreaAllClass);
                 std::string src_ClassBodyFunction         = GenerateClassBodyFunction();
                 std::string src_ClassGetClassIdMacros     = GenerateClassIdSpecificMacros(GenerateInformationMap_GetClassId);
@@ -362,6 +389,7 @@ namespace Object {
 
                 // 构造原始元数据
                 Sources.push_back({ src_EmptyMacros ,               false });
+                Sources.push_back({ src_IDECheckMacro ,             false });
                 Sources.push_back({ src_ClassBodyFunction ,         true  });
                 Sources.push_back({ src_ClassGetClassIdMacros ,     false });
                 Sources.push_back({ src_ObjectTagMacros ,           false });

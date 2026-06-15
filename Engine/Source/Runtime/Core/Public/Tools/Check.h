@@ -33,7 +33,7 @@ inline To* SafeCast(From* ptr) {
     return nullptr;
 }
 
-// 这里我们使用他检测指定类有没有这些函数(可以用来检测是否继承父类)
+// // Check if it inherits from the parent class
 #define FORBIDDEN_METHOD_CONCEPT(Space,method_name) \
     template<typename T> \
     concept HasForbiddenMethod_##Space_##method_name = requires(T t) { t.method_name(); }
