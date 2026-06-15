@@ -1,12 +1,13 @@
-#include "BuildPipeline.h"
+#include "BuildPipeline/ObjectBuildPipeline.h"
 #include <filesystem>
 #include "Tools/Jobsystem.h"		// Jobsystem
 #include "Tools/Tool.h"				// IO
 
-namespace MHT {
+namespace Object {
 	namespace Pipeline {
 		bool GenerateMetadataFile() {
-			const auto& MagicObjectMetadatas = MagicBuildData::Get().GetRefMagicObjectMetadatas();
+			// TODO 优化多个构建管线文件生成
+			const auto& MagicObjectMetadatas = MagicObjectBuildData::Get().GetRefMagicObjectMetadatas();
 
 			for (size_t i = 0; i < MagicObjectMetadatas.size(); i++)
 			{

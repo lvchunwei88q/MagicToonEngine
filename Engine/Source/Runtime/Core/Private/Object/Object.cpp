@@ -9,6 +9,7 @@ namespace Core {
 	void Object::ObjectInit() {
 		try {
 			Handle = GetObjectSystem()->RegisterObject(this); // Register This Object
+			GetObjectSystem()->GetObjectSerializationData(Handle);	// Get ObjectData
 
 			std::vector<uint8_t> binaryData = { 1,2,3 };
 
@@ -33,6 +34,8 @@ namespace Core {
 			const std::string& str = oss.str();
 			BinaryData.assign(str.begin(), str.end());
 
+			ObjectSerializationData Data = {std::move(BinaryData)};
+			GetObjectSystem()->SaveObjectSerializationData(Data);
 			GetObjectSystem()->RemoveObject(Handle); // delete this object for objectSystem
 		}
 		catch (const std::exception& e) {

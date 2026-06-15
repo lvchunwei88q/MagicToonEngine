@@ -2,7 +2,7 @@
 
 #include "Tools/Tool.h"
 
-#include "BuildPipeline.h"
+#include "BuildPipeline/BuildPipeline.h"
 
 namespace MHT {
 
@@ -22,7 +22,6 @@ namespace MHT {
 		bool Run();
 	private:
 		bool readHeaderFiles(size_t index);
-		bool RunBuildPipeline();
 
 		std::wstring generateInfoFile;
 		std::wstring generateDir;

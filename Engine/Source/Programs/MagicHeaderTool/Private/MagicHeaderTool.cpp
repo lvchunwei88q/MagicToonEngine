@@ -4,9 +4,6 @@
 #include "Tools/Tool.h"
 
 namespace MHT{
-	namespace Pipeline{
-		GenerationState GenerationState_;
-	}
 	namespace {
 		TOOL::Timer timer; // 计时器
 
@@ -56,7 +53,7 @@ namespace MHT{
 		if (TOOL::Exists(generateInfoPath)) {
 			generateInfoFile = generateInfoPath;
 			this->generateDir = generateDir;
-			MagicBuildData::Get().SetGeneratePath(generateDir);
+			MagicBuildData::Get().SetGeneratePath(this->generateDir);
 
 			std::string GenerateInfo = TOOL::ReadAllText(generateInfoFile);
 			std::vector<std::string> headers_lines;
@@ -114,7 +111,7 @@ namespace MHT{
 			if (!readHeaderFiles(i)) {
 				return false;
 			}
-			if (!RunBuildPipeline()) {
+			if (!Pipeline::RunBuildPipeline()) {
 				return false;
 			}
 		}
@@ -144,46 +141,6 @@ namespace MHT{
 		MagicBuildData::Get().SetMagicEngineHeaders(MagicEngineHeaders);
 
 		TOOL::Log::Info("Time taken to read engine file: " + std::to_string(timer.elapsed_ms()) + "ms");
-		return true;
-	}
-
-	bool MagicHeaderTool::RunBuildPipeline()
-	{
-		timer.reset(); // 重置计时器
-
-		if (!Pipeline::FindEngineClass()) {
-			TOOL::Log::Error("An error occurred during the Class-finding phase of the build pipeline");
-			return false;
-		}
-		TOOL::Log::Info("Pipeline construction successfully, In found Class stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
-		if(!Pipeline::NeedGenerate())goto end;
-		timer.reset(); // 重置计时器
-
-		if (!Pipeline::FindClassMember()) {
-			TOOL::Log::Error("An error occurred during the Class Member-finding phase of the build pipeline");
-			return false;
-		}
-		TOOL::Log::Info("Pipeline construction successfully, In found Class Member stage Time: " + std::to_string(timer.elapsed_ms()) + "ms");
-		if (!Pipeline::NeedGenerate())goto end;
-		timer.reset(); // 重置计时器
-
-		if (!Pipeline::GenerateObjectMetadata()) {
-			TOOL::Log::Error("An error occurred during the Object metadata generation phase of building the pipeline");
-			return false;
-		}
-		TOOL::Log::Info("Pipeline construction successfully, In Generate Object Metadata Time: " + std::to_string(timer.elapsed_ms()) + "ms");
-		if (!Pipeline::NeedGenerate())goto end;
-		timer.reset(); // 重置计时器
-
-		if (!Pipeline::GenerateMetadataFile()) {
-			TOOL::Log::Error("An error occurred during the Class Member-finding phase of the build pipeline");
-			return false;
-		}
-		TOOL::Log::Info("Pipeline construction successfully, In Generate metadata file Time: " + std::to_string(timer.elapsed_ms()) + "ms");
-		if (!Pipeline::NeedGenerate())goto end;
-		timer.reset(); // 重置计时器
-
-	end:
 		return true;
 	}
 }

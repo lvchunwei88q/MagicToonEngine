@@ -1,9 +1,9 @@
-#include "BuildPipeline.h"
+#include "BuildPipeline/ObjectBuildPipeline.h"
 #include <map>
 #include <vector>
 #include <unordered_set>
 
-namespace MHT {
+namespace Object {
 	namespace {
         struct LocalSourcesIndex {
             enum class Sort : uint8_t {
@@ -53,13 +53,14 @@ namespace MHT {
 
             // Set constructor parameters
             code << "    ##CLASS_NAME() : Core::Object() {                          \n";
-            code << "       this->type = ObjectType::##OBJECT_TYPE;                 \n";
+            code << "       this->type = Core::ObjectType::##OBJECT_TYPE;           \n";
             code << "       this->class_has = GENERATE_OBJECT_TAG_##CLASS_NAME;     \n";
+            code << "       this->Switch = GENERATE_OBJECT_SWITCH_##CLASS_NAME;     \n";
             code << "       this->ObjectInit();                                     \n";
             code << "    }                                                          \n";
             code << "                                                               \n";
             code << "    ~##CLASS_NAME() {                                          \n";
-            code << "       this->ObjectUninit()                                    \n";
+            code << "       this->ObjectUninit();                                   \n";
             code << "    }                                                          \n";
             return code.str();
         }
@@ -90,6 +91,19 @@ namespace MHT {
             for (const auto& [className, Tag] : ObjectTagMap) {
                 // 生成 GENERATE_OBJECT_TAG_XXX 宏
                 code << "#define GENERATE_OBJECT_TAG_" << className << " " << Tag << "\n";
+            }
+
+            return code.str();
+        }
+
+        std::string GenerateObjectSwitchSpecificMacros(
+            const std::map<std::string, std::string>& ObjectSwitchMap
+        ) {
+            std::ostringstream code;
+
+            for (const auto& [className, Switch] : ObjectSwitchMap) {
+                // 生成 GENERATE_OBJECT_SWITCH_ 宏
+                code << "#define GENERATE_OBJECT_SWITCH_" << className << " " << Switch << "\n";
             }
 
             return code.str();
@@ -231,6 +245,15 @@ namespace MHT {
             return true;
         }
 
+        std::string JoinStrings(const std::vector<std::string>& strings, const std::string& delimiter = " | ") {
+            std::string result;
+            for (const auto& str : strings) {
+                if (!result.empty()) result += delimiter;
+                result += str;
+            }
+            return result;
+        }
+
         std::string MergeCode(const std::string& code1, const std::string& code2) {
             std::ostringstream result;
             result << code1 << "\n" << code2;
@@ -269,7 +292,7 @@ namespace MHT {
 
 		bool GenerateObjectMetadata() {
             const auto& MagicEngineClasss =     MagicBuildData::Get().GetRefMagicEngineClasss();
-            auto& MagicObjectMetadatas =        MagicBuildData::Get().GetRefMagicObjectMetadatas();
+            auto& MagicObjectMetadatas =        MagicObjectBuildData::Get().GetRefMagicObjectMetadatas();
             std::unordered_set<std::string> AllArea;
             std::vector<LocalMetaData> MetaDatas;
 
@@ -287,9 +310,12 @@ namespace MHT {
                 LoaclGenerateOptionalInformationMap OptionalMap;
                 std::map<std::string, size_t> GenerateInformationMap_GetClassId;
                 std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
+                std::map<std::string, std::string> GenerateInformationMap_ObjectSwitch;
                 // 校验参数是否正确
                 for (size_t y = 0; y < MagicEngineClasss.size(); y++) {
                     auto& MagicEngineClass = MagicEngineClasss[y];
+
+                    std::vector<std::string> MagicClassTypeEnum;
                     if (Area == MagicEngineClass.headerName) {
                         std::vector<LocalValidateParameter> TargetParameter = {
                             {MagicEngineClass.className,true},      // 第一个参数是输入class的Name
@@ -302,18 +328,21 @@ namespace MHT {
 
                         // 记录当前文件的所有使用MHT的Class
                         CurrentAreaAllClass.push_back(MagicEngineClass.className);
-
                         // 填充Map
                         for (size_t i = 0; i < MagicEngineClass.ClassType.size(); i++)
                         {
                             auto& ClassType = MagicEngineClass.ClassType[i];
                             if (ClassType == "MSERIALIZATION") {
                                 OptionalMap.GenerateInformationMap_Serialize[MagicEngineClass.className] = MagicEngineClass.members;
+                                MagicClassTypeEnum.push_back("Core::ObjectSwitch::Serialization");
                             }
                             else if (ClassType == "MREFLECTION") {
                                 OptionalMap.GenerateInformationMap_Reflection[MagicEngineClass.className] = MagicEngineClass.members;
+                                MagicClassTypeEnum.push_back("Core::ObjectSwitch::Reflection");
                             }
                         }
+
+                        GenerateInformationMap_ObjectSwitch[MagicEngineClass.className] = JoinStrings(MagicClassTypeEnum);
                         GenerateInformationMap_GetClassId[MagicEngineClass.className] = GlobalAutoincrementedValue();
                         GenerateInformationMap_ObjectTag[MagicEngineClass.className] = std::hash<std::string>{}(MagicEngineClass.GenerateBody[2]); // 使用第三个参数
                     }
@@ -325,6 +354,7 @@ namespace MHT {
                 std::string src_ClassBodyFunction         = GenerateClassBodyFunction();
                 std::string src_ClassGetClassIdMacros     = GenerateClassIdSpecificMacros(GenerateInformationMap_GetClassId);
                 std::string src_ObjectTagMacros           = GenerateObjectTagSpecificMacros(GenerateInformationMap_ObjectTag);
+                std::string src_ObjectSwitchMacros        = GenerateObjectSwitchSpecificMacros(GenerateInformationMap_ObjectSwitch);
                 // Optional
                 std::string src_ClassSerializeMacros      = GenerateClassSerializationMacros(OptionalMap.GenerateInformationMap_Serialize);
 
@@ -333,6 +363,7 @@ namespace MHT {
                 Sources.push_back({ src_ClassBodyFunction ,         true  });
                 Sources.push_back({ src_ClassGetClassIdMacros ,     false });
                 Sources.push_back({ src_ObjectTagMacros ,           false });
+                Sources.push_back({ src_ObjectSwitchMacros ,        false });
                 Sources.push_back({ src_ClassSerializeMacros ,      false });
                 MetaDatas.emplace_back().SetSources(Sources, Area);
             }

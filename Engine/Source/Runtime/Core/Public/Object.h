@@ -4,17 +4,12 @@
 #include <string>
 #include <vector>
 #include "Tools/Check.h"
+#include "Tools/EnumClassFlags.h"
 
 // Enumerates the features you can use
 enum {
 	MREFLECTION,
 	MSERIALIZATION,
-};
-
-enum class ObjectType : uint8_t {
-	Unknown,
-	ENGINE,
-	PROJECT
 };
 
 #define MMEMBER(...)				// 你要序列化的成员
@@ -28,6 +23,19 @@ DEFINE_MEMBER_CHECKER_END(GetNextId)
 
 DISABLE_DLL_WARNINGS_PUSH;
 namespace Core {
+	enum class ObjectSwitch : uint8_t {
+		Unknown			= 0,
+		Reflection		= 1 << 0,
+		Serialization	= 1 << 1
+	};
+	ENUM_CLASS_FLAGS(ObjectSwitch);
+
+	enum class ObjectType : uint8_t {
+		Unknown,
+		ENGINE,
+		PROJECT
+	};
+
 	class IObjectSystem;
 	class Object;
 
@@ -91,12 +99,11 @@ namespace Core {
 		void ObjectUninit();
 
 	protected:
-		uint64_t	instance_id;				// The id of each instance
-		size_t		class_has = -1;				// Which area will this class belong to
-		ObjectSystemHandle Handle = {};			// Object Handle
-		ObjectType	type = ObjectType::Unknown;	// Who does he belong to?
-
-		friend class IObjectSystem;
+		uint64_t	instance_id;						// The id of each instance
+		size_t		class_has = -1;						// Which area will this class belong to
+		ObjectSystemHandle Handle = {};					// Object Handle
+		ObjectType	type = ObjectType::Unknown;			// Who does he belong to
+		ObjectSwitch Switch = ObjectSwitch::Unknown;	// The features you need
 	};
 
 	class CORE_API IObjectSystem {
@@ -107,6 +114,7 @@ namespace Core {
 
 		// Functions used by the object class
 	private:
+		friend class Object;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) = 0;
 		virtual void SaveObjectSerializationData(ObjectSerializationData Descriptor) = 0;
