@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     std::string generateDir = parser.get<std::string>("generate-dir");
 
 	std::wstring generateDirW = TOOL::ToWideString(generateDir);
-    std::wstring generateFilePath = generateDirW + L"\\engine_info\\engine_headers.buildmeta";
+    std::wstring generateFilePath = generateDirW + L"\\" MAGICENGINE_FILE_INFO_PATH "\\engine_headers.buildmeta";
 
     JobSystem::Get().Init();
 

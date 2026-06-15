@@ -4,6 +4,9 @@
 
 #include "BuildPipeline/BuildPipeline.h"
 
+#define MAGICENGINE_FILE_INFO_PATH_W L"engine_generate_info"
+#define MAGICENGINE_FILE_INFO_PATH "engine_generate_info"
+
 namespace MHT {
 
 	struct HeadersData {
@@ -22,6 +25,7 @@ namespace MHT {
 		bool Run();
 	private:
 		bool readHeaderFiles(size_t index);
+		const std::vector<std::wstring> FilterFilesNoNeedGenerated(const std::vector<std::string>& files);
 
 		std::wstring generateInfoFile;
 		std::wstring generateDir;

@@ -67,6 +67,9 @@ namespace TOOL {
 		}
 	};
 
+	// 获取文件修改时间
+	size_t GetFileModificationTime(const std::wstring& filepath);
+
 	// 并行读取文件
 	std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths);
 

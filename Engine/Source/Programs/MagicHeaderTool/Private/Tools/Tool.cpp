@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
+#include <chrono>
 #include "Tools/JobSystem.h"
 
 namespace fs = std::filesystem;
@@ -13,6 +14,21 @@ size_t MHT_CurrentJob = 0;
 }
 
 namespace TOOL {
+    size_t GetFileModificationTime(const std::wstring& filepath)
+    {
+        if (!fs::exists(filepath)) {
+            return 0;
+        }
+
+        auto ftime = fs::last_write_time(filepath);
+        // C++17 方式：转换为 time_t
+        auto sys_time = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+            ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now()
+        );
+
+        return static_cast<size_t>(std::chrono::system_clock::to_time_t(sys_time));
+    }
+
     std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths) {
         std::vector<std::string> contents(filePaths.size());
 
