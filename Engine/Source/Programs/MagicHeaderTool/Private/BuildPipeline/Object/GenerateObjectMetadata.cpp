@@ -176,6 +176,8 @@ namespace Object {
         std::string ConvertFunctionToMacro(const std::vector<LocalSourcesIndex>& funcStrings, const std::string& macroName = "GENERATE_BODY", const std::string& macroSignature = "...") {
             std::ostringstream result;
             result << "#define " << macroName << "(" << macroSignature << ") \\\n";
+            // use Check inheritance relationship macros
+            result << "    CHECK_COMBINE_MEMBER(CLASS_NAME, Object);         \\\n";
             result << "public: " << " \\\n";                // 这里我们默认使用公开区域设置
 
             bool firstLine = true;

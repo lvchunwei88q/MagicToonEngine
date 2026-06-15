@@ -16,10 +16,13 @@ enum {
 #define MCLASS(...)					// 你要序列化的类，必须放在类定义的开头
 #define GENERATE_BODY()				// 你要序列化的类的成员函数实现，必须放在类定义的结尾
 
-DEFINE_MEMBER_CHECKER_BEGIN(Object)
-	DEFINE_MEMBER_CHECKER_ADD(GetClassId)
-	DEFINE_MEMBER_CHECKER_ADD(GetInstanceId)
-DEFINE_MEMBER_CHECKER_END(GetNextId)
+FORBIDDEN_METHOD_CONCEPT(Object, GetClassId);
+FORBIDDEN_METHOD_CONCEPT(Object, GetInstanceId);
+FORBIDDEN_METHOD_CONCEPT(Object, GetNextId);
+
+template<typename T>
+concept COMBINE_FORBIDDEN_NAME(Object) = COMBINE_FORBIDDEN_METHODS(Object, GetClassId) ||
+			COMBINE_FORBIDDEN_METHODS(Object, GetInstanceId) || COMBINE_FORBIDDEN_METHODS(Object, GetNextId);
 
 DISABLE_DLL_WARNINGS_PUSH;
 namespace Core {

@@ -33,17 +33,18 @@ inline To* SafeCast(From* ptr) {
     return nullptr;
 }
 
-// TODO 完善检测
-#define DEFINE_MEMBER_CHECKER_BEGIN(CheckerName)      \
-    template<typename T>                              \
-    concept Has##CheckerName = 
+// 这里我们使用他检测指定类有没有这些函数(可以用来检测是否继承父类)
+#define FORBIDDEN_METHOD_CONCEPT(Space,method_name) \
+    template<typename T> \
+    concept HasForbiddenMethod_##Space_##method_name = requires(T t) { t.method_name(); }
 
-#define DEFINE_MEMBER_CHECKER_ADD(Member)             \
-    requires { &T::Member; } ||                       \
+#define COMBINE_FORBIDDEN_METHODS(Space,method_name) \
+    HasForbiddenMethod_##Space_##method_name<T>
 
-#define DEFINE_MEMBER_CHECKER_END(Member)             \
-    requires { &T::Member; };                         \
+#define COMBINE_FORBIDDEN_NAME(Space) \
+    Has##Space
 
-#define CHECK_NO_MEMBER(ClassName, CheckerName) \
-    static_assert(!Has##CheckerName<ClassName>, \
-        "ERROR: " #ClassName " has conflicting member functions for " #CheckerName)
+#define CHECK_COMBINE_MEMBER(ClassName, CheckerName) \
+    static_assert(Has##CheckerName<ClassName>, \
+        "ERROR: " #ClassName " is missing required member functions! " \
+        "Please ensure it inherits from " #CheckerName)
