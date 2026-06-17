@@ -3,6 +3,7 @@
 #include <Common/Compiler.h>
 #include <string>
 #include <vector>
+#include <memory>
 #include "Tools/Check.h"
 #include "Tools/EnumClassFlags.h"
 
@@ -25,6 +26,28 @@ concept COMBINE_FORBIDDEN_NAME(Object) = COMBINE_FORBIDDEN_METHODS(Object, GetCl
 			COMBINE_FORBIDDEN_METHODS(Object, GetInstanceId) || COMBINE_FORBIDDEN_METHODS(Object, GetNextId);
 
 DISABLE_DLL_WARNINGS_PUSH;
+
+// This class helps users build objects
+class ObjectFactory {
+public:
+	template<typename T, typename... Args>
+	static T* Create(Args&&... args) {
+		// Construct object
+		T* obj = new T(std::forward<Args>(args)...);
+
+		obj->generate_object_init_func_();			// this func from MagicHeaderTool
+
+		return obj;
+	}
+
+	template<typename T, typename... Args>
+	static std::shared_ptr<T> CreateShared(Args&&... args) {
+		auto obj = std::make_shared<T>(std::forward<Args>(args)...);
+		obj->generate_object_init_func_();			// this func from MagicHeaderTool
+		return obj;
+	}
+};
+
 namespace Core {
 	enum class ObjectSwitch : uint8_t {
 		Unknown			= 0,
@@ -50,14 +73,20 @@ namespace Core {
 	class CORE_API ObjectSystemHandle {
 	public:
 		ObjectSystemHandle() = default;
-		ObjectSystemHandle(size_t index) 
-		: index(index) {}
+		ObjectSystemHandle(size_t index, ObjectType Type)
+		: index(index), Type(Type) {}
+
+		bool operator==(const ObjectSystemHandle& other) const {
+			return index == other.index && Type == other.Type;
+		}
 
 		const size_t GetIndex() const { return index; }
+		const ObjectType GetType() const { return Type; }
 
 	private:
 		// this object in objectsystem postion
 		size_t index;
+		ObjectType Type = ObjectType::Unknown;
 	};
 
 	// ---------------------------------------------------------------------------------- MSERIALIZATION
@@ -65,11 +94,12 @@ namespace Core {
 	* Object Serialization Descriptor
 	*/
 	struct ObjectSerializationDescriptor {
-		uint8_t* DataStart;
-		size_t Length;
+		size_t Length = 0;
+		uint8_t* DataStart = nullptr;
 	};
 	struct ObjectSerializationData {
 		std::vector<uint8_t> data;
+		ObjectSystemHandle handle;
 	};
 	// ---------------------------------------------------------------------------------- MSERIALIZATION END
 

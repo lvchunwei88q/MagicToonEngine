@@ -10,8 +10,12 @@
 #include "../Test/test.h" // 测试用文件
 
 void TestAdd() {
-    CLASS_B b;
-    b.x++;
+    CLASS_B* b = ObjectFactory::Create<CLASS_B>();
+    b->x++;
+    delete b;
+
+    std::shared_ptr<CLASS_X> X = ObjectFactory::CreateShared<CLASS_X>();
+    X->o++;
 }
 
 #if MAGICEDITOR_MODE

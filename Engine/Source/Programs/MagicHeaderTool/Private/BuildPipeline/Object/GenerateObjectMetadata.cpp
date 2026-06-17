@@ -53,12 +53,12 @@ namespace Object {
             code << "        return GENERATE_OBJECT_TAG_##CLASS_NAME;\n";
             code << "    }\n";
 
-            code << "    virtual uint64_t GetClassType() const {\n";
+            code << "    virtual Core::ObjectType GetClassType() const {\n";
             code << "        \n";
             code << "        return Core::ObjectType::##OBJECT_TYPE;\n";
             code << "    }\n";
 
-            code << "    virtual uint64_t GetClassSwitch() const {\n";
+            code << "    virtual Core::ObjectSwitch GetClassSwitch() const {\n";
             code << "        \n";
             code << "        return GENERATE_OBJECT_SWITCH_##CLASS_NAME;\n";
             code << "    }\n";
@@ -69,6 +69,10 @@ namespace Object {
 
             // Set constructor parameters
             code << "    ##CLASS_NAME() : Core::Object() {                          \n";
+            code << "       /*Please use a factory class to create this object */   \n";
+            code << "       /*this->ObjectInit();*/                                 \n";
+            code << "    }                                                          \n";
+            code << "    void generate_object_init_func_() {                        \n";
             code << "       this->ObjectInit();                                     \n";
             code << "    }                                                          \n";
             code << "                                                               \n";

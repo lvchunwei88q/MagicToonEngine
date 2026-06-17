@@ -37,13 +37,13 @@ namespace IO {
         file.write(content.data(), content.size());
     }
 
-    void WriteAllBytes(const std::wstring& path, const std::vector<char>& data) {
+    void WriteAllBytes(const std::wstring& path, const BinaryBuffer& data) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::trunc);
         if (!file.is_open()) {
             throw std::runtime_error("Failed to write file: " + ToNarrowString(path));
         }
-        file.write(data.data(), data.size());
+        file.write(data.Data(), data.GetUsedSize());
     }
 
     void AppendText(const std::wstring& path, const std::string& content) {
@@ -55,13 +55,13 @@ namespace IO {
         file.write(content.data(), content.size());
     }
 
-    void AppendBytes(const std::wstring& path, const std::vector<char>& data) {
+    void AppendBytes(const std::wstring& path, const BinaryBuffer& data) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::app);
         if (!file.is_open()) {
             throw std::runtime_error("Failed to append to file: " + ToNarrowString(path));
         }
-        file.write(data.data(), data.size());
+        file.write(data.Data(), data.GetUsedSize());
     }
 
     bool DeleteToFile(const std::wstring& path) {

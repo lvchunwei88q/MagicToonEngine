@@ -3,6 +3,7 @@
 #include "Common/Core_API.h"
 #include "Common/Compiler.h"
 #include "Tools/Singleton.h"
+#include "Tools/Buffer.h"
 #include <string>
 #include <vector>
 
@@ -26,17 +27,17 @@ namespace IO {
 	// 读取整个文件
 	CORE_API std::vector<char> ReadAllBytes(const std::wstring& path);
 
-	// 写入字符串到文件（覆盖）
+	// 写入字符串到文件
 	CORE_API void WriteAllText(const std::wstring& path, const std::string& content);
 
-	// 写入字节到文件（覆盖）
-	CORE_API void WriteAllBytes(const std::wstring& path, const std::vector<char>& data);
+	// 写入字节到文件
+	CORE_API void WriteAllBytes(const std::wstring& path, const BinaryBuffer& data);
 
 	// 追加字符串到文件末尾
 	CORE_API void AppendText(const std::wstring& path, const std::string& content);
 
 	// 追加字节到文件末尾
-	CORE_API void AppendBytes(const std::wstring& path, const std::vector<char>& data);
+	CORE_API void AppendBytes(const std::wstring& path, const BinaryBuffer& data);
 
 	// 删除文件
 	CORE_API bool DeleteToFile(const std::wstring& path);

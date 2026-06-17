@@ -42,7 +42,7 @@ namespace Core {
 		const std::string& str = oss.str();
 		BinaryData.assign(str.begin(), str.end());
 
-		ObjectSerializationData Data = { std::move(BinaryData) };
+		ObjectSerializationData Data = { std::move(BinaryData), Handle };
 		GetObjectSystem()->SaveObjectSerializationData(Data);
 	}
 
