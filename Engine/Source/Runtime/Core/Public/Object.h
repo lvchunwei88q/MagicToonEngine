@@ -1,4 +1,53 @@
 #pragma once
+
+/*
+*  The 'capabilities' this object provides only allow single inheritance,
+*  but you don't need to worry about extending functionality because in our architecture,
+*  objects inherit classes responsible for implementing module functions.
+*  Later, we have multiple functions, and now we can freely combine these classes.
+
+┌───────────────────────────────────────────────────────────────┐
+│  Object (Capability provider)									│
+│  背后有 ObjectSystem 管理:										│
+│  - 序列化/反序列化												│
+│  - 对象生命周期管理												│
+│  - Handle/ID 管理												│
+└───────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌───────────────────────────────────────────────────────────────┐
+│  Ability Achiever (Implements Abilities)						│
+│  - NetworkSyncAbility (网络同步能力)							│
+│  - MovementAbility (移动能力)									│
+│  - CombatAbility (战斗能力)										│
+│  - HealthAbility (生命值能力)									│
+│  - InventoryAbility (背包能力)									│
+└───────────────────────────────────────────────────────────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        ▼                   ▼                   ▼
+┌───────────────────────────────────────────────────────────────┐
+│  工作类 (Worker Classes) - 像搭积木一样拼接						│
+│																│
+│  class Player {												│
+│      MovementAbility Move;      ← 能力1						│
+│      CombatAbility Combat;      ← 能力2						│
+│      HealthAbility Health;      ← 能力3						│
+│  };															│
+│																│
+│  class Enemy : public Object {								│
+│      MovementAbility Move;      ← 复用能力1						│
+│      HealthAbility Health;      ← 复用能力3						│
+│      AIControl Ability AI;      ← 能力4						│
+│  };															│
+│																│
+│  class NetworkPlayer : public Object {						│
+│      NetworkSyncAbility Net;   ← 能力5							│
+│      MovementAbility Move;      ← 复用能力1						│
+│  };															│
+└───────────────────────────────────────────────────────────────┘
+*/
+
 #include "Common/Core_API.h"
 #include <Common/Compiler.h>
 #include <string>
