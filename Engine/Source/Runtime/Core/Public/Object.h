@@ -76,6 +76,22 @@ template<typename T>
 concept COMBINE_FORBIDDEN_NAME(Object) = COMBINE_FORBIDDEN_METHODS(Object, GetClassId) ||
 			COMBINE_FORBIDDEN_METHODS(Object, GetInstanceId) || COMBINE_FORBIDDEN_METHODS(Object, GetNextId);
 
+	// Visual Studio IntelliSense
+#if defined(__INTELLISENSE__)
+	#define MAGIC_IN_IDE 1  
+	// JetBrains ReSharper C++
+#elif defined(__RESHARPER__) || defined(__JETBRAINS_IDE__)
+	#define MAGIC_IN_IDE 1
+	// Clang tools
+#elif defined(__clang_analyzer__)
+	#define MAGIC_IN_IDE 1
+	// Other static analysis tools
+#elif defined(__cppcheck__) || defined(__clang_tidy__)
+	#define MAGIC_IN_IDE 1
+#else
+	#define MAGIC_IN_IDE 0
+#endif
+
 DISABLE_DLL_WARNINGS_PUSH;
 
 // This class helps users build objects
