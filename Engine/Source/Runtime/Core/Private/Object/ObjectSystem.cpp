@@ -36,7 +36,7 @@ namespace Core {
 	ObjectSystemHandle ObjectSystem::RegisterObject(Object* ptr)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-		Objects.push_back(ptr);
+		Objects.push_back({ ptr,ptr->GetClassType() });
 		return ObjectSystemHandle(Objects.size() - 1); // return current index for Object, use Handle Wrapper
 	}
 

@@ -65,8 +65,8 @@ namespace Core {
 	* Object Serialization Descriptor
 	*/
 	struct ObjectSerializationDescriptor {
-		uint8_t* SerializationStart;
-		size_t Lenght;
+		uint8_t* DataStart;
+		size_t Length;
 	};
 	struct ObjectSerializationData {
 		std::vector<uint8_t> data;
@@ -84,6 +84,9 @@ namespace Core {
 		Object() : instance_id(GetNextId()) {};
 
 		virtual uint64_t GetClassId() const = 0;					// Class ID generated using MagicHeaderTool
+		virtual uint64_t GetClassHas() const = 0;					// Class Has generated using MagicHeaderTool
+		virtual ObjectType GetClassType() const = 0;				// Class type generated using MagicHeaderTool
+		virtual ObjectSwitch GetClassSwitch() const = 0;			// Class Switch generated using MagicHeaderTool
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
 
 		template<class Archive>
@@ -101,12 +104,16 @@ namespace Core {
 		void ObjectInit();
 		void ObjectUninit();
 
+	private:
+		// We're implementing the functionality of Object here
+		// -------------------------------- serialization
+		void Serialization();
+		void Deserialization();
+		// -------------------------------- 
+
 	protected:
 		uint64_t	instance_id;						// The id of each instance
-		size_t		class_has = -1;						// Which area will this class belong to
 		ObjectSystemHandle Handle = {};					// Object Handle
-		ObjectType	type = ObjectType::Unknown;			// Who does he belong to
-		ObjectSwitch Switch = ObjectSwitch::Unknown;	// The features you need
 	};
 
 	class CORE_API IObjectSystem {

@@ -42,9 +42,25 @@ namespace Object {
          */
         std::string GenerateClassBodyFunction() {
             std::ostringstream code;
+            // Fill in Object type information
             code << "    virtual uint64_t GetClassId() const {\n";
             code << "        \n";
             code << "        return GET_CLASS_ID_##CLASS_NAME;\n";
+            code << "    }\n";
+
+            code << "    virtual uint64_t GetClassHas() const {\n";
+            code << "        \n";
+            code << "        return GENERATE_OBJECT_TAG_##CLASS_NAME;\n";
+            code << "    }\n";
+
+            code << "    virtual uint64_t GetClassType() const {\n";
+            code << "        \n";
+            code << "        return Core::ObjectType::##OBJECT_TYPE;\n";
+            code << "    }\n";
+
+            code << "    virtual uint64_t GetClassSwitch() const {\n";
+            code << "        \n";
+            code << "        return GENERATE_OBJECT_SWITCH_##CLASS_NAME;\n";
             code << "    }\n";
 
             // use macros generate class function
@@ -53,9 +69,6 @@ namespace Object {
 
             // Set constructor parameters
             code << "    ##CLASS_NAME() : Core::Object() {                          \n";
-            code << "       this->type = Core::ObjectType::##OBJECT_TYPE;           \n";
-            code << "       this->class_has = GENERATE_OBJECT_TAG_##CLASS_NAME;     \n";
-            code << "       this->Switch = GENERATE_OBJECT_SWITCH_##CLASS_NAME;     \n";
             code << "       this->ObjectInit();                                     \n";
             code << "    }                                                          \n";
             code << "                                                               \n";

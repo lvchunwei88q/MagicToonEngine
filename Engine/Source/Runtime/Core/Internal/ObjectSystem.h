@@ -6,6 +6,36 @@
 #include <mutex>
 
 namespace Core {
+	struct ObjectByte{
+		std::vector<uint8_t> data;
+		ObjectSystemHandle handle;
+	};
+
+	struct ObjectByteFile {
+		size_t index;
+		std::vector<ObjectByte> data;
+	};
+
+	/*				 size = x
+	* |-----------------------------------|
+	* |				file				  |
+	* |-----------------------------------|
+	*				  |
+	*	 size = 8	 \|/     size = x
+	* |-----------------------------------|
+	* |	Index |  data					  |
+	* |-----------------------------------|
+	*				  |
+	*	 size = 8	 \|/     size = x
+	* |-----------------------------------|
+	* |ObjectByte | data				  |
+	* |-----------------------------------|
+	*/
+
+	struct ObjectContainer {
+		ObjectRef Object;
+		ObjectType Type;
+	};
 
 	// 对象系统，负责管理所有的对象实例
 	class ObjectSystem : public SubsystemTemplate<ObjectSystem,Priority::Core> , public IObjectSystem
@@ -23,7 +53,8 @@ namespace Core {
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 	private:
 		// There is absolutely no management of their deletions here.
-		std::vector<ObjectRef> Objects;
+		std::vector<ObjectContainer> Objects;
+
 
 		mutable std::mutex m_mutex;
 
