@@ -20,7 +20,7 @@ namespace Object {
 					const std::wstring& GeneratePath = MagicBuildData::Get().GetRefGeneratePath();
 
 					TOOL::MakeDirectory(GeneratePath + L"\\" + ModelName);
-					TOOL::WriteAllText(GeneratePath + L"\\" + ModelName + L"\\" + headerName + L".generate.h", Metadata);
+					TOOL::WriteAllText(GeneratePath + L"\\" + ModelName + L"\\" + headerName + L".object.generate.h", Metadata);
 				});
 			}
 			

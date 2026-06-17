@@ -34,7 +34,6 @@ public:
 	static T* Create(Args&&... args) {
 		// Construct object
 		T* obj = new T(std::forward<Args>(args)...);
-
 		obj->generate_object_init_func_();			// this func from MagicHeaderTool
 
 		return obj;
@@ -120,7 +119,8 @@ namespace Core {
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
 
 		template<class Archive>
-		void serialize(Archive& archive) {
+		void serialize(Archive& archive,const std::uint32_t version)
+		{
 			// NOT
 		}
 	private:

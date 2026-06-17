@@ -3,7 +3,7 @@
 #include <synchapi.h>
 #define XXX_API
 
-#include <test.generate.h>
+#include <test.object.generate.h>
 
 class CLASS_A : public SubsystemTemplate<CLASS_A, Core::Priority::Low>
 {

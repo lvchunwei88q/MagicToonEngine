@@ -1,6 +1,6 @@
 #pragma once
 #include <Object.h>
-#include <test1.generate.h>
+#include <test1.object.generate.h>
 
 #define XXX_API
 

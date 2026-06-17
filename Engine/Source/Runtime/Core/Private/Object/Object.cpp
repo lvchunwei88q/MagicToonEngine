@@ -5,7 +5,6 @@
 #include <cereal/archives/binary.hpp>
 
 namespace Core {
-
 	void Object::ObjectInit() {
 		try {
 			Handle = GetObjectSystem()->RegisterObject(this); // Register This Object
@@ -18,6 +17,7 @@ namespace Core {
 			ErrorCapture::Capture("Object Constructor: " + std::string(e.what()));
 		}
 	}
+
 	void Object::ObjectUninit() {
 		try {
 			if (EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization)) {
