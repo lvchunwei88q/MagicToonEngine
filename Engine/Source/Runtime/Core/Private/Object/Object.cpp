@@ -50,6 +50,7 @@ namespace Core {
 	{
 		ObjectSerializationDescriptor ObjectData = GetObjectSystem()->GetObjectSerializationData(Handle);	// Get ObjectData
 
+		if (ObjectData.Length <= 0) return; // No data
 		std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
 		ss.write(reinterpret_cast<const char*>(ObjectData.DataStart), ObjectData.Length);
 		ss.seekg(0, std::ios::beg);
