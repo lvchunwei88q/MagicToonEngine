@@ -14,7 +14,9 @@ public:
 	}
 	virtual void Uninstall() {}
 
-private:
+	template<class Archive>
+	void serialize(Archive& archive) {
+	}
 };
 
 MCLASS(MSERIALIZATION);
@@ -40,13 +42,8 @@ public:
 	MMEMBER();
 	float o;
 
-	MMEMBER();
 	static const CLASS_A Test;
-
-	MMEMBER();
 	const CLASS_A TestA = {};
-
-	MMEMBER();
 	const CLASS_A TestB{};
 
 	MMEMBER();

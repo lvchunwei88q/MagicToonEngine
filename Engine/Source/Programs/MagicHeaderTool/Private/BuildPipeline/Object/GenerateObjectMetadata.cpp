@@ -79,6 +79,17 @@ namespace Object {
             code << "    ~##CLASS_NAME() {                                          \n";
             code << "       this->ObjectUninit();                                   \n";
             code << "    }                                                          \n";
+
+            code << "protected:                                                                     \n";
+            code << "    virtual void serialized_data_generation(std::ostringstream& stream) {      \n";
+            code << "       cereal::BinaryOutputArchive archive(stream);                            \n";
+            code << "       archive(*this);                                                         \n";
+            code << "       return;                                                                 \n";
+            code << "    }                                                                          \n";
+            code << "    virtual void deserialization_data_generation(std::stringstream& stream) {  \n";
+            code << "       cereal::BinaryInputArchive archive(stream);                             \n";
+            code << "       archive(*this);                                                         \n";
+            code << "    }                                                                          \n";
             return code.str();
         }
 

@@ -53,6 +53,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <cereal/archives/binary.hpp>
+
 #include "Tools/Check.h"
 #include "Tools/EnumClassFlags.h"
 
@@ -167,11 +169,11 @@ namespace Core {
 		virtual ObjectSwitch GetClassSwitch() const = 0;			// Class Switch generated using MagicHeaderTool
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
 
-		template<class Archive>
-		void serialize(Archive& archive,const std::uint32_t version)
-		{
+		//template<class Archive>
+		//void serialize(Archive& archive,const std::uint32_t version)
+		//{
 			// NOT
-		}
+		//}
 	private:
 		static uint64_t GetNextId() {
 			static uint64_t counter = 0;
@@ -183,6 +185,9 @@ namespace Core {
 		void ObjectInit();
 		void ObjectUninit();
 
+		// The serialization function that subclasses must implement
+		virtual void serialized_data_generation(std::ostringstream& stream) = 0;
+		virtual void deserialization_data_generation(std::stringstream& stream) = 0;
 	private:
 		// We're implementing the functionality of Object here
 		// -------------------------------- serialization

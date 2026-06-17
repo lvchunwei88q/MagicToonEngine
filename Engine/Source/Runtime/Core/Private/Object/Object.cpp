@@ -2,7 +2,6 @@
 #include "CoreLogCapture/CoreLogCapture.h"
 //////////////////// Serialization library
 #include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
 
 namespace Core {
 	void Object::ObjectInit() {
@@ -36,8 +35,8 @@ namespace Core {
 	{
 		std::vector<uint8_t> BinaryData;
 		std::ostringstream oss;
-		cereal::BinaryOutputArchive archive(oss);
-		archive(*this);
+		// Use the subclass's serialization function
+		serialized_data_generation(oss);
 
 		const std::string& str = oss.str();
 		BinaryData.assign(str.begin(), str.end());
@@ -55,8 +54,8 @@ namespace Core {
 		ss.write(reinterpret_cast<const char*>(ObjectData.DataStart), ObjectData.Length);
 		ss.seekg(0, std::ios::beg);
 
-		cereal::BinaryInputArchive archive(ss);
-		archive(*this);
+		// Use the subclass's serialization function
+		deserialization_data_generation(ss);
 	}
 	// -------------------------------- 
 }

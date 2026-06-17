@@ -119,7 +119,7 @@ namespace Core {
 
 	void ObjectSystem::SaveObjectSerializationData(ObjectSerializationData Descriptor)
 	{
-
+		// 实现文件存储
 	}
 
 	bool ObjectSystem::Serialization()
@@ -160,6 +160,8 @@ namespace Core {
 
 		std::vector<std::string> EngineSerializedFiles = IO::GetFilesInDirectory(EngineSerializedDataDir);
 		std::vector<std::string> ProjectSerializedFiles = IO::GetFilesInDirectory(ProjectSerializedDataDir);
+
+		// TODO 实现文件读取
 
 		return true;
 	}
