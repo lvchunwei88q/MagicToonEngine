@@ -1,4 +1,4 @@
-#include "Tools/cmdline.h" // 参数解析库
+#include <cmdline/cmdline.h> // 参数解析库
 #include "MagicHeaderTool.h"
 
 #include "Tools/Tool.h"

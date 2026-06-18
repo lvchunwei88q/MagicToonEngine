@@ -22,6 +22,11 @@ Copyright (c) 2014-2024 Randolph Voorhies, Shane Grant
 Licensed under the MIT License.
 详见 ThirdParty/cereal/LICENSE.txt
 
+## cmdline
+Copyright (c) 2009, Hideyuki Tanaka
+Licensed under the BSD 3-Clause License
+详见 ThirdParty/cmdline/LICENSE.txt
+
 ## ctre
 Copyright (c) 1994–2025 Lua.org, PUC-Rio.
 Licensed under the Apache License.
