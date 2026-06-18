@@ -27,10 +27,10 @@ class CLASS_B : public Core::Object
 public:
 
 	MMEMBER();
-	int x;
+	int x = 1;
 
 	MMEMBER();
-	float f;
+	float f = 0.0f;
 };
 
 MCLASS(MSERIALIZATION,MREFLECTION);

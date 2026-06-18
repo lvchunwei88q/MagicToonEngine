@@ -69,6 +69,13 @@ namespace Core {
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) override;
 		virtual void SaveObjectSerializationData(ObjectSerializationData Descriptor) override;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
+
+	private:
+		// functions
+		using FindObjectLambda_Const	= std::function<bool(const ObjectByteFile&, size_t, const ObjectSystemHandle&)>;
+		using FindObjectLambda			= std::function<bool(ObjectByteFile&, size_t, ObjectSystemHandle&)>;
+		bool FindObjectByteFile(std::vector<ObjectByteFile>& FileBytes, ObjectSystemHandle& Handle, FindObjectLambda Func = nullptr);
+		bool FindObjectByteFile_Const(const std::vector<ObjectByteFile>& FileBytes, const ObjectSystemHandle& Handle, FindObjectLambda_Const Func = nullptr);
 	protected:
 		// Here we implement the features we need
 		// -------------------------------- serialization

@@ -19,7 +19,7 @@ namespace Core {
 
 	void Object::ObjectUninit() {
 		try {
-			if (EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization)) {
+			if (EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization) && Mode == DestructionMode::SaveAndDestroy) {
 				Serialization();
 			}
 

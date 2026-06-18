@@ -49,6 +49,7 @@
 */
 
 #include "Common/Core_API.h"
+#include "Core.h"
 #include <Common/Compiler.h>
 #include <string>
 #include <vector>
@@ -58,16 +59,6 @@
 #include "Tools/Check.h"
 #include "Tools/EnumClassFlags.h"
 
-// Enumerates the features you can use
-enum {
-	MREFLECTION,
-	MSERIALIZATION,
-};
-
-#define MMEMBER(...)				// 你要序列化的成员
-#define MCLASS(...)					// 你要序列化的类，必须放在类定义的开头
-#define GENERATE_BODY()				// 你要序列化的类的成员函数实现，必须放在类定义的结尾
-
 FORBIDDEN_METHOD_CONCEPT(Object, GetClassId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetInstanceId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetNextId);
@@ -75,22 +66,6 @@ FORBIDDEN_METHOD_CONCEPT(Object, GetNextId);
 template<typename T>
 concept COMBINE_FORBIDDEN_NAME(Object) = COMBINE_FORBIDDEN_METHODS(Object, GetClassId) ||
 			COMBINE_FORBIDDEN_METHODS(Object, GetInstanceId) || COMBINE_FORBIDDEN_METHODS(Object, GetNextId);
-
-	// Visual Studio IntelliSense
-#if defined(__INTELLISENSE__)
-	#define MAGIC_IN_IDE 1  
-	// JetBrains ReSharper C++
-#elif defined(__RESHARPER__) || defined(__JETBRAINS_IDE__)
-	#define MAGIC_IN_IDE 1
-	// Clang tools
-#elif defined(__clang_analyzer__)
-	#define MAGIC_IN_IDE 1
-	// Other static analysis tools
-#elif defined(__cppcheck__) || defined(__clang_tidy__)
-	#define MAGIC_IN_IDE 1
-#else
-	#define MAGIC_IN_IDE 0
-#endif
 
 DISABLE_DLL_WARNINGS_PUSH;
 
@@ -128,6 +103,11 @@ namespace Core {
 		PROJECT
 	};
 
+	enum class DestructionMode : uint8_t {
+		SaveAndDestroy,
+		DestroyOnly,
+	};
+
 	class IObjectSystem;
 	class Object;
 
@@ -139,18 +119,20 @@ namespace Core {
 	class CORE_API ObjectSystemHandle {
 	public:
 		ObjectSystemHandle() = default;
-		ObjectSystemHandle(size_t index, ObjectType Type)
-		: index(index), Type(Type) {}
+		ObjectSystemHandle(size_t id,size_t index, ObjectType Type)
+		: id(id), index(index), Type(Type) {}
 
 		bool operator==(const ObjectSystemHandle& other) const {
 			return index == other.index && Type == other.Type;
 		}
 
-		const size_t GetIndex() const { return index; }
-		const ObjectType GetType() const { return Type; }
+		const size_t GetId()		const { return id;		}
+		const size_t GetIndex()		const { return index;	}
+		const ObjectType GetType()	const { return Type;	}
 
 	private:
 		// this object in objectsystem postion
+		size_t id;
 		size_t index;
 		ObjectType Type = ObjectType::Unknown;
 	};
@@ -161,7 +143,7 @@ namespace Core {
 	*/
 	struct ObjectSerializationDescriptor {
 		size_t Length = 0;
-		uint8_t* DataStart = nullptr;
+		const uint8_t* DataStart = nullptr;
 	};
 	struct ObjectSerializationData {
 		std::vector<uint8_t> data;
@@ -185,6 +167,8 @@ namespace Core {
 		virtual ObjectSwitch GetClassSwitch() const = 0;			// Class Switch generated using MagicHeaderTool
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
 
+		// If we don't need to serialize this object when we destroy it at the end, we can set the destruction mode to prevent its serialization.
+		void SetDestructionMode(DestructionMode NewMode) { Mode = NewMode; }
 		//template<class Archive>
 		//void serialize(Archive& archive,const std::uint32_t version)
 		//{
@@ -214,6 +198,8 @@ namespace Core {
 	protected:
 		uint64_t	instance_id;						// The id of each instance
 		ObjectSystemHandle Handle = {};					// Object Handle
+	private:
+		DestructionMode Mode = DestructionMode::SaveAndDestroy;		// Serialization is required by default
 	};
 
 	class CORE_API IObjectSystem {

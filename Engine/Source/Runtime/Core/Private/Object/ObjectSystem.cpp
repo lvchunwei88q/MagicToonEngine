@@ -1,6 +1,7 @@
 #include "Object.h"
 #include "ObjectSystem.h"
 #include "IO.h"
+#include "Tools/Check.h"
 
 namespace Core {
 	AUTO_REGISTER(ObjectSystem);
@@ -70,7 +71,8 @@ namespace Core {
 	ObjectSystemHandle ObjectSystem::RegisterObject(Object* ptr)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-		ObjectSystemHandle Hanedle{ Objects.size(),ptr->GetClassType() };
+		ObjectSystemHandle Hanedle{ ptr->GetInstanceId(), Objects.size(), ptr->GetClassType()};
+
 		Objects.push_back({ ptr,Hanedle });
 		return Hanedle; // return current index for Object, use Handle Wrapper
 	}
@@ -90,36 +92,73 @@ namespace Core {
 
 	ObjectSerializationDescriptor ObjectSystem::GetObjectSerializationData(ObjectSystemHandle Handle)
 	{
+		ObjectSerializationDescriptor ObjectData;
 		if (Handle.GetType() == ObjectType::Unknown || Handle.GetIndex() > Objects.size())
 		{
 			return ObjectSerializationDescriptor();
 		}
 
-		ObjectRef Ptr = Objects[Handle.GetIndex()].Object;
-		size_t ClassHas = Ptr->GetClassHas();
-
-		for (size_t i = 0; i < Read_FileBytes.size(); i++)
-		{
-			ObjectByteFile& FileByte = Read_FileBytes[i];
-			if (Handle.GetType() == FileByte.GetStorageArea() && ClassHas == FileByte.FileHas) {
-				for (size_t y = 0; y < FileByte.data.size(); y++)
-				{
-					ObjectByte& Byte = FileByte.data[y];
-					if (Byte.handle == Handle) {
-						ObjectSerializationDescriptor ObjectData;
-						ObjectData.DataStart = Byte.data.data();
-						ObjectData.Length = Byte.data.size();
-						return ObjectData;
-					}
+		FindObjectByteFile_Const(Read_FileBytes, Handle,
+			[&](const ObjectByteFile& FileByte, size_t ClassHas, const ObjectSystemHandle&) -> bool {
+			for (size_t y = 0; y < FileByte.data.size(); y++)
+			{
+				const ObjectByte& Byte = FileByte.data[y];
+				if (Byte.handle == Handle) {
+					ObjectSerializationDescriptor ObjectData;
+					ObjectData.DataStart = Byte.data.data();
+					ObjectData.Length = Byte.data.size();
+					return true;
 				}
 			}
-		}
-		return ObjectSerializationDescriptor();
+			return false;
+		});
+		return ObjectData;
 	}
 
 	void ObjectSystem::SaveObjectSerializationData(ObjectSerializationData Descriptor)
 	{
-		// 实现文件存储
+		ObjectSystemHandle& Handle = Descriptor.handle;
+		if (Handle.GetType() == ObjectType::Unknown || Handle.GetIndex() > Objects.size())
+		{
+			return;
+		}
+
+		bool IsFind = FindObjectByteFile(Written_FileBytes, Handle, 
+			[&](ObjectByteFile& FileByte, size_t ClassHas, ObjectSystemHandle& Handle) -> bool {
+				// If we find it, then we'll add it here
+#ifndef _DEBUG
+				for (size_t i = 0; i < FileByte.data.size(); i++)
+				{
+					const auto& FileByte_data = FileByte.data[i];
+					if (FileByte_data.handle == Handle) {
+						ThrowErrorMessage("Error: ObjectSystem already has the same Object");
+					}
+				}
+#endif
+				ObjectByte ByteFrag;
+				ByteFrag.handle = Handle;
+				ByteFrag.data = Descriptor.data;
+
+				FileByte.data.push_back(ByteFrag);
+				return true;
+		});
+
+		if (!IsFind) {
+			// It says there's no such area or the file for this area, so now we need to create this file.
+			ObjectRef Ptr = Objects[Handle.GetIndex()].Object;
+			size_t ClassHas = Ptr->GetClassHas();
+
+			ObjectByte ByteFrag;
+			ByteFrag.handle = Handle;
+			ByteFrag.data = Descriptor.data;
+
+			ObjectByteFile ByteFile;
+			ByteFile.FileHas = ClassHas;
+			ByteFile.Type = Handle.GetType();
+			ByteFile.data.push_back(ByteFrag);
+
+			Written_FileBytes.push_back(ByteFile);
+		}
 	}
 
 	bool ObjectSystem::Serialization()
@@ -164,5 +203,29 @@ namespace Core {
 		// TODO 实现文件读取
 
 		return true;
+	}
+
+#define FIND_OBJECT_BYTE_FILE_FUNCTION(...)															\
+	ObjectRef Ptr = Objects[Handle.GetIndex()].Object;												\
+	size_t ClassHas = Ptr->GetClassHas();															\
+	for (size_t i = 0; i < FileBytes.size(); i++)													\
+	{																								\
+		__VA_ARGS__ ObjectByteFile& FileByte = FileBytes[i];										\
+		if (Handle.GetType() == FileByte.GetStorageArea() && ClassHas == FileByte.FileHas) {		\
+			if (Func) return Func(FileByte, ClassHas, Handle);										\
+			return true;																			\
+		}																							\
+	}
+
+	bool ObjectSystem::FindObjectByteFile(std::vector<ObjectByteFile>& FileBytes,ObjectSystemHandle& Handle, FindObjectLambda Func)
+	{
+		FIND_OBJECT_BYTE_FILE_FUNCTION();
+		return false;
+	}
+
+	bool ObjectSystem::FindObjectByteFile_Const(const std::vector<ObjectByteFile>& FileBytes, const ObjectSystemHandle& Handle, FindObjectLambda_Const Func)
+	{
+		FIND_OBJECT_BYTE_FILE_FUNCTION(const);
+		return false;
 	}
 }
