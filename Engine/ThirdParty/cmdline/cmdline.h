@@ -38,12 +38,9 @@
 #include <algorithm>
 #include <cstdlib>
 
-// Windows 平台特定的头文件
-#ifdef _WIN32
 #include <windows.h>
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
-#endif
 
 namespace cmdline {
 
@@ -106,23 +103,15 @@ namespace cmdline {
         {
             return lexical_cast_t<Target, Source, detail::is_same<Target, Source>::value>::cast(arg);
         }
-
-        // Windows 平台的名称解修饰
+        
+        // Windows Only
         static inline std::string demangle(const std::string& name)
         {
-#ifdef _WIN32
             char buffer[256];
             if (UnDecorateSymbolName(name.c_str(), buffer, sizeof(buffer), UNDNAME_COMPLETE)) {
                 return std::string(buffer);
             }
             return name;
-#else
-            int status = 0;
-            char* p = abi::__cxa_demangle(name.c_str(), 0, 0, &status);
-            std::string ret(p);
-            free(p);
-            return ret;
-#endif
         }
 
         template <class T>
@@ -538,22 +527,16 @@ namespace cmdline {
             return errors.size() == 0;
         }
 
-        void parse_check(const std::string& arg) {
+        bool parse_check(const std::vector<std::string>& args) {
             if (!options.count("help"))
                 add("help", '?', "print this message");
-            check(0, parse(arg));
+            return check(static_cast<int>(args.size()), parse(args));
         }
 
-        void parse_check(const std::vector<std::string>& args) {
+        bool parse_check(int argc, char* argv[]) {
             if (!options.count("help"))
                 add("help", '?', "print this message");
-            check(static_cast<int>(args.size()), parse(args));
-        }
-
-        void parse_check(int argc, char* argv[]) {
-            if (!options.count("help"))
-                add("help", '?', "print this message");
-            check(argc, parse(argc, argv));
+            return check(argc, parse(argc, argv));
         }
 
         std::string error() const {
@@ -600,16 +583,18 @@ namespace cmdline {
 
     private:
 
-        void check(int argc, bool ok) {
+        bool check(int argc, bool ok) {
             if ((argc == 1 && !ok) || exist("help")) {
                 std::cerr << usage();
-                exit(0);
+                return false;
             }
 
             if (!ok) {
                 std::cerr << error() << std::endl << usage();
-                exit(1);
+                return false;
             }
+
+            return true;
         }
 
         void set_option(const std::string& name) {

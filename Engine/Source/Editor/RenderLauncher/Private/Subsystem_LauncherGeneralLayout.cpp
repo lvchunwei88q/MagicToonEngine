@@ -1,5 +1,6 @@
 #include "LauncherGeneralLayout.h"
 #include <RenderUI.h>
+#include <Window/WindowAppointment.hpp>
 
 ///////////////////////
 #include <IO.h> 
@@ -125,15 +126,15 @@ namespace RenderLauncher {
 		SetUIType(UIType::Loading); // 设置为加载界面
 		Core::GetSubsystemContext()->Notification("Application", { encodeToSizeT("SETWINDOW"),nullptr});
 
-		// 构建 MagicEditor.exe 路径
+		// 构建 ENGINE_EDITOR_NAME_W 路径
 		std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
-		std::wstring exePath = exeDir + L"\\MagicEditor.exe";
+		std::wstring exePath = exeDir + L"\\" ENGINE_EDITOR_NAME_W ".exe";
 
-		// 构建命令行参数：-p "path" "name"
+		// 构建命令行参数：--project_path "path" --name "name"
 		std::wstring cmdLine = L"\"" + exePath + L"\"";
-		cmdLine += L" -p \"";
+		cmdLine += L" --project_path \"";
 		cmdLine += IO::ToWideString(path);
-		cmdLine += L"\" \"";
+		cmdLine += L"\" --name \"";
 		cmdLine += IO::ToWideString(name);
 		cmdLine += L"\"";
 

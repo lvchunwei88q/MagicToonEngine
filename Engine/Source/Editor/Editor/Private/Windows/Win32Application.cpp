@@ -62,7 +62,7 @@ namespace Editor
 
 		// init windows
 		WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_CLASSDC, WindowsProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
-				ENGINE_CLASS, nullptr }; // 使用约定名称
+				ENGINE_EDITOR_CLASS, nullptr }; // 使用约定名称
 		wc.hbrBackground = CreateSolidBrush(RGB(25, 25, 25));
 		::RegisterClassEx(&wc);
 

@@ -2,5 +2,13 @@
 #include <Core.h>
 #include <Subsystem/Subsystem.h>
 #include <iostream>
+#include <vector>
 
-bool EngineCheck(int argc, wchar_t* argv[]);
+enum class OperationType {
+    NOT,
+    SpecifyProJect
+};
+
+bool CommandCheck(const std::vector<std::wstring>& argsW);
+void RunMagicLauncher();
+void RegisterSubsystemCallback();

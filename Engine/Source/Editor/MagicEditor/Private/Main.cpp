@@ -48,7 +48,15 @@ int wmain(int argc, wchar_t* argv[]) {
     std::cout << "Engine Init (CMD Mode) ... " << std::endl;
 #endif
 
-    if (!EngineCheck(argc, argv)) { return 0; }
+    std::vector<std::wstring> argsW(argv, argv + argc);
+    if (!CommandCheck(argsW)) 
+    { 
+        std::cout << "The engine has not yet opened a project!" << std::endl;
+        RunMagicLauncher();
+        return 0;
+    }
+
+    RegisterSubsystemCallback();
 
     TestAdd();
 

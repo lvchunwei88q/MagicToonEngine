@@ -12,7 +12,9 @@ int main(int argc, char* argv[]) {
     parser.add<std::string>("generate-dir", 'g', "File directory for generating code", true, "");
     parser.add("help", '?', "Print help");
 
-    parser.parse_check(argc, argv);
+    if (!parser.parse_check(argc, argv)) {
+        return 0;
+    }
 
     std::string generateDir = parser.get<std::string>("generate-dir");
 

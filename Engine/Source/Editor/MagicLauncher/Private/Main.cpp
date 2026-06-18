@@ -6,7 +6,7 @@
 #include <Win32Application.h>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
-    const wchar_t* CLASS = PROJECT_CLASS; // 使用约定名称
+    const wchar_t* CLASS = ENGINE_LAUNCHER_CLASS; // 使用约定名称
     CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // 初始化 COM
 
     WNDCLASSW wc = {};
