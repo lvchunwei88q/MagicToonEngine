@@ -1,28 +1,18 @@
 #include <RenderUIWarehouse.h>
 
 #include "Editor/EditorGeneralLayout.h"
-///////////////////////
-// 序列化文件相关
-#include <IO.h> 
-#include <fstream>
-#include <Tools/SerializeMacro.h>
-
-// 序列化
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>    // 二进制
-///////////////////////
 
 namespace RenderEditor {
 	RENDERUI_REGISTER(EditorGeneralLayout);
 
 	void EditorGeneralLayout::Init()
 	{
-		FILE_SERIALIZATION_LOADING(Switch, CONFIG "Editor\\Windows\\", L"EditorSwitch.mtdata")
+		Switch = ObjectFactory::CreateUnique<ViewSwitch>();
 	}
 
 	void EditorGeneralLayout::Uninstall()
 	{
-		FILE_SERIALIZATION_SAVE(Switch, CONFIG "Editor\\Windows\\", L"EditorSwitch.mtdata")
+		Switch.reset();
 	}
 
 	void* EditorGeneralLayout::PublicData(uint8_t type)
@@ -30,7 +20,7 @@ namespace RenderEditor {
 		switch (static_cast<EditorGeneralLayoutData>(type))
 		{
 			case EditorGeneralLayoutData::ViewSwitch:{
-				return static_cast<void*>(&Switch);
+				return static_cast<void*>(Switch.get());
 			}
 		}
 

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Object.h>
+#include <EditorGeneralLayout.object.generate.h>
+
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
@@ -14,20 +17,24 @@ namespace RenderEditor {
 		ViewSwitch
 	};
 
-	struct ViewSwitch {
+	MCLASS(MSERIALIZATION);
+	class ViewSwitch : public Core::Object
+	{
+		GENERATE_BODY(ViewSwitch, ENGINE, "EDITORUI");
+	public:
+		MMEMBER();
 		bool DetailsWindow;
+		MMEMBER();
 		bool LuaControl;
+		MMEMBER();
 		bool LoggerWindow;
+		MMEMBER();
 		bool RenderViewWindow;
+		MMEMBER();
 		bool ContentBrowserWindow;
 		// -----------------------
+		MMEMBER();
 		bool EditorSettingsView;
-
-		template<class Archive>
-		void serialize(Archive& archive) {
-			archive(DetailsWindow, LuaControl, LoggerWindow,
-				RenderViewWindow, ContentBrowserWindow, EditorSettingsView);
-		}
 	};
 
 	class EditorGeneralLayout final : public RSubsystemTemplate<EditorGeneralLayout, ModeType::ImGui>, public ImGuiMode
@@ -46,6 +53,6 @@ namespace RenderEditor {
 	protected:
 		void ExitProgram();
 	private:
-		ViewSwitch Switch;
+		std::unique_ptr<ViewSwitch> Switch;
 	};
 }

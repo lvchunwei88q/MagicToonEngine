@@ -49,7 +49,7 @@ namespace RenderEditor {
 
             if (ImGui::BeginMenu(Lang::Get("editor.menu.edit").c_str()))
             {
-                ImGui::MenuItem(Lang::Get("editor.menu.editor_settings").c_str(), nullptr, &Switch.EditorSettingsView);
+                ImGui::MenuItem(Lang::Get("editor.menu.editor_settings").c_str(), nullptr, &Switch->EditorSettingsView);
                 ImGui::Separator();
                 if (ImGui::MenuItem(Lang::Get("editor.menu.undo").c_str())) { Core::GetSubsystemContext()->Notification("COMMAND", { encodeToSizeT("Undo"), nullptr }); }
                 if (ImGui::MenuItem(Lang::Get("editor.menu.redo").c_str())) { Core::GetSubsystemContext()->Notification("COMMAND", { encodeToSizeT("Redo"), nullptr }); }
@@ -58,12 +58,12 @@ namespace RenderEditor {
 
             if (ImGui::BeginMenu(Lang::Get("editor.menu.view").c_str()))
             {
-                ImGui::MenuItem(Lang::Get("editor.menu.lua_control").c_str(), nullptr, &Switch.LuaControl);
-                ImGui::MenuItem(Lang::Get("editor.menu.details_panel").c_str(), nullptr, &Switch.DetailsWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.lua_control").c_str(), nullptr, &Switch->LuaControl);
+                ImGui::MenuItem(Lang::Get("editor.menu.details_panel").c_str(), nullptr, &Switch->DetailsWindow);
                 ImGui::Separator();
-                ImGui::MenuItem(Lang::Get("editor.menu.engine_log").c_str(), nullptr, &Switch.LoggerWindow);
-                ImGui::MenuItem(Lang::Get("editor.menu.render_view").c_str(), nullptr, &Switch.RenderViewWindow);
-                ImGui::MenuItem(Lang::Get("editor.menu.content_browser").c_str(), nullptr, &Switch.ContentBrowserWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.engine_log").c_str(), nullptr, &Switch->LoggerWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.render_view").c_str(), nullptr, &Switch->RenderViewWindow);
+                ImGui::MenuItem(Lang::Get("editor.menu.content_browser").c_str(), nullptr, &Switch->ContentBrowserWindow);
                 ImGui::EndMenu();
             }
 

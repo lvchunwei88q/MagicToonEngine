@@ -84,6 +84,13 @@ public:
 		obj->generate_object_init_func_();			// this func from MagicHeaderTool
 		return obj;
 	}
+
+	template<typename T, typename... Args>
+	static std::unique_ptr<T> CreateUnique(Args&&... args) {
+		auto obj = std::make_unique<T>(std::forward<Args>(args)...);
+		obj->generate_object_init_func_();  // this func from MagicHeaderTool
+		return obj;
+	}
 };
 
 namespace Core {
