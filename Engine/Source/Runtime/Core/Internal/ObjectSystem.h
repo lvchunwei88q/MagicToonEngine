@@ -55,7 +55,7 @@ namespace Core {
 		std::wstring ProjectSerializedDataDir;
 	};
 
-	// 对象系统，负责管理所有的对象实例
+	// The object system, responsible for managing all object instances
 	class ObjectSystem : public SubsystemTemplate<ObjectSystem,Priority::Core> , public IObjectSystem
 	{
 	public:
@@ -66,6 +66,10 @@ namespace Core {
 		virtual ObjectSystemHandle RegisterObject(Object* ptr) override;
 		virtual void RemoveObject(ObjectSystemHandle Handle) override;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION
+		/*
+		* For the default Object, we use the serialization file system provided by ObjectSystem.
+		* For Objects that need custom locations, we can use the Object's built-in serialization IO functions.
+		*/
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) override;
 		virtual void SaveObjectSerializationData(ObjectSerializationData Descriptor) override;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
@@ -79,6 +83,10 @@ namespace Core {
 	protected:
 		// Here we implement the features we need
 		// -------------------------------- serialization
+		/*
+		* The serialization file storage rule of ObjectSystem is that any object is treated 'equally' regardless of whether it has previously serialized data,
+		* and it will only be stored if it needs to be re-saved.
+		*/
 		bool Serialization();
 		bool Deserialization();
 		// -------------------------------- 

@@ -1,11 +1,12 @@
 #pragma once
 
-/*
+/*						Entity Component System
 *  The 'capabilities' this object provides only allow single inheritance,
 *  but you don't need to worry about extending functionality because in our architecture,
 *  objects inherit classes responsible for implementing module functions.
 *  Later, we have multiple functions, and now we can freely combine these classes.
 
+						  System
 ┌───────────────────────────────────────────────────────────────┐
 │  Object (Capability provider)									│
 │  背后有 ObjectSystem 管理:										│
@@ -15,6 +16,7 @@
 └───────────────────────────────────────────────────────────────┘
                             │
                             ▼
+						  Component
 ┌───────────────────────────────────────────────────────────────┐
 │  Ability Achiever (Implements Abilities)						│
 │  - NetworkSyncAbility (网络同步能力)							│
@@ -23,9 +25,11 @@
 │  - HealthAbility (生命值能力)									│
 │  - InventoryAbility (背包能力)									│
 └───────────────────────────────────────────────────────────────┘
+                            ▲
                             │
         ┌───────────────────┼───────────────────┐
         ▼                   ▼                   ▼
+						  Entity
 ┌───────────────────────────────────────────────────────────────┐
 │  工作类 (Worker Classes) - 像搭积木一样拼接						│
 │																│
@@ -35,13 +39,13 @@
 │      HealthAbility Health;      ← 能力3						│
 │  };															│
 │																│
-│  class Enemy : public Object {								│
+│  class Enemy {												│
 │      MovementAbility Move;      ← 复用能力1						│
 │      HealthAbility Health;      ← 复用能力3						│
 │      AIControl Ability AI;      ← 能力4						│
 │  };															│
 │																│
-│  class NetworkPlayer : public Object {						│
+│  class NetworkPlayer {										│
 │      NetworkSyncAbility Net;   ← 能力5							│
 │      MovementAbility Move;      ← 复用能力1						│
 │  };															│
@@ -135,7 +139,7 @@ namespace Core {
 		const ObjectType GetType()	const { return Type;	}
 
 	private:
-		// this object in objectsystem postion
+		// this object in objectSystem postion
 		size_t id;
 		size_t index;
 		ObjectType Type = ObjectType::Unknown;

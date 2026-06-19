@@ -34,6 +34,7 @@ namespace Core {
 		return FileData;
 	}
 
+	// ------------------------------------------------------------- ObjectSystem --------------------------------------------------------- //
 	IObjectSystem* GetObjectSystem() {
 		return &ObjectSystem::Get();
 	}
@@ -91,7 +92,7 @@ namespace Core {
 	ObjectSerializationDescriptor ObjectSystem::GetObjectSerializationData(ObjectSystemHandle Handle)
 	{
 		ObjectSerializationDescriptor ObjectData;
-		if (Handle.GetType() == ObjectType::Unknown || Handle.GetIndex() > Objects.size())
+		if (Handle.GetType() == ObjectType::Unknown || Handle.GetIndex() >= Objects.size())
 		{
 			return ObjectSerializationDescriptor();
 		}
@@ -115,7 +116,7 @@ namespace Core {
 	void ObjectSystem::SaveObjectSerializationData(ObjectSerializationData Descriptor)
 	{
 		ObjectSystemHandle& Handle = Descriptor.handle;
-		if (Handle.GetType() == ObjectType::Unknown || Handle.GetIndex() > Objects.size())
+		if (Handle.GetType() == ObjectType::Unknown || Handle.GetIndex() >= Objects.size())
 		{
 			return;
 		}
@@ -276,4 +277,6 @@ namespace Core {
 		FIND_OBJECT_BYTE_FILE_FUNCTION(const);
 		return false;
 	}
+
+	// ------------------------------------------------------------- ObjectSystem --------------------------------------------------------- //
 }
