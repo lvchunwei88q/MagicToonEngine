@@ -28,6 +28,13 @@ namespace IO {
         return content;
     }
 
+    std::vector<uint8_t> ReadAllU8Bytes(const std::wstring& path)
+    {
+        std::vector<char> Content = ReadAllBytes(path);
+        std::vector<uint8_t> uint8_content(Content.begin(), Content.end());
+        return uint8_content;
+    }
+
     void WriteAllText(const std::wstring& path, const std::string& content) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::trunc);
@@ -43,7 +50,7 @@ namespace IO {
         if (!file.is_open()) {
             throw std::runtime_error("Failed to write file: " + ToNarrowString(path));
         }
-        file.write(data.Data(), data.GetUsedSize());
+        file.write(data.DataChar(), data.GetUsedSize());
     }
 
     void AppendText(const std::wstring& path, const std::string& content) {
@@ -61,7 +68,7 @@ namespace IO {
         if (!file.is_open()) {
             throw std::runtime_error("Failed to append to file: " + ToNarrowString(path));
         }
-        file.write(data.Data(), data.GetUsedSize());
+        file.write(data.DataChar(), data.GetUsedSize());
     }
 
     bool DeleteToFile(const std::wstring& path) {
@@ -121,6 +128,24 @@ namespace IO {
             return true;
         }
         return false;
+    }
+
+    bool GetFileName(const std::wstring& src, std::wstring& dst)
+    {
+        try {
+            std::filesystem::path path(src);
+            // Get FileName
+            std::filesystem::path filename = path.filename();
+            // 去除扩展名
+            std::filesystem::path stem = filename.stem();
+
+            dst = stem.wstring();
+            return !dst.empty();
+        }
+        catch (const std::filesystem::filesystem_error&) {
+            dst.clear();
+            return false;
+        }
     }
 
     bool MakeDirectory(const std::wstring& path) {

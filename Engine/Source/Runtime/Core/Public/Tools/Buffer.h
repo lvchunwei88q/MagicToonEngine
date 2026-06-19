@@ -1,7 +1,13 @@
 #pragma once
+#include <string>
 #include <vector>
 #include <cstring>
 #include <cstdint>
+#include <stdexcept>
+
+/*
+* 为了方便我们更好的写入读取字节我们使用这些Class管理
+*/
 
 class BinaryBuffer {
 private:
@@ -15,6 +21,14 @@ public:
         , m_CurrentSize(initialSize) {
         if (initialSize > 0) {
             m_Data.resize(initialSize);
+        }
+    }
+
+    explicit BinaryBuffer(const std::vector<uint8_t>& data)
+        : m_WriteOffset(0)
+        , m_CurrentSize(data.size()) {
+        if (data.size() > 0) {
+            m_Data = data;
         }
     }
 
@@ -63,38 +77,24 @@ public:
         memcpy(ptr, data, size);
     }
 
-    void Write(const std::vector<uint8_t>& data) {
-        Write(data.data(), data.size());
-    }
+    void Write(const std::vector<uint8_t>& data) {Write(data.data(), data.size());}
 
     // 获取当前写入指针
-    const uint8_t* GetCurrentPtr() const {
-        return m_Data.data() + m_WriteOffset;
-    }
+    const uint8_t* GetCurrentPtr() const {return m_Data.data() + m_WriteOffset;}
 
     // 获取数据指针
-    uint8_t* Data() {
-        return m_Data.data();
-    }
+    const uint8_t* DataU8() const {return m_Data.data();}
 
-    const char* Data() const {
-        return reinterpret_cast<const char*>(m_Data.data());
-    }
+    const char* DataChar() const {return reinterpret_cast<const char*>(m_Data.data());}
 
     // 获取当前已写入的大小
-    size_t GetWrittenSize() const {
-        return m_WriteOffset;
-    }
+    size_t GetWrittenSize() const {return m_WriteOffset;}
 
     // 获取当前分配的总大小
-    size_t GetTotalSize() const {
-        return m_CurrentSize;
-    }
+    size_t GetTotalSize() const {return m_CurrentSize;}
 
     // 获取实际数据大小
-    size_t GetUsedSize() const {
-        return m_WriteOffset;
-    }
+    size_t GetUsedSize() const {return m_WriteOffset;}
 
     // 收缩到实际使用大小
     void ShrinkToFit() {
@@ -104,13 +104,13 @@ public:
         }
     }
 
-    // 获取底层 vector（移动语义）
+    // 获取底层 vector
     std::vector<uint8_t> MoveData() {
         ShrinkToFit();
         return std::move(m_Data);
     }
 
-    // 重置（清空数据）
+    // 重置
     void Reset() {
         m_Data.clear();
         m_WriteOffset = 0;
@@ -127,13 +127,165 @@ public:
 
     // 手动设置写入位置
     void Seek(size_t position) {
-        if (position <= m_CurrentSize) {
+        if (position <= m_CurrentSize)
             m_WriteOffset = position;
-        }
     }
 
     // 获取当前偏移
-    size_t Tell() const {
-        return m_WriteOffset;
+    size_t Tell() const {return m_WriteOffset;}
+};
+
+class BinaryReader {
+private:
+    std::vector<uint8_t> m_Data;                // 指向外部数据
+    size_t m_ReadOffset;                        // 当前读取位置
+    size_t m_DataSize;                          // 数据总大小
+
+public:
+    // 从 vector 构造（引用方式，不拷贝数据）
+    explicit BinaryReader(const std::vector<uint8_t>& data)
+        : m_Data(data)
+        , m_ReadOffset(0)
+        , m_DataSize(data.size()) {}
+
+    // 从 BinaryBuffer 读取
+    explicit BinaryReader(const BinaryBuffer& buffer)
+        : m_ReadOffset(0)
+        , m_DataSize(buffer.GetUsedSize()) {
+        // copy data to this
+        const uint8_t* src = buffer.DataU8();
+        m_Data = std::vector<uint8_t>(src, src + m_DataSize);
+    }
+
+    // 拷贝构造
+    BinaryReader(const BinaryReader& other)
+        : m_Data(other.m_Data)  // 共享数据
+        , m_ReadOffset(other.m_ReadOffset)
+        , m_DataSize(other.m_DataSize) {}
+
+    ~BinaryReader() {
+    }
+
+    // 读取基础类型
+    template<typename T>
+    T Read() {
+        static_assert(std::is_trivially_copyable<T>::value,
+            "T must be trivially copyable");
+
+        if (m_ReadOffset + sizeof(T) > m_DataSize) {
+            throw std::out_of_range("Not enough data to read");
+        }
+
+        T value;
+        const uint8_t* src = m_Data.data() + m_ReadOffset;
+        memcpy(&value, src, sizeof(T));
+        m_ReadOffset += sizeof(T);
+        return value;
+    }
+
+    // 读取指定数量的字节到 vector
+    std::vector<uint8_t> ReadBytes(size_t count) {
+        if (m_ReadOffset + count > m_DataSize) {
+            throw std::out_of_range("Not enough data to read");
+        }
+
+        const uint8_t* src = m_Data.data() + m_ReadOffset;
+        std::vector<uint8_t> result(src, src + count);
+        m_ReadOffset += count;
+        return result;
+    }
+
+    // 读取指定数量的字节到缓冲区
+    void ReadBytes(void* buffer, size_t count) {
+        if (m_ReadOffset + count > m_DataSize) {
+            throw std::out_of_range("Not enough data to read");
+        }
+
+        const uint8_t* src = m_Data.data() + m_ReadOffset;
+        memcpy(buffer, src, count);
+        m_ReadOffset += count;
+    }
+
+    // 读取字符串
+    std::string ReadString(size_t length) {
+        if (m_ReadOffset + length > m_DataSize) {
+            throw std::out_of_range("String data truncated");
+        }
+
+        const char* src = reinterpret_cast<const char*>(m_Data.data() + m_ReadOffset);
+        std::string result(src, length);
+        m_ReadOffset += length;
+        return result;
+    }
+
+    // 读取到指定的 vector（追加模式）
+    void ReadToVector(std::vector<uint8_t>& out, size_t count) {
+        if (m_ReadOffset + count > m_DataSize) {
+            throw std::out_of_range("Not enough data to read");
+        }
+
+        const uint8_t* src = m_Data.data() + m_ReadOffset;
+        out.insert(out.end(), src, src + count);
+        m_ReadOffset += count;
+    }
+
+    // 查看数据
+    template<typename T>
+    T Peek() const {
+        static_assert(std::is_trivially_copyable<T>::value,
+            "T must be trivially copyable");
+
+        if (m_ReadOffset + sizeof(T) > m_DataSize) {
+            throw std::out_of_range("Not enough data to peek");
+        }
+
+        T value;
+        const uint8_t* src = m_Data.data() + m_ReadOffset;
+        memcpy(&value, src, sizeof(T));
+        return value;
+    }
+
+    // 跳过指定字节数
+    void Skip(size_t count) {
+        if (m_ReadOffset + count > m_DataSize) {
+            throw std::out_of_range("Skip beyond data end");
+        }
+        m_ReadOffset += count;
+    }
+
+    // 获取当前读取位置
+    size_t Tell() const {return m_ReadOffset;}
+
+    // 设置读取位置
+    void Seek(size_t position) {
+        if (position > m_DataSize) {
+            throw std::out_of_range("Seek position out of range");
+        }
+        m_ReadOffset = position;
+    }
+
+    // 获取剩余可读字节数
+    size_t Remaining() const {return m_DataSize - m_ReadOffset;}
+
+    // 获取数据总大小
+    size_t Size() const {return m_DataSize;}
+
+    // 判断是否已读完
+    bool IsEOF() const {return m_ReadOffset >= m_DataSize;}
+
+    // 获取数据指针
+    const uint8_t* Data() const {return m_Data.data();}
+
+    // 获取当前指针位置
+    const uint8_t* CurrentPtr() const {return m_Data.data() + m_ReadOffset;}
+
+    // 重置读取位置
+    void Reset() {m_ReadOffset = 0;}
+
+    // 重置并设置新数据
+    void Reset(const std::vector<uint8_t>& data) {
+        m_Data = data;
+        m_ReadOffset = 0;
+        m_DataSize = data.size();
     }
 };

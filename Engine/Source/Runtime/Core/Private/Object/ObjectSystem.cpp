@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "ObjectSystem.h"
+#include "CoreLogCapture/CoreLogCapture.h"
 #include "IO.h"
 #include "Tools/Check.h"
 
@@ -23,13 +24,10 @@ namespace Core {
 		for (size_t i = 0; i < data.size(); i++)
 		{
 			ObjectByte& Byte = data[i];
-			std::vector<uint8_t> Handle;
-			Handle.resize(sizeof(ObjectSystemHandle));
-			memcpy(Handle.data(), &Byte.handle, sizeof(ObjectSystemHandle));
 
 			// Byte layout -> [ size , handle , data ]
 			FileData.Write(Byte.data.size());
-			FileData.Write(Handle);
+			FileData.Write(Byte.handle);
 			FileData.Write(Byte.data);
 		}
 
@@ -104,7 +102,6 @@ namespace Core {
 			{
 				const ObjectByte& Byte = FileByte.data[y];
 				if (Byte.handle == Handle) {
-					ObjectSerializationDescriptor ObjectData;
 					ObjectData.DataStart = Byte.data.data();
 					ObjectData.Length = Byte.data.size();
 					return true;
@@ -197,10 +194,61 @@ namespace Core {
 			IO::MakeDirectory(Data_.ProjectSerializedDataDir);
 		}
 
-		std::vector<std::string> EngineSerializedFiles = IO::GetFilesInDirectory(EngineSerializedDataDir);
-		std::vector<std::string> ProjectSerializedFiles = IO::GetFilesInDirectory(ProjectSerializedDataDir);
+		// Get File List
+		std::vector<std::string> EngineSerializedFiles	= IO::GetFilesInDirectory(EngineSerializedDataDir);
+		std::vector<std::string> ProjectSerializedFiles	= IO::GetFilesInDirectory(ProjectSerializedDataDir);
 
-		// TODO 实现文件读取
+		// Reusable Lambda Function
+		auto ReadFileToObjectByteFile = [&](const std::vector<std::string>& files, std::vector<ObjectByteFile>& OutByteFile,ObjectType Type) {
+			for (size_t i = 0; i < files.size(); i++)
+			{
+				auto& file = files[i];
+				std::wstring fileW = IO::ToWideString(file);
+				std::wstring FileName;
+				size_t FileHas;
+				IO::GetFileName(fileW, FileName);
+				try {
+					FileHas = static_cast<size_t>(std::stoull(FileName));
+				}
+				catch (const std::exception&) {
+					WarningCapture::Capture("Files not handled by ObjectSystem have been skipped!");
+					continue;
+				}
+
+				// Read File Name
+				std::wstring pathW;
+				switch (Type)
+				{
+				case ObjectType::ENGINE:	pathW = EngineSerializedDataDir;	break;
+				case ObjectType::PROJECT:	pathW = ProjectSerializedDataDir;	break;
+				}
+
+				pathW += fileW;
+				std::vector<uint8_t> Content = IO::ReadAllU8Bytes(pathW);
+				BinaryReader ObjectByteBuffer(std::move(Content));
+				size_t Index = ObjectByteBuffer.Read<size_t>();
+
+				ObjectByteFile ObjectByte;
+				ObjectByte.Type = Type;
+				ObjectByte.FileHas = FileHas;
+				ObjectByte.data.resize(Index);
+
+				for (size_t y = 0; y < Index; y++)
+				{
+					size_t Size						= ObjectByteBuffer.Read<size_t>();
+					ObjectSystemHandle Handle		= ObjectByteBuffer.Read<ObjectSystemHandle>();
+					std::vector<uint8_t> Data		= ObjectByteBuffer.ReadBytes(Size);
+
+					ObjectByte.data[y].data = Data;
+					ObjectByte.data[y].handle = Handle;
+				}
+
+				OutByteFile.push_back(ObjectByte);
+			}
+		};
+
+		ReadFileToObjectByteFile(EngineSerializedFiles,  Read_FileBytes, ObjectType::ENGINE);
+		ReadFileToObjectByteFile(ProjectSerializedFiles, Read_FileBytes, ObjectType::PROJECT);
 
 		return true;
 	}

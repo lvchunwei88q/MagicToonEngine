@@ -24,8 +24,9 @@ namespace IO {
 	// 读取整个文件
 	CORE_API std::string ReadAllText(const std::wstring& path);
 
-	// 读取整个文件
 	CORE_API std::vector<char> ReadAllBytes(const std::wstring& path);
+
+	CORE_API std::vector<uint8_t> ReadAllU8Bytes(const std::wstring& path);
 
 	// 写入字符串到文件
 	CORE_API void WriteAllText(const std::wstring& path, const std::string& content);
@@ -53,6 +54,9 @@ namespace IO {
 
 	// 获取文件的目录
 	CORE_API bool GetFileDirectory(const std::wstring& src, std::wstring& dst);
+
+	// 获取文件的名称
+	CORE_API bool GetFileName(const std::wstring& src, std::wstring& dst);
 
 	// 创建目录（包括父目录）
 	CORE_API bool MakeDirectory(const std::wstring& path);
