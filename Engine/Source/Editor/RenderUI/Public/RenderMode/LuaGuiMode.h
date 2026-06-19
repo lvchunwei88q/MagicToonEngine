@@ -2,7 +2,7 @@
 
 #include "Common/RENDERUI_API.h"
 #include <sol/sol.hpp> // lua bind
-#include <Common/Compiler.h>
+#include <Common/Check.h>
 
 namespace RenderUI {
 	class LuaGuiMode;

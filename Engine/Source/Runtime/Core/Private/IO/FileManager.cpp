@@ -44,7 +44,7 @@ namespace IO {
         file.write(content.data(), content.size());
     }
 
-    void WriteAllBytes(const std::wstring& path, const BinaryBuffer& data) {
+    void WriteAllBytes(const std::wstring& path, const BinaryWrite& data) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::trunc);
         if (!file.is_open()) {
@@ -62,7 +62,7 @@ namespace IO {
         file.write(content.data(), content.size());
     }
 
-    void AppendBytes(const std::wstring& path, const BinaryBuffer& data) {
+    void AppendBytes(const std::wstring& path, const BinaryWrite& data) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::app);
         if (!file.is_open()) {

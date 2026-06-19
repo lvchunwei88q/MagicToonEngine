@@ -25,7 +25,7 @@ namespace Core {
 		size_t GetIndex() const { return data.size(); }
 		std::wstring GetFileName() const { return std::to_wstring(FileHas); };
 		ObjectType GetStorageArea() const { return Type; };
-		BinaryBuffer GenerateFileData();
+		BinaryWrite GenerateFileData();
 	};
 
 	/*				 size = x

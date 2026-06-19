@@ -2,12 +2,12 @@
 #include "ObjectSystem.h"
 #include "CoreLogCapture/CoreLogCapture.h"
 #include "IO.h"
-#include "Tools/Check.h"
+#include "Common/Check.h"
 
 namespace Core {
 	AUTO_REGISTER(ObjectSystem);
 
-	BinaryBuffer ObjectByteFile::GenerateFileData()
+	BinaryWrite ObjectByteFile::GenerateFileData()
 	{
 		// File layout -> [ index , data ]
 		size_t CurrentFileObjectSize = sizeof(size_t);
@@ -16,7 +16,7 @@ namespace Core {
 			CurrentFileObjectSize += data[i].GetAllSize();
 		}
 
-		BinaryBuffer FileData(CurrentFileObjectSize);
+		BinaryWrite FileData(CurrentFileObjectSize);
 
 		// Write the first one
 		FileData.Write(GetIndex());
@@ -163,7 +163,7 @@ namespace Core {
 		for (size_t i = 0; i < Written_FileBytes.size(); i++)
 		{
 			ObjectByteFile& FileByte = Written_FileBytes[i];
-			const BinaryBuffer& Buffer = FileByte.GenerateFileData();
+			const BinaryWrite& Buffer = FileByte.GenerateFileData();
 
 			ObjectType CurrentStorageArea = FileByte.GetStorageArea();
 			std::wstring CurrentFileSavePath = CurrentStorageArea == ObjectType::ENGINE ? Data_.EngineSerializedDataDir :
@@ -237,7 +237,7 @@ namespace Core {
 				{
 					size_t Size						= ObjectByteBuffer.Read<size_t>();
 					ObjectSystemHandle Handle		= ObjectByteBuffer.Read<ObjectSystemHandle>();
-					std::vector<uint8_t> Data		= ObjectByteBuffer.ReadBytes(Size);
+					std::vector<uint8_t> Data		= ObjectByteBuffer.ReadToVector(Size);
 
 					ObjectByte.data[y].data = Data;
 					ObjectByte.data[y].handle = Handle;

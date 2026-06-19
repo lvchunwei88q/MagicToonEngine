@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/Core_API.h"
-#include "Common/Compiler.h"
+#include "Common/Check.h"
 #include "Tools/Singleton.h"
 #include "Tools/Buffer.h"
 #include <string>
@@ -32,13 +32,13 @@ namespace IO {
 	CORE_API void WriteAllText(const std::wstring& path, const std::string& content);
 
 	// 写入字节到文件
-	CORE_API void WriteAllBytes(const std::wstring& path, const BinaryBuffer& data);
+	CORE_API void WriteAllBytes(const std::wstring& path, const BinaryWrite& data);
 
 	// 追加字符串到文件末尾
 	CORE_API void AppendText(const std::wstring& path, const std::string& content);
 
 	// 追加字节到文件末尾
-	CORE_API void AppendBytes(const std::wstring& path, const BinaryBuffer& data);
+	CORE_API void AppendBytes(const std::wstring& path, const BinaryWrite& data);
 
 	// 删除文件
 	CORE_API bool DeleteToFile(const std::wstring& path);
@@ -77,39 +77,22 @@ namespace IO {
 	public:
 		AbsolutePath() = default;
 
-		/**
-		 * 获取可执行文件所在目录
-		 * @return 可执行文件的完整目录路径（不包含文件名）
-		 */
+		// 获取可执行文件所在目录
 		std::wstring GetExecutableDirectory();
 
-		/**
-		 * 获取当前工作目录
-		 * @return 当前工作目录路径
-		 */
+		// 获取当前工作目录
 		std::wstring GetCurrentWorkingDirectory();
 
-		/**
-		 * 获取可执行文件的完整路径（包含文件名）
-		 * @return 可执行文件的完整路径
-		 */
+		// 获取可执行文件的完整路径
 		std::wstring GetExecutablePath();
 
-		/**
-		* 获取内容路径
-		* @return 内容路径完整路径
-		*/
+		// 获取内容路径
 		std::wstring GetContentPath();
 
-		/**
-		* 获取脚本路径
-		* @return 脚本路径完整路径
-		*/
+		// 获取脚本路径
 		std::wstring GetScriptPath();
 
-		/**
-		* 清除缓存
-		*/
+		// 清除缓存
 		void ClearCache();
 	private:
 		// 缓存路径结果，避免重复计算

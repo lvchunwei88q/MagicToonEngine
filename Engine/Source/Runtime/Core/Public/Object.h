@@ -50,13 +50,12 @@
 
 #include "Common/Core_API.h"
 #include "Core.h"
-#include <Common/Compiler.h>
+#include <Common/Check.h>
 #include <string>
 #include <vector>
 #include <memory>
 #include <cereal/archives/binary.hpp>
 
-#include "Tools/Check.h"
 #include "Tools/EnumClassFlags.h"
 
 FORBIDDEN_METHOD_CONCEPT(Object, GetClassId);
