@@ -2,7 +2,7 @@
 
 #include "ProjectControllerImpl.h"
 #include <string_view>
-#include <Core.h>
+#include <CoreMinimal.h>
 
 ///////////////////////////////////
 #include <IO.h> 

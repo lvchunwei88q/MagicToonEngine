@@ -3,7 +3,7 @@
 #include <IO.h> 
 ///////////////////////////////////
 #include <ILog.h>
-#include <Core.h>
+#include <CoreMinimal.h>
 
 #include <string_view>
 

@@ -48,9 +48,7 @@
 └───────────────────────────────────────────────────────────────┘
 */
 
-#include "Common/Core_API.h"
-#include "Core.h"
-#include <Common/Check.h>
+#include "CoreMinimal.h"
 #include <string>
 #include <vector>
 #include <memory>
