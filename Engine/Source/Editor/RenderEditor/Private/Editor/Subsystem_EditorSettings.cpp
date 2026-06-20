@@ -19,7 +19,7 @@ namespace RenderEditor {
     RENDERUI_REGISTER(EditorSettings);
 
     auto GetLanguageFileName = [](Languages language) {
-            std::wstring ContentPath = IO::AbsolutePath::Get().GetContentPath();
+            std::wstring ContentPath = IO::AbsolutePath::Get().GetContentDirectory().GetRoot();
             ContentPath += L"\\Config\\Languages\\";
 
             switch (language)

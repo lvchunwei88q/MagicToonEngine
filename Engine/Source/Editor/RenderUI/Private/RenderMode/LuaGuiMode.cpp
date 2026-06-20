@@ -60,7 +60,7 @@ namespace RenderUI {
         lua = sol::state();
         lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::debug); // base lib
 
-        std::wstring ScriptPath = IO::AbsolutePath::Get().GetScriptPath();
+        std::wstring ScriptPath = IO::AbsolutePath::Get().GetScriptDirectory().GetRoot();
         std::string narrowPath = IO::ToNarrowString(ScriptPath);
         std::replace(narrowPath.begin(), narrowPath.end(), '\\', '/');
         {

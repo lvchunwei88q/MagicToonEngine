@@ -113,9 +113,9 @@ namespace Core {
 		return ObjectData;
 	}
 
-	void ObjectSystem::SaveObjectSerializationData(ObjectSerializationData Descriptor)
+	void ObjectSystem::SaveObjectSerializationData(ObjectSerializationData ObjectData)
 	{
-		ObjectSystemHandle& Handle = Descriptor.handle;
+		ObjectSystemHandle& Handle = ObjectData.handle;
 		if (Handle.GetType() == ObjectType::Unknown || Handle.GetIndex() >= Objects.size())
 		{
 			return;
@@ -135,7 +135,7 @@ namespace Core {
 #endif
 				ObjectByte ByteFrag;
 				ByteFrag.handle = Handle;
-				ByteFrag.data = Descriptor.data;
+				ByteFrag.data = ObjectData.data;
 
 				FileByte.data.push_back(ByteFrag);
 				return true;
@@ -148,7 +148,7 @@ namespace Core {
 
 			ObjectByte ByteFrag;
 			ByteFrag.handle = Handle;
-			ByteFrag.data = Descriptor.data;
+			ByteFrag.data = ObjectData.data;
 
 			ObjectByteFile ByteFile;
 			ByteFile.FileHas = ClassHas;
@@ -157,6 +157,18 @@ namespace Core {
 
 			Written_FileBytes.push_back(ByteFile);
 		}
+	}
+
+	ObjectCustomSerializationData ObjectSystem::GetCustomObjectSerializationData(ObjectCustomSerializationDescriptor Descriptor)
+	{
+		ObjectCustomSerializationData ObjectData;
+		// TODO 实现功能
+		return ObjectCustomSerializationData();
+	}
+
+	void ObjectSystem::SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData)
+	{
+		// TODO 实现功能
 	}
 
 	bool ObjectSystem::Serialization()
@@ -185,7 +197,7 @@ namespace Core {
 		// Create the corresponding folder if it doesn't exist
 		std::wstring EngineSerializedDataDir = IO::AbsolutePath().Get().GetExecutableDirectory() + L"\\" CACHE L"SerializedData\\";
 		Data_.EngineSerializedDataDir = EngineSerializedDataDir;
-		std::wstring ProjectSerializedDataDir = IO::AbsolutePath().Get().GetCurrentWorkingDirectory() + L"\\" CACHE L"SerializedData\\";
+		std::wstring ProjectSerializedDataDir = IO::AbsolutePath().Get().GetCurrentWorkingDirectory().GetRoot() + L"\\" CACHE L"SerializedData\\";
 		Data_.ProjectSerializedDataDir = ProjectSerializedDataDir;
 
 		if (!IO::Exists(Data_.EngineSerializedDataDir)) {

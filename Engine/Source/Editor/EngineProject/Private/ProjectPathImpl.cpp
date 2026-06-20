@@ -16,12 +16,12 @@ namespace EngineProject {
 	std::wstring ProjectPathImpl::GetRoot()
 	{
 		// 一般工作目录就是项目目录
-		return IO::AbsolutePath::Get().GetCurrentWorkingDirectory();
+		return IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot();
 	}
 
 	std::wstring ProjectPathImpl::GetSubDir(ProJectDirEnum Enum)
 	{
-		std::wstring root = IO::AbsolutePath::Get().GetCurrentWorkingDirectory();
+		std::wstring root = IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot();
 
 		if (!magic_enum::enum_contains(Enum)) {
 			LOG_WARNING("No corresponding path!");
@@ -62,7 +62,7 @@ namespace EngineProject {
 
 	bool ProjectPathImpl::Detection()
 	{
-		std::wstring root = IO::AbsolutePath::Get().GetCurrentWorkingDirectory();
+		std::wstring root = IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot();
 
 		std::wstring project_config = root + L"\\" ProjectJSONName;
 

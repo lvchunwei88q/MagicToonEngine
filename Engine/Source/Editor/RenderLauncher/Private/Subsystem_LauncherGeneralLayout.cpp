@@ -17,7 +17,7 @@ namespace RenderLauncher {
             ])";
 
 	auto GetLanguageFileName = []() {
-			std::wstring ContentPath = IO::AbsolutePath::Get().GetContentPath();
+			std::wstring ContentPath = IO::AbsolutePath::Get().GetContentDirectory().GetRoot();
 			ContentPath += L"\\Config\\Languages\\";
 			ContentPath += L"launcher.json"; // 默认 English
 

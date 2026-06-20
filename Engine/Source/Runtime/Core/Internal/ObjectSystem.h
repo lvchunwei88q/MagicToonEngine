@@ -71,7 +71,10 @@ namespace Core {
 		* For Objects that need custom locations, we can use the Object's built-in serialization IO functions.
 		*/
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) override;
-		virtual void SaveObjectSerializationData(ObjectSerializationData Descriptor) override;
+		virtual void SaveObjectSerializationData(ObjectSerializationData ObjectData) override;
+
+		virtual ObjectCustomSerializationData GetCustomObjectSerializationData(ObjectCustomSerializationDescriptor Descriptor) override;
+		virtual void SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData) override;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 
 	private:

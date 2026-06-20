@@ -25,7 +25,7 @@ namespace RenderEditor {
     void FileBrowserUI::Init()
     {
         state.currentPath = literal_root; // game ==  rootPath
-        state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory(); // 设置根路径就是工作路径
+        state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot(); // 设置根路径就是工作路径
 
         FILE_SERIALIZATION_LOADING(Config, CONFIG "Editor\\Windows\\", L"FileBrowserConfig.mtdata")
     }

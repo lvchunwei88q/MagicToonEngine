@@ -17,7 +17,7 @@ namespace AssetPipeline {
 
 	void UIAssetImpl::LoadAsset()
 	{
-		const std::wstring content = IO::AbsolutePath::Get().GetContentPath();
+		const std::wstring content = IO::AbsolutePath::Get().GetContentDirectory().GetRoot();
 
 		{
 			ICON_PAIR(L"Editor\\content_browser", L"folder.png", Folder);

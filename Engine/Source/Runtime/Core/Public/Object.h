@@ -113,6 +113,7 @@ namespace Core {
 
 	enum class DestructionMode : uint8_t {
 		SaveAndDestroy,
+		CustomSaveAndDestroy,
 		DestroyOnly,
 	};
 
@@ -156,6 +157,14 @@ namespace Core {
 	struct ObjectSerializationData {
 		std::vector<uint8_t> data;
 		ObjectSystemHandle handle;
+	};
+
+	// ---------------------- CUSTOM --------------------------- //
+	struct ObjectCustomSerializationDescriptor {
+		std::wstring Path;
+	};
+	struct ObjectCustomSerializationData : public ObjectSerializationData {
+		std::wstring ObjectSerializationPath;
 	};
 	// ---------------------------------------------------------------------------------- MSERIALIZATION END
 
@@ -220,8 +229,12 @@ namespace Core {
 	private:
 		friend class Object;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION
+		// This from ObjectSystem Automatic management
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) = 0;
-		virtual void SaveObjectSerializationData(ObjectSerializationData Descriptor) = 0;
+		virtual void SaveObjectSerializationData(ObjectSerializationData ObjectData) = 0;
+		// This from Object Specified path
+		virtual ObjectCustomSerializationData GetCustomObjectSerializationData(ObjectCustomSerializationDescriptor Descriptor) = 0;
+		virtual void SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData) = 0;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 	};
 
