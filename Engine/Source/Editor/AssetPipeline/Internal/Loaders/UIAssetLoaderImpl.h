@@ -7,7 +7,7 @@ namespace AssetPipeline {
 	// 加载 Editor Assets
 
 #define ICON(content_path,name, type) \
-    std::wstring _p##type = content + L"\\" content_path L"\\" name; \
+    std::wstring _p##type = editor_content + L"\\" content_path L"\\" name; \
     RenderCore::LoadTextureFromFile(_p##type.c_str(), "uiasset_editor_" #type);
 
 #define ICON_PAIR(content_path,name, type) \

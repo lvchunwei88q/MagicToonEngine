@@ -17,13 +17,13 @@ namespace AssetPipeline {
 
 	void UIAssetImpl::LoadAsset()
 	{
-		const std::wstring content = IO::AbsolutePath::Get().GetContentDirectory().GetRoot();
+		const std::wstring editor_content = IO::AbsolutePath::Get().GetContentDirectory().GetEditor();
 
 		{
-			ICON_PAIR(L"Editor\\content_browser", L"folder.png", Folder);
-			ICON_PAIR(L"Editor\\content_browser", L"default_file.png", File);
-			ICON_PAIR(L"Editor\\content_browser", L"ion_return_up_back.png", Return);
-			ICON_PAIR(L"Editor\\content_browser", L"icons_file_type_json.png", JSON);
+			ICON_PAIR(L"content_browser", L"folder.png", Folder);
+			ICON_PAIR(L"content_browser", L"default_file.png", File);
+			ICON_PAIR(L"content_browser", L"ion_return_up_back.png", Return);
+			ICON_PAIR(L"content_browser", L"icons_file_type_json.png", JSON);
 
 
 			//std::wstring content_folder = content + L"\\Editor\\content_browser\\folder.png";
