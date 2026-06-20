@@ -79,27 +79,20 @@ public:
     }
 
     void Write(const std::vector<uint8_t>& data) {Write(data.data(), data.size());}
-
     // 获取当前写入指针
     const uint8_t* GetCurrentPtr()  const {return m_Data.data() + m_WriteOffset;}
-
     // 获取数据指针
     const uint8_t* DataU8()         const {return m_Data.data();}
-
     const char* DataChar()          const {return reinterpret_cast<const char*>(m_Data.data());}
-
     // 获取当前已写入的大小
     size_t GetWrittenSize()         const {return m_WriteOffset;}
-
     // 获取当前分配的总大小
     size_t GetTotalSize()           const {return m_CurrentSize;}
-
     // 获取实际数据大小
     size_t GetUsedSize()            const {return m_WriteOffset;}
 
     // 手动设置写入位置
     void Seek(size_t position)      { if (position <= m_CurrentSize)m_WriteOffset = position; }
-
     // 获取当前偏移
     size_t Tell()                   const { return m_WriteOffset; }
 
@@ -260,19 +253,14 @@ public:
 
     // 获取剩余可读字节数
     size_t Remaining()          const {return m_DataSize - m_ReadOffset;}
-
     // 获取数据总大小
     size_t Size()               const {return m_DataSize;}
-
     // 判断是否已读完
     bool IsEOF()                const {return m_ReadOffset >= m_DataSize;}
-
     // 获取数据指针
     const uint8_t* Data()       const {return m_Data.data();}
-
     // 获取当前指针位置
     const uint8_t* CurrentPtr() const {return m_Data.data() + m_ReadOffset;}
-
     // 重置读取位置
     void Reset()                {m_ReadOffset = 0;}
 

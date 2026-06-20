@@ -103,18 +103,6 @@ namespace Core {
 		}
 	}
 
-	ObjectCustomSerializationDescriptor ObjectSystem::GetCustomObjectSerializationData(const Object* Object)
-	{
-		ObjectCustomSerializationDescriptor ObjectDescriptor;
-		// TODO 实现功能
-		return ObjectCustomSerializationDescriptor();
-	}
-
-	void ObjectSystem::SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData)
-	{
-		// TODO 实现功能
-	}
-
 	bool ObjectSystem::Serialization()
 	{
 		for (size_t i = 0; i < Written_FileBytes.size(); i++)
@@ -232,6 +220,27 @@ namespace Core {
 	{
 		FIND_OBJECT_BYTE_FILE_FUNCTION(const);
 		return false;
+	}
+
+	// Simple Serialization
+
+	ObjectCustomSerializationDescriptor ObjectSystem::GetCustomObjectSerializationData(const std::wstring& Path)
+	{
+		if (IO::Exists(Path)) {
+			ObjectCustomSerializationDescriptor ObjectDescriptor;
+			ObjectDescriptor.data = IO::ReadAllU8Bytes(Path);
+			return ObjectDescriptor;
+		}
+		return ObjectCustomSerializationDescriptor();
+	}
+
+	void ObjectSystem::SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData)
+	{
+		if (!IO::Exists(ObjectData.ObjectSerializationPath)) {
+			IO::MakeFile(ObjectData.ObjectSerializationPath);
+		}
+
+		IO::WriteAllBytes(ObjectData.ObjectSerializationPath, BinaryWrite(ObjectData.data));
 	}
 
 	// ------------------------------------------------------------------- Object System ------- //

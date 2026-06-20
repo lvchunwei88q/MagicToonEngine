@@ -68,7 +68,7 @@ namespace Core {
 				ss.write(reinterpret_cast<const char*>(Descriptor.DataStart), Descriptor.Length);
 			}break;
 			case DestructionMode::CustomSaveAndDestroy: {
-				ObjectCustomSerializationDescriptor Descriptor = GetObjectSystem()->GetCustomObjectSerializationData(this);
+				ObjectCustomSerializationDescriptor Descriptor = GetObjectSystem()->GetCustomObjectSerializationData(L"");// TODO 实现
 				if (Descriptor.data.size() <= 0) return; // No data
 				ss.write(reinterpret_cast<const char*>(Descriptor.data.data()), Descriptor.data.size());
 			}break;

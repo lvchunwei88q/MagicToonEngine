@@ -72,8 +72,11 @@ namespace Core {
 		*/
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) override;
 		virtual void SaveObjectSerializationData(ObjectSerializationData ObjectData) override;
-
-		virtual ObjectCustomSerializationDescriptor GetCustomObjectSerializationData(const Object* Object) override;
+		/*
+		* Here we only handle storing to the file.
+		* as for how to distinguish between multiple instances, users need to take care of that themselves.
+		*/
+		virtual ObjectCustomSerializationDescriptor GetCustomObjectSerializationData(const std::wstring& Path) override;
 		virtual void SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData) override;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 

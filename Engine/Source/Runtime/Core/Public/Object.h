@@ -238,7 +238,7 @@ namespace Core {
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) = 0;
 		virtual void SaveObjectSerializationData(ObjectSerializationData ObjectData) = 0;
 		// This from Object Specified path
-		virtual ObjectCustomSerializationDescriptor GetCustomObjectSerializationData(const Object* Object) = 0;
+		virtual ObjectCustomSerializationDescriptor GetCustomObjectSerializationData(const std::wstring& Path) = 0;
 		virtual void SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData) = 0;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 	};
