@@ -69,12 +69,21 @@ namespace IO {
 	{
 		explicit WorkingDirectory(const std::wstring& Root) : BaseDirectory(Root) {};
 		WorkingDirectory() = delete;
+
+		std::wstring GetContent()	{ return GetRoot() + L"\\Content\\";	};
+		std::wstring GetConfig()	{ return GetRoot() + L"\\Config\\";		};
+		std::wstring GetCache()		{ return GetRoot() + L"\\Cache\\";		};
 	};
 
 	struct ContentDirectory : public BaseDirectory
 	{
 		explicit ContentDirectory(const std::wstring& Root) : BaseDirectory(Root) {};
 		ContentDirectory() = delete;
+
+		std::wstring GetEditor() { return GetRoot() + L"\\Editor\\"; };
+		std::wstring GetConfig() { return GetRoot() + L"\\Config\\"; };
+		std::wstring GetLogo()   { return GetRoot() + L"\\Logo\\";   };
+		std::wstring GetWindow() { return GetRoot() + L"\\Window\\"; };
 	};
 
 	struct ScriptDirectory : public BaseDirectory

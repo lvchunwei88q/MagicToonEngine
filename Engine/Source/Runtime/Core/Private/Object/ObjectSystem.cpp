@@ -197,7 +197,7 @@ namespace Core {
 		// Create the corresponding folder if it doesn't exist
 		std::wstring EngineSerializedDataDir = IO::AbsolutePath().Get().GetExecutableDirectory() + L"\\" CACHE L"SerializedData\\";
 		Data_.EngineSerializedDataDir = EngineSerializedDataDir;
-		std::wstring ProjectSerializedDataDir = IO::AbsolutePath().Get().GetCurrentWorkingDirectory().GetRoot() + L"\\" CACHE L"SerializedData\\";
+		std::wstring ProjectSerializedDataDir = IO::AbsolutePath().Get().GetCurrentWorkingDirectory().GetCache() + L"SerializedData\\";
 		Data_.ProjectSerializedDataDir = ProjectSerializedDataDir;
 
 		if (!IO::Exists(Data_.EngineSerializedDataDir)) {

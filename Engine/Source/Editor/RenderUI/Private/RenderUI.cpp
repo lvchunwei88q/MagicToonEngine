@@ -206,8 +206,8 @@ namespace RenderUI {
 
         // 定义 Font Awesome 的 Unicode 范围
         static const ImWchar icons_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-		std::string ContentPath = IO::ToNarrowString(IO::AbsolutePath::Get().GetContentDirectory().GetRoot());
-        std::string fullPath = ContentPath + "\\Editor\\font_icon\\Font Awesome 7 Free-Solid-900.otf";
+		std::string ContentPath = IO::ToNarrowString(IO::AbsolutePath::Get().GetContentDirectory().GetEditor());
+        std::string fullPath = ContentPath + "\\font_icon\\Font Awesome 7 Free-Solid-900.otf";
         io.Fonts->AddFontFromFileTTF(
             fullPath.c_str(),
             16.0f,
