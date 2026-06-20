@@ -13,7 +13,7 @@ namespace Core {
 			}
 		}
 		catch (const std::exception& e) {
-			ErrorCapture::Capture("Object Constructor: " + std::string(e.what()));
+			ErrorCapture::Capture("Object - " + GetClassName() + " Init: " + std::string(e.what()));
 		}
 	}
 
@@ -26,7 +26,7 @@ namespace Core {
 			GetObjectSystem()->RemoveObject(Handle); // delete this object for objectSystem
 		}
 		catch (const std::exception& e) {
-			ErrorCapture::Capture("Object Constructor: " + std::string(e.what()));
+			ErrorCapture::Capture("Object - " + GetClassName() + " Uninit: " + std::string(e.what()));
 		}
 	}
 

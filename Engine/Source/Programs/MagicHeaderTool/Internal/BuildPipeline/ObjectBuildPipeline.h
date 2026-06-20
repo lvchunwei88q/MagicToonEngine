@@ -19,8 +19,12 @@ namespace Object {
 	class MagicObjectBuildData : public Singleton<MagicObjectBuildData>
 	{
 		std::vector<MagicObjectMetadata>	m_MagicObjectMetadatas;
+
+		// Here we define the names of all the macros we want to undefine because we want to block the affected function names
+		std::vector<std::string> m_AllUndefMacros = {"GetClassName" };
 	public:
 		GENERATE_PROPERTY(MagicObjectMetadatas, std::vector<MagicObjectMetadata>);
+		GENERATE_GET_REF(AllUndefMacros, std::vector<std::string>);
 
 		void clear() {
 			m_MagicObjectMetadatas.clear();

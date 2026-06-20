@@ -60,6 +60,9 @@
 
 #include "Tools/EnumClassFlags.h"
 
+///////////////////////////////// From Windows 
+#undef GetClassName
+
 FORBIDDEN_METHOD_CONCEPT(Object, GetClassId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetInstanceId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetNextId);
@@ -132,7 +135,7 @@ namespace Core {
 		: id(id), index(index), Type(Type) {}
 
 		bool operator==(const ObjectSystemHandle& other) const {
-			return index == other.index && Type == other.Type;
+			return index == other.index && Type == other.Type && id == other.id;
 		}
 
 		const size_t GetId()		const { return id;		}
@@ -183,6 +186,7 @@ namespace Core {
 		virtual ~Object() = default;
 		Object() : instance_id(GetNextId()) {};
 
+		virtual std::string GetClassName() const = 0;				// Class Name generated using MagicHeaderTool
 		virtual uint64_t GetClassId() const = 0;					// Class ID generated using MagicHeaderTool
 		virtual uint64_t GetClassHas() const = 0;					// Class Has generated using MagicHeaderTool
 		virtual ObjectType GetClassType() const = 0;				// Class type generated using MagicHeaderTool

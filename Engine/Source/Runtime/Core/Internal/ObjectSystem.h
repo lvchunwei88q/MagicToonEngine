@@ -93,8 +93,8 @@ namespace Core {
 		* The serialization file storage rule of ObjectSystem is that any object is treated 'equally' regardless of whether it has previously serialized data,
 		* and it will only be stored if it needs to be re-saved.
 		*/
-		bool Serialization();
-		bool Deserialization();
+		bool SaveSerializationToByte();
+		bool ReadDeserializationToByte();
 		// -------------------------------- 
 	private:
 		// There is absolutely no management of their deletions here.

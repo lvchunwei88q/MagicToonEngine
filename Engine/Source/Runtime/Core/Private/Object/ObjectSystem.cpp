@@ -16,7 +16,7 @@ namespace Core {
 	{
 		Objects.reserve(PRE_ALLOCATED_SIZE);		// Init Object Pool Size
 
-		if (!Deserialization()) {
+		if (!ReadDeserializationToByte()) {
 			// Deserialization Error
 			__debugbreak();
 			return false;
@@ -29,7 +29,7 @@ namespace Core {
 	{
 		Read_FileBytes.clear();				// delete read FileBytes
 
-		if (!Serialization()) {
+		if (!SaveSerializationToByte()) {
 			// Serialization Error
 			__debugbreak();
 			return;

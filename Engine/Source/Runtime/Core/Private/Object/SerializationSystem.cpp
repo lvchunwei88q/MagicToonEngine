@@ -68,7 +68,7 @@ namespace Core {
 		bool IsFind = FindObjectByteFile(Written_FileBytes, Handle,
 			[&](ObjectByteFile& FileByte, size_t ClassHas, ObjectSystemHandle& Handle) -> bool {
 				// If we find it, then we'll add it here
-#ifndef _DEBUG
+#ifdef _DEBUG
 				for (size_t i = 0; i < FileByte.data.size(); i++)
 				{
 					const auto& FileByte_data = FileByte.data[i];
@@ -103,7 +103,7 @@ namespace Core {
 		}
 	}
 
-	bool ObjectSystem::Serialization()
+	bool ObjectSystem::SaveSerializationToByte()
 	{
 		for (size_t i = 0; i < Written_FileBytes.size(); i++)
 		{
@@ -124,7 +124,7 @@ namespace Core {
 		return true;
 	}
 
-	bool ObjectSystem::Deserialization()
+	bool ObjectSystem::ReadDeserializationToByte()
 	{
 		// Create the corresponding folder if it doesn't exist
 		std::wstring EngineSerializedDataDir = IO::AbsolutePath().Get().GetExecutableDirectory() + L"\\" CACHE L"SerializedData\\";

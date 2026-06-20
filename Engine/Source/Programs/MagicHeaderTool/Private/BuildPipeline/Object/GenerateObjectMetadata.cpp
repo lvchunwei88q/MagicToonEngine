@@ -37,12 +37,27 @@ namespace Object {
             return code.str();
         }
 
+        std::string GenerateUndefMacros(const std::vector<std::string>& macroNames) {
+            std::ostringstream code;
+
+            for (const auto& macroName : macroNames) {
+                code << "#undef " << macroName << "\n";
+            }
+
+            return code.str();
+        }
+
         /**
          * 生成序列化函数
          */
         std::string GenerateClassBodyFunction() {
             std::ostringstream code;
             // Fill in Object type information
+            code << "    virtual std::string GetClassName() const {\n";
+            code << "        \n";
+            code << "        return #CLASS_NAME;\n";
+            code << "    }\n";
+
             code << "    virtual uint64_t GetClassId() const {\n";
             code << "        \n";
             code << "        return GET_CLASS_ID_##CLASS_NAME;\n";
@@ -386,6 +401,7 @@ namespace Object {
                 // 生成元数据
                 std::vector<LocalMetadataSource> Sources;
                 std::string src_EmptyMacros               = GenerateEmptyMacros(CurrentAreaAllClass);
+                std::string src_UndefMacros               = GenerateUndefMacros(MagicObjectBuildData::Get().GetRefAllUndefMacros());
                 std::string src_ClassBodyFunction         = GenerateClassBodyFunction();
                 std::string src_ClassGetClassIdMacros     = GenerateClassIdSpecificMacros(GenerateInformationMap_GetClassId);
                 std::string src_ObjectTagMacros           = GenerateObjectTagSpecificMacros(GenerateInformationMap_ObjectTag);
@@ -395,6 +411,7 @@ namespace Object {
 
                 // 构造原始元数据
                 Sources.push_back({ src_EmptyMacros ,               false });
+                Sources.push_back({ src_UndefMacros ,               false });
                 Sources.push_back({ src_ClassBodyFunction ,         true  });
                 Sources.push_back({ src_ClassGetClassIdMacros ,     false });
                 Sources.push_back({ src_ObjectTagMacros ,           false });
