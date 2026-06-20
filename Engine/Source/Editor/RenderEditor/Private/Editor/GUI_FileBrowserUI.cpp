@@ -110,7 +110,7 @@ namespace RenderEditor {
         // main content
         {
             {
-                ImGui::BeginChild("DirTree", ImVec2(Config.dirTreeWidth, 0), true);
+                ImGui::BeginChild("DirTree", ImVec2(Config->dirTreeWidth, 0), true);
                 {
                     DirTreePos = ImGui::GetCursorPos();
                     this->DirTree();
@@ -125,8 +125,8 @@ namespace RenderEditor {
                 ImGui::InvisibleButton("##splitter", splitterSize);
 
                 if (ImGui::IsItemActive()) {
-                    Config.dirTreeWidth += ImGui::GetIO().MouseDelta.x;
-                    Config.dirTreeWidth = ImClamp(Config.dirTreeWidth, 100.0f, ImGui::GetContentRegionAvail().x * 0.6f);
+                    Config->dirTreeWidth += ImGui::GetIO().MouseDelta.x;
+                    Config->dirTreeWidth = ImClamp(Config->dirTreeWidth, 100.0f, ImGui::GetContentRegionAvail().x * 0.6f);
                 }
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
@@ -246,7 +246,7 @@ namespace RenderEditor {
 
         // 计算网格参数
         float panelWidth = ImGui::GetContentRegionAvail().x;
-        const float Zoom = Config.Zoom; // 获取缩放
+        const float Zoom = Config->Zoom; // 获取缩放
         const float ZitemSize = itemSize * Zoom;
         const float Zspacing = spacing * Zoom;
         int columns = (int)(panelWidth / (ZitemSize + Zspacing));
@@ -341,7 +341,7 @@ namespace RenderEditor {
             // 空白区域菜单
             if (ImGui::MenuItem("Reset Size")) {
                 LOG_INFO("Reset Size for file browser...");
-                Config.Zoom = 1.0f;
+                Config->Zoom = 1.0f;
             }
 
             ImGui::Separator();

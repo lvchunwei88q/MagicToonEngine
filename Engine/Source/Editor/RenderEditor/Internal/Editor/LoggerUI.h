@@ -1,6 +1,7 @@
 #pragma once
 ///////////////////////////////////////
 #include <ILog.h>
+#include <Object.h>
 ///////////////////////
 
 #include <RenderSubsystem/RenderSubsystem.h>
@@ -8,21 +9,28 @@
 
 #include <Tools/GetLanguage.h>
 
+#include <LoggerUI.object.generate.h>
+
 using namespace RenderUI;
 
 namespace RenderEditor {
-	struct LoggerSwitch {
+	MCLASS(MSERIALIZATION);
+	class LoggerSwitch : public Core::Object
+	{
+		GENERATE_BODY(LoggerSwitch, ENGINE, "EDITORUI");
+	public:
+		MMEMBER();
 		bool showDebug;
+		MMEMBER();
 		bool showInfo;
+		MMEMBER();
 		bool showWarning;
+		MMEMBER();
 		bool showError;
+		MMEMBER();
 		bool autoScroll;
+		MMEMBER();
 		bool detailedInformation;
-
-		template<class Archive>
-		void serialize(Archive& archive) {
-			archive(showDebug, showInfo, showWarning, showError, autoScroll, detailedInformation);
-		}
 	};
 
 	class LoggerUI final : public RSubsystemTemplate<LoggerUI, ModeType::ImGui>, public ImGuiMode
@@ -34,7 +42,7 @@ namespace RenderEditor {
 		virtual void* PublicData(uint8_t type) override;
 
 	private:
-		LoggerSwitch Switch;
+		std::unique_ptr<LoggerSwitch> Switch;
 
 		std::string Current_Log_Src;
 		std::string Current_Log_Info;

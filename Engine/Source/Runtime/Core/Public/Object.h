@@ -160,10 +160,15 @@ namespace Core {
 	};
 
 	// ---------------------- CUSTOM --------------------------- //
+	/*
+	* Object Serialization Descriptor
+	*/
 	struct ObjectCustomSerializationDescriptor {
-		std::wstring Path;
+		std::vector<uint8_t> data;
 	};
-	struct ObjectCustomSerializationData : public ObjectSerializationData {
+	struct ObjectCustomSerializationData {
+		std::vector<uint8_t> data;
+		ObjectSystemHandle handle;
 		std::wstring ObjectSerializationPath;
 	};
 	// ---------------------------------------------------------------------------------- MSERIALIZATION END
@@ -233,7 +238,7 @@ namespace Core {
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) = 0;
 		virtual void SaveObjectSerializationData(ObjectSerializationData ObjectData) = 0;
 		// This from Object Specified path
-		virtual ObjectCustomSerializationData GetCustomObjectSerializationData(ObjectCustomSerializationDescriptor Descriptor) = 0;
+		virtual ObjectCustomSerializationDescriptor GetCustomObjectSerializationData(const Object* Object) = 0;
 		virtual void SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData) = 0;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 	};

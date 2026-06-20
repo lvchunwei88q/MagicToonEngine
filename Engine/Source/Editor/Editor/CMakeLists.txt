@@ -22,7 +22,6 @@ target_compile_definitions(Editor PRIVATE EDITOR_EXPORTS)
 
 target_link_libraries(Editor PUBLIC Core)
 target_link_libraries(Editor PRIVATE Logger)
-target_link_libraries(Editor PRIVATE EditorCore)
 
 target_link_libraries(Editor PRIVATE RenderCore)
 target_link_libraries(Editor PRIVATE RenderEditor)

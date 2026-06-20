@@ -19,7 +19,7 @@ namespace Core {
 
 	void Object::ObjectUninit() {
 		try {
-			if (EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization) && Mode == DestructionMode::SaveAndDestroy) {
+			if (EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization)) {
 				Serialization();
 			}
 
@@ -42,16 +42,39 @@ namespace Core {
 		BinaryData.assign(str.begin(), str.end());
 
 		ObjectSerializationData Data = { std::move(BinaryData), Handle };
-		GetObjectSystem()->SaveObjectSerializationData(Data);
+		switch (Mode)
+		{
+			case DestructionMode::SaveAndDestroy:
+				GetObjectSystem()->SaveObjectSerializationData(Data);
+				break;
+			case DestructionMode::CustomSaveAndDestroy: {
+				ObjectCustomSerializationData SerializationData;
+				SerializationData.handle = Data.handle;
+				SerializationData.data = Data.data;
+				SerializationData.ObjectSerializationPath = L""; // TODO 实现
+				GetObjectSystem()->SaveCustomObjectSerializationData(SerializationData);
+			}break;
+		}
 	}
 
 	void Object::Deserialization()
 	{
-		ObjectSerializationDescriptor ObjectData = GetObjectSystem()->GetObjectSerializationData(Handle);	// Get ObjectData
-
-		if (ObjectData.Length <= 0) return; // No data
 		std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
-		ss.write(reinterpret_cast<const char*>(ObjectData.DataStart), ObjectData.Length);
+		switch (Mode)
+		{
+			case DestructionMode::SaveAndDestroy: {
+				ObjectSerializationDescriptor Descriptor = GetObjectSystem()->GetObjectSerializationData(Handle);	// Get ObjectData -> Descriptor
+				if (Descriptor.Length <= 0) return; // No data
+				ss.write(reinterpret_cast<const char*>(Descriptor.DataStart), Descriptor.Length);
+			}break;
+			case DestructionMode::CustomSaveAndDestroy: {
+				ObjectCustomSerializationDescriptor Descriptor = GetObjectSystem()->GetCustomObjectSerializationData(this);
+				if (Descriptor.data.size() <= 0) return; // No data
+				ss.write(reinterpret_cast<const char*>(Descriptor.data.data()), Descriptor.data.size());
+			}break;
+			default: return;
+		}
+
 		ss.seekg(0, std::ios::beg);
 
 		// Use the subclass's serialization function

@@ -159,11 +159,11 @@ namespace Core {
 		}
 	}
 
-	ObjectCustomSerializationData ObjectSystem::GetCustomObjectSerializationData(ObjectCustomSerializationDescriptor Descriptor)
+	ObjectCustomSerializationDescriptor ObjectSystem::GetCustomObjectSerializationData(const Object* Object)
 	{
-		ObjectCustomSerializationData ObjectData;
+		ObjectCustomSerializationDescriptor ObjectDescriptor;
 		// TODO 实现功能
-		return ObjectCustomSerializationData();
+		return ObjectCustomSerializationDescriptor();
 	}
 
 	void ObjectSystem::SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData)

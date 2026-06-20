@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <Object.h>
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <RenderUIWarehouse.h>
 
@@ -10,6 +11,8 @@
 #include <IBufferManager.h>
 #include <AssetPipeline.h>
 
+#include <FileBrowserUI.object.generate.h>
+
 #define literal_root L"Game\\"
 
 using namespace RenderUI;
@@ -19,14 +22,14 @@ namespace RenderEditor {
 
 	using namespace AssetPipeline;
 
-	struct FileBrowserConfig {
+	MCLASS(MSERIALIZATION)
+	class FileBrowserConfig : Core::Object {
+		GENERATE_BODY(FileBrowserConfig,ENGINE,"EDITORUI");
+	public:
+		MMEMBER();
 		float Zoom = 1.0f;
+		MMEMBER();
 		float dirTreeWidth = 250.0f;
-
-		template<class Archive>
-		void serialize(Archive& archive) {
-			archive(Zoom,dirTreeWidth);
-		}
 	};
 
     struct ContentBrowserState {
@@ -88,6 +91,6 @@ namespace RenderEditor {
 		ImVec2 DirTreePos;
 		ImVec2 FilePos;
 
-		FileBrowserConfig Config;
+		std::unique_ptr<FileBrowserConfig> Config;
 	};
 }

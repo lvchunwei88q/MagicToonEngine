@@ -3,17 +3,10 @@
 #include <RenderUIWarehouse.h>
 ///////////////////////////////////////
 #include <ILog.h>
-
 #include <IO.h> 
-#include <fstream>
-#include <Tools/SerializeMacro.h>
 
 #include <Tools/Debouncer.h>
 ///////////////////////////////////////
-
-// 序列化
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>    // 二进制
 
 #include <functional>
 #include <string>
@@ -27,12 +20,12 @@ namespace RenderEditor {
         state.currentPath = literal_root; // game ==  rootPath
         state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot(); // 设置根路径就是工作路径
 
-        FILE_SERIALIZATION_LOADING(Config, CONFIG "Editor\\Windows\\", L"FileBrowserConfig.mtdata")
+        Config = ObjectFactory::CreateUnique<FileBrowserConfig>();
     }
 
     void FileBrowserUI::Uninstall()
     {
-        FILE_SERIALIZATION_SAVE(Config, CONFIG "Editor\\Windows\\", L"FileBrowserConfig.mtdata")
+        Config.reset();
     }
 
     void* FileBrowserUI::PublicData(uint8_t type)
@@ -67,14 +60,14 @@ namespace RenderEditor {
         bool isHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
 
         static Debouncer debouncer(300, [this]() {
-            LOG_INFO("FileBrowser Zoom changed to: ", Config.Zoom);
+            LOG_INFO("FileBrowser Zoom changed to: ", Config->Zoom);
             });
 
         if (isHovered) {
             if ((ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl)) &&
                 io.MouseWheel != 0.0f) {
                 float wheelDelta = io.MouseWheel;
-                float& Zoom = Config.Zoom; // 获取缩放
+                float& Zoom = Config->Zoom; // 获取缩放
                 if (wheelDelta != 0.0f) {
                     float newZoom = Zoom + (wheelDelta / 50.0f);
                     newZoom = std::clamp(newZoom, 0.5f, 1.5f);

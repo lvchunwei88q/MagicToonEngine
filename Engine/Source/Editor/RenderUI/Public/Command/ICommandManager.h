@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common/EDITORCORE_API.h"
+#include "Common/RENDERUI_API.h"
 #include "Command/ICommand.h"
 #include <memory>
 #include <functional>
@@ -8,7 +8,7 @@
 namespace Command {
     using RegisterFunc = std::function<void()>;
 
-	class EDITORCORE_API ICommandManager
+	class RENDERUI_API ICommandManager
 	{
 	public:
 		virtual ~ICommandManager() = default;
@@ -30,5 +30,5 @@ namespace Command {
         virtual std::string GetRedoDescription() const = 0;
 	};
 
-    EDITORCORE_API ICommandManager* GetCommandManager();
+    RENDERUI_API ICommandManager* GetCommandManager();
 }

@@ -50,12 +50,12 @@ namespace RenderEditor {
 
     void LoggerUI::Init()
     {
-        FILE_SERIALIZATION_LOADING(Switch, CONFIG "Editor\\Windows\\", L"LoggerSwitch.mtdata")
+        Switch = ObjectFactory::CreateUnique<LoggerSwitch>();
     }
 
     void LoggerUI::Uninstall()
     {
-        FILE_SERIALIZATION_SAVE(Switch, CONFIG "Editor\\Windows\\", L"LoggerSwitch.mtdata")
+        Switch.reset();
     }
 
     void LoggerUI::Tick()
@@ -63,7 +63,7 @@ namespace RenderEditor {
         ViewSwitch& Switch = *(ViewSwitch*)GetSubsystem()->GetSubsystemPublicData("EditorGeneralLayout", (uint8_t)EditorGeneralLayoutData::ViewSwitch);
         if (Switch.LoggerWindow) {
 
-            LoggerSwitch& LogSwitch = this->Switch;
+            LoggerSwitch* LogSwitch = this->Switch.get();
 
             SetBackColor color(ImVec4(0.08f, 0.08f, 0.08f, 1.0f));
 
@@ -77,13 +77,13 @@ namespace RenderEditor {
                 ImGui::SameLine();
 
                 // 级别过滤复选框
-                ImGui::Checkbox("Debug", &LogSwitch.showDebug);
+                ImGui::Checkbox("Debug", &LogSwitch->showDebug);
                 ImGui::SameLine();
-                ImGui::Checkbox("Info", &LogSwitch.showInfo);
+                ImGui::Checkbox("Info", &LogSwitch->showInfo);
                 ImGui::SameLine();
-                ImGui::Checkbox("Warning", &LogSwitch.showWarning);
+                ImGui::Checkbox("Warning", &LogSwitch->showWarning);
                 ImGui::SameLine();
-                ImGui::Checkbox("Error", &LogSwitch.showError);
+                ImGui::Checkbox("Error", &LogSwitch->showError);
 
                 float usedWidth = ImGui::GetItemRectMax().x - ImGui::GetWindowPos().x;
                 float AutoScrollCheckboxWidth = CalcCheckboxWidth("Auto-scroll");
@@ -92,13 +92,13 @@ namespace RenderEditor {
 
                 if (WindowWidth >= (AutoScrollCheckboxWidth + DetailedInformationCheckboxWidth + usedWidth)) {
                     ImGui::SameLine(ImGui::GetContentRegionAvail().x - AutoScrollCheckboxWidth - DetailedInformationCheckboxWidth);
-                    ImGui::Checkbox("Auto-scroll", &LogSwitch.autoScroll);
+                    ImGui::Checkbox("Auto-scroll", &LogSwitch->autoScroll);
                     ImGui::SameLine();
-                    ImGui::Checkbox("Detailed-information", &LogSwitch.detailedInformation);
+                    ImGui::Checkbox("Detailed-information", &LogSwitch->detailedInformation);
                 }
                 else if (WindowWidth >= (DetailedInformationCheckboxWidth + usedWidth)) {
                     ImGui::SameLine(ImGui::GetContentRegionAvail().x - DetailedInformationCheckboxWidth);
-                    ImGui::Checkbox("Detailed-information", &LogSwitch.detailedInformation);
+                    ImGui::Checkbox("Detailed-information", &LogSwitch->detailedInformation);
                 }
             }
 
@@ -106,7 +106,7 @@ namespace RenderEditor {
 
             // ---- 日志列表 ----
             float RemainingHeight = ImGui::GetContentRegionAvail().y;
-            float Height = RemainingHeight - 200 > 0 && LogSwitch.detailedInformation ? RemainingHeight - 100 : RemainingHeight;
+            float Height = RemainingHeight - 200 > 0 && LogSwitch->detailedInformation ? RemainingHeight - 100 : RemainingHeight;
             ImGui::BeginChild("LogScrollRegion", ImVec2(0, Height), false, ImGuiWindowFlags_HorizontalScrollbar);
 
             {
@@ -115,10 +115,10 @@ namespace RenderEditor {
                 ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
                 for (const auto& entry : logs) {
-                    if (entry.level == LogLevel::Debug && !LogSwitch.showDebug)   continue;
-                    if (entry.level == LogLevel::Info && !LogSwitch.showInfo)    continue;
-                    if (entry.level == LogLevel::Warning && !LogSwitch.showWarning) continue;
-                    if (entry.level == LogLevel::Error && !LogSwitch.showError)   continue;
+                    if (entry.level == LogLevel::Debug && !LogSwitch->showDebug)   continue;
+                    if (entry.level == LogLevel::Info && !LogSwitch->showInfo)    continue;
+                    if (entry.level == LogLevel::Warning && !LogSwitch->showWarning) continue;
+                    if (entry.level == LogLevel::Error && !LogSwitch->showError)   continue;
 
                     ImGui::PushID(&entry);
                     ImGui::PushStyleColor(ImGuiCol_Text, GetLevelColor(entry.level));
@@ -163,20 +163,20 @@ namespace RenderEditor {
                     ImGui::PopID();
                 }
 
-                if (LogSwitch.autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+                if (LogSwitch->autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
                     ImGui::SetScrollHereY(1.0f);
 
                 ImGui::EndChild();
             }
 
             // 自动滚动
-            if (LogSwitch.autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
+            if (LogSwitch->autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) {
                 ImGui::SetScrollHereY(1.0f);
             }
 
             ImGui::EndChild();
 
-            if ((RemainingHeight - Height) > 0.0f && LogSwitch.detailedInformation) {
+            if ((RemainingHeight - Height) > 0.0f && LogSwitch->detailedInformation) {
                 SetBackColor color(ImVec4(0.10f, 0.10f, 0.10f, 1.0f), ImGuiCol_ChildBg);
                 ImGui::BeginChild("LogContentRegion", ImVec2(0, ImGui::GetContentRegionAvail().y), ImGuiChildFlags_Borders,0);
                 {

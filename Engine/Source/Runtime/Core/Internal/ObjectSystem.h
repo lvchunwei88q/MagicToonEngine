@@ -73,7 +73,7 @@ namespace Core {
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) override;
 		virtual void SaveObjectSerializationData(ObjectSerializationData ObjectData) override;
 
-		virtual ObjectCustomSerializationData GetCustomObjectSerializationData(ObjectCustomSerializationDescriptor Descriptor) override;
+		virtual ObjectCustomSerializationDescriptor GetCustomObjectSerializationData(const Object* Object) override;
 		virtual void SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData) override;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END
 

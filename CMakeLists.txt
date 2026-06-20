@@ -34,7 +34,6 @@ RuntimeModule(RenderCore)
 RuntimeModule(Logger)
 RuntimeModule(RenderRT)
 
-EditorModule(EditorCore)
 EditorModule(AssetPipeline)
 EditorModule(RenderUI)
 EditorModule(RenderEditor)
