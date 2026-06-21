@@ -9,7 +9,6 @@
 
 // Enumerates the features you can use
 enum {
-	MREFLECTION,
 	MSERIALIZATION,
 };
 

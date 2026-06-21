@@ -7,11 +7,7 @@
 #include <IRender.h> // 渲染接口
 #include <IRenderRT.h>
 
-// 序列化文件相关
 #include <IO.h> 
-#include <fstream>
-#include <Tools/SerializeMacro.h>
-
 #include <Window/WindowAppointment.hpp> // 约定
 
 // 主题文件
@@ -31,8 +27,8 @@ namespace Editor
 		LOG_INFO("Editor subsystem created.");
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED); // 初始化 COM
 
-		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
-		FILE_SERIALIZATION_LOADING(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
+		// Load this configuration from a serialized file
+		WondowsConfig = ObjectFactory::CreateUnique<WindowsConfig>();
 
 		// Initialize the editor subsystem, e.g. create windows, initialize resources, etc.
 		LOG_INFO("Editor Create Windows.");
@@ -44,7 +40,7 @@ namespace Editor
 		LOG_INFO("Init Buffer Manager.");
 		RenderCore::IBufferManagerAdmin* IBMAdmin = RenderCore::GetBufferManagerAdminInterface();
 		RenderCore::ViewContext context;
-		context.ScreenSize = XMINT2(config.width, config.height);
+		context.ScreenSize = XMINT2(WondowsConfig->width, WondowsConfig->height);
 		IBMAdmin->Initialize(context);
 
 		return true;
@@ -54,11 +50,11 @@ namespace Editor
 	{
 		CleanupWindows();
 		CoUninitialize();
+		WondowsConfig.reset();
 	}
 
 	void Win32Application::CreateWindows()
 	{
-		WindowsConfig& config = WindowsConfig::Get();
 
 		// init windows
 		WNDCLASSEXW wc = { sizeof(WNDCLASSEXW), CS_CLASSDC, WindowsProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr,
@@ -70,7 +66,7 @@ namespace Editor
 		HWND hwnd = CreateWindowEx(
 			0, wc.lpszClassName, L"Magic Editor",
 			WS_OVERLAPPEDWINDOW,
-			config.windowsX, config.windowsY, config.width, config.height,
+			WondowsConfig->windowsX, WondowsConfig->windowsY, WondowsConfig->width, WondowsConfig->height,
 			nullptr, nullptr,
 			wc.hInstance,
 			nullptr
@@ -96,19 +92,18 @@ namespace Editor
 
 	void Win32Application::CleanupWindows()
 	{
-		WindowsConfig& config = WindowsConfig::Get(); // Create a default configuration. You can load this from a file if needed.
+		// Create a default configuration. You can load this from a file if needed.
 
 		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-		if (config.windowsX > screenWidth || config.windowsY > screenHeight ||
-			config.windowsX < 0 || config.windowsY < 0)
+		if (WondowsConfig->windowsX > screenWidth || WondowsConfig->windowsY > screenHeight ||
+			WondowsConfig->windowsX < 0 || WondowsConfig->windowsY < 0)
 		{
 			// 窗口位置不正常
 			LOG_WARNING("The window has been minimized and will use the default position");
-			config.windowsX = 100;
-			config.windowsY = 100;
+			WondowsConfig->windowsX = 100;
+			WondowsConfig->windowsY = 100;
 		}
-		FILE_SERIALIZATION_SAVE(config, CONFIG "Editor\\Windows\\", L"WindowsConfig.mtdata")
 	}
 
 	void Win32Application::CleanupDeviceD3D()

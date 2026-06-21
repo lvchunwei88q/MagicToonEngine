@@ -1,5 +1,6 @@
 #pragma once 
 #include "Common/EDITOR_API.h"
+#include "WindowsConfig.h"
 #include <Windows.h>
 #include <EditorUI.h>
 
@@ -49,6 +50,8 @@ namespace Editor
 	private:
 		WindowUpdateRenderingFunc WUR;
 		EditorUI editorUI;
+
+		std::unique_ptr<WindowsConfig> WondowsConfig;
 	};
 
 	AUTO_REGISTER_SINGLETON_INCLUDE(Win32Application)

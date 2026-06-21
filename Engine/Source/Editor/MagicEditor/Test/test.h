@@ -33,7 +33,7 @@ public:
 	float f = 0.0f;
 };
 
-MCLASS(MSERIALIZATION,MREFLECTION);
+MCLASS(MSERIALIZATION);
 class XXX_API CLASS_X : public Core::Object
 {
 	GENERATE_BODY(CLASS_X, ENGINE, "TEST");

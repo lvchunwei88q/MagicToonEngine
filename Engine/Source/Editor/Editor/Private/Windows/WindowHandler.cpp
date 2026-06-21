@@ -27,8 +27,8 @@ namespace Editor {
             // 只在窗口不是最小化时更新
             if (wParam != SIZE_MINIMIZED)
             {
-                WindowsConfig::Get().width = newWidth;
-                WindowsConfig::Get().height = newHeight;
+                Win32Application::Get().WondowsConfig->width = newWidth;
+                Win32Application::Get().WondowsConfig->height = newHeight;
 
                 //RenderCore::ViewContext context;    不要在更新用于渲染的texture的大小因为我们使用IMGUI控制大小
                 //context.ScreenSize.x = newWidth;
@@ -45,8 +45,8 @@ namespace Editor {
             int newX = LOWORD(lParam);
             int newY = HIWORD(lParam);
 
-            WindowsConfig::Get().windowsX = newX;
-            WindowsConfig::Get().windowsY = newY;
+            Win32Application::Get().WondowsConfig->windowsX = newX;
+            Win32Application::Get().WondowsConfig->windowsY = newY;
             break;
         }
 		case WM_DESTROY:
