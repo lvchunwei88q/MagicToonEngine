@@ -46,6 +46,13 @@ public:
 	MMEMBER();
 	float o;
 
+	MMEMBER();
+	int3 Testint3;
+	MMEMBER();
+	float2 Testfloat2;
+	MMEMBER();
+	float3 Testfloat3;
+
 	static const CLASS_A Test;
 	const CLASS_A TestA = {};
 	const CLASS_A TestB{};

@@ -63,6 +63,23 @@
 ///////////////////////////////// From Windows 
 #undef GetClassName
 
+//////////////////////////////// We set up corresponding serialization template functions for these mathematical properties
+template<class Archive, typename T>
+void serialize(Archive& archive, Vec4<T>& v) {
+	archive(v.x, v.y, v.z, v.w);
+}
+
+template<class Archive, typename T>
+void serialize(Archive& archive, Vec3<T>& v) {
+	archive(v.x, v.y, v.z);
+}
+
+template<class Archive, typename T>
+void serialize(Archive& archive, Vec2<T>& v) {
+	archive(v.x, v.y);
+}
+////////////////////////////////
+
 FORBIDDEN_METHOD_CONCEPT(Object, GetClassId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetInstanceId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetNextId);
