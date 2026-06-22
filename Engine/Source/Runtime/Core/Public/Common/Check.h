@@ -49,14 +49,11 @@ inline To* SafeCast(From* ptr) {
     if constexpr (is_upcast) {
         return static_cast<To*>(ptr);
     } 
-    else if constexpr (is_downcast) {
+    if constexpr (is_downcast) {
 #ifdef _DEBUG
         To* result = dynamic_cast<To*>(ptr);
-        if (!result) {
-            assert(result && "SafeCast: Type mismatch"); 
-        }else{
-            return result;
-        }
+        assert(result && "SafeCast: Type mismatch");
+        return result;
 #else
         return static_cast<To*>(ptr);
 #endif
@@ -123,5 +120,5 @@ inline void ThrowIf(bool condition, const std::string& message)
     [[maybe_unused]] static constexpr bool __check = [] {                   \
     if constexpr (MAGIC_IN_IDE) {                                           \
             /* IDE/Compiler analysis mode - perform checks */               \
-            CHECK_COMBINE_MEMBER(##CLASS_NAME, TARGET);                     \
+            CHECK_COMBINE_MEMBER(CLASS_NAME, TARGET);                       \
     }return true;}();
