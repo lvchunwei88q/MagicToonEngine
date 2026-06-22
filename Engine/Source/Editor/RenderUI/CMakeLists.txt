@@ -38,6 +38,6 @@ target_link_libraries(RenderUI PUBLIC RenderRT)
 target_link_libraries(RenderUI PRIVATE Logger)
 
 target_link_libraries(RenderUI PUBLIC IMGUI)
-target_link_libraries(RenderUI PUBLIC liblua)
+target_link_libraries(RenderUI PUBLIC Lua)
 
 target_link_libraries(RenderUI PRIVATE AssetPipeline)

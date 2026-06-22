@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "luaconf.h"
+#include "Common/luaconf.h"
 #include "lua.h"
 
 

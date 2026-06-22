@@ -2,7 +2,7 @@
 #include "BufferManager.inl"
 #include <RenderContext.h>
 
-#include <CoreLogCapture/CoreLogCapture.h>
+#include <CoreMinimal.h>
 
 #include <ostream>
 

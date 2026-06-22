@@ -1,5 +1,5 @@
 #include "Object.h"
-#include "CoreLogCapture/CoreLogCapture.h"
+#include "CoreMinimal.h"
 //////////////////// Serialization library
 #include <cereal/cereal.hpp>
 

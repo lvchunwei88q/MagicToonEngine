@@ -22,6 +22,11 @@ target_link_libraries(MagicEditor PRIVATE
     EngineProject
 )
 
+# TEST
+target_link_libraries(MagicEditor PRIVATE 
+    Lua
+)
+
 set_target_properties(MagicEditor PROPERTIES
     LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
     LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS"

@@ -1,6 +1,6 @@
 #include "Object.h"
 #include "ObjectSystem.h"
-#include "CoreLogCapture/CoreLogCapture.h"
+#include "CoreMinimal.h"
 #include "IO.h"
 #include "Common/Check.h"
 

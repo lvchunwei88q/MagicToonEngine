@@ -59,24 +59,24 @@ constexpr size_t encodeToSizeT(const char* str) {   // Max 10 characters
     inline bool CAT(T, _dummy) = CAT(T, _registered);
 
 /*
-* 在使用模板时这个Class将不可以用于导出API。
-* 如果需要导出API，请使用AUTO_REGISTER_SINGLETON宏，并在对应的cpp文件中实现注册逻辑。
-* 并且直接继承Subsystem和Singleton，而不是SubsystemTemplate。
+* This class can't be used to export APIs when using templates.
+* If you need to export an API, use the AUTO_REGISTER_SINGLETON macro and implement the registration logic in the corresponding cpp file.
+* Like directly inheriting from Subsystem and Singleton, instead of SubsystemTemplate.
 */
 #define AUTO_REGISTER_SINGLETON(T, Priority_)                               \
-struct CAT(T, _AutoRegister)                                                 \
+struct CAT(T, _AutoRegister)                                                \
 {                                                                           \
-    CAT(T, _AutoRegister)() {                                                \
-        T::Get().Register<T, Core::Priority::Priority_>();\
+    CAT(T, _AutoRegister)() {                                               \
+        T::Get().Register<T, ::Core::Priority::Priority_>();                \
     }                                                                       \
 };                                                                          \
 static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);
 
-#define AUTO_REGISTER_SINGLETON_NOTIFICATION(T,TAGS , Priority_)             \
-struct CAT(T, _AutoRegister)                                                 \
+#define AUTO_REGISTER_SINGLETON_NOTIFICATION(T,TAGS , Priority_)            \
+struct CAT(T, _AutoRegister)                                                \
 {                                                                           \
-    CAT(T, _AutoRegister)() {                                                \
-        T::Get().Register<T, Core::Priority::Priority_>(TAGS);\
+    CAT(T, _AutoRegister)() {                                               \
+        T::Get().Register<T, ::Core::Priority::Priority_>(TAGS);            \
     }                                                                       \
 };                                                                          \
 static CAT(T, _AutoRegister) CAT(s_##T, _AutoRegister);

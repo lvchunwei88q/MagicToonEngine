@@ -17,6 +17,8 @@ void TestAdd() {
     std::shared_ptr<CLASS_X> X = ObjectFactory::CreateShared<CLASS_X>();
     X->o = X->o + 100.0f;
     X->Testint3 = X->Testint3 + int3(0,1,0);
+
+    LuaVMTest::RunAllTests();
 }
 
 #if MAGICEDITOR_MODE

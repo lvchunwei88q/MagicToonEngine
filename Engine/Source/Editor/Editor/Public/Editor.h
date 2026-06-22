@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Common/EDITOR_API.h"
-#include <Subsystem/Subsystem.h>
+#include <CoreMinimal.h>
 #include <Subsystem/SubsystemTemplate.h>
 
 namespace Editor
 {
-	class EDITOR_API Editor final : public Singleton<Editor> , public Core::Subsystem
+	class EDITOR_API Editor final : public Singleton<Editor> , public SubSystem
 	{
 	public:
 		Editor() = default;

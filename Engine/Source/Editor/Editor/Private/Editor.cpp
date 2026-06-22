@@ -1,5 +1,4 @@
 #include "Editor.h"
-#include <CoreLogCapture/CoreLogCapture.h>
 #include "Win32Application.h" 
 
 #include <Logo/resource.h>

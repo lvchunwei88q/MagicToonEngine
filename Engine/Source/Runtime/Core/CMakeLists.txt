@@ -26,3 +26,5 @@ target_include_directories(Core
 )
 
 target_compile_definitions(Core PRIVATE CORE_EXPORTS)
+
+target_link_libraries(Core PRIVATE Lua)
