@@ -23,7 +23,7 @@ namespace RenderEditor {
 	using namespace AssetPipeline;
 
 	MCLASS(MSERIALIZATION)
-	class FileBrowserConfig : Core::Object {
+	class FileBrowserConfig : MObject {
 		GENERATE_BODY(FileBrowserConfig,ENGINE,"EDITORUI");
 	public:
 		MMEMBER();

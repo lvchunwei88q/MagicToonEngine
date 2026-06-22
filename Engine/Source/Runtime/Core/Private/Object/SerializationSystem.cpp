@@ -222,13 +222,16 @@ namespace Core {
 		return false;
 	}
 
-	// Simple Serialization
+	/////////////////////////// Simple Serialization
 
 	ObjectCustomSerializationDescriptor ObjectSystem::GetCustomObjectSerializationData(const std::wstring& Path)
 	{
 		if (IO::Exists(Path)) {
 			ObjectCustomSerializationDescriptor ObjectDescriptor;
-			ObjectDescriptor.data = IO::ReadAllU8Bytes(Path);
+			std::vector<uint8_t> data = IO::ReadAllU8Bytes(Path);
+			BinaryReader Data(data);
+			ObjectDescriptor.handle = Data.Read<ObjectSystemHandle>();
+			Data.ReadToVector(ObjectDescriptor.data, Data.Remaining());
 			return ObjectDescriptor;
 		}
 		return ObjectCustomSerializationDescriptor();
@@ -240,7 +243,11 @@ namespace Core {
 			IO::MakeFile(ObjectData.ObjectSerializationPath);
 		}
 
-		IO::WriteAllBytes(ObjectData.ObjectSerializationPath, BinaryWrite(ObjectData.data));
+		BinaryWrite Data;
+		Data.Write(ObjectData.handle);
+		Data.Write(ObjectData.data);
+
+		IO::WriteAllBytes(ObjectData.ObjectSerializationPath, Data);
 	}
 
 	// ------------------------------------------------------------------- Object System ------- //

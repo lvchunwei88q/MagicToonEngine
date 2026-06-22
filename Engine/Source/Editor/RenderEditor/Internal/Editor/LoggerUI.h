@@ -15,7 +15,7 @@ using namespace RenderUI;
 
 namespace RenderEditor {
 	MCLASS(MSERIALIZATION);
-	class LoggerSwitch : public Core::Object
+	class LoggerSwitch : public MObject
 	{
 		GENERATE_BODY(LoggerSwitch, ENGINE, "EDITORUI");
 	public:

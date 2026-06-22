@@ -19,8 +19,9 @@ namespace Editor
 		HWND hWnd = nullptr; // windows id
 	};
 
-	class Win32Application final : public Core::Subsystem, public Singleton<Win32Application>
+	class Win32Application final : public SubSystem, public Singleton<Win32Application>
 	{
+		IDE_CHECK_COMBINE_MEMBER(Win32Application, Subsystem);
 	private:
 		using WindowUpdateRenderingFunc = std::function<void()>;
 	public:

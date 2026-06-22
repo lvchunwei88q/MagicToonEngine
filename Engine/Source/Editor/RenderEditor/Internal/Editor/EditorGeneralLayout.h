@@ -18,7 +18,7 @@ namespace RenderEditor {
 	};
 
 	MCLASS(MSERIALIZATION);
-	class ViewSwitch : public Core::Object
+	class ViewSwitch : public MObject
 	{
 		GENERATE_BODY(ViewSwitch, ENGINE, "EDITORUI");
 	public:

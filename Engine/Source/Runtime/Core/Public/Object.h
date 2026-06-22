@@ -168,6 +168,7 @@ namespace Core {
 	*/
 	struct ObjectCustomSerializationDescriptor {
 		std::vector<uint8_t> data;
+		ObjectSystemHandle handle;
 	};
 	struct ObjectCustomSerializationData {
 		std::vector<uint8_t> data;
@@ -248,6 +249,9 @@ namespace Core {
 	};
 
 	CORE_API IObjectSystem* GetObjectSystem();
-
 }
+
+// We use a nickname to make it more recognizable
+using MObject = Core::Object;
+
 DISABLE_DLL_WARNINGS_POP;

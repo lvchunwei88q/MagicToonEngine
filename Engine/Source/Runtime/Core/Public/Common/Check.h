@@ -11,6 +11,22 @@ using UINT = unsigned int;
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 #endif
 
+// Visual Studio IntelliSense
+#if defined(__INTELLISENSE__)
+#define MAGIC_IN_IDE 1  
+// JetBrains ReSharper C++
+#elif defined(__RESHARPER__) || defined(__JETBRAINS_IDE__)
+#define MAGIC_IN_IDE 1
+// Clang tools
+#elif defined(__clang_analyzer__)
+#define MAGIC_IN_IDE 1
+// Other static analysis tools
+#elif defined(__cppcheck__) || defined(__clang_tidy__)
+#define MAGIC_IN_IDE 1
+#else
+#define MAGIC_IN_IDE 0
+#endif
+
 /*
 * This is used to control the compiler (MSVC) compilation settings.
 * Note that you should not use the tools here casually unless you know what you are doing.
@@ -102,3 +118,10 @@ inline void ThrowIf(bool condition, const std::string& message)
     static_assert(Has##CheckerName<ClassName>, \
         "ERROR: " #ClassName " is missing required member functions! " \
         "Please ensure it inherits from " #CheckerName)
+
+#define IDE_CHECK_COMBINE_MEMBER(CLASS_NAME,TARGET)                         \
+    [[maybe_unused]] static constexpr bool __check = [] {                   \
+    if constexpr (MAGIC_IN_IDE) {                                           \
+            /* IDE/Compiler analysis mode - perform checks */               \
+            CHECK_COMBINE_MEMBER(##CLASS_NAME, TARGET);                     \
+    }return true;}();

@@ -8,7 +8,7 @@
 namespace Editor {
 
 	MCLASS(MSERIALIZATION);
-	class WindowsConfig : public Core::Object
+	class WindowsConfig : public MObject
 	{
 		GENERATE_BODY(WindowsConfig, ENGINE, "Windows");
 	public:
