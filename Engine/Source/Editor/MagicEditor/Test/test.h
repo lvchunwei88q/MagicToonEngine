@@ -37,6 +37,10 @@ MCLASS(MSERIALIZATION);
 class XXX_API CLASS_X : public MObject
 {
 	GENERATE_BODY(CLASS_X, ENGINE, "TEST");
+
+protected:
+	Core::DestructionMode GetDestructionMode() override { return Core::DestructionMode::CustomSaveAndDestroy; }
+	std::wstring GetObjectCustomSerializedPath() override { return L"D:\\Test\\MTE\\TEST\\ObjectTest.masset"; }
 public:
 
 	MMEMBER();

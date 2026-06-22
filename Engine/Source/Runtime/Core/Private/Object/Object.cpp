@@ -4,6 +4,9 @@
 #include <cereal/cereal.hpp>
 
 namespace Core {
+	namespace {
+	}
+
 	void Object::ObjectInit() {
 		try {
 			Handle = GetObjectSystem()->RegisterObject(this); // Register This Object
@@ -42,7 +45,7 @@ namespace Core {
 		BinaryData.assign(str.begin(), str.end());
 
 		ObjectSerializationData Data = { std::move(BinaryData), Handle };
-		switch (Mode)
+		switch (GetDestructionMode())
 		{
 			case DestructionMode::SaveAndDestroy:
 				GetObjectSystem()->SaveObjectSerializationData(Data);
@@ -51,7 +54,7 @@ namespace Core {
 				ObjectCustomSerializationData SerializationData;
 				SerializationData.handle = Data.handle;
 				SerializationData.data = Data.data;
-				SerializationData.ObjectSerializationPath = L""; // TODO 实现
+				SerializationData.ObjectSerializationPath = GetObjectCustomSerializedPath(); // TODO 实现
 				GetObjectSystem()->SaveCustomObjectSerializationData(SerializationData);
 			}break;
 		}
@@ -60,7 +63,7 @@ namespace Core {
 	void Object::Deserialization()
 	{
 		std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
-		switch (Mode)
+		switch (GetDestructionMode())
 		{
 			case DestructionMode::SaveAndDestroy: {
 				ObjectSerializationDescriptor Descriptor = GetObjectSystem()->GetObjectSerializationData(Handle);	// Get ObjectData -> Descriptor
@@ -68,7 +71,7 @@ namespace Core {
 				ss.write(reinterpret_cast<const char*>(Descriptor.DataStart), Descriptor.Length);
 			}break;
 			case DestructionMode::CustomSaveAndDestroy: {
-				ObjectCustomSerializationDescriptor Descriptor = GetObjectSystem()->GetCustomObjectSerializationData(L"");// TODO 实现
+				ObjectCustomSerializationDescriptor Descriptor = GetObjectSystem()->GetCustomObjectSerializationData(GetObjectCustomSerializedPath());
 				if (Descriptor.data.size() <= 0) return; // No data
 				ss.write(reinterpret_cast<const char*>(Descriptor.data.data()), Descriptor.data.size());
 			}break;

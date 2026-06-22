@@ -194,8 +194,6 @@ namespace Core {
 		virtual ObjectSwitch GetClassSwitch() const = 0;			// Class Switch generated using MagicHeaderTool
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
 
-		// If we don't need to serialize this object when we destroy it at the end, we can set the destruction mode to prevent its serialization.
-		void SetDestructionMode(DestructionMode NewMode) { Mode = NewMode; }
 		//template<class Archive>
 		//void serialize(Archive& archive,const std::uint32_t version)
 		//{
@@ -215,6 +213,10 @@ namespace Core {
 		// The serialization function that subclasses must implement
 		virtual void serialized_data_generation(std::ostringstream& stream) = 0;
 		virtual void deserialization_data_generation(std::stringstream& stream) = 0;
+
+		// We now provide the default mode, and you can override these two functions to implement storage if needed.
+		virtual DestructionMode GetDestructionMode() { return DestructionMode::SaveAndDestroy; }
+		virtual std::wstring GetObjectCustomSerializedPath() { return L""; }
 	private:
 		// We're implementing the functionality of Object here
 		// -------------------------------- serialization
@@ -225,8 +227,6 @@ namespace Core {
 	protected:
 		uint64_t	instance_id;						// The id of each instance
 		ObjectSystemHandle Handle = {};					// Object Handle
-	private:
-		DestructionMode Mode = DestructionMode::SaveAndDestroy;		// Serialization is required by default
 	};
 
 	class CORE_API IObjectSystem {

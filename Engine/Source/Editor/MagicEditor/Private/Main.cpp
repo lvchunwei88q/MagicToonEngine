@@ -15,7 +15,7 @@ void TestAdd() {
     delete b;
 
     std::shared_ptr<CLASS_X> X = ObjectFactory::CreateShared<CLASS_X>();
-    X->o++;
+    X->o = X->o + 100.0f;
 }
 
 #if MAGICEDITOR_MODE
