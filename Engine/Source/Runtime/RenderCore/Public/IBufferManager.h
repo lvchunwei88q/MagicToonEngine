@@ -1,9 +1,8 @@
 #pragma once
 #include "Common/RENDERCORE_API.h"
 #include <Tools/EnumClassFlags.h>
-// DX 数学库
-#include <DirectXMath.h>
-using namespace DirectX;
+// Magic 数学库
+#include <CoreMinimal.h>
 
 #include <string>
 #include <d3d11.h>
@@ -17,7 +16,7 @@ namespace RenderCore // RenderCore
     // 这里控制 Texture Buffer 的创建销毁 并且在窗口变化时更新
     struct ViewContext
     {
-        XMINT2 ScreenSize;
+        int2 ScreenSize;
     };
 
     enum class TextureCreateType : uint32_t

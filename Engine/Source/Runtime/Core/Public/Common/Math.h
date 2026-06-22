@@ -93,7 +93,7 @@ Vec3<T> operator-(const Vec3<T>& a) { return Vec3<T>(-a.x, -a.y, -a.z); }
 template<typename T>
 Vec4<T> operator-(const Vec4<T>& a) { return Vec4<T>(-a.x, -a.y, -a.z, -a.w); }
 
-// ---------- Binary operator: vector + vector ----------
+// ---------- Binary operator: vector vector ----------
 template<typename T> Vec2<T> operator+(const Vec2<T>& a, const Vec2<T>& b) { return Vec2<T>(a.x + b.x, a.y + b.y); }
 template<typename T> Vec2<T> operator-(const Vec2<T>& a, const Vec2<T>& b) { return Vec2<T>(a.x - b.x, a.y - b.y); }
 template<typename T> Vec2<T> operator*(const Vec2<T>& a, const Vec2<T>& b) { return Vec2<T>(a.x * b.x, a.y * b.y); }
@@ -109,7 +109,29 @@ template<typename T> Vec4<T> operator-(const Vec4<T>& a, const Vec4<T>& b) { ret
 template<typename T> Vec4<T> operator*(const Vec4<T>& a, const Vec4<T>& b) { return Vec4<T>(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w); }
 template<typename T> Vec4<T> operator/(const Vec4<T>& a, const Vec4<T>& b) { return Vec4<T>(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w); }
 
-// ---------- Binary operator: vector + scalar ----------
+// ---------- Comparison Operators (Vector to Vector, returns bool) ---------- 
+template<typename T> bool operator==(const Vec2<T>& a, const Vec2<T>& b) {return a.x == b.x && a.y == b.y;}
+template<typename T> bool operator!=(const Vec2<T>& a, const Vec2<T>& b) {return a.x != b.x || a.y != b.y;}
+template<typename T> bool operator<(const Vec2<T>& a, const Vec2<T>& b) {return a.x < b.x && a.y < b.y;}
+template<typename T> bool operator>(const Vec2<T>& a, const Vec2<T>& b) {return a.x > b.x && a.y > b.y;}
+template<typename T> bool operator<=(const Vec2<T>& a, const Vec2<T>& b) {return a.x <= b.x && a.y <= b.y;}
+template<typename T> bool operator>=(const Vec2<T>& a, const Vec2<T>& b) {return a.x >= b.x && a.y >= b.y;}
+
+template<typename T> bool operator==(const Vec3<T>& a, const Vec3<T>& b) {return a.x == b.x && a.y == b.y && a.z == b.z;}
+template<typename T> bool operator!=(const Vec3<T>& a, const Vec3<T>& b) {return a.x != b.x || a.y != b.y || a.z != b.z;}
+template<typename T> bool operator<(const Vec3<T>& a, const Vec3<T>& b) {return a.x < b.x && a.y < b.y && a.z < b.z;}
+template<typename T> bool operator>(const Vec3<T>& a, const Vec3<T>& b) {return a.x > b.x && a.y > b.y && a.z > b.z;}
+template<typename T> bool operator<=(const Vec3<T>& a, const Vec3<T>& b) {return a.x <= b.x && a.y <= b.y && a.z <= b.z;}
+template<typename T> bool operator>=(const Vec3<T>& a, const Vec3<T>& b) {return a.x >= b.x && a.y >= b.y && a.z >= b.z;}
+
+template<typename T> bool operator==(const Vec4<T>& a, const Vec4<T>& b) {return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;}
+template<typename T> bool operator!=(const Vec4<T>& a, const Vec4<T>& b) {return a.x != b.x || a.y != b.y || a.z != b.z || a.w != b.w;}
+template<typename T> bool operator<(const Vec4<T>& a, const Vec4<T>& b) {return a.x < b.x && a.y < b.y && a.z < b.z && a.w < b.w;}
+template<typename T> bool operator>(const Vec4<T>& a, const Vec4<T>& b) {return a.x > b.x && a.y > b.y && a.z > b.z && a.w > b.w;}
+template<typename T> bool operator<=(const Vec4<T>& a, const Vec4<T>& b) {return a.x <= b.x && a.y <= b.y && a.z <= b.z && a.w <= b.w;}
+template<typename T> bool operator>=(const Vec4<T>& a, const Vec4<T>& b) {return a.x >= b.x && a.y >= b.y && a.z >= b.z && a.w >= b.w;}
+
+// ---------- Binary operator: vector scalar ----------
 template<typename T> Vec2<T> operator+(const Vec2<T>& a, T s) { return Vec2<T>(a.x + s, a.y + s); }
 template<typename T> Vec2<T> operator+(T s, const Vec2<T>& a) { return Vec2<T>(s + a.x, s + a.y); }
 template<typename T> Vec2<T> operator-(const Vec2<T>& a, T s) { return Vec2<T>(a.x - s, a.y - s); }

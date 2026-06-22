@@ -14,14 +14,10 @@ namespace Editor {
 	public:
 		// This Windows Size
 		MMEMBER();
-		int width = 1280;
-		MMEMBER();
-		int height = 800;
+		int2 WindowsSize = int2(1280,800);
 
 		// This Windows Postion
 		MMEMBER();
-		int windowsX = 100;
-		MMEMBER();
-		int windowsY = 100;
+		int2 WindowsPostion = int2(100, 100);
 	};
 }

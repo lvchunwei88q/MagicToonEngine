@@ -23,7 +23,7 @@ namespace RenderCore //RenderCore
     bool BufferManagerImpl::Init()
     {
         ViewContext view;
-        view.ScreenSize = XMINT2(0, 0);
+        view.ScreenSize = int2(0, 0);
         this->view = view; // 初始化
         return true;
     }
@@ -69,7 +69,7 @@ namespace RenderCore //RenderCore
 
         TextureBuffer textureBuffer;
         textureBuffer.Name = context.BufferName;
-        textureBuffer.ViewSize = XMINT2(context.Desc->Width, context.Desc->Height);
+        textureBuffer.ViewSize = int2(context.Desc->Width, context.Desc->Height);
         textureBuffer.FixedSize = context.FixedSize;
         if (!context.FixedSize) // 没有设置固定大小
         {

@@ -40,7 +40,7 @@ namespace Editor
 		LOG_INFO("Init Buffer Manager.");
 		RenderCore::IBufferManagerAdmin* IBMAdmin = RenderCore::GetBufferManagerAdminInterface();
 		RenderCore::ViewContext context;
-		context.ScreenSize = XMINT2(WondowsConfig->width, WondowsConfig->height);
+		context.ScreenSize = WondowsConfig->WindowsSize;
 		IBMAdmin->Initialize(context);
 
 		return true;
@@ -63,10 +63,12 @@ namespace Editor
 		::RegisterClassEx(&wc);
 
 		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("SetDpi"),nullptr }); // Set Imgui Dpi Scale
+		int2 WP = WondowsConfig->WindowsPostion;
+		int2 WS = WondowsConfig->WindowsSize;
 		HWND hwnd = CreateWindowEx(
 			0, wc.lpszClassName, L"Magic Editor",
 			WS_OVERLAPPEDWINDOW,
-			WondowsConfig->windowsX, WondowsConfig->windowsY, WondowsConfig->width, WondowsConfig->height,
+			WP.x, WP.y, WS.x, WS.y,
 			nullptr, nullptr,
 			wc.hInstance,
 			nullptr
@@ -96,13 +98,12 @@ namespace Editor
 
 		int screenWidth = GetSystemMetrics(SM_CXSCREEN);
 		int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-		if (WondowsConfig->windowsX > screenWidth || WondowsConfig->windowsY > screenHeight ||
-			WondowsConfig->windowsX < 0 || WondowsConfig->windowsY < 0)
+		if (WondowsConfig->WindowsPostion.x > screenWidth || WondowsConfig->WindowsPostion.y > screenHeight ||
+			WondowsConfig->WindowsPostion < int2(0,0))
 		{
 			// 窗口位置不正常
 			LOG_WARNING("The window has been minimized and will use the default position");
-			WondowsConfig->windowsX = 100;
-			WondowsConfig->windowsY = 100;
+			WondowsConfig->WindowsPostion = int2(100, 100);
 		}
 	}
 

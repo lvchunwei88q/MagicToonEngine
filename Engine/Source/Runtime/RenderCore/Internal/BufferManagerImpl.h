@@ -44,7 +44,7 @@ namespace RenderCore //RenderCore
 
     struct TextureBuffer : public BufferBase
     {
-        XMINT2 ViewSize;
+        int2 ViewSize;
         bool FixedSize;
         // 组成纹理的基础 RTV and SRV and DSV and UAV
         D3D11_TEXTURE2D_DESC Desc; // desc struct
@@ -65,7 +65,7 @@ namespace RenderCore //RenderCore
 
     struct ResourcesTextureBuffer : public BufferBase
     {
-        XMINT2 ViewSize;
+        int2 ViewSize;
         ComPtr<ID3D11Texture2D> Texture; // default == nullptr
         ComPtr<ID3D11ShaderResourceView> SRV; // default == nullptr
     };
