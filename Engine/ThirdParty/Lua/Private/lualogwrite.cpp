@@ -10,6 +10,7 @@ extern "C" void Lua_LogWrite(const char* s, size_t len) {
             msg.pop_back();
         if (!msg.empty()){
             //LOG_INFO("LuaScript: ", msg.c_str());
+            // TODO 实现日志打印
         }
 
         //lua_writestringerror("%s", msg.c_str());
@@ -23,6 +24,7 @@ extern "C" void Lua_ErrorLogWrite(const char* s, size_t len) {
             msg.pop_back();
         if (!msg.empty()) {
             //LOG_ERROR("LuaScript: ", msg.c_str());
+            // TODO 实现日志打印
         }
             
     }
