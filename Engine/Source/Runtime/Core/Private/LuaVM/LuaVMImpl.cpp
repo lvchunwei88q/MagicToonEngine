@@ -4,6 +4,19 @@
 
 namespace Core {
 
+    namespace {
+        auto RegisterSaveRef = [](LuaScriptRegisterStatus& Rs, lua_State* Lua) -> bool {
+            // If Register is true, it means it's already registered, so you can't register it again.
+            if (Rs.Register) {
+                WarningCapture::Capture("Please release the current Lua bytecode before loading other Lua code!");
+                return false;
+            }
+            Rs.Ref = luaL_ref(Lua, LUA_REGISTRYINDEX);
+            Rs.Register = true;
+            return true;
+        };
+    }
+
     void* LuaAllocator::Allocate(void* ud, void* ptr, size_t osize, size_t nsize) {
         // We need to use our own memory allocator, so we have to pass a pointer to our allocator in the user data.
         LuaAllocator* allocator = static_cast<LuaAllocator*>(ud);
@@ -40,7 +53,6 @@ namespace Core {
         *  and afterwards we can directly create Lua state threads without needing to call luaL_newstate.
         */
 
-
         // Using our own memory allocator
         Lua = luaL_newstate(LuaAllocator::Allocate, static_cast<void*>(&Allocator));
         if (!Lua) {
@@ -57,22 +69,72 @@ namespace Core {
         }
     }
 
-    bool LuaVM::Impl::DoFile(const std::string& filePath, std::string* errorMsg) {
+    bool LuaVM::Impl::LoadFile(const std::string& filePath, std::string* errorMsg) {
         if (luaL_loadfile(Lua, filePath.c_str()) != LUA_OK) {
             if (errorMsg) *errorMsg = PopErrorMessage();
             else lua_pop(Lua, 1);
             return false;
         }
-        return ExecuteLoadedFunction(0, LUA_MULTRET, errorMsg);
+        // Save Reference ID
+        return RegisterSaveRef(this->Rs, Lua);
     }
 
-    bool LuaVM::Impl::DoString(const std::string& chunk, std::string* errorMsg) {
+    bool LuaVM::Impl::LoadString(const std::string& chunk, std::string* errorMsg) {
         if (luaL_loadstring(Lua, chunk.c_str()) != LUA_OK) {
             if (errorMsg) *errorMsg = PopErrorMessage();
             else lua_pop(Lua, 1);
             return false;
         }
-        return ExecuteLoadedFunction(0, LUA_MULTRET, errorMsg);
+        // Save Reference ID
+        return RegisterSaveRef(this->Rs, Lua);
+    }
+
+    bool LuaVM::Impl::Execute(int numArgs, int numResults, LuaResultCallback callback, std::string* errorMsg)
+    {
+        // Return immediately if not registered
+        if (!Rs.Register) {
+            if (errorMsg) *errorMsg = "No Lua function loaded. Call LoadString/LoadFile first.";
+            return false;
+        }
+        // Pop a function from the stack using its ID
+        lua_rawgeti(Lua, LUA_REGISTRYINDEX, Rs.Ref);
+
+        // Check whether the top of the stack is a function (safety check)
+        if (!lua_isfunction(Lua, -1)) {
+            if (errorMsg) *errorMsg = "Registered reference is not a function.";
+            lua_pop(Lua, 1);
+            return false;
+        }
+
+        int status = lua_pcall(Lua, numArgs, numResults, 0);
+        if (status != LUA_OK) {
+            if (errorMsg) *errorMsg = PopErrorMessage();
+            else lua_pop(Lua, 1);
+            return false;
+        }
+        // Execution successful: numResults return values are on the top of the stack
+        int nresults = lua_gettop(Lua);
+        if (callback)
+            callback(Lua, nresults);
+        lua_pop(Lua, nresults);
+
+        // Note: The function has been popped, Rs.Ref is still valid, and can be executed again
+        return true;
+    }
+
+    void LuaVM::Impl::Unload()
+    {
+        if (!Rs.Register) {
+            WarningCapture::Capture("Lua bytecode Already uninstalled!");
+            return;  // Already uninstalled
+        }
+        // Release the reference in the registry
+        luaL_unref(Lua, LUA_REGISTRYINDEX, Rs.Ref);
+        Rs.Ref = LUA_NOREF;
+        // Clear the stack
+        lua_settop(Lua, 0);
+
+        Rs.Register = false;
     }
 
     bool LuaVM::Impl::RegisterPackagePath(const std::string& path)
@@ -84,7 +146,14 @@ namespace Core {
             "package.path = package.path .. \";" +
             path +
             "/?.lua\"";
-        bool result = DoString(script, &errormsg);
+        // Load Lua (Load and Compile Lua)
+        bool result = LoadString(script, &errormsg);
+        if (result) {
+            result = Execute(0, LUAVM_MULTRET,nullptr, &errormsg);
+        }
+        // Whether it succeeds or not, we'll clear it once anyway.
+        Unload();
+        
         if (!result) {
             ErrorCapture::Capture(errormsg);
             return false;
@@ -92,7 +161,7 @@ namespace Core {
         return true;
     }
 
-    void LuaVM::Impl::RegisterFunction(const std::string& name, int (*func)(lua_State*)) {
+    void LuaVM::Impl::RegisterFunction(const std::string& name,lua_CFunction func) {
         lua_register(Lua, name.c_str(), func);
     }
 
@@ -167,21 +236,38 @@ namespace Core {
     LuaVM::LuaVM() : pImpl(std::make_unique<Impl>()) {}
     LuaVM::~LuaVM() = default;
 
-    bool LuaVM::DoFile(const std::string& filePath, std::string* errorMsg) {
-        return pImpl->DoFile(filePath, errorMsg);
+    // ------------------------------- Core ----------------------------------- //
+
+    bool LuaVM::LoadFile(const std::string& filePath, std::string* errorMsg) {
+        return pImpl->LoadFile(filePath, errorMsg);
     }
 
-    bool LuaVM::DoString(const std::string& chunk, std::string* errorMsg) {
-        return pImpl->DoString(chunk, errorMsg);
+    bool LuaVM::LoadString(const std::string& chunk, std::string* errorMsg) {
+        return pImpl->LoadString(chunk, errorMsg);
     }
 
-    bool LuaVM::RegisterPackagePath(const std::string& path){
+    bool LuaVM::Execute(int numArgs, int numResults, LuaResultCallback callback, std::string* errorMsg){
+        return pImpl->Execute(numArgs, numResults, callback, errorMsg);
+    }
+
+    void LuaVM::Unload(){
+        pImpl->Unload();
+    }
+
+    bool LuaVM::IsLoaded() const{
+        // Whether to register here means whether to read it 
+        return pImpl->GetRegisterStatus().Register;
+    }
+
+    bool LuaVM::RegisterPackagePath(const std::string& path) {
         return pImpl->RegisterPackagePath(path);
     }
 
-    void LuaVM::RegisterFunction(const std::string& name, int (*func)(lua_State*)) {
+    void LuaVM::RegisterFunction(const std::string& name, const LuaCFunction& func) {
         pImpl->RegisterFunction(name, func);
     }
+
+    // ------------------------------- Core End ----------------------------------- //
 
     void LuaVM::SetGlobal(const std::string& name, int value) {
         pImpl->SetGlobal(name, value);

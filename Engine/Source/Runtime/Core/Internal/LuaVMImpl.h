@@ -41,6 +41,13 @@ namespace Core {
         size_t m_totalAllocated{0};
     };
 
+    struct LuaScriptRegisterStatus {
+        //Reference ID returned by the registry
+        int Ref;
+        // Sign up ?
+        bool Register = false;
+    };
+
     // Implementation class that holds all Lua states
     class LuaVM::Impl {
     public:
@@ -48,10 +55,14 @@ namespace Core {
         ~Impl();
 
         // Implementation of a public interface
-        bool DoFile(const std::string& filePath, std::string* errorMsg);
-        bool DoString(const std::string& chunk, std::string* errorMsg);
+        bool LoadFile(const std::string& filePath, std::string* errorMsg);
+        bool LoadString(const std::string& chunk, std::string* errorMsg);
+        // If your Lua function needs arguments, please push them before executing it.
+        bool Execute(int numArgs = 0, int numResults = LUAVM_MULTRET, LuaResultCallback callback = nullptr, std::string* errorMsg = nullptr);
+        void Unload();
+
         bool RegisterPackagePath(const std::string& path);
-        void RegisterFunction(const std::string& name, int (*func)(lua_State*));
+        void RegisterFunction(const std::string& name,lua_CFunction func);
 
         /////////////////////////// Global Variable
         void SetGlobal(const std::string& name, int value);
@@ -68,9 +79,12 @@ namespace Core {
 
         // Get underlying state (for internal use only)
         lua_State* GetState() const { return Lua; }
+        // Get register status
+        LuaScriptRegisterStatus GetRegisterStatus() const { return Rs; }
     private:
         LuaAllocator Allocator;
         lua_State* Lua;  // Actual Lua State Machine
+        LuaScriptRegisterStatus Rs; // Registration Status
 
         bool ExecuteLoadedFunction(int numArgs, int numResults, std::string* errorMsg);
         std::string PopErrorMessage();

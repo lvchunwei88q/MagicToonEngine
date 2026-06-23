@@ -90,7 +90,13 @@ private:
         std::string error;
 
         // 执行简单 Lua 代码
-        bool result = vm.DoString("print('Hello from Lua!')", &error);
+        bool result = vm.LoadString("print('Hello from Lua!')", &error);
+        if (result) {
+            vm.Execute();
+            vm.Execute();
+        }
+
+        vm.Unload();
 
         if (!result) {
             std::cerr << "[FAIL] BasicExecution: " << error << std::endl;
@@ -128,7 +134,10 @@ private:
         )";
 
         std::string error;
-        bool result = vm.DoString(luaCode, &error);
+        bool result = vm.LoadString(luaCode, &error);
+        if (result) {
+            vm.Execute();
+        }
 
         if (!result) {
             std::cerr << "[FAIL] GlobalVariables: " << error << std::endl;
@@ -166,7 +175,10 @@ private:
         )";
 
         std::string error;
-        bool result = vm.DoString(luaCode, &error);
+        bool result = vm.LoadString(luaCode, &error);
+        if (result) {
+            vm.Execute();
+        }
 
         if (!result) {
             std::cerr << "[FAIL] FunctionRegistration: " << error << std::endl;
@@ -202,7 +214,10 @@ private:
         )";
 
         std::string error;
-        bool result = vm.DoString(luaCode, &error);
+        bool result = vm.LoadString(luaCode, &error);
+        if (result) {
+            vm.Execute();
+        }
 
         if (!result) {
             std::cerr << "[FAIL] VectorToTable: " << error << std::endl;
@@ -219,7 +234,10 @@ private:
         std::string error;
 
         // 执行有错误的 Lua 代码
-        bool result = vm.DoString("invalid lua syntax!!!", &error);
+        bool result = vm.LoadString("invalid lua syntax!!!", &error);
+        if (result) {
+            vm.Execute();
+        }
 
         if (result) {
             std::cerr << "[FAIL] ErrorHandling: Expected error but got success" << std::endl;

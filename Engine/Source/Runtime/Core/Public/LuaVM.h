@@ -10,6 +10,15 @@
 // Forward declaration, hiding the specific implementation
 struct lua_State;
 
+// Cancel Windows' impact on us
+#undef LoadString
+#undef LoadFile
+
+#define LUAVM_MULTRET (-1)
+
+using LuaResultCallback = std::function<void(lua_State*, int)>;
+using LuaCFunction = int (*)(lua_State*);
+
 DISABLE_DLL_WARNINGS_PUSH
 namespace Core {
     /**
@@ -25,12 +34,15 @@ namespace Core {
         LuaVM& operator=(const LuaVM&) = delete;
 
         // ---- Core ----
-        bool DoFile(const std::string& filePath, std::string* errorMsg = nullptr);
-        bool DoString(const std::string& chunk, std::string* errorMsg = nullptr);
+        bool LoadFile(const std::string& filePath, std::string* errorMsg = nullptr);
+        bool LoadString(const std::string& chunk, std::string* errorMsg = nullptr);
+        bool Execute(int numArgs = 0, int numResults = LUAVM_MULTRET, LuaResultCallback callback = nullptr, std::string* errorMsg = nullptr);
+        void Unload();
+        bool IsLoaded() const;
 
         // ---- C++ Lua Registration Operation ----
         bool RegisterPackagePath(const std::string& path);
-        void RegisterFunction(const std::string& name, int (*func)(lua_State*));
+        void RegisterFunction(const std::string& name, const LuaCFunction& func);
 
         // ---- Global variable operations ----
         void SetGlobal(const std::string& name, int value);
