@@ -76,19 +76,7 @@ namespace RenderUI {
 		{
 			auto& context = Subsystems[i];
 			if (context.Subsystem) {
-				switch (context.Subsystem->GetModeType())
-				{
-				case ModeType::LuaGui: {
-					context.Subsystem->Tick();
-				}
-					break;
-				case ModeType::ImGui: {
-					context.Subsystem->Tick();
-				}
-					break;
-				default:LOG_ERROR("No specified rendering mode");
-					break;
-				}
+				context.Subsystem->Tick();
 			}
 		}
 	}

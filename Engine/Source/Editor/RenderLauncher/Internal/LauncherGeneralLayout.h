@@ -4,7 +4,6 @@
 #include "AssetStruct.h"
 #include <RenderUIWarehouse.h>
 #include <cereal/cereal.hpp>
-#include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
 #include <Theme.h>
 
@@ -79,7 +78,7 @@ namespace RenderLauncher {
 	private:
 	};
 
-	class LauncherGeneralLayout final : public RSubsystemTemplate<LauncherGeneralLayout, ModeType::ImGui>, public ImGuiMode
+	class LauncherGeneralLayout final : public RSubsystemTemplate<LauncherGeneralLayout>
 	{
 	public:
 		virtual void Init() override;

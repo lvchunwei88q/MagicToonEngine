@@ -1,7 +1,6 @@
 #pragma once
 #include <RenderSubsystem/RenderSubsystem.h>
 
-#include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
 #include <Commands/EditorSettingCommands.h>
 #include <Command/ICommandManager.h>
@@ -10,7 +9,7 @@ using namespace RenderUI;
 
 namespace RenderEditor {
 
-	class EditorSettings final : public RSubsystemTemplate<EditorSettings, ModeType::ImGui>, public ImGuiMode
+	class EditorSettings final : public RSubsystemTemplate<EditorSettings>
 	{
 	public:
 		virtual void Init() override;

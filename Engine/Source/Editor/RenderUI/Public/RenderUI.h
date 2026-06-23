@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Common/RENDERUI_API.h"
-#include "RenderMode/RenderMode.h" // 绘制模式 
 #include <imgui.h>
 #include <Common/Check.h>
 

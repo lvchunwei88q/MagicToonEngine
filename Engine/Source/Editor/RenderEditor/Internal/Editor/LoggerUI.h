@@ -5,7 +5,6 @@
 ///////////////////////
 
 #include <RenderSubsystem/RenderSubsystem.h>
-#include <RenderMode/ImGuiMode.h>
 
 #include <Tools/GetLanguage.h>
 
@@ -33,7 +32,7 @@ namespace RenderEditor {
 		bool detailedInformation;
 	};
 
-	class LoggerUI final : public RSubsystemTemplate<LoggerUI, ModeType::ImGui>, public ImGuiMode
+	class LoggerUI final : public RSubsystemTemplate<LoggerUI>
 	{
 	public:
 		virtual void Init() override;

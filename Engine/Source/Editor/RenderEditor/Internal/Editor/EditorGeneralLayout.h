@@ -4,7 +4,6 @@
 #include <EditorGeneralLayout.object.generate.h>
 
 #include <RenderSubsystem/RenderSubsystem.h>
-#include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
 #include <Command/ICommandManager.h>
 
@@ -37,7 +36,7 @@ namespace RenderEditor {
 		bool EditorSettingsView;
 	};
 
-	class EditorGeneralLayout final : public RSubsystemTemplate<EditorGeneralLayout, ModeType::ImGui>, public ImGuiMode
+	class EditorGeneralLayout final : public RSubsystemTemplate<EditorGeneralLayout>
 	{
 	public:
 		virtual void Init() override;

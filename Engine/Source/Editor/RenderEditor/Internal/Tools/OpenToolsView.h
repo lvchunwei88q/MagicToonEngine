@@ -1,6 +1,5 @@
 #pragma once
 #include <RenderSubsystem/RenderSubsystem.h>
-#include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
 
 using namespace RenderUI;
@@ -17,7 +16,7 @@ namespace RenderEditor {
 		OpenTools Open = OpenTools::NOT;
 	};
 
-	class OpenToolsView final : public RSubsystemTemplate<OpenToolsView, ModeType::ImGui>, public ImGuiMode
+	class OpenToolsView final : public RSubsystemTemplate<OpenToolsView>
 	{
 	public:
 		virtual void Init() override;

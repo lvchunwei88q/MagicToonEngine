@@ -1,15 +1,47 @@
 // Core/Private/LuaVM/LuaVMImpl.cpp
 #include "LuaVMImpl.h"
 
-
 namespace Core {
+
+    void* LuaAllocator::Allocate(void* ud, void* ptr, size_t osize, size_t nsize) {
+        // We need to use our own memory allocator, so we have to pass a pointer to our allocator in the user data.
+        LuaAllocator* allocator = static_cast<LuaAllocator*>(ud);
+
+        // In Lua, allocating a size of 0 means you need to delete this area, so we delete this memory.
+        if (nsize == 0) {
+            // free
+            free(ptr);
+            return nullptr;
+        }
+
+        if (ptr == nullptr) {
+            // new malloc
+            void* result = malloc(nsize);
+            if (result && allocator) {
+                allocator->m_totalAllocated += nsize;
+            }
+            return result;
+        }
+
+        // realloc
+        void* result = realloc(ptr, nsize);
+        if (result && allocator) {
+            // First subtract the old size, then add the new size
+            allocator->m_totalAllocated -= osize;
+            allocator->m_totalAllocated += nsize;
+        }
+        return result;
+    }
+
     // ---- Impl achieve ----
 
     LuaVM::Impl::Impl() {
         /* This operation will create a new Lua global state,
         *  and afterwards we can directly create Lua state threads without needing to call luaL_newstate.
         */
-        L = luaL_newstate();
+
+        // Using our own memory allocator
+        L = luaL_newstate(LuaAllocator::Allocate, static_cast<void*>(&Allocator));
         if (!L) {
             throw std::runtime_error("LuaVM: Failed to create lua_State");
         }
@@ -104,6 +136,7 @@ namespace Core {
     }
 
     std::string LuaVM::Impl::PopErrorMessage() {
+        // When lua_pcall fails, the error message is pushed onto the top of the stack
         const char* err = lua_tostring(L, -1);
         std::string result = err ? err : "Unknown error";
         lua_pop(L, 1);

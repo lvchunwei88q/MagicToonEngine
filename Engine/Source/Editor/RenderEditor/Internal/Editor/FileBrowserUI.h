@@ -4,7 +4,6 @@
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <RenderUIWarehouse.h>
 
-#include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
 
 #include <filesystem>
@@ -43,7 +42,7 @@ namespace RenderEditor {
 		fs::path entry_path;
 	};
 
-	class FileBrowserUI final : public RSubsystemTemplate<FileBrowserUI, ModeType::ImGui>, public ImGuiMode
+	class FileBrowserUI final : public RSubsystemTemplate<FileBrowserUI>
 	{
 	public:
 		const ContentBrowserState& GetState() {return state;};

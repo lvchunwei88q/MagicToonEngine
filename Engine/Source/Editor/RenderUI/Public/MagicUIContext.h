@@ -4,7 +4,6 @@
 
 // imgui for lua context
 #include <imgui.h>
-#include <sol/sol.hpp> // lua bind
 
 #include <cstdint>
 #include <functional>
@@ -19,8 +18,6 @@ namespace RenderUI
     class RENDERUI_API MteGUIContext : public Singleton<MteGUIContext> // from https://github.com/ChenlizheMe/Infernux
     {
     public:
-        /* bind for lua function */
-        void BindLuaFunction(sol::state& lua);
 
         /* basic text & labels */
         void Label(const std::string& text);
@@ -291,13 +288,6 @@ namespace RenderUI
 
         bool m_dragCaptured = false;
         int m_ignoreMouseDeltaFrames = 0; // suppress N frames after SDL warp
-
-    private: // Bind Lua Function
-        void BindCore(sol::state& lua, const std::string& name);
-        void BindLayout(sol::state& lua, const std::string& name);
-        void BindWindowPopup(sol::state& lua, const std::string& name);
-        void BindTableDraw(sol::state& lua, const std::string& name);
-        void BindUtils(sol::state& lua, const std::string& name);
     };
 
 } // namespace RenderUI

@@ -27,6 +27,19 @@ namespace Core {
         }
     }
 
+    // Responsible for allocating memory for Lua's virtual machine
+    class LuaAllocator {
+    public:
+        LuaAllocator() = default;
+
+        //Lua allocator callback function
+        static void* Allocate(void* ud, void* ptr, size_t osize, size_t nsize);
+        //Get the current total allocated bytes
+        size_t GetTotalAllocated() const { return m_totalAllocated; }
+    private:
+        size_t m_totalAllocated{0};
+    };
+
     // Implementation class that holds all Lua states
     class LuaVM::Impl {
     public:
@@ -53,7 +66,7 @@ namespace Core {
 
         // Get underlying state (for internal use only)
         lua_State* GetState() const { return L; }
-
+        LuaAllocator Allocator;
     private:
         lua_State* L;  // Actual Lua State Machine
         bool ExecuteLoadedFunction(int numArgs, int numResults, std::string* errorMsg);

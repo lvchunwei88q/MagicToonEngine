@@ -1,12 +1,11 @@
 #pragma once
 #include <RenderSubsystem/RenderSubsystem.h>
-#include <RenderMode/ImGuiMode.h>
 #include <Tools/GetLanguage.h>
 
 using namespace RenderUI;
 
 namespace RenderEditor {
-	class RenderView final : public RSubsystemTemplate<RenderView, ModeType::ImGui>, public ImGuiMode
+	class RenderView final : public RSubsystemTemplate<RenderView>
 	{
 	public:
 		virtual void Init() override;

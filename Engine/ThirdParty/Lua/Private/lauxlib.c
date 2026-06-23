@@ -1023,16 +1023,8 @@ LUALIB_API const char *luaL_gsub (lua_State *L, const char *s,
 }
 
 
-static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
-  (void)ud; (void)osize;  /* not used */
-  if (nsize == 0) {
-    free(ptr);
-    return NULL;
-  }
-  else
-    return realloc(ptr, nsize);
-}
-
+// Please implement the allocator yourself
+//static void* l_alloc(void* ud, void* ptr, size_t osize, size_t nsize);
 
 /*
 ** Standard panic funcion just prints an error message. The test
@@ -1105,8 +1097,8 @@ static void warnfon (void *ud, const char *message, int tocont) {
 }
 
 
-LUALIB_API lua_State *luaL_newstate (void) {
-  lua_State *L = lua_newstate(l_alloc, NULL);
+LUALIB_API lua_State *luaL_newstate (lua_Alloc l_alloc,void* ud) {
+  lua_State *L = lua_newstate(l_alloc, ud);
   if (l_likely(L)) {
     lua_atpanic(L, &panic);
     lua_setwarnf(L, warnfoff, L);  /* default is warnings off */

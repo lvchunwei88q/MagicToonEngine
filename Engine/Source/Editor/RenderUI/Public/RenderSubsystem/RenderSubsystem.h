@@ -1,6 +1,5 @@
 #pragma once
 #include "Common/RENDERUI_API.h"
-#include "RenderMode/RenderMode.h"
 
 #include "RenderSubsystem/RenderUICotext.h"
 
@@ -50,14 +49,13 @@ namespace RenderUI {
 		virtual void Notification(const char* msg) {};
 		virtual void* PublicData(uint8_t type) = 0;
 
-		template<typename Derived, ModeType type>
+		template<typename Derived>
 		void Register(const char* name) {
 			// Register the subsystem in the system manager
 
 			RegisterSubsystemContext context{};
 			context.Name = name;
 			context.Subsystem = this;
-			this->Type = type;
 
 			this->RegisterFunctions();		// 注册函数指针到FunctionArray
 			IRSubsystem* Subsystemcontext = GetSubsystem();
@@ -65,7 +63,7 @@ namespace RenderUI {
 		}
 
 	protected:
-		ModeType Type;
+		// not
 	public:
 		struct FunctionArray {
 			// 注册函数数组
@@ -80,21 +78,18 @@ namespace RenderUI {
 		}
 		virtual void RegisterFunctions() {};
 	public:
-		[[nodiscard]] ModeType GetModeType() const {
-			return Type;
-		}
 		virtual [[nodiscard]] int GetPriority() const { // 可选
 			return 0;
 		}
 	};
 
 	// the subsystems template Cannot be used as an export API!!!
-	template<typename T, ModeType type>
+	template<typename T>
 	class RSubsystemTemplate : public RSubsystem, public Singleton<T>
 	{
 	public:
 		static void RegisterStatic(const char* name) {
-			RSubsystemTemplate::Get().template Register<T, type>(name);
+			RSubsystemTemplate::Get().template Register<T>(name);
 		}
 	};
 
