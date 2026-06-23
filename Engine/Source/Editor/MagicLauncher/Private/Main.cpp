@@ -21,7 +21,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
     int x = (screenW - winW) / 2;
     int y = (screenH - winH) / 2;
 
-    Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("SetDpi"),nullptr }); // Set Imgui Dpi Scale
+    NotifContext Notif{ encodeToSizeT("SetDpi"),nullptr };
+    Core::SubsystemControl::NotificationSubsystem("IMGUI", Notif); // Set Imgui Dpi Scale
     MagicLauncher::WindowsContext::Get().hWnd = CreateWindowW(CLASS, L"Engine Launcher",
         WS_POPUP,
         x, y, winW, winH,
@@ -35,7 +36,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
         SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);   // 小图标（标题栏）
     }
     
-    Core::SubsystemError error = Core::SubsystemControl::Init();// 初始化子系统
+    SubSystemError error = Core::SubsystemControl::Init();// 初始化子系统
     if (!error.error) {
         //每个进程有独立的虚拟地址空间，泄漏只影响自己的进程，不会污染其他程序或系统 所以不需要释放了
         std::stringstream ss;

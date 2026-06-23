@@ -15,28 +15,23 @@ public:
     }
 };
 
-// 如果使用通知系统我们推荐使用字符串来确定type，使用encodeToSizeT来编码字符串到size_t，这样可以在保持可读性的同时提高效率。
-constexpr size_t encodeToSizeT(const char* str) {   // Max 10 characters
-    int len = 0;
-    for (const char* p = str; *p; ++p) ++len;
-    if (len > 10) {
-#ifdef _DEBUG
-        __debugbreak();
-#endif
-        return 0;
-    }
+// If you use the notification system, we recommend using strings to identify the type and using encodeToSizeT to encode the string into size_t,
+// which can improve efficiency while keeping it readable.
+template<size_t N>
+constexpr size_t encodeToSizeT(const char(&str)[N]) {   // Max 10 characters
+    static_assert(N <= 11, "The input character label is more than 10, please reduce the label size");
 
     size_t result = 0;
     int count = 0;
-    for (const char* p = str; *p && count < 10; ++p, ++count) {
+    for (const char* p = str; *p && count < N; ++p, ++count) {
         char c = *p;
         int val = (c >= 'A' && c <= 'Z') ? (c - 'A') :           // 0-25
             (c >= 'a' && c <= 'z') ? (c - 'a' + 26) :      // 26-51
             -1;
-        if (val == -1) return 0;  // 无效字符返回0
+        if (val == -1) return 0;  // Invalid character returned0
         result = (result << 6) | val;
     }
-    for (int i = count; i < 10; ++i) {
+    for (int i = count; i < N; ++i) {
         result = (result << 6) | 63;
     }
 

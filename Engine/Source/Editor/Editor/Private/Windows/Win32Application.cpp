@@ -62,7 +62,8 @@ namespace Editor
 		wc.hbrBackground = CreateSolidBrush(RGB(25, 25, 25));
 		::RegisterClassEx(&wc);
 
-		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("SetDpi"),nullptr }); // Set Imgui Dpi Scale
+		NotifContext Notif_SetDpi{ encodeToSizeT("SetDpi"),nullptr };
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", Notif_SetDpi); // Set Imgui Dpi Scale
 		int2 WP = WondowsConfig->WindowsPostion;
 		int2 WS = WondowsConfig->WindowsSize;
 		HWND hwnd = CreateWindowEx(
@@ -84,7 +85,9 @@ namespace Editor
 
 		char buffer[sizeof(HWND)];
 		memcpy(buffer, &hwnd, sizeof(HWND));
-		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("HWND"),buffer });
+
+		NotifContext Notif_HWND{ encodeToSizeT("HWND"),buffer };
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", Notif_HWND);
 	}
 
 	void Win32Application::CreateDeviceD3D()

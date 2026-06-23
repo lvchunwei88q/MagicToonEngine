@@ -11,7 +11,9 @@ namespace MagicLauncher
 		// 设置窗口句柄
 		char buffer[sizeof(HWND)];
 		memcpy(buffer, &WindowsContext::Get().hWnd, sizeof(HWND));
-		Core::SubsystemControl::NotificationSubsystem("IMGUI", { encodeToSizeT("HWND"),buffer });
+
+		NotifContext Notif{ encodeToSizeT("HWND"),buffer };
+		Core::SubsystemControl::NotificationSubsystem("IMGUI", Notif);
 		// 创建D3D设备
 		RenderCore::GetRenderInterface()->CreateDeviceD3D(WindowsContext::Get().hWnd);
 

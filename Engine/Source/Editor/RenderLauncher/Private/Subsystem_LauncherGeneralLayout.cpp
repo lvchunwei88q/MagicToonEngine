@@ -124,7 +124,9 @@ namespace RenderLauncher {
 
 	void LauncherGeneralLayout::OpenProject(std::string path, std::string name) {
 		SetUIType(UIType::Loading); // 设置为加载界面
-		Core::GetSubsystemContext()->Notification("Application", { encodeToSizeT("SETWINDOW"),nullptr});
+
+		NotifContext Notif{ encodeToSizeT("SETWINDOW"),nullptr };
+		Core::GetSubsystemContext()->Notification("Application", Notif);
 
 		// 构建 ENGINE_EDITOR_NAME_W 路径
 		std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();

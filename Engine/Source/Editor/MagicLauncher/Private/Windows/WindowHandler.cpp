@@ -31,7 +31,9 @@ namespace MagicLauncher
             PCOPYDATASTRUCT pcds = (PCOPYDATASTRUCT)lParam;
             if (pcds->dwData == MessageTypeNumber_0 && pcds->cbData > 0) {
                 const char* pData = (const char*)pcds->lpData;
-                Core::GetSubsystemContext()->Notification("LAUNCHERDATA", { encodeToSizeT("LOADVALUE"),pData });
+
+                NotifContext Notif{ encodeToSizeT("LOADVALUE"),pData };
+                Core::GetSubsystemContext()->Notification("LAUNCHERDATA", Notif);
                 return TRUE;
             }
         }break;
