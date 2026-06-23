@@ -28,7 +28,8 @@ namespace Core {
         bool DoFile(const std::string& filePath, std::string* errorMsg = nullptr);
         bool DoString(const std::string& chunk, std::string* errorMsg = nullptr);
 
-        // ---- C++ Function Registration ----
+        // ---- C++ Lua Registration Operation ----
+        bool RegisterPackagePath(const std::string& path);
         void RegisterFunction(const std::string& name, int (*func)(lua_State*));
 
         // ---- Global variable operations ----

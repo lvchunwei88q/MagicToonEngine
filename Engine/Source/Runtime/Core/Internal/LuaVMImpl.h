@@ -1,5 +1,6 @@
 // Core/Private/LuaVM/LuaVMImpl.h
 #pragma once
+#include "CoreMinimal.h"
 
 #include <lua.hpp>
 
@@ -49,6 +50,7 @@ namespace Core {
         // Implementation of a public interface
         bool DoFile(const std::string& filePath, std::string* errorMsg);
         bool DoString(const std::string& chunk, std::string* errorMsg);
+        bool RegisterPackagePath(const std::string& path);
         void RegisterFunction(const std::string& name, int (*func)(lua_State*));
 
         /////////////////////////// Global Variable
@@ -65,25 +67,26 @@ namespace Core {
         void SetGlobal(const std::string& name, const std::vector<std::string>& value);
 
         // Get underlying state (for internal use only)
-        lua_State* GetState() const { return L; }
-        LuaAllocator Allocator;
+        lua_State* GetState() const { return Lua; }
     private:
-        lua_State* L;  // Actual Lua State Machine
+        LuaAllocator Allocator;
+        lua_State* Lua;  // Actual Lua State Machine
+
         bool ExecuteLoadedFunction(int numArgs, int numResults, std::string* errorMsg);
         std::string PopErrorMessage();
 
         // Simplify array registration using templates
         template<typename T>
         void SetGlobalVector(const std::string& name, const std::vector<T>& value) {
-            lua_newtable(L); // Create a new table
+            lua_newtable(Lua); // Create a new table
             for (size_t i = 0; i < value.size(); ++i) {
                 // Lua Table indexes start from 1
-                lua_pushinteger(L, static_cast<lua_Integer>(i + 1));
-                PushValueToLua(L, value[i]);
-                lua_settable(L, -3);// Store the key-value pair in the table
+                lua_pushinteger(Lua, static_cast<lua_Integer>(i + 1));
+                PushValueToLua(Lua, value[i]);
+                lua_settable(Lua, -3);// Store the key-value pair in the table
             }
             // Finally assign it to the global variable
-            lua_setglobal(L, name.c_str());
+            lua_setglobal(Lua, name.c_str());
         }
     };
 

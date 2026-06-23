@@ -1,5 +1,6 @@
 // Core/Private/LuaVM/LuaVMImpl.cpp
 #include "LuaVMImpl.h"
+#include "IO.h"
 
 namespace Core {
 
@@ -32,7 +33,6 @@ namespace Core {
         }
         return result;
     }
-
     // ---- Impl achieve ----
 
     LuaVM::Impl::Impl() {
@@ -40,72 +40,91 @@ namespace Core {
         *  and afterwards we can directly create Lua state threads without needing to call luaL_newstate.
         */
 
+
         // Using our own memory allocator
-        L = luaL_newstate(LuaAllocator::Allocate, static_cast<void*>(&Allocator));
-        if (!L) {
+        Lua = luaL_newstate(LuaAllocator::Allocate, static_cast<void*>(&Allocator));
+        if (!Lua) {
             throw std::runtime_error("LuaVM: Failed to create lua_State");
         }
-        luaL_openlibs(L);
+
+        luaL_openlibs(Lua);
     }
 
     LuaVM::Impl::~Impl() {
-        if (L) {
-            lua_close(L);
-            L = nullptr;
+        if (Lua) {
+            lua_close(Lua);
+            Lua = nullptr;
         }
     }
 
     bool LuaVM::Impl::DoFile(const std::string& filePath, std::string* errorMsg) {
-        if (luaL_loadfile(L, filePath.c_str()) != LUA_OK) {
+        if (luaL_loadfile(Lua, filePath.c_str()) != LUA_OK) {
             if (errorMsg) *errorMsg = PopErrorMessage();
-            else lua_pop(L, 1);
+            else lua_pop(Lua, 1);
             return false;
         }
         return ExecuteLoadedFunction(0, LUA_MULTRET, errorMsg);
     }
 
     bool LuaVM::Impl::DoString(const std::string& chunk, std::string* errorMsg) {
-        if (luaL_loadstring(L, chunk.c_str()) != LUA_OK) {
+        if (luaL_loadstring(Lua, chunk.c_str()) != LUA_OK) {
             if (errorMsg) *errorMsg = PopErrorMessage();
-            else lua_pop(L, 1);
+            else lua_pop(Lua, 1);
             return false;
         }
         return ExecuteLoadedFunction(0, LUA_MULTRET, errorMsg);
     }
 
+    bool LuaVM::Impl::RegisterPackagePath(const std::string& path)
+    {
+        // First, build the Lua source code and then compile it.
+        // Hand it over to the Lua VM to execute, and this way you can modify global variables located in the global state.
+        std::string errormsg;
+        std::string script =
+            "package.path = package.path .. \";" +
+            path +
+            "/?.lua\"";
+        bool result = DoString(script, &errormsg);
+        if (!result) {
+            ErrorCapture::Capture(errormsg);
+            return false;
+        }
+        return true;
+    }
+
     void LuaVM::Impl::RegisterFunction(const std::string& name, int (*func)(lua_State*)) {
-        lua_register(L, name.c_str(), func);
+        lua_register(Lua, name.c_str(), func);
     }
 
     /////////////////////////// Global Variable
     void LuaVM::Impl::SetGlobal(const std::string& name, int value) {
-        lua_pushinteger(L, value);
-        lua_setglobal(L, name.c_str());
+        lua_pushinteger(Lua, value);
+        lua_setglobal(Lua, name.c_str());
     }
 
     void LuaVM::Impl::SetGlobal(const std::string& name, float value) {
-        lua_pushnumber(L, static_cast<lua_Number>(value));
-        lua_setglobal(L, name.c_str());
+        lua_pushnumber(Lua, static_cast<lua_Number>(value));
+        lua_setglobal(Lua, name.c_str());
     }
 
     void LuaVM::Impl::SetGlobal(const std::string& name, double value) {
-        lua_pushnumber(L, value);
-        lua_setglobal(L, name.c_str());
+        lua_pushnumber(Lua, value);
+        lua_setglobal(Lua, name.c_str());
     }
 
     void LuaVM::Impl::SetGlobal(const std::string& name, bool value) {
-        lua_pushboolean(L, value ? 1 : 0);
-        lua_setglobal(L, name.c_str());
+        lua_pushboolean(Lua, value ? 1 : 0);
+        lua_setglobal(Lua, name.c_str());
     }
 
     void LuaVM::Impl::SetGlobal(const std::string& name, const char* value) {
-        lua_pushstring(L, value ? value : "");
-        lua_setglobal(L, name.c_str());
+        lua_pushstring(Lua, value ? value : "");
+        lua_setglobal(Lua, name.c_str());
     }
 
     void LuaVM::Impl::SetGlobal(const std::string& name, const std::string& value) {
-        lua_pushstring(L, value.c_str());
-        lua_setglobal(L, name.c_str());
+        lua_pushstring(Lua, value.c_str());
+        lua_setglobal(Lua, name.c_str());
     }
 
     void LuaVM::Impl::SetGlobal(const std::string& name, const std::vector<uint8_t>& value) {
@@ -126,10 +145,10 @@ namespace Core {
     ///////////////////////////
 
     bool LuaVM::Impl::ExecuteLoadedFunction(int numArgs, int numResults, std::string* errorMsg) {
-        int status = lua_pcall(L, numArgs, numResults, 0);
+        int status = lua_pcall(Lua, numArgs, numResults, 0);
         if (status != LUA_OK) {
             if (errorMsg) *errorMsg = PopErrorMessage();
-            else lua_pop(L, 1);
+            else lua_pop(Lua, 1);
             return false;
         }
         return true;
@@ -137,9 +156,9 @@ namespace Core {
 
     std::string LuaVM::Impl::PopErrorMessage() {
         // When lua_pcall fails, the error message is pushed onto the top of the stack
-        const char* err = lua_tostring(L, -1);
+        const char* err = lua_tostring(Lua, -1);
         std::string result = err ? err : "Unknown error";
-        lua_pop(L, 1);
+        lua_pop(Lua, 1);
         return result;
     }
 
@@ -154,6 +173,10 @@ namespace Core {
 
     bool LuaVM::DoString(const std::string& chunk, std::string* errorMsg) {
         return pImpl->DoString(chunk, errorMsg);
+    }
+
+    bool LuaVM::RegisterPackagePath(const std::string& path){
+        return pImpl->RegisterPackagePath(path);
     }
 
     void LuaVM::RegisterFunction(const std::string& name, int (*func)(lua_State*)) {
