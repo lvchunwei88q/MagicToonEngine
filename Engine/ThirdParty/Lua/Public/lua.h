@@ -85,6 +85,10 @@ typedef struct lua_State lua_State;
 #define LUA_RIDX_GLOBALS	2
 #define LUA_RIDX_LAST		LUA_RIDX_GLOBALS
 
+// magic log level enum
+#define MAGIC_LUA_LOG_INFO    0
+#define MAGIC_LUA_LOG_WARNING 1
+#define MAGIC_LUA_LOG_ERROR   2
 
 /* type of numbers in Lua */
 typedef LUA_NUMBER lua_Number;
@@ -124,6 +128,10 @@ typedef int (*lua_Writer) (lua_State *L, const void *p, size_t sz, void *ud);
 */
 typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 
+/*
+** Type for magic_log functions
+*/
+typedef void (*lua_magic_log) (const char* msg, size_t len, int type);
 
 /*
 ** Type for warning functions
@@ -321,6 +329,12 @@ LUA_API int (lua_isyieldable) (lua_State *L);
 */
 LUA_API void (lua_setwarnf) (lua_State *L, lua_WarnFunction f, void *ud);
 LUA_API void (lua_warning)  (lua_State *L, const char *msg, int tocont);
+
+
+/*
+* Set up Lua's log output
+*/
+LUA_API void (set_magic_log_func) (lua_magic_log func);
 
 
 /*

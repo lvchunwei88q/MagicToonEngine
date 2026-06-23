@@ -3,6 +3,35 @@
 #include "IO.h"
 
 namespace Core {
+    namespace VM {
+        static void lua_for_magic_log(const char* msg, size_t len, int type) {
+            std::string prefix = "LuaVM ";
+            std::string full_msg = prefix + std::string(msg, len);
+            switch (type)
+            {
+            case MAGIC_LUA_LOG_INFO:
+                InfoCapture::Capture(full_msg);
+                break;
+            case MAGIC_LUA_LOG_WARNING:
+                WarningCapture::Capture(full_msg);
+                break;
+            case MAGIC_LUA_LOG_ERROR:
+                ErrorCapture::Capture(full_msg);
+                break;
+            default:ErrorCapture::Capture("Unknown log type msg: ");
+                    ErrorCapture::Capture(full_msg);
+                break;
+            }
+        }
+
+        // This operation won't be destroyed throughout the whole program lifecycle just because Lua is destroyed.
+        void SetLuaModuleBindLoggingSystem()
+        {
+            // set func
+            set_magic_log_func(lua_for_magic_log);
+        }
+    }
+
 
     namespace {
         auto RegisterSaveRef = [](LuaScriptRegisterStatus& Rs, lua_State* Lua) -> bool {

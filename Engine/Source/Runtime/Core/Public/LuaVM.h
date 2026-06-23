@@ -62,5 +62,10 @@ namespace Core {
         class Impl;
         std::unique_ptr<Impl> pImpl;
     };
+
+    namespace VM{
+        // This operation won't be destroyed throughout the whole program lifecycle just because Lua is destroyed.
+        void CORE_API SetLuaModuleBindLoggingSystem();
+    }
 }
 DISABLE_DLL_WARNINGS_POP

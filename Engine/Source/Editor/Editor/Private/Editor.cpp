@@ -1,5 +1,6 @@
 #include "Editor.h"
 #include "Win32Application.h" 
+#include <LuaVM.h>
 
 #include <Logo/resource.h>
 #include <ILog.h>
@@ -20,6 +21,9 @@ namespace Editor
         Core::InfoCapture::RegisterCaptureFunction([](const std::string& infoMessage) {
             LOG_INFO(infoMessage.c_str());
             });
+
+        // For LuaVMbind logs
+        Core::VM::SetLuaModuleBindLoggingSystem();
 
         return true;
     }

@@ -271,7 +271,8 @@ extern "C" {
 
 /* print a newline and flush the output */
 #if !defined(lua_writeline)
-#define lua_writeline()        Lua_LogWrite("\n", 1)
+// We'll automatically add line breaks for Lua, so we don't need to set them manually anymore.
+#define lua_writeline()        /*Lua_LogWrite("\n", 1)*/
 #endif
 
 /* print an error message */
