@@ -27370,12 +27370,10 @@ namespace sol {
 #endif
 						break;
 					case lib::io:
-						luaL_requiref(L, "io", luaopen_io, 1);
-						lua_pop(L, 1);
+						// NOT
 						break;
 					case lib::os:
-						luaL_requiref(L, "os", luaopen_os, 1);
-						lua_pop(L, 1);
+						// NOT
 						break;
 					case lib::debug:
 						luaL_requiref(L, "debug", luaopen_debug, 1);
