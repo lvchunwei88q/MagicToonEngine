@@ -12,6 +12,13 @@ namespace Core {
                 return false;
             }
             Rs.Ref = luaL_ref(Lua, LUA_REGISTRYINDEX);
+            // We need to check if the return value is valid
+            if (Rs.Ref == LUA_NOREF || Rs.Ref == LUA_REFNIL) {
+                Rs.Register = false;
+                Rs.Ref = LUA_NOREF;
+                WarningCapture::Capture("Failed to register Lua function (invalid or nil)");
+                return false;
+            }
             Rs.Register = true;
             return true;
         };
