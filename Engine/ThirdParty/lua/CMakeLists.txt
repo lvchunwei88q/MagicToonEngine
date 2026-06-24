@@ -11,7 +11,6 @@ target_compile_definitions(Lua PRIVATE LUA_EXPORTS)
 target_include_directories(Lua
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/Public 
-        ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal
 )

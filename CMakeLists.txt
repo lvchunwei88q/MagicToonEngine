@@ -23,7 +23,7 @@ include(Engine/Cmake/macro.cmake)
 BuildToolsModule(${MAGIC_HEADER_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
 
 # 第三方项目
-ThirdPartyModule(imgui-docking)
+ThirdPartyModule(IMGUI)
 ThirdPartyModule(ufbx)
 ThirdPartyModule(WICTextureLoader)
 ThirdPartyModule(Lua)

@@ -66,7 +66,7 @@ endfunction()
 function(add_engine_external_library name)
     add_library(${name} ${ARGN})
     set_target_properties(${name} PROPERTIES 
-        PREFIX "Magic-External"
+        PREFIX "Magic-External-"
     )
 endfunction()
 

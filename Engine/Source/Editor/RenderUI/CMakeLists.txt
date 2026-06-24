@@ -17,18 +17,6 @@ target_include_directories(RenderUI
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
 )
 
-set(BIND_SOURCES # 单独设置
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindCore.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindLayout.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindTableDraw.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindUtils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/Private/BindLua/MagicUI_BindWindowPopup.cpp
-)
-
-set_source_files_properties(${BIND_SOURCES} PROPERTIES
-    COMPILE_FLAGS "$<$<CXX_COMPILER_ID:MSVC>:/MP>"
-)
-
 target_compile_definitions(RenderUI PRIVATE RENDERUI_EXPORTS)
 
 target_link_libraries(RenderUI PUBLIC Core)
