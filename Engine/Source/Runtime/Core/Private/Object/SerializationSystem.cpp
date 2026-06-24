@@ -116,7 +116,7 @@ namespace Core {
 
 			CurrentFileSavePath += FileByte.GetFileName() + L".ObjectByte";
 			if (!IO::Exists(CurrentFileSavePath)) {
-				IO::MakeFile(CurrentFileSavePath);
+				IO::CreateFile(CurrentFileSavePath);
 			}
 
 			IO::WriteAllBytes(CurrentFileSavePath, Buffer);
@@ -133,10 +133,10 @@ namespace Core {
 		Data_.ProjectSerializedDataDir = ProjectSerializedDataDir;
 
 		if (!IO::Exists(Data_.EngineSerializedDataDir)) {
-			IO::MakeDirectory(Data_.EngineSerializedDataDir);
+			IO::CreateDirectory(Data_.EngineSerializedDataDir);
 		}
 		if (!IO::Exists(Data_.ProjectSerializedDataDir)) {
-			IO::MakeDirectory(Data_.ProjectSerializedDataDir);
+			IO::CreateDirectory(Data_.ProjectSerializedDataDir);
 		}
 
 		// Get File List
@@ -240,7 +240,7 @@ namespace Core {
 	void ObjectSystem::SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData)
 	{
 		if (!IO::Exists(ObjectData.ObjectSerializationPath)) {
-			IO::MakeFile(ObjectData.ObjectSerializationPath);
+			IO::CreateFile(ObjectData.ObjectSerializationPath);
 		}
 
 		BinaryWrite Data;

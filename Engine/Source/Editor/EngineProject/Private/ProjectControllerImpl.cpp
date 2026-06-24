@@ -35,7 +35,7 @@ namespace EngineProject {
 		std::wstring ProjectPath = IO::ToWideString(config.path);
 		std::wstring ProjectName = IO::ToWideString(config.name);
 		if (IO::Exists(ProjectPath)) {
-			IO::MakeDirectory(ProjectPath + L"\\" + ProjectName);
+			IO::CreateDirectory(ProjectPath + L"\\" + ProjectName);
 
 			// enum list
 			constexpr auto all_types = magic_enum::enum_values<ProJectDirEnum>();
@@ -43,7 +43,7 @@ namespace EngineProject {
 				std::string_view item = magic_enum::enum_name(dir);
 				std::wstring witem = ProjectPath + L"\\" + ProjectName + L"\\" + IO::ToWideString(std::string(item));
 
-				IO::MakeDirectory(witem);
+				IO::CreateDirectory(witem);
 			}
 
 			// Create main file
@@ -53,7 +53,7 @@ namespace EngineProject {
 			mainjson[magic_enum::enum_name(ProJectJSON::projectname)] = config.name;
 
 			std::string Dump = mainjson.dump(4);
-			IO::MakeFile(main_file_path);
+			IO::CreateFile(main_file_path);
 			IO::WriteAllText(main_file_path,Dump);
 		}
 		else {

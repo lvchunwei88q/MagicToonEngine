@@ -84,16 +84,16 @@ namespace IO {
         std::error_code ec;
 
         if (fs::is_directory(p)) {
-            fs::remove_all(p, ec);  // 删除文件夹及其所有内容
+            fs::remove_all(p, ec);  // remove all content
             return !ec;
         }
-        return false;  // 不是文件夹，返回 false
+        return false;  // Not a folder, return false
     }
 
-    bool MakeFile(const std::wstring& path) {
+    bool CreateFile(const std::wstring& path) {
         fs::path p(path);
         if (fs::exists(p)) {
-            // 更新最后修改时间
+            // Update Last Modified Time
             fs::last_write_time(p, fs::file_time_type::clock::now());
             return true;
         }
@@ -106,12 +106,12 @@ namespace IO {
             fs::path srcPath(src);
             fs::path dstPath(dst);
 
-            // 如果目标已存在且是文件，先删除
+            // No, if the target already exists and is a file, delete it first
             if (fs::exists(dstPath) && fs::is_regular_file(dstPath)) {
                 fs::remove(dstPath);
             }
 
-            // 移动/重命名
+            // Move/Rename
             fs::rename(srcPath, dstPath);
             return true;
         }
@@ -136,7 +136,7 @@ namespace IO {
             std::filesystem::path path(src);
             // Get FileName
             std::filesystem::path filename = path.filename();
-            // 去除扩展名
+            // Remove the extension
             std::filesystem::path stem = filename.stem();
 
             dst = stem.wstring();
@@ -148,7 +148,7 @@ namespace IO {
         }
     }
 
-    bool MakeDirectory(const std::wstring& path) {
+    bool CreateDirectory(const std::wstring& path) {
         fs::path p(path);
         if (fs::exists(p)) {
             return fs::is_directory(p);

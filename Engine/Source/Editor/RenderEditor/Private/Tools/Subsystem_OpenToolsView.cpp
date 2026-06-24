@@ -46,6 +46,6 @@ namespace RenderEditor {
 		std::wstring currentPath = FileBrowserUI::Get().GetAbsolutePath(FileBrowserUI::Get().GetState().currentPath);
 		std::wstring Folder = IO::ToWideString(std::string(Src));
 		Folder = currentPath + L"\\" + Folder;
-		IO::MakeDirectory(Folder);
+		IO::CreateDirectory(Folder);
 	}
 }

@@ -21,7 +21,7 @@ namespace LOG {
 
         // 确保日志目录存在
         if (!IO::Exists(logDir_)) {
-            IO::MakeDirectory(logDir_);
+            IO::CreateDirectory(logDir_);
         }
 
         // 生成当前日志文件名（精确到秒）
