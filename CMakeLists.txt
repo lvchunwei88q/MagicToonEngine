@@ -25,6 +25,7 @@ BuildToolsModule(${MAGIC_HEADER_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUT
 # 第三方项目
 ThirdPartyModule(IMGUI)
 ThirdPartyModule(ufbx)
+ThirdPartyModule(SPIRV-Cross)
 ThirdPartyModule(WICTextureLoader)
 ThirdPartyModule(Lua)
 

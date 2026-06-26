@@ -42,6 +42,23 @@ Copyright (c) 2021-2024 Samuli Raivio
 Licensed under the MIT License or Unlicense.
 详见 ThirdParty/ufbx/LICENSE.txt
 
+## DXC (DirectX Shader Compiler)
+
+Copyright (c) Microsoft Corporation
+Licensed under the Microsoft Software License Terms (MS-LT) / MIT / LLVM
+详见 ThirdParty/DirectXShaderCompiler/LICENSE-MS.txt
+详见 ThirdParty/DirectXShaderCompiler/LICENSE-MIT.txt
+详见 ThirdParty/DirectXShaderCompiler/LICENSE-LLVM.txt
+
+------
+
+## SPIRV-Cross
+
+Copyright (c) 2014-2021 The Khronos Group Inc.
+Copyright (c) 2015-2021 Arm Limited
+Licensed under the Apache-2.0 License
+详见 ThirdParty/SPIRV-Cross/LICENSE.txt
+
 ## WICTextureLoader
 Copyright (c) Microsoft Corporation.
 Licensed under the MIT License.
