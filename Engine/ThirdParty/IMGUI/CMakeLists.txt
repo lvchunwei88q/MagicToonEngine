@@ -13,6 +13,7 @@ target_include_directories(IMGUI
         ${CMAKE_CURRENT_SOURCE_DIR}/Public 
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Internal
+        ${CMAKE_SOURCE_DIR}/Engine/Content
 )
 
 target_link_libraries(IMGUI PRIVATE dxgi.lib d3d11.lib d3d12.lib dxguid.lib)

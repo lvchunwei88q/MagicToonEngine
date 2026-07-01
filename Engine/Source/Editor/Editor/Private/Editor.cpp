@@ -40,7 +40,7 @@ namespace Editor
 	void Editor::Run()
 	{
 		HWND Hwnd = Win32Application::Get().GetWindowsContext()->hWnd; // 确保窗口上下文已创建
-        HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
+        HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ENGINE_ICON));
         if (hIcon)
         {
             SendMessage(Hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);   // 大图标（任务栏）

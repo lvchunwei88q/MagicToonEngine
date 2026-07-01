@@ -102,6 +102,7 @@
 #include <windowsx.h> // GET_X_LPARAM(), GET_Y_LPARAM()
 #include <tchar.h>
 #include <dwmapi.h>
+#include <Logo/resource.h>
 
 // Using XInput for gamepad (will load DLL dynamically)
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
@@ -1478,19 +1479,22 @@ static LRESULT CALLBACK ImGui_ImplWin32_WndProcHandler_PlatformWindow(HWND hWnd,
 
 static void ImGui_ImplWin32_InitMultiViewportSupport(bool platform_has_own_dc)
 {
+    // Load Icon
+    HICON hIcon = LoadIcon (GetModuleHandle (NULL), MAKEINTRESOURCE (IDI_ENGINE_ICON));
+    // Set WNDCLASSEXW
     WNDCLASSEXW wcex;
     wcex.cbSize = sizeof(WNDCLASSEXW);
-    wcex.style = CS_HREDRAW | CS_VREDRAW | (platform_has_own_dc ? CS_OWNDC : 0);
+    wcex.style = CS_HREDRAW | CS_VREDRAW | (platform_has_own_dc ? CS_OWNDC : 0) | CS_DROPSHADOW;
     wcex.lpfnWndProc = ImGui_ImplWin32_WndProcHandler_PlatformWindow;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
     wcex.hInstance = ::GetModuleHandle(nullptr);
-    wcex.hIcon = nullptr;
+    wcex.hIcon = hIcon;
     wcex.hCursor = nullptr;
     wcex.hbrBackground = (HBRUSH)(COLOR_BACKGROUND + 1);
     wcex.lpszMenuName = nullptr;
     wcex.lpszClassName = L"ImGui Platform";
-    wcex.hIconSm = nullptr;
+    wcex.hIconSm = hIcon;
     ::RegisterClassExW(&wcex);
 
     ImGui_ImplWin32_UpdateMonitors();
