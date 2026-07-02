@@ -108,6 +108,9 @@ namespace Editor
 			LOG_WARNING("The window has been minimized and will use the default position");
 			WondowsConfig->WindowsPostion = int2(100, 100);
 		}
+
+		// Clear out the WindowsClass we registered
+		::UnregisterClass(ENGINE_EDITOR_CLASS, ::GetModuleHandle(nullptr));
 	}
 
 	void Win32Application::CleanupDeviceD3D()

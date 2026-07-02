@@ -71,6 +71,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
 
     MagicLauncher::Win32Application::Get().EndUI(); // 结束UI
 	Core::SubsystemControl::Uninstall(); // 卸载子系统
+
+    // Clear out the WindowsClass we registered
+    ::UnregisterClassW (ENGINE_EDITOR_CLASS, ::GetModuleHandle (nullptr));
     CoUninitialize();
     return 0;
 }
