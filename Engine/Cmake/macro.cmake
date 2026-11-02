@@ -1,3 +1,4 @@
+# ================================================ Engine Modules ================================================
 macro(BuildToolsModule)
     set(ModuleName ${ARGV0})
     set(ModuleArgs "")
@@ -34,29 +35,29 @@ macro(ThirdPartyModule)
     add_subdirectory("Engine/ThirdParty/${ARGV}")
 endmacro()
 
+# ================================================ Cmake Utilities ================================================
 macro(add_module_sources ModuleName)
-file(GLOB_RECURSE ${ModuleName}_SOURCES 
-    CONFIGURE_DEPENDS
-    "*.cpp"
-    "*.cc"
-    "*.cxx"
-    "*.c"
-)
+    file(GLOB_RECURSE ${ModuleName}_SOURCES 
+        CONFIGURE_DEPENDS
+        "*.cpp"
+        "*.cc"
+        "*.cxx"
+        "*.c"
+    )
 
-file(GLOB_RECURSE ${ModuleName}_HEADERS 
-    CONFIGURE_DEPENDS
-    "*.h"
-    "*.hpp"
-)
+    file(GLOB_RECURSE ${ModuleName}_HEADERS 
+        CONFIGURE_DEPENDS
+        "*.h"
+        "*.hpp"
+    )
 
-# 将源文件列表写入到一个文本文件中
-foreach(HEADER ${${ModuleName}_HEADERS})
-    file(APPEND ${HEADER_LIST_FILE} "${HEADER} || ${ModuleName}\n")
-endforeach()
-
+    # Write the list of source files into a text file, which will be used for generating reflection code in MHT
+    foreach(HEADER ${${ModuleName}_HEADERS})
+        file(APPEND ${HEADER_LIST_FILE} "${HEADER} || ${ModuleName}\n")
+    endforeach()
 endmacro()
 
-# 给模块的前缀
+# Prefix for the module
 function(add_engine_library name)
     add_library(${name} ${ARGN})
     set_target_properties(${name} PROPERTIES 
@@ -70,6 +71,17 @@ function(add_engine_external_library name)
     )
 endfunction()
 
+# ================================================ add Engine tests ===============================================
+function(AddEngineTest TARGET_NAME TEST_DIR)
+    set(SOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${TEST_DIR}/${TARGET_NAME}.cpp")
+    add_executable(${TARGET_NAME} ${SOURCE_FILE})
+    target_link_libraries(${TARGET_NAME} PRIVATE RHI Core)
+    target_include_directories(${TARGET_NAME} PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+endfunction()
+
+# =============================================== MHT tool ===============================================
 function(apply_mht_generate_path)
     foreach(module ${GENERATE_HEADER_MODEL})
         message(STATUS " This module will use the MHT tool: ${module}")
