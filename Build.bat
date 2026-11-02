@@ -1,13 +1,13 @@
 @echo off
 setlocal
 
-:: 在使用Ninja 构建时请使用 64位VS命令行构建
+:: Use the 64-bit VS command prompt when building with Ninja.
 set "PROJECT_ROOT=%~dp0"
 set "PROJECT_ROOT=%PROJECT_ROOT:~0,-1%"
 
 echo %VSCMD_ARG_TGT_ARCH%
 
-:: 询问使用哪种构建方式
+:: Ask which build method to use.
 echo ========================================
 echo Choose build method:
 echo [1] Visual Studio (MSBuild) - For debugging in VS
@@ -15,7 +15,7 @@ echo [2] Ninja (with compile_commands.json) - For clangd/IDE
 echo ========================================
 set /p "BUILD_METHOD=Enter 1 or 2: "
 
-:: 询问构建配置
+:: Ask which build configuration to use.
 echo ========================================
 echo Choose build configuration:
 echo [1] Debug
@@ -38,7 +38,7 @@ goto :vs_build
 :ninja_build
 echo Using Ninja + CMake (for compile_commands.json)
 
-:: Ninja 是单配置生成器，需要在配置时指定构建类型
+:: Ninja is a single-config generator, so the build type must be specified at configuration time.
 if "%CONFIG%"=="Debug" (
     set "BUILD_TYPE=Debug"
     set "CMAKE_BUILD_TYPE=-DCMAKE_BUILD_TYPE=Debug"
@@ -49,7 +49,7 @@ if "%CONFIG%"=="Debug" (
 
 set "BUILD_DIR=%PROJECT_ROOT%\out\Ninja_%BUILD_TYPE%"
 
-:: 删除旧缓存避免架构冲突
+:: Remove the old cache to avoid architecture conflicts.
 if exist "%BUILD_DIR%" (
     echo Removing old build cache...
     rmdir /s /q "%BUILD_DIR%"
