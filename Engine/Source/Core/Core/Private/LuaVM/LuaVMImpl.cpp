@@ -272,7 +272,7 @@ namespace Core {
     LuaVM::LuaVM() : pImpl(std::make_unique<Impl>()) {}
     LuaVM::~LuaVM() = default;
 
-    // ------------------------------- Core ----------------------------------- //
+    // ------------------------------- Core Functions ----------------------------------- //
 
     bool LuaVM::LoadFile(const std::string& filePath, std::string* errorMsg) {
         return pImpl->LoadFile(filePath, errorMsg);
@@ -303,7 +303,7 @@ namespace Core {
         pImpl->RegisterFunction(name, func);
     }
 
-    // ------------------------------- Core End ----------------------------------- //
+    // ------------------------------- Core Functions End ----------------------------------- //
 
     void LuaVM::SetGlobal(const std::string& name, int value) {
         pImpl->SetGlobal(name, value);
