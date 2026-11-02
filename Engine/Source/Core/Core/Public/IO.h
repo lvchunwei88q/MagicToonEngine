@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/Core_API.h"
-#include "Common/Check.h"
+#include "Common/Checker.h"
 #include "Tools/Singleton.h"
 #include "Tools/Buffer.h"
 #include <string>

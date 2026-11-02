@@ -2,7 +2,7 @@
 #include "ObjectSystem.h"
 #include "CoreMinimal.h"
 #include "IO.h"
-#include "Common/Check.h"
+#include "Common/Checker.h"
 
 namespace Core {
 	AUTO_REGISTER(ObjectSystem);

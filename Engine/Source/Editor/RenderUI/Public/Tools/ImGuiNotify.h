@@ -11,7 +11,7 @@
 
 #pragma once
 #include "Common/RENDERUI_API.h"
-#include <Common/Check.h>
+#include <Common/Checker.h>
 
 #include <vector>			// Vector for storing notifications list
 #include <string>
