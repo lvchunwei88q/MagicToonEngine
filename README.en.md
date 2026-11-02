@@ -101,6 +101,25 @@ GenerateVSProject.bat    # Generate Visual Studio project files
 Update.bat               # Update source code and LFS dependencies
 ```
 
+## Third-Party Library Overview
+
+The project depends on several third-party components for rendering, scripting, serialization, and toolchain support. A brief summary is listed below:
+
+| Library | Purpose | Description |
+| --- | --- | --- |
+| `DirectXShaderCompiler` | Shader compilation | Compiles HLSL / DirectX shaders into executable formats such as DXIL or SPIR-V. |
+| `IMGUI` | Debug UI | Provides a lightweight immediate-mode GUI for editor panels, debug windows, and tools. |
+| `Lua` | Scripting | Enables script-driven logic, configuration, and data behaviors. |
+| `SPIRV-Cross` | Shader cross-compilation | Converts SPIR-V intermediate code to formats usable by other graphics APIs. |
+| `WICTextureLoader` | Image loading | Loads common image formats on Windows, such as PNG and JPG textures. |
+| `cereal` | Serialization | Provides C++ object serialization and deserialization for config and asset data. |
+| `cmdline` | Command-line parsing | Parses command-line options for tools and debugging workflows. |
+| `ctre` | Regex matching | Provides high-performance text matching for parsing and filtering tasks. |
+| `magic_enum` | Enum reflection | Converts C++ enums to strings and provides reflection-like utilities for debugging and tooling. |
+| `nlohmann` | JSON processing | Reads and writes JSON configuration files and runtime data. |
+| `ufbx` | 3D model loading | Imports and processes 3D model assets such as FBX files. |
+| `Vulkan SDK` | Vulkan API support | Provides Vulkan headers, validation layers, and tools required for Vulkan rendering. |
+
 ## Notes
 
 This project is currently focused on Windows local development and debugging, and is suitable for visual evaluation, rendering effect verification, and engine prototype development. If you want to debug or extend rendering features in the IDE, generate the Visual Studio solution first and open the project from `out\VS`.

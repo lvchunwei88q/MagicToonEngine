@@ -1,6 +1,6 @@
 # MagicToonEngine
 
-[简体中文](README.md) | [English](README.en)
+[简体中文](README.md) | [English](README.en.md)
 
 MagicToonEngine 是一个基于 C++ 的卡通渲染验证引擎，主要用于渲染效果原型开发与可视化验证。项目采用 CMake 组织模块，并支持使用 Visual Studio / MSBuild 和 Ninja 进行本地构建。
 
@@ -100,6 +100,25 @@ Build.bat                # 一键构建脚本
 GenerateVSProject.bat    # 生成 Visual Studio 项目文件
 Update.bat               # 更新源码和 LFS 依赖
 ```
+
+## 第三方库说明
+
+项目依赖的第三方组件主要用于渲染、脚本、序列化和工具链支持，简要说明如下：
+
+| 库名 | 用途 | 说明 |
+| --- | --- | --- |
+| `DirectXShaderCompiler` | 着色器编译 | 用于将 HLSL / DirectX 着色器编译为可执行的 DXIL / SPIR-V 等格式。 |
+| `IMGUI` | 调试界面 | 提供轻量级即时 UI，常用于编辑器、调试窗口和工具面板。 |
+| `Lua` | 脚本能力 | 允许项目通过脚本扩展逻辑、配置和数据驱动行为。 |
+| `SPIRV-Cross` | 着色器跨平台转换 | 用于将 SPIR-V 中间代码转换为其他图形 API 可用的格式。 |
+| `WICTextureLoader` | 图片加载 | 用于在 Windows 上加载常见图片格式，例如 PNG、JPG 等纹理资源。 |
+| `cereal` | 数据序列化 | 提供 C++ 对象的序列化 / 反序列化能力，便于资源和配置保存。 |
+| `cmdline` | 命令行参数解析 | 用于解析工具命令行参数，便于启动和调试场景。 |
+| `ctre` | 正则表达式 | 用于高性能文本匹配和模式识别，适合解析和过滤数据。 |
+| `magic_enum` | 枚举反射 | 提供 C++ 枚举到字符串的转换与反射能力，便于调试和工具链。 |
+| `nlohmann` | JSON 处理 | 用于读取和写入 JSON 配置文件和运行时数据。 |
+| `ufbx` | 3D 模型加载 | 用于导入和处理 FBX 等 3D 模型资源。 |
+| `Vulkan SDK` | Vulkan 图形 API | 提供 Vulkan 标头、验证层和相关工具，支持 Vulkan 相关渲染功能。 |
 
 ## 说明
 
