@@ -1,8 +1,3 @@
-# 如果支持，请为 MSVC 编译器启用热重载。
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
 
 if(MSVC)
     message(STATUS "🔧 MSVC: Applying MSVC-specific settings...")
@@ -13,7 +8,7 @@ if(MSVC)
     string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_C "${CMAKE_DEPFILE_FLAGS_C}")
     string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_CXX "${CMAKE_DEPFILE_FLAGS_CXX}")
     message(STATUS "MSVC: /utf-8 enabled")
-    # 更改最大数
+    # Max object size for MSVC is 2GB, but we can increase it to 4GB with /bigobj
     add_compile_options(/bigobj)
 endif()
 

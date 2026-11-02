@@ -16,7 +16,7 @@ macro(BuildToolsModule)
     endif()
 
     add_subdirectory("Engine/Source/Programs/${ModuleName}")
-    add_custom_target(Run${ModuleName} ALL
+    add_custom_target(${MAGIC_HEADER_TOOL_RUN} ALL
         COMMAND $<TARGET_FILE:${ModuleName}> ${ModuleArgs}
         DEPENDS ${ModuleName}
         COMMENT "Running ${ModuleName}..."
