@@ -51,7 +51,7 @@ namespace RenderCore //RenderCore
 
         if (FAILED(hr))
         {
-            Core::ErrorCapture::Capture("Error when creating buffer - "
+            Core::ErrorCapture{}("Error when creating buffer - "
 				"Error code:" + std::to_string(hr) + " - Creating buffer name:" + buffer.Name);
             return;
         }
@@ -110,7 +110,7 @@ namespace RenderCore //RenderCore
 
         if (FAILED(hr))
         {
-            Core::ErrorCapture::Capture("Error when creating texture buffer - "
+            Core::ErrorCapture{}("Error when creating texture buffer - "
 				"Error code:" + std::to_string(hr) + " - Creating buffer name:" + textureBuffer.Name);
             return;
         }
@@ -135,7 +135,7 @@ namespace RenderCore //RenderCore
 
         if (FAILED(hr))
         {
-            Core::ErrorCapture::Capture("Error when creating RTV/SRV - "
+            Core::ErrorCapture{}("Error when creating RTV/SRV - "
                 "Error code:" + std::to_string(hr) + " - Texture name:" + textureBuffer.Name);
             return;
         }
@@ -160,7 +160,7 @@ namespace RenderCore //RenderCore
             texture2D->Release();
         }
         else {
-            Core::ErrorCapture::Capture("Failed to convert to texture!");
+            Core::ErrorCapture{}("Failed to convert to texture!");
             return;
         }
 
@@ -170,7 +170,7 @@ namespace RenderCore //RenderCore
         textureBuffer.SRV = context.ResourcesSRV;
 
         if (textureBuffer.Texture == nullptr || textureBuffer.Name.c_str() == nullptr || textureBuffer.SRV == nullptr) {
-            Core::ErrorCapture::Capture("Content missing when registering resources!");
+            Core::ErrorCapture{}("Content missing when registering resources!");
             return;
         }
 
@@ -184,7 +184,7 @@ namespace RenderCore //RenderCore
     void BufferManagerImpl::UpdateBuffers(ViewContext context)
     {
         if (IsRegisterTextureBuffer) {
-            Core::ErrorCapture::Capture("Updating the texture buffer is not allowed when registering the texture buffer!");
+            Core::ErrorCapture{}("Updating the texture buffer is not allowed when registering the texture buffer!");
             return;
         }
 
@@ -206,7 +206,7 @@ namespace RenderCore //RenderCore
                 hr = RenderContext::Get().g_pd3dDevice->CreateTexture2D(&texture.Desc, nullptr, &texture.Texture);
             if (FAILED(hr))
             {
-                Core::ErrorCapture::Capture("Error when creating texture buffer - "
+                Core::ErrorCapture{}("Error when creating texture buffer - "
 					"Error code:" + std::to_string(hr) + " - Creating buffer name:" + texture.Name);
                 continue;
             }
@@ -235,7 +235,7 @@ namespace RenderCore //RenderCore
 
             if (FAILED(hr))
             {
-                Core::ErrorCapture::Capture("Error when creating RTV/SRV - "
+                Core::ErrorCapture{}("Error when creating RTV/SRV - "
 					"Error code:" + std::to_string(hr) + " - Texture name:" + texture.Name);
                 continue;
             }

@@ -10,7 +10,7 @@ namespace RenderCore {
         ID3D11Device* device = RenderContext::Get().g_pd3dDevice;
 
         if (device == nullptr) {
-            Core::ErrorCapture::Capture("Reading textures is now prohibited because the device has not been created yet.");
+            Core::ErrorCapture{}("Reading textures is now prohibited because the device has not been created yet.");
             return;
         }
 
@@ -29,7 +29,7 @@ namespace RenderCore {
         {
             if (texture) texture->Release();
             if (textureView) textureView->Release();
-            Core::ErrorCapture::Capture(std::string("Failed to load texture! ") + "Error Code:" + std::to_string(hr));
+            Core::ErrorCapture{}(std::string("Failed to load texture! ") + "Error Code:" + std::to_string(hr));
             return;
         }
 
