@@ -2,7 +2,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 
 add_module_sources(ufbx)
 
-# 添加库
+# add library
 add_library(ufbx STATIC
     ${ufbx_SOURCES}
     ${ufbx_HEADERS}
@@ -15,5 +15,5 @@ target_compile_definitions(ufbx PRIVATE UFBX_REAL_IMPLEMENTATION)
 
 target_include_directories(ufbx
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR} # 别的项目也可以访问
+        ${CMAKE_CURRENT_SOURCE_DIR} # Other projects can access it too
 )

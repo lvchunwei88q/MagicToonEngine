@@ -8,26 +8,33 @@
 
 # This approach helps control dependencies between modules and avoids unnecessary coupling.
 
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.20)
 project ("MagicToonEngine")
 
 include(Engine/Cmake/common.cmake)
 include(Engine/Cmake/macro.cmake)
 
+# =============================================== Core Modules ================================================
+# Third-party Core projects.
+ThirdPartyCoreModule(ufbx)
+ThirdPartyCoreModule(SPIRV-Cross)
+ThirdPartyCoreModule(WICTextureLoader)
+ThirdPartyCoreModule(Lua)
+
+# Engine Core projects.
+CoreModule(Core)
+CoreModule(Logger)
+
+#========================================================== We'll only start MHT after all the core modules are ready.
 # Tools project includes subprojects.
 BuildToolsModule(${MAGIC_HEADER_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
 
+# ============================================== Engine Modules ================================================
 # Third-party projects.
 ThirdPartyModule(IMGUI)
-ThirdPartyModule(ufbx)
-ThirdPartyModule(SPIRV-Cross)
-ThirdPartyModule(WICTextureLoader)
-ThirdPartyModule(Lua)
 
 # Engine project includes subprojects.
-RuntimeModule(Core)
 RuntimeModule(RenderCore)
-RuntimeModule(Logger)
 RuntimeModule(RenderRT)
 
 EditorModule(AssetPipeline)

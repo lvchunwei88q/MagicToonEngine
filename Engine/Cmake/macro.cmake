@@ -1,4 +1,13 @@
 # ================================================ Engine Modules ================================================
+macro(ThirdPartyCoreModule)
+    add_subdirectory("Engine/ThirdParty/${ARGV}")
+endmacro()
+
+macro(CoreModule)
+    add_subdirectory("Engine/Source/Core/${ARGV}")
+    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
+endmacro()
+
 macro(BuildToolsModule)
     set(ModuleName ${ARGV0})
     set(ModuleArgs "")
@@ -14,6 +23,16 @@ macro(BuildToolsModule)
     )
 endmacro()
 
+macro(ThirdPartyModule)
+    add_subdirectory("Engine/ThirdParty/${ARGV}")
+endmacro()
+
+macro(RuntimeModule)
+    add_subdirectory("Engine/Source/Runtime/${ARGV}")
+    add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
+    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
+endmacro()
+
 macro(ProgramModule)
     add_subdirectory("Engine/Source/Programs/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
@@ -24,15 +43,6 @@ macro(EditorModule)
     add_subdirectory("Engine/Source/Editor/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
     list(APPEND GENERATE_HEADER_MODEL ${ARGV})
-endmacro()
-macro(RuntimeModule)
-    add_subdirectory("Engine/Source/Runtime/${ARGV}")
-    add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
-    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
-endmacro()
-
-macro(ThirdPartyModule)
-    add_subdirectory("Engine/ThirdParty/${ARGV}")
 endmacro()
 
 # ================================================ Cmake Utilities ================================================
@@ -75,7 +85,10 @@ endfunction()
 function(AddEngineTest TARGET_NAME TEST_DIR)
     set(SOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${TEST_DIR}/${TARGET_NAME}.cpp")
     add_executable(${TARGET_NAME} ${SOURCE_FILE})
-    target_link_libraries(${TARGET_NAME} PRIVATE RHI Core)
+    
+    # Set Core as the default base libraries, with ARGN receiving other libraries passed in during the call
+    target_link_libraries(${TARGET_NAME} PRIVATE Core ${ARGN})
+    
     target_include_directories(${TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
     )

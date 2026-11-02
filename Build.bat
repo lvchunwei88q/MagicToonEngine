@@ -66,6 +66,21 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
+:: Copy compile_commands.json to the out directory for IDE tooling.
+if not exist "%BUILD_DIR%\compile_commands.json" (
+    echo Error: compile_commands.json was not generated!
+    pause
+    exit /b 1
+)
+
+copy /Y "%BUILD_DIR%\compile_commands.json" "%PROJECT_ROOT%\out\compile_commands.json"
+if errorlevel 1 (
+    echo Failed to copy compile_commands.json!
+    pause
+    exit /b 1
+)
+echo compile_commands.json generated and copied to the out directory.
+
 echo Building project with Ninja (%BUILD_TYPE%)...
 cmake --build .
 if %errorlevel% neq 0 (
@@ -76,6 +91,7 @@ if %errorlevel% neq 0 (
 
 echo Build completed successfully!
 echo Output directory: %PROJECT_ROOT%\Binary\%BUILD_TYPE%
+echo compile_commands.json: %PROJECT_ROOT%\out\compile_commands.json
 pause
 exit /b 0
 

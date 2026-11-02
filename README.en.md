@@ -56,7 +56,9 @@ The script will prompt for:
 1. Build method: `1` for Visual Studio / MSBuild, `2` for Ninja
 2. Build configuration: `1` for Debug, `2` for Release
 
-The selected configuration will be generated and built automatically, and the output will be placed in the corresponding `Binary` directory. Visual Studio builds use the x64 architecture, and Ninja builds can generate `compile_commands.json`.
+The selected configuration will be generated and built automatically, and the output will be placed in the corresponding `Binary` directory. Visual Studio builds use the x64 architecture. When Ninja is selected, the script generates `compile_commands.json` and copies it to `out\compile_commands.json` for IDE tools such as clangd.
+
+> Before configuring a Ninja build, the script removes the corresponding `out\Ninja_Debug` or `out\Ninja_Release` directory. After each run, `out\compile_commands.json` contains the compile commands for the selected configuration.
 
 You can also configure the project manually with CMake:
 

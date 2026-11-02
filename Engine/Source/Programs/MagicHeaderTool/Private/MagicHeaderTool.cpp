@@ -3,6 +3,9 @@
 #include <utility>
 #include "Tools/Tool.h"
 
+// Core Libraries
+#include <IO.h>
+
 namespace MHT{
 	namespace {
 		TOOL::Timer timer; // 计时器
@@ -56,12 +59,12 @@ namespace MHT{
 
 	bool MagicHeaderTool::readGenerateInfoFile(const std::wstring& generateInfoPath,const std::wstring& generateDir)
 	{
-		if (TOOL::Exists(generateInfoPath)) {
+		if (IO::Exists(generateInfoPath)) {
 			generateInfoFile = generateInfoPath;
 			this->generateDir = generateDir;
 			MagicBuildData::Get().SetGeneratePath(this->generateDir);
 
-			std::string GenerateInfo = TOOL::ReadAllText(generateInfoFile);
+			std::string GenerateInfo = IO::ReadAllText(generateInfoFile);
 			std::vector<std::string> headers_lines_file;
 			GetLine(GenerateInfo, headers_lines_file);
 
@@ -95,7 +98,7 @@ namespace MHT{
 					size_t startindex = i * CF::SingleJobCapacity;
 					auto [path, moudel] = SplitInput(NeedGeneratedFiles[startindex + y]);
 					headers.headers_array[y] = path;
-					headers.headerForMoudel_[y] = TOOL::ToNarrowString(moudel);
+					headers.headerForMoudel_[y] = IO::ToNarrowString(moudel);
 				}
 			}
 
@@ -104,7 +107,7 @@ namespace MHT{
 			return true;
 		}
 		else {
-			TOOL::Log::Error("Header list file not found at: " + TOOL::ToNarrowString(generateInfoPath)
+			TOOL::Log::Error("Header list file not found at: " + IO::ToNarrowString(generateInfoPath)
 																+ "\\" MAGICENGINE_FILE_INFO_PATH "\\engine_headers.buildmeta");
 			return false;
 		}
@@ -146,7 +149,7 @@ namespace MHT{
 			MagicEngineHeader magicHeader;
 			GetLine(AllHeadersContent[i], magicHeader.lines);
 
-			magicHeader.headerName = TOOL::ToNarrowString(headers.headers_array[i]);
+			magicHeader.headerName = IO::ToNarrowString(headers.headers_array[i]);
 			magicHeader.moudelName = headers.headerForMoudel_[i];
 			MagicEngineHeaders.push_back(std::move(magicHeader));
 		}
@@ -165,15 +168,15 @@ namespace MHT{
 		std::vector<LocalCheckFile> NewCheckFileCache;
 
 		// 读取缓存文件
-		if (TOOL::Exists(TimeCheckFilePath)) {
-			std::string CheckInfo = TOOL::ReadAllText(TimeCheckFilePath);
+		if (IO::Exists(TimeCheckFilePath)) {
+			std::string CheckInfo = IO::ReadAllText(TimeCheckFilePath);
 			std::vector<std::string> FileLine;
 			GetLine(CheckInfo, FileLine);
 
 			for (size_t i = 0; i < FileLine.size(); i++)
 			{
 				auto& Line = FileLine[i];
-				std::wstring LineW = TOOL::ToWideString(Line);
+				std::wstring LineW = IO::ToWideString(Line);
 				auto[path, time] = SplitInput(LineW);
 
 				size_t time_number = std::stoull(time);
@@ -184,13 +187,13 @@ namespace MHT{
 		}
 		else {
 			// 没有缓存文件全部生成
-			TOOL::MakeFile(TimeCheckFilePath);
+			IO::CreateFile(TimeCheckFilePath);
 		}
 
 		for (size_t i = 0; i < files.size(); i++)
 		{
 			auto& file = files[i];
-			std::wstring fileW = TOOL::ToWideString(file);
+			std::wstring fileW = IO::ToWideString(file);
 			auto [path, moudel] = SplitInput(fileW);
 			size_t CheckTime = TOOL::GetFileModificationTime(path);
 
@@ -226,8 +229,8 @@ namespace MHT{
 #endif
 		}
 
-		std::string CheckFileCache_Contents = TOOL::ToNarrowString(CheckFileCache_ContentsW);
-		TOOL::WriteAllText(TimeCheckFilePath , CheckFileCache_Contents);
+		std::string CheckFileCache_Contents = IO::ToNarrowString(CheckFileCache_ContentsW);
+		IO::WriteAllText(TimeCheckFilePath , CheckFileCache_Contents);
 
 		return NeedGeneratedFiles;
 	}

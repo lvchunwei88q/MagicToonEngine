@@ -2,7 +2,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 
 add_module_sources(MagicLauncher)
 
-# 添加库
+# add library
 add_executable(MagicLauncher WIN32 
     ${MagicLauncher_SOURCES}
     ${MagicLauncher_HEADERS}
@@ -10,9 +10,9 @@ add_executable(MagicLauncher WIN32
 
 target_include_directories(MagicLauncher
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/Public # 别的项目也可以访问
+        ${CMAKE_CURRENT_SOURCE_DIR}/Public # Other projects can access it too
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Internal # 别的项目不可以访问
+        ${CMAKE_CURRENT_SOURCE_DIR}/Internal # Other projects can't be accessed
         ${THIRD_PARTY_DIR} # 使用WebView2JSON HTTP 库 
         ${CONTENT_DIR} # 内容目录
 )

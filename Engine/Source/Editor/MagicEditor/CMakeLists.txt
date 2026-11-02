@@ -2,7 +2,7 @@ include(${PROJECT_SOURCE_DIR}/Engine/Cmake/macro.cmake)
 
 add_module_sources(MagicEditor)
 
-# 添加库
+# add library
 add_executable(MagicEditor
     ${MagicEditor_SOURCES}
     ${MagicEditor_HEADERS}

@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about related properties.
+    // Hover to see a description of the existing attributes.
+    // For more info, check out: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run the selected test program",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/Binary/Debug/${input:pickExecutable}",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "pickExecutable",
+            "type": "pickString",
+            "description": "Select the test program to run:",
+            "options": [
+                "HelloTriangleTest.exe",
+                "TestSwapChain.exe",
+                "TestShaderCompile.exe"
+            ]
+        }
+    ]
+
+    // ============================================================
+    // This configuration relies on the following plugins to work properly:
+    //    - vadimcn.vscode-lldb
+    //    - franneck94.c-cpp-runner
+    //    - nilssoderman.batch-runner
+    // ============================================================
+}

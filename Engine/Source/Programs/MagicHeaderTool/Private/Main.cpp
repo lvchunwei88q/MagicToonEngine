@@ -1,8 +1,9 @@
-#include <cmdline/cmdline.h> // 参数解析库
+#include <cmdline/cmdline.h> // Parameter Parsing Library
+#include <Jobsystem/JobSystem.h> // JobSystem
+#include <IO.h> // File IO
 #include "MagicHeaderTool.h"
 
 #include "Tools/Tool.h"
-#include "Tools/JobSystem.h"
 
 using namespace MHT;
 
@@ -18,21 +19,21 @@ int main(int argc, char* argv[]) {
 
     std::string generateDir = parser.get<std::string>("generate-dir");
 
-	std::wstring generateDirW = TOOL::ToWideString(generateDir);
+	std::wstring generateDirW = IO::ToWideString(generateDir);
     std::wstring generateFilePath = generateDirW + L"\\" MAGICENGINE_FILE_INFO_PATH "\\engine_headers.buildmeta";
 
-    JobSystem::Get().Init();
+    Core::JobSystem::Get().Init();
 
     MagicHeaderTool MagicHT;
     if (MagicHT.readGenerateInfoFile(generateFilePath, generateDirW)) {
         TOOL::Log::Info("Start reading all engine header file contents");
         if (MagicHT.Run()) {
             TOOL::Log::Info("Code generation completed successfully");
-            JobSystem::Get().Uninstall();
+            Core::JobSystem::Get().Uninstall();
             return 0; // success
         }
     }
 
-    JobSystem::Get().Uninstall();
+    Core::JobSystem::Get().Uninstall();
     return 1; // error
 }
