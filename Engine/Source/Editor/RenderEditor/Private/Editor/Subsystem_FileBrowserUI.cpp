@@ -24,9 +24,9 @@ namespace RenderEditor {
         const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
         const std::wstring configPath = configDir + L"FileBrowserConfig.mtdata";
         if (IO::Exists(configPath)) {
-            BinaryReader configFileData = IO::ReadAllU8Bytes(configPath);
+            std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(configPath);
             BinaryWriter configData;
-            configData.Write(configFileData.ReadToVector(configFileData.Remaining()));
+            configData.Write(configFileData.data(), configFileData.size());
             Config->Deserialize(configData);
         }
     }
@@ -36,7 +36,7 @@ namespace RenderEditor {
         const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
         IO::CreateDirectory(configDir);
         const BinaryReader configData = Config->Serialize();
-        IO::WriteAllBytes(configDir + L"FileBrowserConfig.mtdata", configData);
+        IO::WriteAllBytes(configDir + L"FileBrowserConfig.mtdata", configData.DataU8(), configData.Size());
         Config.reset();
     }
 
