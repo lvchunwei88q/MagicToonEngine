@@ -20,9 +20,8 @@
             "type": "pickString",
             "description": "Select the test program to run:",
             "options": [
-                "HelloTriangleTest.exe",
-                "TestSwapChain.exe",
-                "TestShaderCompile.exe"
+                "MagicEditor.exe",
+                "MagicLauncher.exe"
             ]
         }
     ]
