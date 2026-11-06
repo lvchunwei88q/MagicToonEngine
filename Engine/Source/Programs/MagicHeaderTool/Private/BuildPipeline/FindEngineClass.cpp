@@ -4,6 +4,19 @@
 
 namespace MHT {
     namespace {
+        struct LocalMagicClassParamsInfo {
+            std::vector<std::string> mclassParams = {};
+            std::vector<std::string> mgeneratebodyParams = {};
+            std::string currentClassName;       // 当前正在处理的类名
+            size_t currentClassLineNum = 0;     // 当前正在处理的类所在行数
+
+            void clear() {
+                currentClassName.clear();
+                mclassParams.clear();
+                mgeneratebodyParams.clear();
+            }
+        };
+
         void SplitParams(std::string_view args, std::vector<std::string>& outParams) {
             std::string_view remaining = args;
             while (!remaining.empty()) {
@@ -78,19 +91,6 @@ namespace MHT {
     }
 
     namespace Pipeline {
-        struct LocalMagicClassParamsInfo {
-            std::vector<std::string> mclassParams = {};
-            std::vector<std::string> mgeneratebodyParams = {};
-            std::string currentClassName;       // 当前正在处理的类名
-            size_t currentClassLineNum = 0;     // 当前正在处理的类所在行数
-
-            void clear() {
-                currentClassName.clear();
-                mclassParams.clear();
-                mgeneratebodyParams.clear();
-            }
-        };
-
         bool FindEngineClass()
         {
             std::vector<MagicEngineHeader> magicEngineHeaders = MagicBuildData::Get().GetMagicEngineHeaders();
