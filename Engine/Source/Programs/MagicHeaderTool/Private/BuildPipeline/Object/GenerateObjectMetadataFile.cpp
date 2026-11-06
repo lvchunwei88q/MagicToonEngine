@@ -2,10 +2,8 @@
 #include <filesystem>
 
 // Core Libraries
-#include <IO.h>					// IO
+#include <IO.h>							// IO
 #include <Jobsystem/Jobsystem.h>		// Jobsystem
-
-#include "Tools/Tool.h"				// IO
 
 namespace Object {
 	namespace Pipeline {

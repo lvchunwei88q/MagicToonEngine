@@ -21,6 +21,29 @@ namespace Object {
             bool consistent = false;
         };
 
+        struct LocalMetadataSource {
+            std::string Source;
+            bool NeedMacro = true;
+        };
+
+        struct LocalMetaData {
+            std::string headerName;
+            std::vector<LocalMetadataSource> Sources;
+            std::string Metadata;
+
+            void SetSources(const std::vector<LocalMetadataSource>& Sources, const std::string& headerName)
+            {
+                this->Sources = Sources;
+                this->headerName  = headerName;
+            }
+            void SetMetadata(const std::string& Metadata) { this->Metadata = Metadata; }
+        };
+
+        struct LoaclGenerateOptionalInformationMap {
+            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Serialize;
+            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Reflection;
+        };
+
         std::string GenerateEmptyMacros(const std::vector<std::string>& classNames) {
             std::ostringstream code;
 
@@ -317,29 +340,6 @@ namespace Object {
 	}
 
 	namespace Pipeline {
-        struct LocalMetadataSource {
-            std::string Source;
-            bool NeedMacro = true;
-        };
-
-        struct LocalMetaData {
-            std::string headerName;
-            std::vector<LocalMetadataSource> Sources;
-            std::string Metadata;
-
-            void SetSources(const std::vector<LocalMetadataSource>& Sources, const std::string& headerName)
-            {
-                this->Sources = Sources;
-                this->headerName  = headerName;
-            }
-            void SetMetadata(const std::string& Metadata) { this->Metadata = Metadata; }
-        };
-
-        struct LoaclGenerateOptionalInformationMap {
-            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Serialize;
-            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Reflection;
-        };
-
 		bool GenerateObjectMetadata() {
             const auto& MagicEngineClasss =     MagicBuildData::Get().GetRefMagicEngineClasss();
             auto& MagicObjectMetadatas =        MagicObjectBuildData::Get().GetRefMagicObjectMetadatas();
