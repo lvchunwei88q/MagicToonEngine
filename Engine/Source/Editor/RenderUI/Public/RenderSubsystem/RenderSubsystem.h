@@ -31,8 +31,8 @@ namespace RenderUI {
 		virtual void* GetSubsystemPublicData(std::string Target, uint8_t Type) = 0;
 		virtual void CallSubsystemFunction(std::string Target, std::string Func, void* data) = 0;
 
-		virtual [[nodiscard]] const RenderUIContext& GetRenderUIContext() const = 0;
-		virtual [[nodiscard]] RenderUIContext& SetRenderUIContext() = 0;
+		[[nodiscard]] virtual const RenderUIContext& GetRenderUIContext() const = 0;
+		[[nodiscard]] virtual RenderUIContext& SetRenderUIContext() = 0;
 	};
 	RENDERUI_API IRSubsystem* GetSubsystem();
 
@@ -78,7 +78,7 @@ namespace RenderUI {
 		}
 		virtual void RegisterFunctions() {};
 	public:
-		virtual [[nodiscard]] int GetPriority() const { // 可选
+		[[nodiscard]] virtual int GetPriority() const { // 可选
 			return 0;
 		}
 	};

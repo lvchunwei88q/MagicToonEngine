@@ -10,7 +10,7 @@ namespace Editor {
 	MCLASS(MSERIALIZATION);
 	class WindowsConfig : public MObject
 	{
-		GENERATE_BODY(WindowsConfig, ENGINE, "Windows");
+		GENERATE_BODY(WindowsConfig, ENGINE);
 	public:
 		// This Windows Size
 		MMEMBER();

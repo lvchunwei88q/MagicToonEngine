@@ -10,7 +10,7 @@ class CLASS_A : public SubsystemTemplate<CLASS_A, Core::Priority::Low>
 {
 public:
 	virtual bool Init() {
-		Sleep(2000);
+		//Sleep(2000);
 		return true;
 	}
 	virtual void Uninstall() {}
@@ -23,7 +23,7 @@ public:
 MCLASS(MSERIALIZATION);
 class CLASS_B : public MObject
 {
-	GENERATE_BODY(CLASS_B, ENGINE, "TEST");
+	GENERATE_BODY(CLASS_B, ENGINE);
 
 public:
 
@@ -37,7 +37,7 @@ public:
 MCLASS(MSERIALIZATION);
 class XXX_API CLASS_X : public MObject
 {
-	GENERATE_BODY(CLASS_X, ENGINE, "TEST");
+	GENERATE_BODY(CLASS_X, ENGINE);
 
 protected:
 public:

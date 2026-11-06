@@ -16,7 +16,7 @@ namespace RenderEditor {
 	MCLASS(MSERIALIZATION);
 	class LoggerSwitch : public MObject
 	{
-		GENERATE_BODY(LoggerSwitch, ENGINE, "EDITORUI");
+		GENERATE_BODY(LoggerSwitch, ENGINE);
 	public:
 		MMEMBER();
 		bool showDebug = true;

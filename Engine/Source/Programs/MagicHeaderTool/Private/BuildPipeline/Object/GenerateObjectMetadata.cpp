@@ -76,27 +76,27 @@ namespace Object {
         std::string GenerateClassBodyFunction() {
             std::ostringstream code;
             // Fill in Object type information
-            code << "    virtual std::string GetClassName() const {\n";
+            code << "    virtual std::string GetClassName() const override {\n";
             code << "        \n";
             code << "        return #CLASS_NAME;\n";
             code << "    }\n";
 
-            code << "    virtual uint64_t GetClassId() const {\n";
+            code << "    virtual uint64_t GetClassId() const override {\n";
             code << "        \n";
             code << "        return GET_CLASS_ID_##CLASS_NAME;\n";
             code << "    }\n";
 
-            code << "    virtual uint64_t GetClassHas() const {\n";
+            code << "    virtual uint64_t GetClassHas() const override {\n";
             code << "        \n";
-            code << "        return GENERATE_OBJECT_TAG_##CLASS_NAME;\n";
+            code << "        return GENERATE_CLASS_HAS_##CLASS_NAME;\n";
             code << "    }\n";
 
-            code << "    virtual Core::ObjectType GetClassType() const {\n";
+            code << "    virtual Core::ObjectType GetClassType() const override {\n";
             code << "        \n";
-            code << "        return Core::ObjectType::##OBJECT_TYPE;\n";
+            code << "        return Core::ObjectType::OBJECT_TYPE;\n";
             code << "    }\n";
 
-            code << "    virtual Core::ObjectSwitch GetClassSwitch() const {\n";
+            code << "    virtual Core::ObjectSwitch GetClassSwitch() const override  {\n";
             code << "        \n";
             code << "        return GENERATE_OBJECT_SWITCH_##CLASS_NAME;\n";
             code << "    }\n";
@@ -106,7 +106,7 @@ namespace Object {
             code << "    GENERATE_REFLECTION_##CLASS_NAME()\n";
 
             // Set constructor parameters
-            code << "    ##CLASS_NAME() : Core::Object() {                          \n";
+            code << "    CLASS_NAME() : Core::Object() {                            \n";
             code << "       /*Please use a factory class to create this object */   \n";
             code << "       /*this->ObjectInit();*/                                 \n";
             code << "    }                                                          \n";
@@ -114,17 +114,17 @@ namespace Object {
             code << "       this->ObjectInit();                                     \n";
             code << "    }                                                          \n";
             code << "                                                               \n";
-            code << "    ~##CLASS_NAME() {                                          \n";
+            code << "    ~CLASS_NAME() {                                            \n";
             code << "       this->ObjectUninit();                                   \n";
             code << "    }                                                          \n";
 
             code << "protected:                                                                     \n";
-            code << "    virtual void SerializeData(std::ostringstream& stream) override {      \n";
+            code << "    virtual void SerializeData(std::ostringstream& stream) override {          \n";
             code << "       cereal::BinaryOutputArchive archive(stream);                            \n";
             code << "       archive(*this);                                                         \n";
             code << "       return;                                                                 \n";
             code << "    }                                                                          \n";
-            code << "    virtual void DeserializeData(std::stringstream& stream) override {  \n";
+            code << "    virtual void DeserializeData(std::stringstream& stream) override {         \n";
             code << "       cereal::BinaryInputArchive archive(stream);                             \n";
             code << "       archive(*this);                                                         \n";
             code << "    }                                                                          \n";
@@ -155,8 +155,8 @@ namespace Object {
             std::ostringstream code;
 
             for (const auto& [className, Tag] : ObjectTagMap) {
-                // 生成 GENERATE_OBJECT_TAG_XXX 宏
-                code << "#define GENERATE_OBJECT_TAG_" << className << " " << Tag << "\n";
+                // 生成 GENERATE_CLASS_HAS_XXX 宏
+                code << "#define GENERATE_CLASS_HAS_" << className << " " << Tag << "\n";
             }
 
             return code.str();
@@ -370,7 +370,6 @@ namespace Object {
                         std::vector<LocalValidateParameter> TargetParameter = {
                             {MagicEngineClass.className,true},      // 第一个参数是输入class的Name
                             {"ObjectType",false},                   // 第二个参数是输入Object的属于谁
-                            {"ObjectTag",false},                   // 第三个参数是输入Object的标志
                             // more ...
                         };
                         if (!ValidateParameters(TargetParameter, MagicEngineClass.GenerateBody)) // 参数校验
@@ -394,7 +393,7 @@ namespace Object {
 
                         GenerateInformationMap_ObjectSwitch[MagicEngineClass.className] = JoinStrings(MagicClassTypeEnum);
                         GenerateInformationMap_GetClassId[MagicEngineClass.className] = GlobalAutoincrementedValue();
-                        GenerateInformationMap_ObjectTag[MagicEngineClass.className] = std::hash<std::string>{}(MagicEngineClass.GenerateBody[2]); // 使用第三个参数
+                        GenerateInformationMap_ObjectTag[MagicEngineClass.className] = std::hash<std::string>{}(MagicEngineClass.className); // Use hash of class name as unique tag
                     }
                 }
 
@@ -445,7 +444,7 @@ namespace Object {
                     }
                 };
 
-                std::string Source_GENERATE_BODY = ConvertFunctionToMacro(Sources, "GENERATE_BODY", "CLASS_NAME,OBJECT_TYPE,OBJECT_TAG");
+                std::string Source_GENERATE_BODY = ConvertFunctionToMacro(Sources, "GENERATE_BODY", "CLASS_NAME,OBJECT_TYPE");
                 std::string Source;
 
                 AssembleMetadata(Source, LocalSourcesIndex::Sort::BeforeBody);

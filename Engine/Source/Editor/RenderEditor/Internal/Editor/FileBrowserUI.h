@@ -23,7 +23,7 @@ namespace RenderEditor {
 
 	MCLASS(MSERIALIZATION)
 	class FileBrowserConfig : public MObject {
-		GENERATE_BODY(FileBrowserConfig,ENGINE,"EDITORUI");
+		GENERATE_BODY(FileBrowserConfig,ENGINE);
 	public:
 		MMEMBER();
 		float Zoom = 1.0f;

@@ -19,7 +19,7 @@ namespace RenderEditor {
 	MCLASS(MSERIALIZATION);
 	class ViewSwitch : public MObject
 	{
-		GENERATE_BODY(ViewSwitch, ENGINE, "EDITORUI");
+		GENERATE_BODY(ViewSwitch, ENGINE);
 	public:
 		MMEMBER();
 		bool DetailsWindow = false;

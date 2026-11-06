@@ -8,6 +8,26 @@ namespace MHT {
 		struct Result : public MemberVariable {
 			bool success = false;
 		};
+
+		struct LocalClassMemberInfo {
+			std::vector<MemberVariable> InHeaderMemberVariables;
+			std::string headerName;
+
+			LocalClassMemberInfo(std::vector<MemberVariable>&& InHeaderMemberVariables, std::string headerName)
+				: InHeaderMemberVariables(InHeaderMemberVariables), headerName(headerName){}
+		};
+
+		struct LocalMagicClassInfo {
+			std::vector<MagicEngineClass> MagicClasss;
+			std::string headerName;
+
+			LocalMagicClassInfo(std::vector<MagicEngineClass>&& MagicClasss, std::string headerName)
+				: MagicClasss(MagicClasss), headerName(headerName) {
+			}
+
+			LocalMagicClassInfo(){}
+		};
+
 		class MemberVariableParser {
 		public:
 			static Result Parse(const std::string& decl) {
@@ -156,25 +176,6 @@ namespace MHT {
 	}
 
 	namespace Pipeline {
-		struct LocalClassMemberInfo {
-			std::vector<MemberVariable> InHeaderMemberVariables;
-			std::string headerName;
-
-			LocalClassMemberInfo(std::vector<MemberVariable>&& InHeaderMemberVariables, std::string headerName)
-				: InHeaderMemberVariables(InHeaderMemberVariables), headerName(headerName){}
-		};
-
-		struct LocalMagicClassInfo {
-			std::vector<MagicEngineClass> MagicClasss;
-			std::string headerName;
-
-			LocalMagicClassInfo(std::vector<MagicEngineClass>&& MagicClasss, std::string headerName)
-				: MagicClasss(MagicClasss), headerName(headerName) {
-			}
-
-			LocalMagicClassInfo(){}
-		};
-
 		bool FindClassMember()
 		{
 			// 首先找到这些类所在的头文件
