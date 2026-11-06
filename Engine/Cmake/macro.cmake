@@ -5,7 +5,6 @@ endmacro()
 
 macro(CoreModule)
     add_subdirectory("Engine/Source/Core/${ARGV}")
-    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
 endmacro()
 
 macro(BuildToolsModule)
@@ -30,19 +29,19 @@ endmacro()
 macro(RuntimeModule)
     add_subdirectory("Engine/Source/Runtime/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
-    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
+    list(APPEND GENERATE_HEADER_LINKPATH ${ARGV})
 endmacro()
 
 macro(ProgramModule)
     add_subdirectory("Engine/Source/Programs/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
-    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
+    list(APPEND GENERATE_HEADER_LINKPATH ${ARGV})
 endmacro()
 
 macro(EditorModule)
     add_subdirectory("Engine/Source/Editor/${ARGV}")
     add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
-    list(APPEND GENERATE_HEADER_MODEL ${ARGV})
+    list(APPEND GENERATE_HEADER_LINKPATH ${ARGV})
 endmacro()
 
 # ================================================ Cmake Utilities ================================================
@@ -65,6 +64,9 @@ macro(add_module_sources ModuleName)
     foreach(HEADER ${${ModuleName}_HEADERS})
         file(APPEND ${HEADER_LIST_FILE} "${HEADER} || ${ModuleName}\n")
     endforeach()
+    foreach(SOURCE ${${ModuleName}_SOURCES})
+        file(APPEND ${HEADER_LIST_FILE} "${SOURCE} || ${ModuleName}\n")
+    endforeach()
 endmacro()
 
 # Prefix for the module
@@ -80,11 +82,19 @@ function(add_engine_external_library name)
         PREFIX "Magic-External-"
     )
 endfunction()
+function(add_engine_test_library name)
+    add_executable(${name} ${ARGN})
+    set_target_properties(${name} PROPERTIES 
+        PREFIX "MagicTest-"
+    )
+endfunction()
 
 # ================================================ add Engine tests ===============================================
 function(AddEngineTest TARGET_NAME TEST_DIR)
-    set(SOURCE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${TEST_DIR}/${TARGET_NAME}.cpp")
-    add_executable(${TARGET_NAME} ${SOURCE_FILE})
+    add_module_sources(${TARGET_NAME})
+    add_engine_test_library(${TARGET_NAME} ${${TARGET_NAME}_SOURCES} ${${TARGET_NAME}_HEADERS})
+    add_dependencies(${TARGET_NAME} ${MAGIC_HEADER_TOOL_RUN})
+    list(APPEND GENERATE_HEADER_LINKPATH ${TARGET_NAME})
     
     # Set Core as the default base libraries, with ARGN receiving other libraries passed in during the call
     target_link_libraries(${TARGET_NAME} PRIVATE Core ${ARGN})
@@ -111,7 +121,7 @@ endfunction()
 
 # =============================================== MHT tool ===============================================
 function(apply_mht_generate_path)
-    foreach(module ${GENERATE_HEADER_MODEL})
+    foreach(module ${GENERATE_HEADER_LINKPATH})
         message(STATUS " This module will use the MHT tool: ${module}")
         # Set the include path for the generated files of this module to the MHT output directory
         target_include_directories(${module} PRIVATE

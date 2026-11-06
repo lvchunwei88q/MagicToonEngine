@@ -32,7 +32,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Write the list of header files into a text file, which will be used for generating reflection code in MHT
 set(HEADER_LIST_FILE "${CMAKE_GENERATE_OUTPUT_DIRECTORY}/engine_generate_info/engine_headers.buildmeta")
-set(GENERATE_HEADER_MODEL "")
+set(GENERATE_HEADER_LINKPATH "")
 file(WRITE ${HEADER_LIST_FILE} "")
 
 # Windows API use Unicode by default
