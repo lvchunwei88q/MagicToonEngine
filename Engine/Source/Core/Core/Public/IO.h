@@ -24,18 +24,28 @@ DISABLE_DLL_WARNINGS_PUSH;
 */
 
 namespace IO {
-	// read file
+	// Read text to file
 	CORE_API std::string ReadAllText(const std::wstring& path);
-	CORE_API std::vector<char> ReadAllBytes(const std::wstring& path);
-	CORE_API std::vector<uint8_t> ReadAllU8Bytes(const std::wstring& path);
+	// Read bytes to file
+	CORE_API std::vector<char> ReadAllCharBytes(const std::wstring& path);
+	CORE_API std::vector<uint8_t> ReadAllUINT8Bytes(const std::wstring& path);
+	CORE_API BinaryReader ReadAllBinaryReaderBytes(const std::wstring& path);
 	// Write string to file
 	CORE_API void WriteAllText(const std::wstring& path, const std::string& content);
 	// Write byte to file
-	CORE_API void WriteAllBytes(const std::wstring& path, const BinaryWrite& data);
+	CORE_API void WriteAllBytes(const std::wstring& path, const std::vector<char>& data);
+	CORE_API void WriteAllBytes(const std::wstring& path, const std::vector<uint8_t>& data);
+	CORE_API void WriteAllBytes(const std::wstring& path, const BinaryWriter& data);
+	CORE_API void WriteAllBytes(const std::wstring& path, const uint8_t* data, size_t size);
+	CORE_API void WriteAllBytes(const std::wstring& path, const char* data, size_t size);
 	// Append a string to the end of the file
 	CORE_API void AppendText(const std::wstring& path, const std::string& content);
 	// Append bytes to the end of the file
-	CORE_API void AppendBytes(const std::wstring& path, const BinaryWrite& data);
+	CORE_API void AppendBytes(const std::wstring& path, const std::vector<char>& data);
+	CORE_API void AppendBytes(const std::wstring& path, const std::vector<uint8_t>& data);
+	CORE_API void AppendBytes(const std::wstring& path, const BinaryWriter& data);
+	CORE_API void AppendBytes(const std::wstring& path, const uint8_t* data, size_t size);
+	CORE_API void AppendBytes(const std::wstring& path, const char* data, size_t size);
 	// deleta file
 	CORE_API bool DeleteToFile(const std::wstring& path);
 	// deleta directory

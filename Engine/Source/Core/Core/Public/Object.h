@@ -191,8 +191,8 @@ namespace Core {
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
 
 		// Serialization handles object data only; callers own the storage medium and location.
-		BinaryWrite Serialize();
-		void Deserialize(const BinaryReader& reader);
+		BinaryReader Serialize();
+		void Deserialize(const BinaryWriter& writer);
 
 		//template<class Archive>
 		//void serialize(Archive& archive,const std::uint32_t version)

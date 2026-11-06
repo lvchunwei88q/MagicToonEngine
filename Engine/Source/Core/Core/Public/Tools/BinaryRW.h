@@ -14,14 +14,14 @@
 */
 
 // Binary write buffer Responsible for writing data to a binary buffer
-class BinaryWrite {
+class BinaryWriter {
 private:
     std::vector<uint8_t> m_Data;
     size_t m_WriteOffset;      // Current Write Position
     size_t m_CurrentSize;      // Currently allocated size
 
 public:
-    explicit BinaryWrite(size_t initialSize = 0)
+    explicit BinaryWriter(size_t initialSize = 0)
         : m_WriteOffset(0)
         , m_CurrentSize(initialSize) {
         if (initialSize > 0) {
@@ -29,24 +29,24 @@ public:
         }
     }
 
-    explicit BinaryWrite(const std::vector<uint8_t>& data)
+    explicit BinaryWriter(const std::vector<uint8_t>& data)
         : m_Data(data)
         , m_WriteOffset(0)
         , m_CurrentSize(data.size()) {}
 
-    explicit BinaryWrite(std::vector<uint8_t>&& data) noexcept
+    explicit BinaryWriter(std::vector<uint8_t>&& data) noexcept
         : m_Data(std::move(data))
         , m_WriteOffset(0)
         , m_CurrentSize(m_Data.size()) {}
 
     // copy construction
-    BinaryWrite(const BinaryWrite& other)
+    BinaryWriter(const BinaryWriter& other)
         : m_Data(other.m_Data)
         , m_WriteOffset(other.m_WriteOffset)
         , m_CurrentSize(other.m_CurrentSize) {}
 
     // Note that 'other' can no longer be used afterwards
-    BinaryWrite(BinaryWrite&& other) noexcept
+    BinaryWriter(BinaryWriter&& other) noexcept
         : m_Data(std::move(other.m_Data))
         , m_WriteOffset(other.m_WriteOffset)
         , m_CurrentSize(other.m_CurrentSize) {
@@ -54,7 +54,7 @@ public:
         other.m_CurrentSize = 0;
     }
 
-    BinaryWrite& operator=(const BinaryWrite& other) {
+    BinaryWriter& operator=(const BinaryWriter& other) {
         if (this != &other) {
             m_Data = other.m_Data;
             m_WriteOffset = other.m_WriteOffset;
@@ -63,7 +63,7 @@ public:
         return *this;
     }
 
-    BinaryWrite& operator=(BinaryWrite&& other) noexcept {
+    BinaryWriter& operator=(BinaryWriter&& other) noexcept {
         if (this != &other) {
             m_Data = std::move(other.m_Data);
             m_WriteOffset = other.m_WriteOffset;
@@ -127,8 +127,6 @@ public:
     size_t GetWrittenSize()         const { return m_WriteOffset; }
     // Get the total size currently allocated
     size_t GetTotalSize()           const { return m_CurrentSize; }
-    // Get the actual data size
-    size_t GetUsedSize()            const { return m_WriteOffset; }
 
     // Manually set write position (throws if out of allocated range)
     void Seek(size_t position) {
@@ -194,10 +192,10 @@ public:
         , m_ReadOffset(0)
         , m_DataSize(m_Data.size()) {}
 
-    // construct from BinaryWrite (copy written bytes only)
-    explicit BinaryReader(const BinaryWrite& buffer)
+    // construct from BinaryWriter (copy written bytes only)
+    explicit BinaryReader(const BinaryWriter& buffer)
         : m_ReadOffset(0)
-        , m_DataSize(buffer.GetUsedSize()) {
+        , m_DataSize(buffer.GetWrittenSize()) {
         if (m_DataSize > 0) {
             const uint8_t* src = buffer.DataU8();
             m_Data.assign(src, src + m_DataSize);

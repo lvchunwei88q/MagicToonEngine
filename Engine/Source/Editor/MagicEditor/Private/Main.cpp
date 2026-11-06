@@ -14,22 +14,30 @@ void TestAdd() {
     CLASS_B* b = ObjectFactory::Create<CLASS_B>();
     const std::wstring objectBPath = L"D:\\Test\\MTE\\TEST\\ObjectB.masset";
     if (IO::Exists(objectBPath)) {
-        b->Deserialize(IO::ReadAllU8Bytes(objectBPath));
+        BinaryReader objectFileData = IO::ReadAllU8Bytes(objectBPath);
+        BinaryWriter objectData;
+        objectData.Write(objectFileData.ReadToVector(objectFileData.Remaining()));
+        b->Deserialize(objectData);
     }
     b->x++;
     IO::CreateDirectory(L"D:\\Test\\MTE\\TEST");
-    IO::WriteAllBytes(objectBPath, b->Serialize());
+    const BinaryReader objectData = b->Serialize();
+    IO::WriteAllBytes(objectBPath, objectData);
     delete b;
 
     std::shared_ptr<CLASS_X> X = ObjectFactory::CreateShared<CLASS_X>();
     const std::wstring objectXPath = L"D:\\Test\\MTE\\TEST\\ObjectTest.masset";
     if (IO::Exists(objectXPath)) {
-        X->Deserialize(IO::ReadAllU8Bytes(objectXPath));
+        BinaryReader objectFileData = IO::ReadAllU8Bytes(objectXPath);
+        BinaryWriter objectData;
+        objectData.Write(objectFileData.ReadToVector(objectFileData.Remaining()));
+        X->Deserialize(objectData);
     }
     X->o = X->o + 100.0f;
     X->Testint3 = X->Testint3 + int3(0,1,0);
     IO::CreateDirectory(L"D:\\Test\\MTE\\TEST");
-    IO::WriteAllBytes(objectXPath, X->Serialize());
+    const BinaryReader objectData = X->Serialize();
+    IO::WriteAllBytes(objectXPath, objectData);
 
     LuaVMTest::RunAllTests();
 }

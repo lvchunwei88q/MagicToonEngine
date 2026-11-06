@@ -32,7 +32,10 @@ namespace Editor
 		const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
 		const std::wstring configPath = configDir + L"WindowsConfig.mtdata";
 		if (IO::Exists(configPath)) {
-			WondowsConfig->Deserialize(IO::ReadAllU8Bytes(configPath));
+			std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(configPath);
+			BinaryWriter configData;
+			configData.Write(configFileData.data(), configFileData.size());
+			WondowsConfig->Deserialize(configData);
 		}
 
 		// Initialize the editor subsystem, e.g. create windows, initialize resources, etc.
@@ -118,7 +121,8 @@ namespace Editor
 		::UnregisterClass(ENGINE_EDITOR_CLASS, ::GetModuleHandle(nullptr));
 		const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
 		IO::CreateDirectory(configDir);
-		IO::WriteAllBytes(configDir + L"WindowsConfig.mtdata", WondowsConfig->Serialize());
+		const BinaryReader configData = WondowsConfig->Serialize();
+		IO::WriteAllBytes(configDir + L"WindowsConfig.mtdata", configData.DataU8(), configData.Size());
 	}
 
 	void Win32Application::CleanupDeviceD3D()

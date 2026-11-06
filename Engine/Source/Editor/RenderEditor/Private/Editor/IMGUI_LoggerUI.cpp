@@ -54,7 +54,10 @@ namespace RenderEditor {
         const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
         const std::wstring configPath = configDir + L"LoggerSwitch.mtdata";
         if (IO::Exists(configPath)) {
-            Switch->Deserialize(IO::ReadAllU8Bytes(configPath));
+            std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(configPath);
+            BinaryWriter configData;
+            configData.Write(configFileData.data(), configFileData.size());
+            Switch->Deserialize(configData);
         }
     }
 
@@ -62,7 +65,8 @@ namespace RenderEditor {
     {
         const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
         IO::CreateDirectory(configDir);
-        IO::WriteAllBytes(configDir + L"LoggerSwitch.mtdata", Switch->Serialize());
+        const BinaryReader configData = Switch->Serialize();
+        IO::WriteAllBytes(configDir + L"LoggerSwitch.mtdata", configData.DataU8(), configData.Size());
         Switch.reset();
     }
 

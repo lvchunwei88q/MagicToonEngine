@@ -24,7 +24,7 @@ namespace Core {
 		}
 	}
 
-	BinaryWrite Object::Serialize()
+	BinaryReader Object::Serialize()
 	{
 		if (!EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization)) {
 			throw std::logic_error("Object does not support serialization: " + GetClassName());
@@ -34,21 +34,21 @@ namespace Core {
 		SerializeData(oss);
 
 		const std::string& str = oss.str();
-		return BinaryWrite(std::vector<uint8_t>(str.begin(), str.end()));
+		return BinaryReader(std::vector<uint8_t>(str.begin(), str.end()));
 	}
 
-	void Object::Deserialize(const BinaryReader& reader)
+	void Object::Deserialize(const BinaryWriter& writer)
 	{
 		if (!EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization)) {
 			throw std::logic_error("Object does not support serialization: " + GetClassName());
 		}
 
-		if (reader.Size() == 0) {
+		if (writer.GetWrittenSize() == 0) {
 			throw std::invalid_argument("Cannot deserialize an empty buffer: " + GetClassName());
 		}
 
 		std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
-		ss.write(reader.DataChar(), static_cast<std::streamsize>(reader.Size()));
+		ss.write(writer.DataChar(), static_cast<std::streamsize>(writer.GetWrittenSize()));
 		ss.seekg(0, std::ios::beg);
 		DeserializeData(ss);
 	}
