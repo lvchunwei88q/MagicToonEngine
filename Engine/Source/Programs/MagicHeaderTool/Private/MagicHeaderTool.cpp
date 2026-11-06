@@ -163,7 +163,7 @@ namespace MHT{
 	const std::vector<std::wstring> MagicHeaderTool::FilterFilesNoNeedGenerated(const std::vector<std::string>& files)
 	{
 		std::vector<std::wstring> NeedGeneratedFiles;
-		std::wstring TimeCheckFilePath = generateDir + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\engine_headers_check_file.buildmeta";
+		std::wstring TimeCheckFilePath = generateDir + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\engine_headers_time_check_file.buildmeta";
 		std::vector<LocalCheckFile> CheckFiles;
 		std::vector<LocalCheckFile> NewCheckFileCache;
 

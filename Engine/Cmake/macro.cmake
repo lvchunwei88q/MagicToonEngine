@@ -92,14 +92,30 @@ function(AddEngineTest TARGET_NAME TEST_DIR)
     target_include_directories(${TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
     )
+
+    # Get the base output directory for the target. If the target does not have a specific output directory set, it will inherit the global one.
+    get_target_property(BASE_OUTPUT_DIR ${TARGET_NAME} RUNTIME_OUTPUT_DIRECTORY)
+    if(NOT BASE_OUTPUT_DIR)
+        set(BASE_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    endif()
+    
+    # apply the output directory settings for the test target
+    set_target_properties(${TARGET_NAME} PROPERTIES 
+        RUNTIME_OUTPUT_DIRECTORY "${BASE_OUTPUT_DIR}/Test"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${BASE_OUTPUT_DIR}/Test"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${BASE_OUTPUT_DIR}/Test"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BASE_OUTPUT_DIR}/Test"
+        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${BASE_OUTPUT_DIR}/Test"
+    )
 endfunction()
 
 # =============================================== MHT tool ===============================================
 function(apply_mht_generate_path)
     foreach(module ${GENERATE_HEADER_MODEL})
         message(STATUS " This module will use the MHT tool: ${module}")
+        # Set the include path for the generated files of this module to the MHT output directory
         target_include_directories(${module} PRIVATE
-            ${CMAKE_GENERATE_OUTPUT_DIRECTORY}/${module}
+            ${CMAKE_GENERATE_OUTPUT_DIRECTORY}/Object/${module}
         )
     endforeach()
 endfunction()

@@ -20,8 +20,8 @@ namespace Object {
 					const std::string& Metadata = MagicObjectMetadata.Metadata;
 					const std::wstring& GeneratePath = MagicBuildData::Get().GetRefGeneratePath();
 
-					IO::CreateDirectory(GeneratePath + L"\\" + ModelName);
-					IO::WriteAllText(GeneratePath + L"\\" + ModelName + L"\\" + headerName + L".object.generate.h", Metadata);
+					IO::CreateDirectory(GeneratePath + L"\\" + L"Object" + L"\\" + ModelName);
+					IO::WriteAllText(GeneratePath + L"\\" + L"Object" + L"\\" + ModelName + L"\\" + headerName + L".object.generate.h", Metadata);
 				});
 			}
 			
