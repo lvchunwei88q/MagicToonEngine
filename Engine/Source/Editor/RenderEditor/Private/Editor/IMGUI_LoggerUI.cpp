@@ -51,12 +51,18 @@ namespace RenderEditor {
     void LoggerUI::Init()
     {
         Switch = ObjectFactory::CreateUnique<LoggerSwitch>();
-        Switch->Load();
+        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        const std::wstring configPath = configDir + L"LoggerSwitch.mtdata";
+        if (IO::Exists(configPath)) {
+            Switch->Deserialize(IO::ReadAllU8Bytes(configPath));
+        }
     }
 
     void LoggerUI::Uninstall()
     {
-        Switch->Save();
+        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        IO::CreateDirectory(configDir);
+        IO::WriteAllBytes(configDir + L"LoggerSwitch.mtdata", Switch->Serialize());
         Switch.reset();
     }
 

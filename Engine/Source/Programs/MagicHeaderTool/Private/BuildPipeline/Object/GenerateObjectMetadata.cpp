@@ -96,12 +96,12 @@ namespace Object {
             code << "    }                                                          \n";
 
             code << "protected:                                                                     \n";
-            code << "    virtual void serialized_data_generation(std::ostringstream& stream) {      \n";
+            code << "    virtual void SerializeData(std::ostringstream& stream) override {      \n";
             code << "       cereal::BinaryOutputArchive archive(stream);                            \n";
             code << "       archive(*this);                                                         \n";
             code << "       return;                                                                 \n";
             code << "    }                                                                          \n";
-            code << "    virtual void deserialization_data_generation(std::stringstream& stream) {  \n";
+            code << "    virtual void DeserializeData(std::stringstream& stream) override {  \n";
             code << "       cereal::BinaryInputArchive archive(stream);                             \n";
             code << "       archive(*this);                                                         \n";
             code << "    }                                                                          \n";

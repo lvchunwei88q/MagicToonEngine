@@ -1,8 +1,6 @@
 #include "Object.h"
 #include "ObjectSystem.h"
 #include "CoreMinimal.h"
-#include "IO.h"
-#include "Common/Checker.h"
 
 namespace Core {
 	AUTO_REGISTER(ObjectSystem);
@@ -15,25 +13,11 @@ namespace Core {
 	bool ObjectSystem::Init()
 	{
 		Objects.reserve(PRE_ALLOCATED_SIZE);		// Init Object Pool Size
-
-		if (!ReadDeserializationToByte()) {
-			// Deserialization Error
-			__debugbreak();
-			return false;
-		}
-
 		return true;
 	}
 
 	void ObjectSystem::Uninstall()
 	{
-		Read_FileBytes.clear();				// delete read FileBytes
-
-		if (!SaveSerializationToByte()) {
-			// Serialization Error
-			__debugbreak();
-			return;
-		}
 	}
 
 	size_t ObjectSystem::GetObjectNum() {

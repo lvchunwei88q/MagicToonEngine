@@ -1,7 +1,5 @@
 #include "Object.h"
 #include "CoreMinimal.h"
-//////////////////// Serialization library
-#include <cereal/cereal.hpp>
 #include <stdexcept>
 
 namespace Core {
@@ -26,59 +24,33 @@ namespace Core {
 		}
 	}
 
-	void Object::Save()
+	std::vector<uint8_t> Object::Serialize()
 	{
 		if (!EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization)) {
 			throw std::logic_error("Object does not support serialization: " + GetClassName());
-		}
-
-		const std::wstring path = GetObjectCustomSerializedPath();
-		if (path.empty()) {
-			throw std::logic_error("Object serialization path is empty: " + GetClassName());
 		}
 
 		std::ostringstream oss;
-		serialized_data_generation(oss);
+		SerializeData(oss);
 
 		const std::string& str = oss.str();
-		ObjectCustomSerializationData data;
-		data.handle = Handle;
-		data.data.assign(str.begin(), str.end());
-		data.ObjectSerializationPath = path;
-		GetObjectSystem()->SaveCustomObjectSerializationData(std::move(data));
+		return std::vector<uint8_t>(str.begin(), str.end());
 	}
 
-	bool Object::Load()
+	void Object::Deserialize(const std::vector<uint8_t>& data)
 	{
 		if (!EnumHasAnyFlags(GetClassSwitch(), ObjectSwitch::Serialization)) {
 			throw std::logic_error("Object does not support serialization: " + GetClassName());
 		}
 
-		const std::wstring path = GetObjectCustomSerializedPath();
-		if (path.empty()) {
-			throw std::logic_error("Object serialization path is empty: " + GetClassName());
+		if (data.empty()) {
+			throw std::invalid_argument("Cannot deserialize an empty buffer: " + GetClassName());
 		}
 
 		std::stringstream ss(std::ios::binary | std::ios::in | std::ios::out);
-
-		ObjectCustomSerializationDescriptor customData =
-			GetObjectSystem()->GetCustomObjectSerializationData(path);
-		if (!customData.data.empty()) {
-			ss.write(reinterpret_cast<const char*>(customData.data.data()), customData.data.size());
-		}
-		else {
-			// Read legacy ObjectSystem-managed data once so existing settings survive the path migration.
-			ObjectSerializationDescriptor legacyData =
-				GetObjectSystem()->GetObjectSerializationData(Handle);
-			if (legacyData.Length == 0) {
-				return false;
-			}
-			ss.write(reinterpret_cast<const char*>(legacyData.DataStart), legacyData.Length);
-		}
-
+		ss.write(reinterpret_cast<const char*>(data.data()), static_cast<std::streamsize>(data.size()));
 		ss.seekg(0, std::ios::beg);
-		deserialization_data_generation(ss);
-		return true;
+		DeserializeData(ss);
 	}
 	// -------------------------------- 
 }

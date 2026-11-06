@@ -53,6 +53,17 @@ namespace IO {
         file.write(data.DataChar(), data.GetUsedSize());
     }
 
+    void WriteAllBytes(const std::wstring& path, const std::vector<uint8_t>& data) {
+        fs::path p(path);
+        std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::trunc);
+        if (!file.is_open()) {
+            throw std::runtime_error("Failed to write file: " + ToNarrowString(path));
+        }
+        if (!data.empty()) {
+            file.write(reinterpret_cast<const char*>(data.data()), static_cast<std::streamsize>(data.size()));
+        }
+    }
+
     void AppendText(const std::wstring& path, const std::string& content) {
         fs::path p(path);
         std::ofstream file(p, std::ios::out | std::ios::binary | std::ios::app);

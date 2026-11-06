@@ -21,12 +21,18 @@ namespace RenderEditor {
         state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot(); // 设置根路径就是工作路径
 
         Config = ObjectFactory::CreateUnique<FileBrowserConfig>();
-        Config->Load();
+        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        const std::wstring configPath = configDir + L"FileBrowserConfig.mtdata";
+        if (IO::Exists(configPath)) {
+            Config->Deserialize(IO::ReadAllU8Bytes(configPath));
+        }
     }
 
     void FileBrowserUI::Uninstall()
     {
-        Config->Save();
+        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        IO::CreateDirectory(configDir);
+        IO::WriteAllBytes(configDir + L"FileBrowserConfig.mtdata", Config->Serialize());
         Config.reset();
     }
 

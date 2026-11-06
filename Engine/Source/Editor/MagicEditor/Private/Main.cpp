@@ -2,6 +2,7 @@
 #include <windows.h>
 #include "Main.h"
 #include <Editor.h>
+#include <IO.h>
 
 #if MAGICEDITOR_MODE
 #include <shellapi.h>
@@ -11,16 +12,24 @@
 
 void TestAdd() {
     CLASS_B* b = ObjectFactory::Create<CLASS_B>();
-    b->Load();
+    const std::wstring objectBPath = L"D:\\Test\\MTE\\TEST\\ObjectB.masset";
+    if (IO::Exists(objectBPath)) {
+        b->Deserialize(IO::ReadAllU8Bytes(objectBPath));
+    }
     b->x++;
-    b->Save();
+    IO::CreateDirectory(L"D:\\Test\\MTE\\TEST");
+    IO::WriteAllBytes(objectBPath, b->Serialize());
     delete b;
 
     std::shared_ptr<CLASS_X> X = ObjectFactory::CreateShared<CLASS_X>();
-    X->Load();
+    const std::wstring objectXPath = L"D:\\Test\\MTE\\TEST\\ObjectTest.masset";
+    if (IO::Exists(objectXPath)) {
+        X->Deserialize(IO::ReadAllU8Bytes(objectXPath));
+    }
     X->o = X->o + 100.0f;
     X->Testint3 = X->Testint3 + int3(0,1,0);
-    X->Save();
+    IO::CreateDirectory(L"D:\\Test\\MTE\\TEST");
+    IO::WriteAllBytes(objectXPath, X->Serialize());
 
     LuaVMTest::RunAllTests();
 }
