@@ -3,7 +3,7 @@
 #include "Common/Core_API.h"
 #include "Common/Checker.h"
 #include "Tools/Singleton.h"
-#include "Tools/Buffer.h"
+#include "Tools/BinaryRW.h"
 #include <string>
 #include <vector>
 
@@ -32,7 +32,6 @@ namespace IO {
 	CORE_API void WriteAllText(const std::wstring& path, const std::string& content);
 	// Write byte to file
 	CORE_API void WriteAllBytes(const std::wstring& path, const BinaryWrite& data);
-	CORE_API void WriteAllBytes(const std::wstring& path, const std::vector<uint8_t>& data);
 	// Append a string to the end of the file
 	CORE_API void AppendText(const std::wstring& path, const std::string& content);
 	// Append bytes to the end of the file
