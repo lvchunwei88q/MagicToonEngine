@@ -56,7 +56,13 @@
 #include <string>
 #include <vector>
 #include <memory>
+
+// impute certain header files to avoid circular dependencies
 #include <cereal/archives/binary.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/list.hpp>
+#include <cereal/types/memory.hpp>
 
 #include "Tools/EnumClassFlags.h"
 #include "Tools/BinaryRW.h"

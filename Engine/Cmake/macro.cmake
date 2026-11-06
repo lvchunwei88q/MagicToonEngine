@@ -90,17 +90,21 @@ function(add_engine_test_library name)
 endfunction()
 
 # ================================================ add Engine tests ===============================================
-function(AddEngineTest TARGET_NAME TEST_DIR)
+macro(AddEngineTest TARGET_NAME TEST_DIR)
     add_module_sources(${TARGET_NAME})
     add_engine_test_library(${TARGET_NAME} ${${TARGET_NAME}_SOURCES} ${${TARGET_NAME}_HEADERS})
     add_dependencies(${TARGET_NAME} ${MAGIC_HEADER_TOOL_RUN})
-    list(APPEND GENERATE_HEADER_LINKPATH ${TARGET_NAME})
+    # list(APPEND GENERATE_HEADER_LINKPATH ${TARGET_NAME})
     
     # Set Core as the default base libraries, with ARGN receiving other libraries passed in during the call
     target_link_libraries(${TARGET_NAME} PRIVATE Core ${ARGN})
     
     target_include_directories(${TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+    # Tests are added from a subdirectory, so register their generated-header path directly.
+    target_include_directories(${TARGET_NAME} PRIVATE
+        ${CMAKE_GENERATE_OUTPUT_DIRECTORY}/Object/${TARGET_NAME}
     )
 
     # Get the base output directory for the target. If the target does not have a specific output directory set, it will inherit the global one.
@@ -117,7 +121,7 @@ function(AddEngineTest TARGET_NAME TEST_DIR)
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BASE_OUTPUT_DIR}/Test"
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${BASE_OUTPUT_DIR}/Test"
     )
-endfunction()
+endmacro()
 
 # =============================================== MHT tool ===============================================
 function(apply_mht_generate_path)

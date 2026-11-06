@@ -3,15 +3,16 @@
 #include <Object.h>
 
 #include <cmath>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 
 #include <ObjectTest.object.generate.h>
 
 MCLASS(MSERIALIZATION)
-class TestObject final : public Core::Object
+class SerializableTestObject final : public MObject
 {
-	GENERATE_BODY(TestObject, Unknown);
+	GENERATE_BODY(SerializableTestObject, Unknown);
 public:
 	MMEMBER();
 	int32_t integer = 0;
@@ -19,61 +20,72 @@ public:
 	float decimal = 0.0f;
 	MMEMBER();
 	std::string text;
-	MMEMBER();
-	bool serializable = true;
 };
+
+MCLASS(MSERIALIZATION)
+class NonSerializableTestObject final : public MObject
+{
+	GENERATE_BODY(NonSerializableTestObject, Unknown);
+};
+
+template<typename Exception, typename Callable>
+void ExpectThrows(Callable&& callable)
+{
+	bool threw = false;
+	try {
+		callable();
+	}
+	catch (const Exception&) {
+		threw = true;
+	}
+
+	EXPECT_TRUE(threw);
+}
 
 void ObjectSerializationRoundTrip()
 {
-	TestObject source;
-	source.integer = 42;
-	source.decimal = 3.25f;
-	source.text = "Object serialization test";
+	auto source = ObjectFactory::CreateUnique<SerializableTestObject>();
+	source->integer = 42;
+	source->decimal = 3.25f;
+	source->text = "Object serialization test";
 
-	BinaryReader serialized = source.Serialize();
+	BinaryReader serialized = source->Serialize();
 	EXPECT_TRUE(serialized.Size() > 0);
 
 	BinaryWriter input;
 	input.Write(serialized.ReadToVector(serialized.Remaining()));
 
-	TestObject restored;
-	restored.Deserialize(input);
+	auto restored = ObjectFactory::CreateUnique<SerializableTestObject>();
+	restored->Deserialize(input);
 
-	EXPECT_EQ(restored.integer, source.integer);
-	EXPECT_TRUE(std::fabs(restored.decimal - source.decimal) < 0.0001f);
-	EXPECT_EQ(restored.text, source.text);
+	EXPECT_EQ(restored->integer, source->integer);
+	EXPECT_TRUE(std::fabs(restored->decimal - source->decimal) < 0.0001f);
+	EXPECT_EQ(restored->text, source->text);
 }
 
 void ObjectRejectsEmptyInput()
 {
-	TestObject object;
+	auto object = ObjectFactory::CreateUnique<SerializableTestObject>();
 	BinaryWriter emptyInput;
-	bool threw = false;
 
-	try {
-		object.Deserialize(emptyInput);
-	}
-	catch (const std::invalid_argument&) {
-		threw = true;
-	}
-
-	EXPECT_TRUE(threw);
+	ExpectThrows<std::invalid_argument>([&] {
+		object->Deserialize(emptyInput);
+	});
 }
 
 void ObjectRejectsSerializationWhenDisabled()
 {
-	TestObject object;
-	object.serializable = false;
-	bool threw = false;
+	auto object = ObjectFactory::CreateUnique<NonSerializableTestObject>();
 
-	try {
-		object.Serialize();
-	}
-	catch (const std::logic_error&) {
-		threw = true;
-	}
+	ExpectThrows<std::logic_error>([&] {
+		object->Serialize();
+	});
 
-	EXPECT_TRUE(threw);
+	BinaryWriter input;
+	input.Write(uint8_t{0});
+	ExpectThrows<std::logic_error>([&] {
+		object->Deserialize(input);
+	});
 }
 
 TEST_MAIN(

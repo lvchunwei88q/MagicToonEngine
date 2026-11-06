@@ -189,16 +189,21 @@ namespace Object {
                 code << "#define GENERATE_SERIALIZE_" << className << "() \\\n";
 
                 code << "    template<class Archive>                        \\\n";
-                code << "    void serialize(Archive& archive) {             \\\n";
-                code << "        archive(";
-                for (size_t i = 0; i < params.size(); ++i) {
-                    code << params[i].name;
-                    if (i < params.size() - 1) {
-                        code << ", ";
-                    }
+                if (params.empty()) {
+                    code << "    void serialize(Archive&) {}                  \\\n";
                 }
-                code << ");                                                 \\\n";
-                code << "    }                                              \\\n";
+                else {
+                    code << "    void serialize(Archive& archive) {             \\\n";
+                    code << "        archive(";
+                    for (size_t i = 0; i < params.size(); ++i) {
+                        code << params[i].name;
+                        if (i < params.size() - 1) {
+                            code << ", ";
+                        }
+                    }
+                    code << ");                                                 \\\n";
+                    code << "    }                                              \\\n";
+                }
                 code << "\n";
             }
 
