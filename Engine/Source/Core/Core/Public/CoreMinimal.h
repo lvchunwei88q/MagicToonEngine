@@ -28,19 +28,6 @@
             }                                                       \
         };
 
-// --------------------------------------- Core Macro ------------------------------------------ // 
-
-// Enumerates the features you can use
-enum {
-	MSERIALIZATION,
-};
-
-#define MCLASS(...)					// 你要序列化的类，必须放在类定义的开头
-#define GENERATE_BODY()				// 你要序列化的类的成员函数实现，必须放在类定义的结尾
-#define MMEMBER(...)				// 你要序列化的成员
-
-// --------------------------------------- Core Macro End ------------------------------------------ // 
-
 namespace Core
 {
     TEMPPLATE_CAPTURE(Error);

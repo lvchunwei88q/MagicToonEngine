@@ -80,6 +80,19 @@ void serialize(Archive& archive, Vec2<T>& v) {
 }
 ////////////////////////////////
 
+// --------------------------------------- Object Macro ------------------------------------------ // 
+
+// Enumerates the features you can use
+enum {
+	MSERIALIZATION,
+};
+
+#define MCLASS(...)					// The class you want to serialize must be placed at the beginning of the class definition
+#define GENERATE_BODY()				// The member function implementation of the class to be serialized must be placed at the end of the class definition.
+#define MMEMBER(...)				// Member to serialize
+
+// --------------------------------------- Object Macro End ------------------------------------------ // 
+
 FORBIDDEN_METHOD_CONCEPT(Object, GetClassId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetInstanceId);
 FORBIDDEN_METHOD_CONCEPT(Object, GetNextId);
