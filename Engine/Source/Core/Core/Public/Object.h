@@ -144,12 +144,6 @@ namespace Core {
 		PROJECT
 	};
 
-	enum class DestructionMode : uint8_t {
-		SaveAndDestroy,
-		CustomSaveAndDestroy,
-		DestroyOnly,
-	};
-
 	class IObjectSystem;
 	class Object;
 
@@ -209,7 +203,6 @@ namespace Core {
 
 	/*
 	* The base class for MagicHeaderTool services. Any class that wants to use advanced C features should inherit from this class.
-	* Note that all Objects will be automatically serialized, but they can only be initialized after the SubsystemCore has completed initialization.
 	*/
 	class CORE_API Object
 	{
@@ -223,6 +216,10 @@ namespace Core {
 		virtual ObjectType GetClassType() const = 0;				// Class type generated using MagicHeaderTool
 		virtual ObjectSwitch GetClassSwitch() const = 0;			// Class Switch generated using MagicHeaderTool
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
+
+		void Save();
+		// Returns false when no serialized data exists yet.
+		bool Load();
 
 		//template<class Archive>
 		//void serialize(Archive& archive,const std::uint32_t version)
@@ -244,17 +241,9 @@ namespace Core {
 		virtual void serialized_data_generation(std::ostringstream& stream) = 0;
 		virtual void deserialization_data_generation(std::stringstream& stream) = 0;
 
-		// We now provide the default mode, and you can override these two functions to implement storage if needed.
-		virtual DestructionMode GetDestructionMode() { return DestructionMode::SaveAndDestroy; }
+		// Return the file used by explicit Save and Load calls.
 		virtual std::wstring GetObjectCustomSerializedPath() { return L""; }
-	private:
-		// We're implementing the functionality of Object here
-		// -------------------------------- serialization
-		void Serialization();
-		void Deserialization();
-		// -------------------------------- 
 
-	protected:
 		uint64_t	instance_id;						// The id of each instance
 		ObjectSystemHandle Handle = {};					// Object Handle
 	};
@@ -269,10 +258,10 @@ namespace Core {
 	private:
 		friend class Object;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION
-		// This from ObjectSystem Automatic management
+		// Legacy ObjectSystem-managed storage, used to migrate existing serialized data.
 		virtual ObjectSerializationDescriptor GetObjectSerializationData(ObjectSystemHandle Handle) = 0;
 		virtual void SaveObjectSerializationData(ObjectSerializationData ObjectData) = 0;
-		// This from Object Specified path
+		// Explicit path-based storage used by Object::Save and Object::Load.
 		virtual ObjectCustomSerializationDescriptor GetCustomObjectSerializationData(const std::wstring& Path) = 0;
 		virtual void SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData) = 0;
 		// ---------------------------------------------------------------------------------- MSERIALIZATION END

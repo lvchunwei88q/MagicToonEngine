@@ -51,10 +51,12 @@ namespace RenderEditor {
     void LoggerUI::Init()
     {
         Switch = ObjectFactory::CreateUnique<LoggerSwitch>();
+        Switch->Load();
     }
 
     void LoggerUI::Uninstall()
     {
+        Switch->Save();
         Switch.reset();
     }
 

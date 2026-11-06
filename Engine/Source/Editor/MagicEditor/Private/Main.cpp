@@ -11,12 +11,16 @@
 
 void TestAdd() {
     CLASS_B* b = ObjectFactory::Create<CLASS_B>();
+    b->Load();
     b->x++;
+    b->Save();
     delete b;
 
     std::shared_ptr<CLASS_X> X = ObjectFactory::CreateShared<CLASS_X>();
+    X->Load();
     X->o = X->o + 100.0f;
     X->Testint3 = X->Testint3 + int3(0,1,0);
+    X->Save();
 
     LuaVMTest::RunAllTests();
 }

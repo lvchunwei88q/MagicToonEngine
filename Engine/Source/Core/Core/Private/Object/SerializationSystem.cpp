@@ -239,6 +239,12 @@ namespace Core {
 
 	void ObjectSystem::SaveCustomObjectSerializationData(ObjectCustomSerializationData ObjectData)
 	{
+		std::wstring directory;
+		if (IO::GetFileDirectory(ObjectData.ObjectSerializationPath, directory) &&
+			!IO::Exists(directory)) {
+			IO::CreateDirectory(directory);
+		}
+
 		if (!IO::Exists(ObjectData.ObjectSerializationPath)) {
 			IO::CreateFile(ObjectData.ObjectSerializationPath);
 		}

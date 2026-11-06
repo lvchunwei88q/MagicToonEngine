@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <Object.h>
+#include <IO.h>
 #include <RenderSubsystem/RenderSubsystem.h>
 #include <RenderUIWarehouse.h>
 
@@ -24,6 +25,10 @@ namespace RenderEditor {
 	MCLASS(MSERIALIZATION)
 	class FileBrowserConfig : MObject {
 		GENERATE_BODY(FileBrowserConfig,ENGINE,"EDITORUI");
+	protected:
+		std::wstring GetObjectCustomSerializedPath() override {
+			return IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\FileBrowserConfig.mtdata";
+		}
 	public:
 		MMEMBER();
 		float Zoom = 1.0f;

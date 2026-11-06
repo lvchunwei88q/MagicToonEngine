@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Object.h>
+#include <IO.h>
 #include <EditorGeneralLayout.object.generate.h>
 
 #include <RenderSubsystem/RenderSubsystem.h>
@@ -20,20 +21,24 @@ namespace RenderEditor {
 	class ViewSwitch : public MObject
 	{
 		GENERATE_BODY(ViewSwitch, ENGINE, "EDITORUI");
+	protected:
+		std::wstring GetObjectCustomSerializedPath() override {
+			return IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\ViewSwitch.mtdata";
+		}
 	public:
 		MMEMBER();
-		bool DetailsWindow;
+		bool DetailsWindow = false;
 		MMEMBER();
-		bool LuaControl;
+		bool LuaControl = false;
 		MMEMBER();
-		bool LoggerWindow;
+		bool LoggerWindow = false;
 		MMEMBER();
-		bool RenderViewWindow;
+		bool RenderViewWindow = false;
 		MMEMBER();
-		bool ContentBrowserWindow;
+		bool ContentBrowserWindow = false;
 		// -----------------------
 		MMEMBER();
-		bool EditorSettingsView;
+		bool EditorSettingsView = false;
 	};
 
 	class EditorGeneralLayout final : public RSubsystemTemplate<EditorGeneralLayout>

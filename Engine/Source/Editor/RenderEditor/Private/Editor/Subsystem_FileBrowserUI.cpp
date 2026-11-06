@@ -21,10 +21,12 @@ namespace RenderEditor {
         state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot(); // 设置根路径就是工作路径
 
         Config = ObjectFactory::CreateUnique<FileBrowserConfig>();
+        Config->Load();
     }
 
     void FileBrowserUI::Uninstall()
     {
+        Config->Save();
         Config.reset();
     }
 

@@ -8,10 +8,12 @@ namespace RenderEditor {
 	void EditorGeneralLayout::Init()
 	{
 		Switch = ObjectFactory::CreateUnique<ViewSwitch>();
+		Switch->Load();
 	}
 
 	void EditorGeneralLayout::Uninstall()
 	{
+		Switch->Save();
 		Switch.reset();
 	}
 

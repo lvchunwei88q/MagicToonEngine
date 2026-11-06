@@ -29,6 +29,7 @@ namespace Editor
 
 		// Load this configuration from a serialized file
 		WondowsConfig = ObjectFactory::CreateUnique<WindowsConfig>();
+		WondowsConfig->Load();
 
 		// Initialize the editor subsystem, e.g. create windows, initialize resources, etc.
 		LOG_INFO("Editor Create Windows.");
@@ -111,6 +112,7 @@ namespace Editor
 
 		// Clear out the WindowsClass we registered
 		::UnregisterClass(ENGINE_EDITOR_CLASS, ::GetModuleHandle(nullptr));
+		WondowsConfig->Save();
 	}
 
 	void Win32Application::CleanupDeviceD3D()

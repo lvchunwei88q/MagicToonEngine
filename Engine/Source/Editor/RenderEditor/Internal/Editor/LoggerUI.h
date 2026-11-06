@@ -2,6 +2,7 @@
 ///////////////////////////////////////
 #include <ILog.h>
 #include <Object.h>
+#include <IO.h>
 ///////////////////////
 
 #include <RenderSubsystem/RenderSubsystem.h>
@@ -17,19 +18,23 @@ namespace RenderEditor {
 	class LoggerSwitch : public MObject
 	{
 		GENERATE_BODY(LoggerSwitch, ENGINE, "EDITORUI");
+	protected:
+		std::wstring GetObjectCustomSerializedPath() override {
+			return IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\LoggerSwitch.mtdata";
+		}
 	public:
 		MMEMBER();
-		bool showDebug;
+		bool showDebug = true;
 		MMEMBER();
-		bool showInfo;
+		bool showInfo = true;
 		MMEMBER();
-		bool showWarning;
+		bool showWarning = true;
 		MMEMBER();
-		bool showError;
+		bool showError = true;
 		MMEMBER();
-		bool autoScroll;
+		bool autoScroll = true;
 		MMEMBER();
-		bool detailedInformation;
+		bool detailedInformation = false;
 	};
 
 	class LoggerUI final : public RSubsystemTemplate<LoggerUI>
