@@ -9,7 +9,7 @@
 namespace Core {
 	struct ObjectContainer {
 		ObjectRef Object;
-		ObjectSystemHandle Handle;
+		ObjectHandle Handle;
 	};
 
 	class ObjectSystem : public SubsystemTemplate<ObjectSystem, Priority::Core>, public IObjectSystem
@@ -19,8 +19,8 @@ namespace Core {
 		virtual void Uninstall() override;
 
 		virtual size_t GetObjectNum() override;
-		virtual ObjectSystemHandle RegisterObject(Object* ptr) override;
-		virtual void RemoveObject(ObjectSystemHandle Handle) override;
+		virtual ObjectHandle RegisterObject(Object* ptr) override;
+		virtual void RemoveObject(ObjectHandle Handle) override;
 
 	private:
 		std::vector<ObjectContainer> Objects;

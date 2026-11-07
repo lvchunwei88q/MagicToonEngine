@@ -24,16 +24,16 @@ namespace Core {
 		return Objects.size();
 	}
 
-	ObjectSystemHandle ObjectSystem::RegisterObject(Object* ptr)
+	ObjectHandle ObjectSystem::RegisterObject(Object* ptr)
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-		ObjectSystemHandle Hanedle{ ptr->GetInstanceId(), Objects.size(), ptr->GetClassType()};
+		ObjectHandle Hanedle{ ptr->GetInstanceId(), Objects.size(), ptr->GetClassType()};
 
 		Objects.push_back({ ptr,Hanedle });
 		return Hanedle; // return current index for Object, use Handle Wrapper
 	}
 
-	void ObjectSystem::RemoveObject(ObjectSystemHandle Handle)
+	void ObjectSystem::RemoveObject(ObjectHandle Handle)
 	{
 		size_t index = Handle.GetIndex();
 		std::lock_guard<std::mutex> lock(m_mutex);

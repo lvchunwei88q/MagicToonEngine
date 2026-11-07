@@ -158,13 +158,13 @@ namespace Core {
 	/*
 	* Object Handle in System
 	*/
-	class CORE_API ObjectSystemHandle {
+	class CORE_API ObjectHandle {
 	public:
-		ObjectSystemHandle() = default;
-		ObjectSystemHandle(size_t id,size_t index, ObjectType Type)
+		ObjectHandle() = default;
+		ObjectHandle(size_t id,size_t index, ObjectType Type)
 		: id(id), index(index), Type(Type) {}
 
-		bool operator==(const ObjectSystemHandle& other) const {
+		bool operator==(const ObjectHandle& other) const {
 			return index == other.index && Type == other.Type && id == other.id;
 		}
 
@@ -225,14 +225,14 @@ namespace Core {
 		/////////////////////////////////////////
 
 		uint64_t	instance_id;						// The id of each instance
-		ObjectSystemHandle Handle = {};					// Object Handle
+		ObjectHandle Handle = {};					// Object Handle
 	};
 
 	class CORE_API IObjectSystem {
 	public:
 		virtual size_t GetObjectNum() = 0;								// Get Current ObjectNum
-		virtual ObjectSystemHandle RegisterObject(Object* ptr) = 0;		// Register This Object For ObjectSystem Return Handle
-		virtual void RemoveObject(ObjectSystemHandle Handle) = 0;		// Delete This Object Input this Handle
+		virtual ObjectHandle RegisterObject(Object* ptr) = 0;		// Register This Object For ObjectSystem Return Handle
+		virtual void RemoveObject(ObjectHandle Handle) = 0;		// Delete This Object Input this Handle
 
 	};
 
