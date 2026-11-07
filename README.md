@@ -67,16 +67,6 @@ cmake -S . -B out\VS_Debug -G "Visual Studio 17 2022" -A x64
 cmake --build out\VS_Debug --config Debug
 ```
 
-## 生成项目文件
-
-如果希望在 IDE 中直接查看和编辑代码，可运行：
-
-```powershell
-.\GenerateVSProject.bat
-```
-
-脚本会在 `out\VS` 目录生成项目文件，并提示是否打开解决方案。
-
 ## 构建产物
 
 构建完成后，可执行文件和运行时 DLL 会输出到：

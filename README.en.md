@@ -67,16 +67,6 @@ cmake -S . -B out\VS_Debug -G "Visual Studio 17 2022" -A x64
 cmake --build out\VS_Debug --config Debug
 ```
 
-## Generate Project Files
-
-To inspect and edit the project in an IDE, run:
-
-```powershell
-.\GenerateVSProject.bat
-```
-
-The script generates project files under `out\VS` and gives you the option to open the solution.
-
 ## Build Artifacts
 
 After a successful build, the executables and runtime DLLs are placed in:
