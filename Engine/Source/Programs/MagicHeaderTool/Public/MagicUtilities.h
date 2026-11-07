@@ -44,18 +44,18 @@ namespace Utilitie {
 		static void Info(const std::string& msg) {
 			MGC ctx = MagicGlobalContext::Get();
 #ifdef _DEBUG
-			std::cout << "[" + std::to_string(ctx.GetInfo().CurrentTaskIndex) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][INFO] " << msg << "\n";
+			std::cout << "[" + std::to_string(ctx.GetCurrentShowTaskIndex()) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][INFO] " << msg << "\n";
 #endif
 		}
 
 		static void Warning(const std::string& msg) {
 			MGC ctx = MagicGlobalContext::Get();
-			std::cout << "[" + std::to_string(ctx.GetInfo().CurrentTaskIndex) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][WARNING] " << msg << "\n";
+			std::cout << "[" + std::to_string(ctx.GetCurrentShowTaskIndex()) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][WARNING] " << msg << "\n";
 		}
 
 		static void Error(const std::string& msg) {
 			MGC ctx = MagicGlobalContext::Get();
-			std::cout << "[" + std::to_string(ctx.GetInfo().CurrentTaskIndex) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][ERROR] " << msg << "\n";
+			std::cout << "[" + std::to_string(ctx.GetCurrentShowTaskIndex()) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][ERROR] " << msg << "\n";
 		}
 	};
 

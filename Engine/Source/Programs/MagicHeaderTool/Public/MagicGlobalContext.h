@@ -62,6 +62,7 @@ public:
     GENERATE_PROPERTY(generateDir,std::wstring);
     GENERATE_PROPERTY(generateInfoFilePath,std::wstring);
     GENERATE_PROPERTY(Info,Context::TaskInfo);
+    const size_t GetCurrentShowTaskIndex() const { return m_Info.CurrentTaskIndex + 1; }
     GENERATE_PROPERTY(HDDs,std::vector<Context::HeaderDescriptorData>);
     [[nodiscard]]Context::HeaderDescriptorData& GetCurrentTaskHeaderDescriptorData() {
         return m_HDDs[m_Info.CurrentTaskIndex];
