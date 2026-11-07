@@ -8,22 +8,21 @@
 
 						  System
 ┌───────────────────────────────────────────────────────────────┐
-│  Object (Capability provider)									│
-│  背后有 ObjectSystem 管理:										│
-│  - 序列化/反序列化												│
-│  - 对象生命周期管理												│
-│  - Handle/ID 管理												│
+│  Object (Capability provider)									
+│  背后有 ObjectSystem 管理:									
+│  - 对象生命周期管理											
+│  - Handle/ID 管理											
 └───────────────────────────────────────────────────────────────┘
                             │
                             ▼
 						  Component
 ┌───────────────────────────────────────────────────────────────┐
-│  Ability Achiever (Implements Abilities)						│
-│  - NetworkSyncAbility (网络同步能力)							│
-│  - MovementAbility (移动能力)									│
-│  - CombatAbility (战斗能力)										│
-│  - HealthAbility (生命值能力)									│
-│  - InventoryAbility (背包能力)									│
+│  Ability Achiever (Implements Abilities)						
+│  - NetworkSyncAbility (网络同步能力)							
+│  - MovementAbility (移动能力)									
+│  - CombatAbility (战斗能力)										
+│  - HealthAbility (生命值能力)									
+│  - InventoryAbility (背包能力)									
 └───────────────────────────────────────────────────────────────┘
                             ▲
                             │
@@ -31,24 +30,24 @@
         ▼                   ▼                   ▼
 						  Entity
 ┌───────────────────────────────────────────────────────────────┐
-│  工作类 (Worker Classes) - 像搭积木一样拼接						│
-│																│
-│  class Player {												│
-│      MovementAbility Move;      ← 能力1						│
-│      CombatAbility Combat;      ← 能力2						│
-│      HealthAbility Health;      ← 能力3						│
-│  };															│
-│																│
-│  class Enemy {												│
-│      MovementAbility Move;      ← 复用能力1						│
-│      HealthAbility Health;      ← 复用能力3						│
-│      AIControl Ability AI;      ← 能力4						│
-│  };															│
-│																│
-│  class NetworkPlayer {										│
-│      NetworkSyncAbility Net;   ← 能力5							│
-│      MovementAbility Move;      ← 复用能力1						│
-│  };															│
+│  工作类 (Worker Classes) - 像搭积木一样拼接 					
+│																
+│  class Player {												
+│      MovementAbility Move;      ← 能力1					
+│      CombatAbility Combat;      ← 能力2						
+│      HealthAbility Health;      ← 能力3						
+│  };															
+│																
+│  class Enemy {											
+│      MovementAbility Move;      ← 复用能力1				
+│      HealthAbility Health;      ← 复用能力3					
+│      AIControl Ability AI;      ← 能力4					
+│  };														
+│															
+│  class NetworkPlayer {									
+│      NetworkSyncAbility Net;   ← 能力5						
+│      MovementAbility Move;      ← 复用能力1					
+│  };														
 └───────────────────────────────────────────────────────────────┘
 */
 
@@ -216,8 +215,14 @@ namespace Core {
 		void ObjectInit();
 		void ObjectUninit();
 
-		virtual void SerializeData(std::ostringstream& stream) = 0;
-		virtual void DeserializeData(std::stringstream& stream) = 0;
+		///////////////////////////////////////// Serialize Ability
+		virtual void SerializeData(std::ostringstream& stream) { 
+			throw std::logic_error("SerializeData not implemented for class: " + GetClassName());
+		};
+		virtual void DeserializeData(std::stringstream& stream) { 
+			throw std::logic_error("DeserializeData not implemented for class: " + GetClassName());
+		};
+		/////////////////////////////////////////
 
 		uint64_t	instance_id;						// The id of each instance
 		ObjectSystemHandle Handle = {};					// Object Handle

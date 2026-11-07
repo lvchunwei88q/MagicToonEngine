@@ -1,8 +1,111 @@
 // Test.h
 // The test database is used for some functional testing
+
 #include <iostream>
 #include <vector>
 #include <string>
+
+#ifndef LOADED_DLL_H
+#define LOADED_DLL_H
+
+#include <stdexcept>
+
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <Windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
+namespace EngineTest {
+
+    class LoadedDll {
+    public:
+        explicit LoadedDll(const std::string& dllPath) {
+#ifdef _WIN32
+            // Convert a UTF-8 string to Windows UTF-16 wide characters
+            int size_needed = MultiByteToWideChar(CP_UTF8, 0, dllPath.c_str(), (int)dllPath.size(), NULL, 0);
+            std::wstring wPath(size_needed, 0);
+            MultiByteToWideChar(CP_UTF8, 0, dllPath.c_str(), (int)dllPath.size(), &wPath[0], size_needed);
+            
+            handle = LoadLibraryW(wPath.c_str());
+            if (!handle) {
+                throw std::runtime_error("LoadLibraryW failed with Windows error " + std::to_string(GetLastError()));
+            }
+#else
+            // Linux/macOS Usse dlopen
+            handle = dlopen(dllPath.c_str(), RTLD_LAZY);
+            if (!handle) {
+                throw std::runtime_error("dlopen failed: " + std::string(dlerror()));
+            }
+#endif
+        }
+
+        ~LoadedDll() {
+#ifdef _WIN32
+            if (handle) FreeLibrary(handle);
+#else
+            if (handle) dlclose(handle);
+#endif
+        }
+
+        LoadedDll(const LoadedDll&) = delete;
+        LoadedDll& operator=(const LoadedDll&) = delete;
+
+        LoadedDll(LoadedDll&& other) noexcept : handle(other.handle) {
+            other.handle = nullptr;
+        }
+
+        LoadedDll& operator=(LoadedDll&& other) noexcept {
+            if (this != &other) {
+                Release();
+                handle = other.handle;
+                other.handle = nullptr;
+            }
+            return *this;
+        }
+
+        // A general way to get symbols (function pointers)
+        void* GetSymbol(const char* symbolName) const {
+#ifdef _WIN32
+            return reinterpret_cast<void*>(GetProcAddress(handle, symbolName));
+#else
+            return dlsym(handle, symbolName);
+#endif
+        }
+
+#ifdef _WIN32
+        HMODULE Get() const { return handle; }
+#else
+        void* Get() const { return handle; }
+#endif
+
+    private:
+        void Release() {
+#ifdef _WIN32
+            if (handle) FreeLibrary(handle);
+#else
+            if (handle) dlclose(handle);
+#endif
+            handle = nullptr;
+        }
+
+#ifdef _WIN32
+        HMODULE handle = nullptr;
+#else
+        void* handle = nullptr;
+#endif
+    };
+
+}
+#endif // LOADED_DLL_H
+
+#define LOAD_ENGINE_DLL(variable, dll_path) ::EngineTest::LoadedDll variable(dll_path)
 
 inline int& GetFailedCount() { static int count = 0; return count; }
 
@@ -74,6 +177,21 @@ inline int& GetFailedCount() { static int count = 0; return count; }
             std::exit(1); \
         } \
     } while (0)
+
+template<typename Exception, typename Callable>
+void ExpectThrows(Callable&& callable)
+{
+	bool threw = false;
+	try {
+		callable();
+	}
+	catch (const Exception&) {
+		threw = true;
+	}
+
+	EXPECT_TRUE(threw);
+}
+
 // main function for running tests
 inline int RunTests(void (*testFunc)()) 
 {

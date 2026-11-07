@@ -1,4 +1,4 @@
-#include "BuildPipeline/BuildPipeline.h"
+#include "Pipeline/GeneralPipeline.h"
 #include <vector>
 #include <ctre/ctre.hpp>
 #include <algorithm>
@@ -149,12 +149,12 @@ namespace MHT {
 				std::vector<std::string> params;
 				if (ParseMMember(line, params)) {	// 找到成员变量进入
 					if (params.size() > 0) {
-						TOOL::Log::Error("Unknown member parameter:" + header.headerName + " Line:" + std::to_string(i + 1));
+						Utilitie::Log::Error("Unknown member parameter:" + header.headerName + " Line:" + std::to_string(i + 1));
 						return false;
 					}
 
 					if (i + 1 >= header.lines.size()) {
-						TOOL::Log::Error("MMEMBER at end of file without declaration: " + header.headerName + " Line:" + std::to_string(i + 1));
+						Utilitie::Log::Error("MMEMBER at end of file without declaration: " + header.headerName + " Line:" + std::to_string(i + 1));
 						return false;
 					}
 
@@ -165,7 +165,7 @@ namespace MHT {
 						InHeaderMemberVariables.push_back({ result.name, result.type,VariableLineNum });
 					}
 					else {
-						TOOL::Log::Error("Undefined member parameter:" + header.headerName + " Line:" + std::to_string(i + 2));
+						Utilitie::Log::Error("Undefined member parameter:" + header.headerName + " Line:" + std::to_string(i + 2));
 						return false;
 					}
 				}
@@ -175,12 +175,12 @@ namespace MHT {
 		}
 	}
 
-	namespace Pipeline {
+	namespace GeneralPipeline {
 		bool FindClassMember()
 		{
 			// 首先找到这些类所在的头文件
-			const auto& magicEngineClasss = MagicBuildData::Get().GetRefMagicEngineClasss();
-			const auto& MagicEngineHeaders = MagicBuildData::Get().GetRefMagicEngineHeaders();
+			const auto& magicEngineClasss = MagicGeneralPipelinedData::Get().GetRefMagicEngineClasss();
+			const auto& MagicEngineHeaders = MagicGeneralPipelinedData::Get().GetRefMagicEngineHeaders();
 			// Generate Data
 			std::vector<MagicEngineHeader> MagicClassHeaders;		// 所有类的所在文件
 			std::vector<LocalClassMemberInfo> MagicClassMemberVariables;	// 存储所有类的成员
@@ -304,9 +304,9 @@ namespace MHT {
 					order_magicEngineClasss.push_back(MagicClass);
 				}
 			}
-			MagicBuildData::Get().SetMagicEngineClasss(order_magicEngineClasss);
+			MagicGeneralPipelinedData::Get().SetMagicEngineClasss(order_magicEngineClasss);
 
-#if 0
+#if MAGIC_DEV
 			for (size_t a = 0; a < order_magicEngineClasss.size(); a++) {
 				auto& OrderClass = order_magicEngineClasss[a];
 				std::cout << OrderClass.className << std::endl;

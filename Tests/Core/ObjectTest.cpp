@@ -28,20 +28,6 @@ class NonSerializableTestObject final : public MObject
 	GENERATE_BODY(NonSerializableTestObject, Unknown);
 };
 
-template<typename Exception, typename Callable>
-void ExpectThrows(Callable&& callable)
-{
-	bool threw = false;
-	try {
-		callable();
-	}
-	catch (const Exception&) {
-		threw = true;
-	}
-
-	EXPECT_TRUE(threw);
-}
-
 void ObjectSerializationRoundTrip()
 {
 	auto source = ObjectFactory::CreateUnique<SerializableTestObject>();

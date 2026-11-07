@@ -90,14 +90,22 @@ function(add_engine_test_library name)
 endfunction()
 
 # ================================================ add Engine tests ===============================================
-macro(AddEngineTest TARGET_NAME TEST_DIR)
-    add_module_sources(${TARGET_NAME})
-    add_engine_test_library(${TARGET_NAME} ${${TARGET_NAME}_SOURCES} ${${TARGET_NAME}_HEADERS})
+macro(AddEngineTest TARGET_NAME)
+    if(ARGC LESS 2)
+        message(FATAL_ERROR "AddEngineTest(${TARGET_NAME}) requires at least one source file")
+    endif()
+
+    add_engine_test_library(${TARGET_NAME} ${ARGN})
+    foreach(TEST_FILE IN LISTS ARGN)
+        get_filename_component(TEST_FILE_ABSOLUTE "${TEST_FILE}" ABSOLUTE
+            BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+        )
+        file(APPEND "${HEADER_LIST_FILE}" "${TEST_FILE_ABSOLUTE} || ${TARGET_NAME}\n")
+    endforeach()
     add_dependencies(${TARGET_NAME} ${MAGIC_HEADER_TOOL_RUN})
-    # list(APPEND GENERATE_HEADER_LINKPATH ${TARGET_NAME})
     
-    # Set Core as the default base libraries, with ARGN receiving other libraries passed in during the call
-    target_link_libraries(${TARGET_NAME} PRIVATE Core ${ARGN})
+    # Core is the default base library; all arguments after TARGET_NAME are source files.
+    target_link_libraries(${TARGET_NAME} PRIVATE Core)
     
     target_include_directories(${TARGET_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -120,6 +128,16 @@ macro(AddEngineTest TARGET_NAME TEST_DIR)
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${BASE_OUTPUT_DIR}/Test"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BASE_OUTPUT_DIR}/Test"
         RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${BASE_OUTPUT_DIR}/Test"
+    )
+
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:Core>"
+            "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:Lua>"
+            "$<TARGET_FILE_DIR:${TARGET_NAME}>"
+        VERBATIM
     )
 endmacro()
 

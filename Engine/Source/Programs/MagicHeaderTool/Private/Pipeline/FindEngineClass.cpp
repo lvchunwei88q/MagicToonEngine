@@ -1,4 +1,4 @@
-#include "BuildPipeline/BuildPipeline.h"
+#include "Pipeline/GeneralPipeline.h"
 #include <vector>
 #include <ctre/ctre.hpp>
 
@@ -7,8 +7,8 @@ namespace MHT {
         struct LocalMagicClassParamsInfo {
             std::vector<std::string> mclassParams = {};
             std::vector<std::string> mgeneratebodyParams = {};
-            std::string currentClassName;       // 当前正在处理的类名
-            size_t currentClassLineNum = 0;     // 当前正在处理的类所在行数
+            std::string currentClassName;       // The class name currently being processed
+            size_t currentClassLineNum = 0;     // The line number of the class currently being processed
 
             void clear() {
                 currentClassName.clear();
@@ -25,7 +25,7 @@ namespace MHT {
                     ? remaining
                     : remaining.substr(0, comma_pos);
 
-                // 去除前导空白
+                // Remove leading spaces
                 size_t start = param.find_first_not_of(" \t");
                 if (start == std::string_view::npos) {
                     remaining = (comma_pos == std::string_view::npos)
@@ -33,7 +33,7 @@ namespace MHT {
                         : remaining.substr(comma_pos + 1);
                     continue;
                 }
-                // 去除尾部空白
+                // Remove trailing spaces
                 size_t end = param.find_last_not_of(" \t");
                 param = param.substr(start, end - start + 1);
 
@@ -42,17 +42,17 @@ namespace MHT {
                     outParams.push_back(paramString);
                 }
 
-                // 移动到下一个参数
+                // Move to the next parameter
                 remaining = (comma_pos == std::string_view::npos)
                     ? std::string_view()
                     : remaining.substr(comma_pos + 1);
             }
         }
 
-        // 检测 MCLASS(...); 并提取括号内的参数
+        // Check MCLASS(...); and extract parameters within parentheses
         bool ParseMClass(const std::string& line, std::vector<std::string>& outParams) {
 
-            // 匹配 MCLASS( ... );
+            // Match MCLASS( ... );
             if (auto match = ctre::match<R"(^\s*MCLASS\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)">(line)) {
                 std::string_view args = match.get<1>();
                 SplitParams(args, outParams);
@@ -61,17 +61,17 @@ namespace MHT {
             return false;
         }
 
-        // 检测当前行是否是 class 签名
+        // Check if the current line is a class signature
         bool IsClassSignature(const std::string& line) {
-            // 匹配 class 关键字（作为独立单词），后面可以跟各种内容
-            return ctre::search<R"(^\s*class\s)">(line) ||  // class 后有空白
-                ctre::search<R"(^\s*class\b)">(line);    // class 作为完整单词
+            // The 'match class' keyword (as a standalone word) can be followed by all kinds of stuff
+            return ctre::search<R"(^\s*class\s)">(line) ||  // There's a space after class
+                ctre::search<R"(^\s*class\b)">(line);    // class as a complete word
         }
 
-        // 检测固定字符串 GENERATE_BODY();
+        // Check for the fixed string GENERATE_BODY();
         bool ParseGenerateBody(const std::string& line, std::vector<std::string>& outParams) {
 
-            // 匹配 GENERATE_BODY( ... );
+            // Match GENERATE_BODY( ... );
             if (auto match = ctre::match<R"(^\s*GENERATE_BODY\s*\(\s*([^)]*?)\s*\)\s*;?\s*$)">(line)) {
                 std::string_view args = match.get<1>();
                 SplitParams(args, outParams);
@@ -81,7 +81,7 @@ namespace MHT {
         }
 
 
-        // 获取到类名 class a or class XXX_API a
+        // Get the class name class a or class XXX_API a
         std::string ExtractClassName(const std::string& line) {
             if (auto search = ctre::search<R"(^\s*class\s+(?:\w+_API\s+)?(\w+))">(line)) {
                 return search.get<1>().to_string();
@@ -90,17 +90,20 @@ namespace MHT {
         }
     }
 
-    namespace Pipeline {
+    namespace GeneralPipeline {
         bool FindEngineClass()
         {
-            std::vector<MagicEngineHeader> magicEngineHeaders = MagicBuildData::Get().GetMagicEngineHeaders();
+            // Get Magic Global Context
+            MGC ctx = MagicGlobalContext::Get();
+            std::vector<MagicEngineHeader> magicEngineHeaders = MagicGeneralPipelinedData::Get().GetMagicEngineHeaders();
 
             std::vector<MagicEngineClass> magicEngineClasss;
             for (size_t i = 0; i < magicEngineHeaders.size(); i++)
             {
                 auto& EngineHeader = magicEngineHeaders[i];
 
-                bool NeedtoFindGenerator = false; // 默认不需要找
+                // Mark whether you need to look for GENERATE_BODY By default, no need to look
+                bool IsNeedtoFindGenerator = false;
                 LocalMagicClassParamsInfo Info;
 
                 for (size_t y = 0; y < EngineHeader.lines.size(); y++)
@@ -108,43 +111,51 @@ namespace MHT {
                     std::string& line = EngineHeader.lines[y];
 
                     if (ParseMClass(line, Info.mclassParams)) {
-                        if (Info.mclassParams.size() <= 0) {
-                            TOOL::Log::Error("Cannot determine the generation type without filling in the corresponding MCLASS parameter:"
-                                                                        + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
-                            return false;
-                        }
+                        // So abilities should be optional and you shouldn't be forced to use just one.
+                        // if (Info.mclassParams.size() <= 0) {
+                        //     Utilitie::Log::Error("Cannot determine the generation type without filling in the corresponding MCLASS parameter:"
+                        //                                                 + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                        //     return false;
+                        // }
 
-                        if (NeedtoFindGenerator) { // 此时是在寻找ClassBody
-                            TOOL::Log::Error("No body corresponding to the Class was found:" + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                        // If at this point you are already looking for GENERATE_BODY (after finding MCLASS), but then find another one, an exception should be thrown.
+                        if (IsNeedtoFindGenerator) {
+                            Utilitie::Log::Error("No body corresponding to the Class was found:" + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
                             return false;
                         }
                         
+                        // If MCLASS is found but the next line is the end of the file, throw an exception
                         if (y + 1 >= EngineHeader.lines.size()) {
-                            TOOL::Log::Error("MCLASS at end of file without class: " + EngineHeader.headerName);
+                            Utilitie::Log::Error("MCLASS at end of file without class: " + EngineHeader.headerName);
                             return false;
                         }
+
+                        // If the next line is not a class signature, an exception should be thrown.
                         std::string& next_line = EngineHeader.lines[y + 1];
                         if (!IsClassSignature(next_line)) {
-                            TOOL::Log::Error("No CLASS corresponding to MCLASS was found:" + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
+                            Utilitie::Log::Error("No CLASS corresponding to MCLASS was found:" + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
                             return false;
                         }
 
                         Info.currentClassName = ExtractClassName(next_line);
-                        Info.currentClassLineNum = y; // 记录类宏定义所在行数
+                        Info.currentClassLineNum = y; // The line number where the macro definition is recorded
 
-                        NeedtoFindGenerator = true; // 找到 MCLASS 了，接下来需要找 GENERATE_BODY
+                        //After finding MCLASS, you need to look for GENERATE_BODY
+                        IsNeedtoFindGenerator = true;
                     }
 
-                    if (NeedtoFindGenerator) {
+                    if (IsNeedtoFindGenerator) {
                         if (ParseGenerateBody(line, Info.mgeneratebodyParams)) {
                             if (Info.mgeneratebodyParams.size() <= 0) {
-                                TOOL::Log::Error("If the corresponding GenerateBody parameter is not filled in, the type cannot be generated.:"
+                                Utilitie::Log::Error("If the corresponding GenerateBody parameter is not filled in, the type cannot be generated.:"
                                     + EngineHeader.headerName + " Line:" + std::to_string(y + 1));
                                 return false;
                             }
-                            NeedtoFindGenerator = false; // 找到 GENERATE_BODY 了，重置状态
 
+                            // Found GENERATE_BODY, resetting the state to avoid affecting subsequent judgments.
+                            IsNeedtoFindGenerator = false;
 
+                            // add the class to the list of classes
                             magicEngineClasss.push_back({ std::move(Info.mclassParams),std::move(Info.mgeneratebodyParams),
                                                             EngineHeader.headerName,EngineHeader.moudelName,
                                                             Info.currentClassName,Info.currentClassLineNum });
@@ -152,14 +163,17 @@ namespace MHT {
                         }
                     }
                 }
-                if (NeedtoFindGenerator) { // 如果找到了 MCLASS 但是没有找到 GENERATE_BODY 就报错
-                    TOOL::Log::Error("No GENERATE_BODY corresponding to MCLASS was found:" + EngineHeader.headerName);
+                if (IsNeedtoFindGenerator) { // It throws an error if MCLASS is found but GENERATE_BODY isn't.
+                    Utilitie::Log::Error("No GENERATE_BODY corresponding to MCLASS was found:" + EngineHeader.headerName);
                     return false;
                 }
             }
 
-            if (magicEngineClasss.size() <= 0)SetGenerateCompleted();
-			MagicBuildData::Get().SetMagicEngineClasss(magicEngineClasss);
+            // If the number of Classes found is less than or equal to 0, then it means there's no need to continue processing.
+            if (magicEngineClasss.size() <= 0) ctx.SetGenerateCompleted();
+
+            // Finally, save the found classes to MagicBuildData
+			MagicGeneralPipelinedData::Get().SetMagicEngineClasss(magicEngineClasss);
 
             return true;
         }

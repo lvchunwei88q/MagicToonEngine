@@ -1,5 +1,5 @@
 #pragma once
-#include "BuildPipeline.h"
+#include "GeneralPipeline.h"
 using namespace MHT;
 namespace Object {
 

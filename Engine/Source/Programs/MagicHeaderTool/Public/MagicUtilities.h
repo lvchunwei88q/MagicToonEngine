@@ -10,64 +10,58 @@
 #include <string>
 #include <vector>
 
-namespace CF {
-///////////////////////////// Config
-#define DETAILED 1
-constexpr int SingleJobCapacity = 100; // 数量
-
-extern size_t MHT_JobNum;
-extern size_t MHT_CurrentJob;
-/////////////////////////////
-}
+#include "MagicGlobalContext.h"
+#include "MagicConfig.h"
 
 DISABLE_DLL_WARNINGS_PUSH;
 
-namespace TOOL {
-	class Timer {
+namespace Utilitie {
+	class GlobalTimer : public Singleton<GlobalTimer>
+	{
 	private:
 		std::chrono::steady_clock::time_point startTime;
 
 	public:
-		Timer() {
-			start();
-		}
+		GlobalTimer() {}
+		~GlobalTimer() {}
 
+		// Start the timer
 		void start() {
 			startTime = std::chrono::steady_clock::now();
 		}
 
-		// 返回经过的毫秒数
+		// Return time taken
 		long long elapsed_ms() const {
 			auto endTime = std::chrono::steady_clock::now();
 			return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 		}
-
-		void reset() {
-			start();
-		}
 	};
+
+	using GTimer = decltype(GlobalTimer::Get());
 
 	class Log {
 	public:
 		static void Info(const std::string& msg) {
+			MGC ctx = MagicGlobalContext::Get();
 #ifdef _DEBUG
-			std::cout << "[" + std::to_string(CF::MHT_CurrentJob) + "/" + std::to_string(CF::MHT_JobNum) + "][INFO] " << msg << "\n";
+			std::cout << "[" + std::to_string(ctx.GetInfo().CurrentTaskIndex) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][INFO] " << msg << "\n";
 #endif
 		}
 
 		static void Warning(const std::string& msg) {
-			std::cout << "[" + std::to_string(CF::MHT_CurrentJob) + "/" + std::to_string(CF::MHT_JobNum) + "][WARNING] " << msg << "\n";
+			MGC ctx = MagicGlobalContext::Get();
+			std::cout << "[" + std::to_string(ctx.GetInfo().CurrentTaskIndex) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][WARNING] " << msg << "\n";
 		}
 
 		static void Error(const std::string& msg) {
-			std::cout << "[" + std::to_string(CF::MHT_CurrentJob) + "/" + std::to_string(CF::MHT_JobNum) + "][ERROR] " << msg << "\n";
+			MGC ctx = MagicGlobalContext::Get();
+			std::cout << "[" + std::to_string(ctx.GetInfo().CurrentTaskIndex) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][ERROR] " << msg << "\n";
 		}
 	};
 
-	// 获取文件修改时间
+	// Get file modification time
 	size_t GetFileModificationTime(const std::wstring& filepath);
-
-	// 并行读取文件
+	// Read files in parallel
 	std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths);
 }
 

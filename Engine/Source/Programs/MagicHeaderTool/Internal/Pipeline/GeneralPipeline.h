@@ -3,23 +3,7 @@
 #include <vector>
 #include <string>
 #include "Tools/Singleton.h"
-#include "Tools/Tool.h" 
-
-#define GENERATE_GET(name, type) \
-    type Get##name() const { return m_##name; }
-
-#define GENERATE_GET_REF(name, type) \
-    const type& GetRef##name() const { return m_##name; } \
-    type& GetRef##name() { return m_##name; }
-
-#define GENERATE_SET(name, type) \
-    void Set##name(const type& val) { m_##name = val; }
-
-// 同时生成 Get 和 Set
-#define GENERATE_PROPERTY(name, type)	\
-    GENERATE_GET(name, type)			\
-	GENERATE_GET_REF(name, type)		\
-    GENERATE_SET(name, type)
+#include "MagicUtilities.h" 
 
 namespace MHT {
 	// 所有数据都保存在这个单例中，方便在不同的阶段访问和修改
@@ -66,7 +50,7 @@ namespace MHT {
 		MagicEngineClass() {}
 	};
 
-	class MagicBuildData : public Singleton<MagicBuildData>
+	class MagicGeneralPipelinedData : public Singleton<MagicGeneralPipelinedData>
 	{
 		std::vector<MagicEngineHeader>		m_MagicEngineHeaders;
 		std::vector<MagicEngineClass>		m_MagicEngineClasss;
@@ -77,24 +61,14 @@ namespace MHT {
 		GENERATE_PROPERTY(MagicEngineClasss, std::vector<MagicEngineClass>);
 		GENERATE_PROPERTY(GeneratePath, std::wstring);
 
-		void clear() {
+		void clearAll() {
 			m_MagicEngineHeaders.clear();
 			m_MagicEngineClasss.clear();
 		}
 	};
+	using MagicGPD = decltype(MagicGeneralPipelinedData::Get());
 
-
-	namespace Pipeline {
-		enum GenerationState {
-			Pending,       // 有待生成的数据
-			Completed      // 已无待生成数据
-		};
-
-		extern GenerationState GenerationState_;
-		inline bool NeedGenerate() { return GenerationState_ == GenerationState::Pending; }
-		inline void SetGenerateCompleted() { GenerationState_ = GenerationState::Completed; }
-		inline void ResetStatus() { GenerationState_ = GenerationState::Pending; }
-
+	namespace GeneralPipeline {
 		bool FindEngineClass();
 		bool FindClassMember();
 

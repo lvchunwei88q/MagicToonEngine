@@ -1,4 +1,4 @@
-#include "BuildPipeline/ObjectBuildPipeline.h"
+#include "Pipeline/ObjectPipeline.h"
 #include <map>
 #include <vector>
 #include <unordered_set>
@@ -293,12 +293,12 @@ namespace Object {
             // 检查长度是否一致
             if (a.size() != b.size()) {
                 if (a.size() > b.size()) {
-                    TOOL::Log::Error("Parameter count mismatch: expected " +
+                    Utilitie::Log::Error("Parameter count mismatch: expected " +
                         std::to_string(b.size()) + " parameters, but got " +
                         std::to_string(a.size()) + " parameters (too many)");
                 }
                 else {
-                    TOOL::Log::Error("Parameter count mismatch: expected " +
+                    Utilitie::Log::Error("Parameter count mismatch: expected " +
                         std::to_string(b.size()) + " parameters, but got " +
                         std::to_string(a.size()) + " parameters (too few)");
                 }
@@ -310,7 +310,7 @@ namespace Object {
                 LocalValidateParameter Parameter = a[i];
                 if (Parameter.consistent) {
                     if (Parameter.Parameter != b[i]) {
-                        TOOL::Log::Error("Parameter mismatch at index " + std::to_string(i) +
+                        Utilitie::Log::Error("Parameter mismatch at index " + std::to_string(i) +
                             ": expected \"" + b[i] + "\", but got \"" + Parameter.Parameter + "\"");
                         return false;
                     }
@@ -346,7 +346,7 @@ namespace Object {
 
 	namespace Pipeline {
 		bool GenerateObjectMetadata() {
-            const auto& MagicEngineClasss =     MagicBuildData::Get().GetRefMagicEngineClasss();
+            const auto& MagicEngineClasss =     MagicGeneralPipelinedData::Get().GetRefMagicEngineClasss();
             auto& MagicObjectMetadatas =        MagicObjectBuildData::Get().GetRefMagicObjectMetadatas();
             std::unordered_set<std::string> AllArea;
             std::vector<LocalMetaData> MetaDatas;

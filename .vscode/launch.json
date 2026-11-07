@@ -21,7 +21,8 @@
             "description": "Select the test program to run:",
             "options": [
                 "MagicEditor.exe",
-                "MagicLauncher.exe"
+                "MagicLauncher.exe",
+                "Test/MagicTest-ObjectTest.exe",
             ]
         }
     ]
