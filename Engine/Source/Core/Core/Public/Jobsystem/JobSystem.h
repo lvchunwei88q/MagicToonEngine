@@ -3,7 +3,7 @@
 
 #include "Subsystem/Subsystem.h"
 #include "Subsystem/SubsystemTemplate.h" // AUTO_REGISTER_SINGLETON
-#include "Tools/Singleton.h"
+#include "Utilities/Singleton.h"
 #include "Common/Checker.h"
 #include <memory>
 #include <atomic>

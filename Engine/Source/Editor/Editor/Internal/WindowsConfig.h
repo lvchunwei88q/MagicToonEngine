@@ -1,7 +1,7 @@
 #pragma once
 #include <Object.h>
 #include <Windows.h>
-#include <Tools/Singleton.h>
+#include <Utilities/Singleton.h>
 
 #include <WindowsConfig.object.generate.h>
 

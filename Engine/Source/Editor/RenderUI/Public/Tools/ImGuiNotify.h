@@ -17,7 +17,7 @@
 #include <string>
 #include <chrono>			// For the notifications timed dissmiss
 #include <functional>		// For storing the code, which executest on the button click in the notification
-#include <Tools/Singleton.h>
+#include <Utilities/Singleton.h>
 
 #include <imgui.h>
 #include <imgui_internal.h>

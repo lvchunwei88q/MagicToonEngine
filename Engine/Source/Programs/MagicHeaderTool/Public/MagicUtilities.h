@@ -2,7 +2,7 @@
 
 // Core Libraries
 #include <Common/Checker.h>
-#include <Tools/Singleton.h>
+#include <Utilities/Singleton.h>
 
 #include <iostream>
 #include <chrono>

@@ -2,8 +2,8 @@
 
 #include "Common/Core_API.h"
 #include "Common/Checker.h"
-#include "Tools/Singleton.h"
-#include "Tools/BinaryRW.h"
+#include "Utilities/Singleton.h"
+#include "Utilities/BinaryRW.h"
 #include <string>
 #include <vector>
 

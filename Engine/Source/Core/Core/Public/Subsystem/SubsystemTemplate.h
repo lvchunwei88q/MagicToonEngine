@@ -1,6 +1,6 @@
 #pragma once
 #include "Subsystem/Subsystem.h"
-#include "Tools/Singleton.h"
+#include "Utilities/Singleton.h"
 
 // the subsystems template Cannot be used as an export API!!!
 template<typename T, Core::Priority Priority>

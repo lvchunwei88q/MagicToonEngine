@@ -6,7 +6,7 @@
 
 #include <Subsystem/Subsystem.h>
 #include <Subsystem/SubsystemTemplate.h>
-#include <Tools/Singleton.h>
+#include <Utilities/Singleton.h>
 #include <functional>
 
 /*

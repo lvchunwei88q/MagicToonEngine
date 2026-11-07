@@ -1,7 +1,7 @@
 // Command/FileBrowserCommands.h
 #pragma once
 #include <Command/ICommand.h>
-#include <Tools/Singleton.h>
+#include <Utilities/Singleton.h>
 #include <string>
 #include <RenderSubsystem/RenderSubsystem.h>
 

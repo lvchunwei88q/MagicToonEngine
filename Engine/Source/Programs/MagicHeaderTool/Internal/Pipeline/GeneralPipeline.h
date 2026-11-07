@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include "Tools/Singleton.h"
+#include <Utilities/Singleton.h>
 #include "MagicUtilities.h" 
 
 namespace MHT {

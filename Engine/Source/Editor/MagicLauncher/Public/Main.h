@@ -2,7 +2,7 @@
 
 #include <windows.h>
 #include <string>
-#include <Tools/Singleton.h> // from Core
+#include <Utilities/Singleton.h> // from Core
 #include <IO.h>
 #include <atomic>
 

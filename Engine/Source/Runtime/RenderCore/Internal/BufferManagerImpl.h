@@ -2,7 +2,7 @@
 #include <vector>
 #include <mutex>
 #include <atomic>
-#include <Tools/EnumClassFlags.h>
+#include <Utilities/EnumClassFlags.h>
 
 #include <Subsystem/SubsystemTemplate.h>
 

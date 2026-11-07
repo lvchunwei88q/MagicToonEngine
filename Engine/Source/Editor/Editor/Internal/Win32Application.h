@@ -5,7 +5,7 @@
 #include <EditorUI.h>
 
 #include <Subsystem/Subsystem.h>
-#include <Tools/Singleton.h>
+#include <Utilities/Singleton.h>
 #include <functional>
 #include <Subsystem/SubsystemTemplate.h>
 

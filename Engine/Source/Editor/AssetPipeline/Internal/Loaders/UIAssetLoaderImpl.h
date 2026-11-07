@@ -1,6 +1,6 @@
 #pragma once
 #include "AssetPipeline.h"
-#include <Tools/Singleton.h>
+#include <Utilities/Singleton.h>
 #include <unordered_map>
 
 namespace AssetPipeline {

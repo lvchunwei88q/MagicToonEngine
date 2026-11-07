@@ -63,8 +63,8 @@
 #include <cereal/types/list.hpp>
 #include <cereal/types/memory.hpp>
 
-#include "Tools/EnumClassFlags.h"
-#include "Tools/BinaryRW.h"
+#include "Utilities/EnumClassFlags.h"
+#include "Utilities/BinaryRW.h"
 
 ///////////////////////////////// From Windows 
 #undef GetClassName
