@@ -15,9 +15,17 @@ int main(int argc, char* argv[]) {
     parser.add<std::string>("generate-dir", 'g', "File directory for generating code", true, "");
     parser.add("help", '?', "Print help");
 
-    // Parse the command-line arguments
+    // Parse the command-line arguments.
+    // Exit codes: 0 = success (including an explicit --help / -?),
+    //             2 = bad arguments, 1 = code generation failed.
+    // If you return 0 every time parsing fails, then CMake's
+    // add_custom_target(${MAGIC_HEADER_TOOL_RUN} ALL ...) reported the codegen
+    // step as successful and the build only failed later with a wall of
+    // "cannot open xxx.object.generate.h".
     if (!parser.parse_check(argc, argv)) {
-        return 0;
+        // parse_check() already printed the error message and usage to stderr;
+        // --help / -? is a normal request, everything else is a real failure.
+        return parser.exist("help") ? 0 : 2;
     }
 
     // Get the generate directory from the parsed arguments
