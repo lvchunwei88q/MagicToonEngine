@@ -96,7 +96,7 @@ macro(AddEngineTest TARGET_NAME)
     endif()
 
     add_engine_test_library(${TARGET_NAME} ${ARGN})
-    foreach(TEST_FILE IN LISTS ARGN)
+    foreach(TEST_FILE ${ARGN})
         get_filename_component(TEST_FILE_ABSOLUTE "${TEST_FILE}" ABSOLUTE
             BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
         )

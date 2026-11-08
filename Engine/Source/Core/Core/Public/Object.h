@@ -91,6 +91,7 @@ void serialize(Archive& archive, Vec2<T>& v) {
 // Enumerates the features you can use
 enum {
 	MSERIALIZATION,
+	MDELEGATES
 };
 
 #define MCLASS(...)					// The class you want to serialize must be placed at the beginning of the class definition
@@ -139,7 +140,7 @@ public:
 namespace Core {
 	enum class ObjectSwitch : uint8_t {
 		Unknown			= 0,
-		Reflection		= 1 << 0,
+		Delegates		= 1 << 0,
 		Serialization	= 1 << 1
 	};
 	ENUM_CLASS_FLAGS(ObjectSwitch);

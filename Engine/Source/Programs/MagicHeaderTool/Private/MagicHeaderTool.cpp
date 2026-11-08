@@ -121,7 +121,7 @@ namespace MHT{
 				CheckModificationTime_ContentsW += Content;
 
 #if MAGIC_DEV
-				Utilitie::Log::Info(Utilitie::ToNarrowString(CheckFileCache.file) + " - Time: " + std::to_string(CheckFileCache.time));
+				Utilitie::Log::Info(IO::ToNarrowString(CheckFileCache.file) + " - Time: " + std::to_string(CheckFileCache.time));
 #endif
 			}
 

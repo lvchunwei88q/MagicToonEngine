@@ -46,18 +46,17 @@ namespace MHT {
 		private:
 			static std::string ExtractName(const std::string& decl) {
 				std::string_view view(decl);
-				std::string lastMatch;
 
 				// 使用 CTRE 的 search 获取匹配
 				auto matches = ctre::search_all<R"(\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:[=;{]|$))">(view);
 				for (auto& match : matches) {
 					// 获取第一个捕获组的内容
 					if (match.get<1>().size() > 0) {
-						lastMatch = match.get<1>().to_string();
+						return match.get<1>().to_string();
 					}
 				}
 
-				return lastMatch;
+				return {};
 			}
 
 			static std::string ExtractType(const std::string& decl, const std::string& name) {
@@ -307,6 +306,7 @@ namespace MHT {
 			MagicGeneralPipelinedData::Get().SetMagicEngineClasss(order_magicEngineClasss);
 
 #if MAGIC_DEV
+			// print out the sorted classes and their members for debugging
 			for (size_t a = 0; a < order_magicEngineClasss.size(); a++) {
 				auto& OrderClass = order_magicEngineClasss[a];
 				std::cout << OrderClass.className << std::endl;

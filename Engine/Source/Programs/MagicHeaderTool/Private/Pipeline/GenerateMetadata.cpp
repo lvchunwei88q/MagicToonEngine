@@ -1,9 +1,11 @@
-#include "Pipeline/ObjectPipeline.h"
+#include "Pipeline/GeneralPipeline.h"
+#include <algorithm>
 #include <map>
 #include <vector>
 #include <unordered_set>
 
-namespace Object {
+namespace MHT {
+	namespace GeneralPipeline {
 	namespace {
         struct LocalSourcesIndex {
             enum class Sort : uint8_t {
@@ -39,27 +41,6 @@ namespace Object {
             void SetMetadata(const std::string& Metadata) { this->Metadata = Metadata; }
         };
 
-        struct LoaclGenerateOptionalInformationMap {
-            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Serialize;
-            std::map<std::string, std::vector<MemberVariable>> GenerateInformationMap_Reflection;
-        };
-
-        std::string GenerateEmptyMacros(const std::vector<std::string>& classNames) {
-            std::ostringstream code;
-
-            for (const auto& className : classNames) {
-                // Generate GENERATE_SERIALIZE_XXX() NOT
-                code << "#define GENERATE_SERIALIZE_" << className << "() \\\n";
-                code << "\n";
-
-                // Generate GENERATE_REFLECTION_XXX() NOT
-                code << "#define GENERATE_REFLECTION_" << className << "() \\\n";
-                code << "\n";
-            }
-
-            return code.str();
-        }
-
         std::string GenerateUndefMacros(const std::vector<std::string>& macroNames) {
             std::ostringstream code;
 
@@ -70,12 +51,9 @@ namespace Object {
             return code.str();
         }
 
-        /**
-         * 生成序列化函数
-         */
+        // Build the shared class API and leave extension points for optional capabilities.
         std::string GenerateClassBodyFunction() {
             std::ostringstream code;
-            // Fill in Object type information
             code << "    virtual std::string GetClassName() const override {\n";
             code << "        \n";
             code << "        return #CLASS_NAME;\n";
@@ -103,7 +81,8 @@ namespace Object {
 
             // use macros generate class function
             code << "    GENERATE_SERIALIZE_##CLASS_NAME()\n";
-            code << "    GENERATE_REFLECTION_##CLASS_NAME()\n";
+            code << "    GENERATE_DELEGATES_##CLASS_NAME()\n";
+            // ...
 
             // Set constructor parameters
             code << "    CLASS_NAME() : Core::Object() {                            \n";
@@ -117,17 +96,8 @@ namespace Object {
             code << "    ~CLASS_NAME() {                                            \n";
             code << "       this->ObjectUninit();                                   \n";
             code << "    }                                                          \n";
-
             code << "protected:                                                                     \n";
-            code << "    virtual void SerializeData(std::ostringstream& stream) override {          \n";
-            code << "       cereal::BinaryOutputArchive archive(stream);                            \n";
-            code << "       archive(*this);                                                         \n";
-            code << "       return;                                                                 \n";
-            code << "    }                                                                          \n";
-            code << "    virtual void DeserializeData(std::stringstream& stream) override {         \n";
-            code << "       cereal::BinaryInputArchive archive(stream);                             \n";
-            code << "       archive(*this);                                                         \n";
-            code << "    }                                                                          \n";
+            code << "    GENERATE_SERIALIZE_BODY_##CLASS_NAME()\n";
             return code.str();
         }
 
@@ -157,54 +127,6 @@ namespace Object {
             for (const auto& [className, Tag] : ObjectTagMap) {
                 // 生成 GENERATE_CLASS_HAS_XXX 宏
                 code << "#define GENERATE_CLASS_HAS_" << className << " " << Tag << "\n";
-            }
-
-            return code.str();
-        }
-
-        std::string GenerateObjectSwitchSpecificMacros(
-            const std::map<std::string, std::string>& ObjectSwitchMap
-        ) {
-            std::ostringstream code;
-
-            for (const auto& [className, Switch] : ObjectSwitchMap) {
-                // 生成 GENERATE_OBJECT_SWITCH_ 宏
-                code << "#define GENERATE_OBJECT_SWITCH_" << className << " " << Switch << "\n";
-            }
-
-            return code.str();
-        }
-
-        std::string GenerateClassSerializationMacros(
-            const std::map<std::string, std::vector<MemberVariable>>& classParamsMap
-        ) {
-            std::ostringstream code;
-
-            for (const auto& [className, params] : classParamsMap) {
-                // 生成 GENERATE_SERIALIZE_XXX 宏
-                code << "#ifdef GENERATE_SERIALIZE_" << className << "\n";
-                code << "#undef GENERATE_SERIALIZE_" << className << "\n";
-                code << "#endif\n\n";
-
-                code << "#define GENERATE_SERIALIZE_" << className << "() \\\n";
-
-                code << "    template<class Archive>                        \\\n";
-                if (params.empty()) {
-                    code << "    void serialize(Archive&) {}                  \\\n";
-                }
-                else {
-                    code << "    void serialize(Archive& archive) {             \\\n";
-                    code << "        archive(";
-                    for (size_t i = 0; i < params.size(); ++i) {
-                        code << params[i].name;
-                        if (i < params.size() - 1) {
-                            code << ", ";
-                        }
-                    }
-                    code << ");                                                 \\\n";
-                    code << "    }                                              \\\n";
-                }
-                code << "\n";
             }
 
             return code.str();
@@ -323,15 +245,6 @@ namespace Object {
             return true;
         }
 
-        std::string JoinStrings(const std::vector<std::string>& strings, const std::string& delimiter = " | ") {
-            std::string result;
-            for (const auto& str : strings) {
-                if (!result.empty()) result += delimiter;
-                result += str;
-            }
-            return result;
-        }
-
         std::string MergeCode(const std::string& code1, const std::string& code2) {
             std::ostringstream result;
             result << code1 << "\n" << code2;
@@ -344,10 +257,9 @@ namespace Object {
         }
 	}
 
-	namespace Pipeline {
-		bool GenerateObjectMetadata() {
+		bool GenerateMetadata() {
             const auto& MagicEngineClasss =     MagicGeneralPipelinedData::Get().GetRefMagicEngineClasss();
-            auto& MagicObjectMetadatas =        MagicObjectBuildData::Get().GetRefMagicObjectMetadatas();
+            auto& generatedMetadata = MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
             std::unordered_set<std::string> AllArea;
             std::vector<LocalMetaData> MetaDatas;
 
@@ -361,16 +273,12 @@ namespace Object {
             // 为每个文件生成对应的生成信息 之后生成元数据
             for (const auto& Area : AllArea) 
             {
-                std::vector<std::string> CurrentAreaAllClass;
-                LoaclGenerateOptionalInformationMap OptionalMap;
                 std::map<std::string, size_t> GenerateInformationMap_GetClassId;
                 std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
-                std::map<std::string, std::string> GenerateInformationMap_ObjectSwitch;
                 // 校验参数是否正确
                 for (size_t y = 0; y < MagicEngineClasss.size(); y++) {
                     auto& MagicEngineClass = MagicEngineClasss[y];
 
-                    std::vector<std::string> MagicClassTypeEnum;
                     if (Area == MagicEngineClass.headerName) {
                         std::vector<LocalValidateParameter> TargetParameter = {
                             {MagicEngineClass.className,true},      // 第一个参数是输入class的Name
@@ -380,23 +288,6 @@ namespace Object {
                         if (!ValidateParameters(TargetParameter, MagicEngineClass.GenerateBody)) // 参数校验
                             return false;
 
-                        // 记录当前文件的所有使用MHT的Class
-                        CurrentAreaAllClass.push_back(MagicEngineClass.className);
-                        // 填充Map
-                        for (size_t i = 0; i < MagicEngineClass.ClassType.size(); i++)
-                        {
-                            auto& ClassType = MagicEngineClass.ClassType[i];
-                            if (ClassType == "MSERIALIZATION") {
-                                OptionalMap.GenerateInformationMap_Serialize[MagicEngineClass.className] = MagicEngineClass.members;
-                                MagicClassTypeEnum.push_back("Core::ObjectSwitch::Serialization");
-                            }
-                            else if (ClassType == "MREFLECTION") {
-                                OptionalMap.GenerateInformationMap_Reflection[MagicEngineClass.className] = MagicEngineClass.members;
-                                MagicClassTypeEnum.push_back("Core::ObjectSwitch::Reflection");
-                            }
-                        }
-
-                        GenerateInformationMap_ObjectSwitch[MagicEngineClass.className] = JoinStrings(MagicClassTypeEnum);
                         GenerateInformationMap_GetClassId[MagicEngineClass.className] = GlobalAutoincrementedValue();
                         GenerateInformationMap_ObjectTag[MagicEngineClass.className] = std::hash<std::string>{}(MagicEngineClass.className); // Use hash of class name as unique tag
                     }
@@ -404,23 +295,16 @@ namespace Object {
 
                 // 生成元数据
                 std::vector<LocalMetadataSource> Sources;
-                std::string src_EmptyMacros               = GenerateEmptyMacros(CurrentAreaAllClass);
-                std::string src_UndefMacros               = GenerateUndefMacros(MagicObjectBuildData::Get().GetRefAllUndefMacros());
+                std::string src_UndefMacros               = GenerateUndefMacros(MagicGeneralPipelinedData::Get().GetRefAllUndefMacros());
                 std::string src_ClassBodyFunction         = GenerateClassBodyFunction();
                 std::string src_ClassGetClassIdMacros     = GenerateClassIdSpecificMacros(GenerateInformationMap_GetClassId);
                 std::string src_ObjectTagMacros           = GenerateObjectTagSpecificMacros(GenerateInformationMap_ObjectTag);
-                std::string src_ObjectSwitchMacros        = GenerateObjectSwitchSpecificMacros(GenerateInformationMap_ObjectSwitch);
-                // Optional
-                std::string src_ClassSerializeMacros      = GenerateClassSerializationMacros(OptionalMap.GenerateInformationMap_Serialize);
 
                 // 构造原始元数据
-                Sources.push_back({ src_EmptyMacros ,               false });
                 Sources.push_back({ src_UndefMacros ,               false });
                 Sources.push_back({ src_ClassBodyFunction ,         true  });
                 Sources.push_back({ src_ClassGetClassIdMacros ,     false });
                 Sources.push_back({ src_ObjectTagMacros ,           false });
-                Sources.push_back({ src_ObjectSwitchMacros ,        false });
-                Sources.push_back({ src_ClassSerializeMacros ,      false });
                 MetaDatas.emplace_back().SetSources(Sources, Area);
             }
 
@@ -481,7 +365,7 @@ namespace Object {
                     }
                 }
 
-                MagicObjectMetadatas.push_back({ MetaData.headerName , MetaData.Metadata,ModelName });
+                generatedMetadata.push_back({ MetaData.headerName, MetaData.Metadata, ModelName });
             }
 
 			return true;

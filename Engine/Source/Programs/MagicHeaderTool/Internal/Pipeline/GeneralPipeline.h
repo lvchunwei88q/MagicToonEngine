@@ -30,7 +30,7 @@ namespace MHT {
 
 	struct MagicEngineClass {
 		std::vector<MemberVariable> members;	// members
-		std::vector<std::string> ClassType;		// class Required function
+		std::vector<std::string> ClassType;		// class Required function	Abilities unlocked by class
 		std::vector<std::string> GenerateBody;	// class Required function
 		std::string headerName;					// src
 		std::string moudelName;					// model
@@ -50,20 +50,31 @@ namespace MHT {
 		MagicEngineClass() {}
 	};
 
+	struct GeneratedHeader {
+		std::string headerName;
+		std::string contents;
+		std::string moduleName;
+	};
+
 	class MagicGeneralPipelinedData : public Singleton<MagicGeneralPipelinedData>
 	{
 		std::vector<MagicEngineHeader>		m_MagicEngineHeaders;
 		std::vector<MagicEngineClass>		m_MagicEngineClasss;
+		std::vector<GeneratedHeader>		m_GeneratedHeaders;
+		std::vector<std::string>			m_AllUndefMacros = { "GetClassName" };
 
 		std::wstring m_GeneratePath;
 	public:
 		GENERATE_PROPERTY(MagicEngineHeaders, std::vector<MagicEngineHeader>);
 		GENERATE_PROPERTY(MagicEngineClasss, std::vector<MagicEngineClass>);
+		GENERATE_PROPERTY(GeneratedHeaders, std::vector<GeneratedHeader>);
 		GENERATE_PROPERTY(GeneratePath, std::wstring);
+		GENERATE_GET_REF(AllUndefMacros, std::vector<std::string>);
 
 		void clearAll() {
 			m_MagicEngineHeaders.clear();
 			m_MagicEngineClasss.clear();
+			m_GeneratedHeaders.clear();
 		}
 	};
 	using MagicGPD = decltype(MagicGeneralPipelinedData::Get());
@@ -71,6 +82,8 @@ namespace MHT {
 	namespace GeneralPipeline {
 		bool FindEngineClass();
 		bool FindClassMember();
+		bool GenerateMetadata();
+		bool GenerateMetadataFile();
 
 		bool RunBuildPipeline(); // for object build pipeline
 	}

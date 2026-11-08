@@ -4,7 +4,7 @@
  * @brief Build tool development mode switch (0: disabled, 1: enabled).
  * @details When enabled, the build tool outputs additional runtime debug information to help troubleshoot issues.
  */
-#define MAGIC_DEV 0
+#define MAGIC_DEV 1
 
 /**
  * @brief Maximum number of files that a single job (batch) can process.

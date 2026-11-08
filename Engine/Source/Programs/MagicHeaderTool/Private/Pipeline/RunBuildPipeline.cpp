@@ -2,7 +2,7 @@
 
 // -------------------------------- Pipelines
 #include "Pipeline/GeneralPipeline.h"
-#include "Pipeline/ObjectPipeline.h"
+#include "Pipeline/AbilityPipeline.h"
 // --------------------------------
 
 namespace MHT{
@@ -19,7 +19,7 @@ namespace MHT{
 		}
 		Utilitie::Log::Info("Pipeline construction successfully, In found Class stage Time: " + std::to_string(GTimer.elapsed_ms()) + "ms");
 		if (!ctx.IsNeedGenerate())goto end;
-		
+
 		GTimer.start(); // Reset the timer
 
 		if (!GeneralPipeline::FindClassMember()) {
@@ -28,31 +28,45 @@ namespace MHT{
 		}
 		Utilitie::Log::Info("Pipeline construction successfully, In found Class Member stage Time: " + std::to_string(GTimer.elapsed_ms()) + "ms");
 		if (!ctx.IsNeedGenerate())goto end;
-		
+
 		GTimer.start(); // Reset the timer
 
-		// ------------------------------------------- 
+		if (!GeneralPipeline::GenerateMetadata()) {
+			Utilitie::Log::Error("An error occurred during the metadata generation phase of building the pipeline");
+			return false;
+		}
+		Utilitie::Log::Info("Pipeline construction successfully, In metadata generation Time: " + std::to_string(GTimer.elapsed_ms()) + "ms");
+		if (!ctx.IsNeedGenerate())goto end;
 
-		{ // Object
-			if (!Object::Pipeline::GenerateObjectMetadata()) {
-				Utilitie::Log::Error("An error occurred during the Object metadata generation phase of building the pipeline");
+		GTimer.start(); // Reset the timer
+
+		{	// Ability Metadata Generation
+			if (!Ability::Pipeline::GenerateObjectSwitchMetadata()) {
+				Utilitie::Log::Error("An error occurred during object switch metadata generation");
 				return false;
 			}
-			Utilitie::Log::Info("Pipeline construction successfully, In Generate Object Metadata Time: " + std::to_string(GTimer.elapsed_ms()) + "ms");
-			if (!ctx.IsNeedGenerate())goto end;
-			
-			GTimer.start(); // Reset the timer
-
-			if (!Object::Pipeline::GenerateMetadataFile()) {
-				Utilitie::Log::Error("An error occurred during the Class Member-finding phase of the build pipeline");
+			if (!Ability::Pipeline::GenerateSerializationMetadata()) {
+				Utilitie::Log::Error("An error occurred during serialization metadata generation");
 				return false;
 			}
-			Utilitie::Log::Info("Pipeline construction successfully, In Generate metadata file Time: " + std::to_string(GTimer.elapsed_ms()) + "ms");
+			if (!Ability::Pipeline::GenerateDelegateMetadata()) {
+				Utilitie::Log::Error("An error occurred during delegate metadata generation");
+				return false;
+			}
+			Utilitie::Log::Info("Ability metadata generated in " + std::to_string(GTimer.elapsed_ms()) + "ms");
 			if (!ctx.IsNeedGenerate())goto end;
-			
-			GTimer.start(); // Reset the timer
 		}
 
+		GTimer.start(); // Reset the timer
+
+		if (!GeneralPipeline::GenerateMetadataFile()) {
+			Utilitie::Log::Error("An error occurred while writing generated metadata");
+			return false;
+		}
+		Utilitie::Log::Info("Pipeline construction successfully, In Generate metadata file Time: " + std::to_string(GTimer.elapsed_ms()) + "ms");
+		if (!ctx.IsNeedGenerate())goto end;
+
+		GTimer.start(); // Reset the timer
 		// -------------------------------------------
 
 	end:
