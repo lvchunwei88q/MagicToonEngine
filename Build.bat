@@ -49,12 +49,6 @@ if "%CONFIG%"=="Debug" (
 
 set "BUILD_DIR=%PROJECT_ROOT%\out\Ninja_%BUILD_TYPE%"
 
-:: Remove the old cache to avoid architecture conflicts.
-if exist "%BUILD_DIR%" (
-    echo Removing old build cache...
-    rmdir /s /q "%BUILD_DIR%"
-)
-
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 cd /d "%BUILD_DIR%"
 

@@ -58,7 +58,7 @@ git lfs pull
 
 根据选择，脚本会自动生成并构建项目，并输出到对应的 `Binary` 目录。Visual Studio 构建使用 x64 架构；选择 Ninja 时，脚本会生成 `compile_commands.json`，并复制到 `out\compile_commands.json`，供 clangd 等 IDE 工具使用。
 
-> Ninja 配置会在构建前清理对应的 `out\Ninja_Debug` 或 `out\Ninja_Release` 目录。每次运行后，`out\compile_commands.json` 会更新为本次所选配置对应的编译命令。
+> Ninja 配置会复用对应的 `out\Ninja_Debug` 或 `out\Ninja_Release` 构建目录，因此后续构建可以只重新编译有变化的文件。每次运行后，`out\compile_commands.json` 会更新为本次所选配置对应的编译命令。如需完全重新构建，可手动删除对应的构建目录。
 
 也可以手动使用 CMake 配置构建，例如：
 

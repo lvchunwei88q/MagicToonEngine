@@ -58,7 +58,7 @@ The script will prompt for:
 
 The selected configuration will be generated and built automatically, and the output will be placed in the corresponding `Binary` directory. Visual Studio builds use the x64 architecture. When Ninja is selected, the script generates `compile_commands.json` and copies it to `out\compile_commands.json` for IDE tools such as clangd.
 
-> Before configuring a Ninja build, the script removes the corresponding `out\Ninja_Debug` or `out\Ninja_Release` directory. After each run, `out\compile_commands.json` contains the compile commands for the selected configuration.
+> Ninja builds reuse the corresponding `out\Ninja_Debug` or `out\Ninja_Release` directory, so subsequent builds only recompile changed files. After each run, `out\compile_commands.json` contains the compile commands for the selected configuration. To perform a clean rebuild, delete the corresponding build directory manually.
 
 You can also configure the project manually with CMake:
 
