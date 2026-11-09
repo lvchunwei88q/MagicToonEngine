@@ -31,12 +31,12 @@ public:
 
     explicit BinaryWriter(const std::vector<uint8_t>& data)
         : m_Data(data)
-        , m_WriteOffset(0)
+        , m_WriteOffset(data.size())
         , m_CurrentSize(data.size()) {}
 
     explicit BinaryWriter(std::vector<uint8_t>&& data) noexcept
         : m_Data(std::move(data))
-        , m_WriteOffset(0)
+        , m_WriteOffset(m_Data.size())
         , m_CurrentSize(m_Data.size()) {}
 
     // copy construction
