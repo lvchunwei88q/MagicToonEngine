@@ -237,12 +237,12 @@ namespace MHT {
 			const std::vector<CompileCommandData>& commands,
 			const MagicEngineHeader& header)
 		{
+			const std::filesystem::path headerPath =
+				std::filesystem::u8path(header.headerName);
+			const std::string normalizedHeaderPath = NormalizePath(
+				std::filesystem::absolute(headerPath).string());
 			const std::filesystem::path moduleRoot =
 				FindModuleRoot(header.headerName, header.moudelName);
-			if (moduleRoot.empty())
-			{
-				return nullptr;
-			}
 
 			const CompileCommandData* bestCommand = nullptr;
 			size_t bestDirectoryLength = 0;
@@ -252,6 +252,16 @@ namespace MHT {
 				const std::filesystem::path absoluteSource = sourcePath.is_absolute()
 					? sourcePath
 					: std::filesystem::u8path(command.directory) / sourcePath;
+				if (NormalizePath(std::filesystem::absolute(absoluteSource).string()) ==
+					normalizedHeaderPath)
+				{
+					return &command;
+				}
+
+				if (moduleRoot.empty())
+				{
+					continue;
+				}
 				if (!IsPathWithinDirectory(absoluteSource, moduleRoot))
 				{
 					continue;
@@ -620,13 +630,25 @@ namespace MHT {
 			std::vector<std::string> params;
 			for (const std::string& line : lines)
 			{
-				if ((IsIncludeDirective(line) &&
-					line.find(".object.generate.h") != std::string::npos) ||
-					ParseMacro(line, "MCLASS", params) ||
-					ParseMacro(line, "GENERATE_BODY", params) ||
+				if (IsIncludeDirective(line) &&
+					line.find(".object.generate.h") != std::string::npos)
+				{
+					source << "#undef GetClassName\n";
+				}
+				else if (ParseMacro(line, "MCLASS", params) ||
 					ParseMacro(line, "MMEMBER", params))
 				{
 					source << '\n';
+				}
+				else if (ParseMacro(line, "GENERATE_BODY", params))
+				{
+					source << "public: "
+						<< "virtual std::string GetClassName() const override; "
+						<< "virtual uint64_t GetClassId() const override; "
+						<< "virtual uint64_t GetClassHas() const override; "
+						<< "virtual Core::ObjectType GetClassType() const override; "
+						<< "virtual Core::ObjectSwitch GetClassSwitch() const override; "
+						<< "void generate_object_init_func_();\n";
 				}
 				else
 				{
