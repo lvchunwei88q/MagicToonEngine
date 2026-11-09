@@ -60,6 +60,8 @@ git lfs pull
 
 > Ninja 配置会复用对应的 `out\Ninja_Debug` 或 `out\Ninja_Release` 构建目录，因此后续构建可以只重新编译有变化的文件。每次运行后，`out\compile_commands.json` 会更新为本次所选配置对应的编译命令。如需完全重新构建，可手动删除对应的构建目录。
 
+`MagicHeaderTool` 使用 CMake 在运行 MHT 前从当前构建目录生成的编译数据库副本 `out\engine_mht_generate\engine_generate_info\engine_compile_commands.buildmeta` 解析头文件；它不会读取供 IDE 使用的 `out\compile_commands.json`。此解析数据库由 CMake 的 Ninja/Makefile 生成器提供。解析结果还包括每个含 `MCLASS(...)` 的目标头文件对应的 `.ast` 语法树，以及记录类、函数、访问级别和 `MMEMBER(...)` 成员变量的 `engine_class_info.txt`。Clang 遇到头文件错误时会停止生成。
+
 也可以手动使用 CMake 配置构建，例如：
 
 ```powershell

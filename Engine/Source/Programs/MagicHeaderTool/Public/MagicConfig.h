@@ -50,6 +50,19 @@
 #define MAGICENGINE_HEADER_TIME_CHECK_FILE "engine_headers_time_check_file.buildmeta"
 
 /**
+ * @brief Path to the engine class info file (wide-character version).
+ * @details A fixed file path used to store class information.
+ */
+#define MAGICENGINE_CLASS_INFO_FILE_W L"engine_class_info.log"
+
+/**
+ * @brief Path to the engine class info file (narrow-character version).
+ * @details A fixed path corresponding to MAGICENGINE_CLASS_INFO_FILE_W.
+ */
+#define MAGICENGINE_CLASS_INFO_FILE "engine_class_info.log"
+
+
+/**
  * @brief Path to the engine class metadata debug file (wide-character version).
  * @details A fixed file path used for debugging the generation of Engine class metadata.
  */

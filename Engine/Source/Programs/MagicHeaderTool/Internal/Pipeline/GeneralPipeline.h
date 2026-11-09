@@ -6,7 +6,7 @@
 #include "MagicUtilities.h" 
 
 namespace MHT {
-	// 所有数据都保存在这个单例中，方便在不同的阶段访问和修改
+	// All the data is stored in this singleton, making it easy to access and modify at different stages.
 	struct MagicEngineHeader
 	{
 		std::string headerName;
@@ -18,14 +18,42 @@ namespace MHT {
 		MagicEngineHeader() {}
 	};
 
-	// 所有用于记录行数的值我们默认都是从0开始的，方便计算和使用
+	// All values used to record row numbers start from 0 by default.
 	struct MemberVariable {
 		std::string name;			// 名称
 		std::string type;			// 类型
-		size_t lineNum;				// 在头文件中的行数
+		std::string access;
+		std::vector<std::string> annotationParams;
+		size_t lineNum = 0;			// 在头文件中的行数
 
-		MemberVariable(std::string name, std::string type, size_t lineNum) : name(name), type(type), lineNum(lineNum) {}
+		MemberVariable(std::string name, std::string type, size_t lineNum,
+			std::string access = {})
+			: name(name), type(type), access(access), lineNum(lineNum) {}
 		MemberVariable() {}
+	};
+
+	struct MagicClassFunction {
+		std::string name;
+		std::string signature;
+		std::string access;
+		size_t lineNum = 0;
+	};
+
+	struct MagicClassInfo {
+		std::string className;
+		std::string qualifiedName;
+		std::string kind;
+		std::string headerName;
+		size_t lineNum = 0;				// Zero-based class declaration line
+		size_t endLineNum = 0;			// Zero-based class end line
+		bool isDefinition = false;
+		bool hasMClass = false;
+		bool hasGenerateBody = false;
+		std::vector<std::string> mclassParams;
+		std::vector<std::string> generateBodyParams;
+		std::vector<std::string> baseClasses;
+		std::vector<MemberVariable> members;	// Member declaration lineNum values are zero-based
+		std::vector<MagicClassFunction> functions;
 	};
 
 	struct MagicEngineClass {
@@ -35,7 +63,7 @@ namespace MHT {
 		std::string headerName;					// src
 		std::string moudelName;					// model
 		std::string className;					// class
-		size_t lineNum;							// line number in header file
+		size_t lineNum = 0;						// Zero-based MCLASS line in header file
 
 		MagicEngineClass(const std::vector<std::string>& ClassType,
 			const std::vector<std::string>& GenerateBody,
@@ -60,26 +88,32 @@ namespace MHT {
 	{
 		std::vector<MagicEngineHeader>		m_MagicEngineHeaders;
 		std::vector<MagicEngineClass>		m_MagicEngineClasss;
+		std::vector<MagicClassInfo>			m_MagicClasses;
 		std::vector<GeneratedHeader>		m_GeneratedHeaders;
 		std::vector<std::string>			m_AllUndefMacros = { "GetClassName" };
 
 		std::wstring m_GeneratePath;
+		std::string m_CompileCommandsPath;
 	public:
 		GENERATE_PROPERTY(MagicEngineHeaders, std::vector<MagicEngineHeader>);
 		GENERATE_PROPERTY(MagicEngineClasss, std::vector<MagicEngineClass>);
+		GENERATE_PROPERTY(MagicClasses, std::vector<MagicClassInfo>);
 		GENERATE_PROPERTY(GeneratedHeaders, std::vector<GeneratedHeader>);
 		GENERATE_PROPERTY(GeneratePath, std::wstring);
+		GENERATE_PROPERTY(CompileCommandsPath, std::string);
 		GENERATE_GET_REF(AllUndefMacros, std::vector<std::string>);
 
 		void clearAll() {
 			m_MagicEngineHeaders.clear();
 			m_MagicEngineClasss.clear();
+			m_MagicClasses.clear();
 			m_GeneratedHeaders.clear();
 		}
 	};
 	using MagicGPD = decltype(MagicGeneralPipelinedData::Get());
 
 	namespace GeneralPipeline {
+		bool FindClass();
 		bool FindEngineClass();
 		bool FindClassMember();
 		bool OutputMagicEngineClassInfo();

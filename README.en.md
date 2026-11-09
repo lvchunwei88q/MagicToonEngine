@@ -60,6 +60,8 @@ The selected configuration will be generated and built automatically, and the ou
 
 > Ninja builds reuse the corresponding `out\Ninja_Debug` or `out\Ninja_Release` directory, so subsequent builds only recompile changed files. After each run, `out\compile_commands.json` contains the compile commands for the selected configuration. To perform a clean rebuild, delete the corresponding build directory manually.
 
+Before running MHT, CMake copies the compilation database from the active build directory to `out\engine_mht_generate\engine_generate_info\engine_compile_commands.buildmeta`. MHT reads this dedicated file, not `out\compile_commands.json` copied for IDE tooling. CMake's Ninja/Makefile generators provide the compilation database. Other outputs are written to the same `engine_generate_info` directory: one `.ast` syntax tree per target header containing `MCLASS(...)`, plus `engine_class_info.txt` describing classes, functions, access levels, and members annotated with `MMEMBER(...)`. Clang errors in a header stop generation.
+
 You can also configure the project manually with CMake:
 
 ```powershell
