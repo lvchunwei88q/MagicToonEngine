@@ -1,10 +1,7 @@
 #include "Pipeline/GeneralPipeline.h"
 
 #include <algorithm>
-#include <fstream>
-#include <filesystem>
 #include <string_view>
-#include <system_error>
 #include <vector>
 
 namespace MHT {
@@ -170,94 +167,6 @@ namespace MHT {
 			return nullptr;
 		}
 
-		bool WriteClassInfoReport(const std::vector<MagicClassInfo>& classes)
-		{
-			const std::filesystem::path reportPath =
-				std::filesystem::path(MagicGeneralPipelinedData::Get().GetGeneratePath())
-				/ MAGICENGINE_FILE_INFO_PATH
-				/ MAGICENGINE_CLASS_INFO_FILE;
-			std::error_code directoryError;
-			std::filesystem::create_directories(reportPath.parent_path(), directoryError);
-			if (directoryError)
-			{
-				Utilitie::Log::Error(
-					"Could not create class information directory: " +
-					directoryError.message());
-				return false;
-			}
-			std::ofstream report(reportPath, std::ios::binary | std::ios::trunc);
-			if (!report)
-			{
-				Utilitie::Log::Error("Could not write class information report: " + reportPath.string());
-				return false;
-			}
-
-			for (const MagicClassInfo& classInfo : classes)
-			{
-				report << "Class: " << classInfo.qualifiedName << '\n'
-					<< "Kind: " << classInfo.kind << '\n'
-					<< "Header: " << classInfo.headerName << '\n'
-					<< "Line: " << classInfo.lineNum + 1 << '\n'
-					<< "MCLASS: yes";
-				for (size_t i = 0; i < classInfo.mclassParams.size(); ++i)
-				{
-					report << (i == 0 ? " (" : ", ") << classInfo.mclassParams[i];
-				}
-				if (!classInfo.mclassParams.empty())
-				{
-					report << ')';
-				}
-				report << "\nGENERATE_BODY: yes";
-				for (size_t i = 0; i < classInfo.generateBodyParams.size(); ++i)
-				{
-					report << (i == 0 ? " (" : ", ") << classInfo.generateBodyParams[i];
-				}
-				if (!classInfo.generateBodyParams.empty())
-				{
-					report << ')';
-				}
-				report << "\nBases:";
-				for (const std::string& base : classInfo.baseClasses)
-				{
-					report << ' ' << base;
-				}
-				report << "\nFunctions:\n";
-				for (const MagicClassFunction& function : classInfo.functions)
-				{
-					report << "  [" << function.access << "] "
-						<< function.signature << " (line " << function.lineNum + 1 << ")\n";
-				}
-				report << "MMEMBER variables:\n";
-				for (const MemberVariable& member : classInfo.members)
-				{
-					if (!member.hasMMember)
-					{
-						continue;
-					}
-					report << "  [" << member.access << "] "
-						<< member.type << ' ' << member.name
-						<< " (line " << member.lineNum << ") MMEMBER(";
-					for (size_t i = 0; i < member.annotationParams.size(); ++i)
-					{
-						if (i != 0)
-						{
-							report << ", ";
-						}
-						report << member.annotationParams[i];
-					}
-					report << ")\n";
-				}
-				report << "\n";
-			}
-
-			report.close();
-			if (!report)
-			{
-				Utilitie::Log::Error("Failed while writing class information report: " + reportPath.string());
-				return false;
-			}
-			return true;
-		}
 	}
 
 	namespace GeneralPipeline {
@@ -340,7 +249,7 @@ namespace MHT {
 					"Member parsing found errors; class information report was not written");
 				return false;
 			}
-			return WriteClassInfoReport(classes);
+			return true;
 		}
 	}
 }
