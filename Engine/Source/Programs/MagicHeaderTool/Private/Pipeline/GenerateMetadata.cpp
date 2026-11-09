@@ -262,11 +262,26 @@ namespace MHT {
             auto& generatedMetadata = MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
             std::unordered_set<std::string> AllArea;
             std::vector<LocalMetaData> MetaDatas;
+            bool hasInvalidParameters = false;
 
             // 获取所有不重复的区域
             for (const auto& classInfo : classes)
             {
                 AllArea.insert(classInfo.headerName);
+                std::vector<LocalValidateParameter> targetParameters = {
+                    {classInfo.className,true},
+                    {"ObjectType",false},
+                };
+                if (!ValidateParameters(targetParameters, classInfo.generateBodyParams))
+                {
+                    hasInvalidParameters = true;
+                }
+            }
+            if (hasInvalidParameters)
+            {
+                Utilitie::Log::Error(
+                    "Metadata generation found invalid GENERATE_BODY parameters; see diagnostics above");
+                return false;
             }
 
             // 为每个文件生成对应的生成信息 之后生成元数据
@@ -274,17 +289,9 @@ namespace MHT {
             {
                 std::map<std::string, size_t> GenerateInformationMap_GetClassId;
                 std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
-                // 校验参数是否正确
+                // Build per-class metadata for this header.
                 for (const auto& classInfo : classes) {
                     if (Area == classInfo.headerName) {
-                        std::vector<LocalValidateParameter> TargetParameter = {
-                            {classInfo.className,true},      // 第一个参数是输入class的Name
-                            {"ObjectType",false},                   // 第二个参数是输入Object的属于谁
-                            // more ...
-                        };
-                        if (!ValidateParameters(TargetParameter, classInfo.generateBodyParams)) // 参数校验
-                            return false;
-
                         GenerateInformationMap_GetClassId[classInfo.className] = GlobalAutoincrementedValue();
                         GenerateInformationMap_ObjectTag[classInfo.className] = std::hash<std::string>{}(classInfo.className); // Use hash of class name as unique tag
                     }

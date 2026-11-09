@@ -1,5 +1,6 @@
 #include "Pipeline/GeneralPipeline.h"
 #include <IO.h>
+#include <exception>
 
 namespace MHT 
 {
@@ -52,12 +53,23 @@ namespace MHT
 
             // Write to or add to a file
             std::string debugText = oss.str();
-            if(IO::Exists(ClassDebugFilePath)){
-                IO::AppendText(ClassDebugFilePath, debugText);
+            try {
+                if(IO::Exists(ClassDebugFilePath)){
+                    IO::AppendText(ClassDebugFilePath, debugText);
+                }
+                else{
+                    if (!IO::CreateFile(ClassDebugFilePath)) {
+                        Utilitie::Log::Error("Could not create class metadata debug file");
+                        return false;
+                    }
+                    IO::WriteAllText(ClassDebugFilePath, debugText);
+                }
             }
-            else{
-                IO::CreateFile(ClassDebugFilePath);
-                IO::WriteAllText(ClassDebugFilePath, debugText);
+            catch (const std::exception& error) {
+                Utilitie::Log::Error(
+                    "Could not write class metadata debug file: " +
+                    std::string(error.what()));
+                return false;
             }
 
             return true;

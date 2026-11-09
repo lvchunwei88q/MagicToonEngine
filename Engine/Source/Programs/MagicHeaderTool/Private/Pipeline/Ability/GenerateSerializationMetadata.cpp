@@ -9,6 +9,7 @@ namespace Ability {
 		{
 			const auto& classes = MHT::MagicGeneralPipelinedData::Get().GetRefMagicClasses();
 			auto& generatedMetadata = MHT::MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
+			bool hasErrors = false;
 
 			for (const auto& engineClass : classes) {
 				const auto metadata = std::find_if(generatedMetadata.begin(), generatedMetadata.end(),
@@ -19,7 +20,8 @@ namespace Ability {
 					Utilitie::Log::Error(
 						"Could not find generated metadata for " + engineClass.className +
 						" in " + engineClass.headerName);
-					return false;
+					hasErrors = true;
+					continue;
 				}
 
 				std::ostringstream code;
@@ -80,7 +82,7 @@ namespace Ability {
 				metadata->contents += "\n\n";
 			}
 
-			return true;
+			return !hasErrors;
 		}
 	}
 }

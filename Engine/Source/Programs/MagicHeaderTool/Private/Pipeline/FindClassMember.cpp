@@ -266,6 +266,7 @@ namespace MHT {
 			auto& pipelineData = MagicGeneralPipelinedData::Get();
 			auto& classes = pipelineData.GetRefMagicClasses();
 			const auto& headers = pipelineData.GetRefMagicEngineHeaders();
+			bool hasErrors = false;
 
 			for (MagicClassInfo& classInfo : classes)
 			{
@@ -274,7 +275,8 @@ namespace MHT {
 				{
 					Utilitie::Log::Error(
 						"Source lines are missing for " + classInfo.headerName);
-					return false;
+					hasErrors = true;
+					continue;
 				}
 
 				for (MemberVariable& member : classInfo.members)
@@ -302,7 +304,8 @@ namespace MHT {
 				if (header == nullptr)
 				{
 					Utilitie::Log::Error("Class source data is missing for " + classInfo.className);
-					return false;
+					hasErrors = true;
+					continue;
 				}
 
 				for (size_t line = classInfo.lineNum;
@@ -326,11 +329,17 @@ namespace MHT {
 						Utilitie::Log::Error(
 							"libclang could not resolve declaration after MMEMBER in " +
 							classInfo.headerName + " Line:" + std::to_string(line + 1));
-						return false;
+						hasErrors = true;
 					}
 				}
 			}
 
+			if (hasErrors)
+			{
+				Utilitie::Log::Error(
+					"Member parsing found errors; class information report was not written");
+				return false;
+			}
 			return WriteClassInfoReport(classes);
 		}
 	}

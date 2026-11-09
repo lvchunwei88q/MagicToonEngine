@@ -50,16 +50,15 @@ namespace MHT{
 		GTimer.start(); // Reset the timer
 
 		{	// Ability Metadata Generation
-			if (!Ability::Pipeline::GenerateObjectSwitchMetadata()) {
-				Utilitie::Log::Error("An error occurred during object switch metadata generation");
-				return false;
-			}
-			if (!Ability::Pipeline::GenerateSerializationMetadata()) {
-				Utilitie::Log::Error("An error occurred during serialization metadata generation");
-				return false;
-			}
-			if (!Ability::Pipeline::GenerateDelegateMetadata()) {
-				Utilitie::Log::Error("An error occurred during delegate metadata generation");
+			const bool objectSwitchSucceeded =
+				Ability::Pipeline::GenerateObjectSwitchMetadata();
+			const bool serializationSucceeded =
+				Ability::Pipeline::GenerateSerializationMetadata();
+			const bool delegatesSucceeded =
+				Ability::Pipeline::GenerateDelegateMetadata();
+			if (!objectSwitchSucceeded || !serializationSucceeded || !delegatesSucceeded) {
+				Utilitie::Log::Error(
+					"One or more ability metadata generators failed; see diagnostics above");
 				return false;
 			}
 			Utilitie::Log::Info("Ability metadata generated in " + std::to_string(GTimer.elapsed_ms()) + "ms");

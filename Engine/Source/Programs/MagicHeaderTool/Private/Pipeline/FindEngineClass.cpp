@@ -838,7 +838,8 @@ namespace MHT {
 			const std::vector<MagicEngineHeader>& allHeaders,
 			const std::vector<CompileCommandData>& compileCommands,
 			const std::vector<size_t>& mClassDeclarationLines,
-			std::vector<MagicClassInfo>& outClasses)
+			std::vector<MagicClassInfo>& outClasses,
+			std::unordered_set<std::string>& failedHeaders)
 		{
 			const CompileCommandData* compileCommand =
 				FindModuleCompileCommand(compileCommands, header);
@@ -847,12 +848,14 @@ namespace MHT {
 				Utilitie::Log::Error(
 					"No compile command found for module " + header.moudelName +
 					" while parsing " + header.headerName);
+				failedHeaders.insert(header.headerName);
 				return false;
 			}
 
 			std::vector<std::string> arguments;
 			if (!BuildClangArguments(*compileCommand, arguments))
 			{
+				failedHeaders.insert(header.headerName);
 				return false;
 			}
 			std::vector<std::string> includePaths;
@@ -903,6 +906,7 @@ namespace MHT {
 				Utilitie::Log::Error(
 					"libclang failed to parse header: " + header.headerName +
 					" (error " + std::to_string(static_cast<int>(result)) + ")");
+				failedHeaders.insert(header.headerName);
 				return false;
 			}
 
@@ -925,6 +929,7 @@ namespace MHT {
 			}
 			if (hasErrors)
 			{
+				failedHeaders.insert(header.headerName);
 				clang_disposeTranslationUnit(translationUnit);
 				return false;
 			}
@@ -936,6 +941,7 @@ namespace MHT {
 			{
 				Utilitie::Log::Error(
 					"Could not create AST output directory: " + directoryError.message());
+				failedHeaders.insert(header.headerName);
 				clang_disposeTranslationUnit(translationUnit);
 				return false;
 			}
@@ -948,6 +954,7 @@ namespace MHT {
 				Utilitie::Log::Error(
 					"Could not save libclang AST for " + header.headerName +
 					" (error " + std::to_string(saveResult) + ")");
+				failedHeaders.insert(header.headerName);
 				clang_disposeTranslationUnit(translationUnit);
 				return false;
 			}
@@ -982,7 +989,8 @@ namespace MHT {
 
 		bool ParseHeadersWithLibClang(
 			const std::vector<MagicEngineHeader>& headers,
-			std::vector<MagicClassInfo>& outClasses)
+			std::vector<MagicClassInfo>& outClasses,
+			std::unordered_set<std::string>& failedHeaders)
 		{
 			const std::filesystem::path compileCommandsPath =
 				GetCompileCommandsPath();
@@ -1029,10 +1037,10 @@ namespace MHT {
 					headers,
 					compileCommands,
 					mClassDeclarationLines,
-					outClasses))
+					outClasses,
+					failedHeaders))
 				{
-					clang_disposeIndex(index);
-					return false;
+					continue;
 				}
 			}
 
@@ -1064,13 +1072,20 @@ namespace MHT {
 			MGC context = MagicGlobalContext::Get();
 			const auto& headers = MagicGeneralPipelinedData::Get().GetRefMagicEngineHeaders();
 			std::vector<MagicClassInfo> parsedClasses;
-			if (!ParseHeadersWithLibClang(headers, parsedClasses))
+			std::unordered_set<std::string> failedHeaders;
+			if (!ParseHeadersWithLibClang(headers, parsedClasses, failedHeaders))
 			{
 				return false;
 			}
 
+			bool hasErrors = !failedHeaders.empty();
 			for (const MagicEngineHeader& header : headers)
 			{
+				if (failedHeaders.contains(header.headerName))
+				{
+					continue;
+				}
+
 				for (size_t line = 0; line < header.lines.size(); ++line)
 				{
 					std::vector<std::string> classParams;
@@ -1091,7 +1106,8 @@ namespace MHT {
 						Utilitie::Log::Error(
 							"libclang could not find a class declaration after MCLASS: " +
 							header.headerName + " Line:" + std::to_string(line + 1));
-						return false;
+						hasErrors = true;
+						continue;
 					}
 
 					std::vector<std::string> bodyParams;
@@ -1101,7 +1117,8 @@ namespace MHT {
 						Utilitie::Log::Error(
 							"No valid GENERATE_BODY was found in class " +
 							classInfo->className + " in " + header.headerName);
-						return false;
+						hasErrors = true;
+						continue;
 					}
 
 					classInfo->mclassParams = classParams;
@@ -1111,6 +1128,12 @@ namespace MHT {
 			}
 
 			MagicGeneralPipelinedData::Get().SetMagicClasses(parsedClasses);
+			if (hasErrors)
+			{
+				Utilitie::Log::Error(
+					"Class parsing found errors; see the diagnostics above for all affected headers/classes");
+				return false;
+			}
 			if (parsedClasses.empty())
 			{
 				context.SetGenerateCompleted();
