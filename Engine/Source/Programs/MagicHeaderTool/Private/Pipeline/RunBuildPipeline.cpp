@@ -31,6 +31,15 @@ namespace MHT{
 
 		GTimer.start(); // Reset the timer
 
+		if (!GeneralPipeline::OutputMagicEngineClassInfo()) {
+			Utilitie::Log::Error("An error occurred during the debug data writing stage of the build process");
+			return false;
+		}
+		Utilitie::Log::Info("Pipeline construction successfully, Time during the generation of debug files: " + std::to_string(GTimer.elapsed_ms()) + "ms");
+		if (!ctx.IsNeedGenerate())goto end;
+
+		GTimer.start(); // Reset the timer
+
 		if (!GeneralPipeline::GenerateMetadata()) {
 			Utilitie::Log::Error("An error occurred during the metadata generation phase of building the pipeline");
 			return false;
@@ -70,6 +79,7 @@ namespace MHT{
 		// -------------------------------------------
 
 	end:
+		Utilitie::Log::Info("The current task has been completed.");
 		return true;
 	}
 }

@@ -305,20 +305,6 @@ namespace MHT {
 			}
 			MagicGeneralPipelinedData::Get().SetMagicEngineClasss(order_magicEngineClasss);
 
-#if MAGIC_DEV
-			// print out the sorted classes and their members for debugging
-			for (size_t a = 0; a < order_magicEngineClasss.size(); a++) {
-				auto& OrderClass = order_magicEngineClasss[a];
-				std::cout << OrderClass.className << std::endl;
-				for (size_t i = 0; i < OrderClass.members.size(); i++)
-				{
-					auto& members = OrderClass.members[i];
-					std::cout << "   " << members.type << " - ";
-					std::cout << members.name << std::endl;
-				}
-			}
-#endif
-
 			return true;
 		}
 	}

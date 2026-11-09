@@ -82,6 +82,7 @@ namespace MHT {
 	namespace GeneralPipeline {
 		bool FindEngineClass();
 		bool FindClassMember();
+		bool OutputMagicEngineClassInfo();
 		bool GenerateMetadata();
 		bool GenerateMetadataFile();
 

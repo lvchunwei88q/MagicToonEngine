@@ -4,7 +4,7 @@
  * @brief Build tool development mode switch (0: disabled, 1: enabled).
  * @details When enabled, the build tool outputs additional runtime debug information to help troubleshoot issues.
  */
-#define MAGIC_DEV 1
+#define MAGIC_DEV 0
 
 /**
  * @brief Maximum number of files that a single job (batch) can process.
@@ -48,3 +48,15 @@
  * @details A fixed path corresponding to MAGICENGINE_HEADER_TIME_CHECK_FILE_W.
  */
 #define MAGICENGINE_HEADER_TIME_CHECK_FILE "engine_headers_time_check_file.buildmeta"
+
+/**
+ * @brief Path to the engine class metadata debug file (wide-character version).
+ * @details A fixed file path used for debugging the generation of Engine class metadata.
+ */
+#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W L"engine_class_metadata_debug_file.buildmeta"
+
+/**
+ * @brief Path to the engine class metadata debug file (narrow-character version).
+ * @details A fixed path corresponding to MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W.
+ */
+#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE "engine_class_metadata_debug_file.buildmeta"
