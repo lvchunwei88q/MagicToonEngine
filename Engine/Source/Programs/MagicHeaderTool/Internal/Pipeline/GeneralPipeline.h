@@ -24,6 +24,7 @@ namespace MHT {
 		std::string type;			// 类型
 		std::string access;
 		std::vector<std::string> annotationParams;
+		bool hasMMember = false;
 		size_t lineNum = 0;			// 在头文件中的行数
 
 		MemberVariable(std::string name, std::string type, size_t lineNum,
@@ -44,6 +45,7 @@ namespace MHT {
 		std::string qualifiedName;
 		std::string kind;
 		std::string headerName;
+		std::string moduleName;
 		size_t lineNum = 0;				// Zero-based class declaration line
 		size_t endLineNum = 0;			// Zero-based class end line
 		bool isDefinition = false;
@@ -56,28 +58,6 @@ namespace MHT {
 		std::vector<MagicClassFunction> functions;
 	};
 
-	struct MagicEngineClass {
-		std::vector<MemberVariable> members;	// members
-		std::vector<std::string> ClassType;		// class Required function	Abilities unlocked by class
-		std::vector<std::string> GenerateBody;	// class Required function
-		std::string headerName;					// src
-		std::string moudelName;					// model
-		std::string className;					// class
-		size_t lineNum = 0;						// Zero-based MCLASS line in header file
-
-		MagicEngineClass(const std::vector<std::string>& ClassType,
-			const std::vector<std::string>& GenerateBody,
-			const std::string& headerName,
-			const std::string& moudelName,
-			const std::string& className,
-			size_t lineNum)
-			: members(), ClassType(ClassType), GenerateBody(GenerateBody),
-			headerName(headerName), moudelName(moudelName),
-			className(className), lineNum(lineNum) {}
-
-		MagicEngineClass() {}
-	};
-
 	struct GeneratedHeader {
 		std::string headerName;
 		std::string contents;
@@ -87,7 +67,6 @@ namespace MHT {
 	class MagicGeneralPipelinedData : public Singleton<MagicGeneralPipelinedData>
 	{
 		std::vector<MagicEngineHeader>		m_MagicEngineHeaders;
-		std::vector<MagicEngineClass>		m_MagicEngineClasss;
 		std::vector<MagicClassInfo>			m_MagicClasses;
 		std::vector<GeneratedHeader>		m_GeneratedHeaders;
 		std::vector<std::string>			m_AllUndefMacros = { "GetClassName" };
@@ -96,7 +75,6 @@ namespace MHT {
 		std::string m_CompileCommandsPath;
 	public:
 		GENERATE_PROPERTY(MagicEngineHeaders, std::vector<MagicEngineHeader>);
-		GENERATE_PROPERTY(MagicEngineClasss, std::vector<MagicEngineClass>);
 		GENERATE_PROPERTY(MagicClasses, std::vector<MagicClassInfo>);
 		GENERATE_PROPERTY(GeneratedHeaders, std::vector<GeneratedHeader>);
 		GENERATE_PROPERTY(GeneratePath, std::wstring);
@@ -105,7 +83,6 @@ namespace MHT {
 
 		void clearAll() {
 			m_MagicEngineHeaders.clear();
-			m_MagicEngineClasss.clear();
 			m_MagicClasses.clear();
 			m_GeneratedHeaders.clear();
 		}

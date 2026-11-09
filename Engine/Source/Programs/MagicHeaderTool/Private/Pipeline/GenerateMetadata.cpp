@@ -258,16 +258,17 @@ namespace MHT {
 	}
 
 		bool GenerateMetadata() {
-            const auto& MagicEngineClasss =     MagicGeneralPipelinedData::Get().GetRefMagicEngineClasss();
+            const auto& classes = MagicGeneralPipelinedData::Get().GetRefMagicClasses();
             auto& generatedMetadata = MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
             std::unordered_set<std::string> AllArea;
             std::vector<LocalMetaData> MetaDatas;
 
             // 获取所有不重复的区域
-            for (size_t i = 0; i < MagicEngineClasss.size(); i++)
+            for (const auto& classInfo : classes)
             {
-                auto& MagicEngineClass = MagicEngineClasss[i];
-                AllArea.insert(MagicEngineClass.headerName);
+                if (classInfo.hasMClass) {
+                    AllArea.insert(classInfo.headerName);
+                }
             }
 
             // 为每个文件生成对应的生成信息 之后生成元数据
@@ -276,20 +277,18 @@ namespace MHT {
                 std::map<std::string, size_t> GenerateInformationMap_GetClassId;
                 std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
                 // 校验参数是否正确
-                for (size_t y = 0; y < MagicEngineClasss.size(); y++) {
-                    auto& MagicEngineClass = MagicEngineClasss[y];
-
-                    if (Area == MagicEngineClass.headerName) {
+                for (const auto& classInfo : classes) {
+                    if (classInfo.hasMClass && Area == classInfo.headerName) {
                         std::vector<LocalValidateParameter> TargetParameter = {
-                            {MagicEngineClass.className,true},      // 第一个参数是输入class的Name
+                            {classInfo.className,true},      // 第一个参数是输入class的Name
                             {"ObjectType",false},                   // 第二个参数是输入Object的属于谁
                             // more ...
                         };
-                        if (!ValidateParameters(TargetParameter, MagicEngineClass.GenerateBody)) // 参数校验
+                        if (!ValidateParameters(TargetParameter, classInfo.generateBodyParams)) // 参数校验
                             return false;
 
-                        GenerateInformationMap_GetClassId[MagicEngineClass.className] = GlobalAutoincrementedValue();
-                        GenerateInformationMap_ObjectTag[MagicEngineClass.className] = std::hash<std::string>{}(MagicEngineClass.className); // Use hash of class name as unique tag
+                        GenerateInformationMap_GetClassId[classInfo.className] = GlobalAutoincrementedValue();
+                        GenerateInformationMap_ObjectTag[classInfo.className] = std::hash<std::string>{}(classInfo.className); // Use hash of class name as unique tag
                     }
                 }
 
@@ -357,11 +356,10 @@ namespace MHT {
                 auto& MetaData = MetaDatas[i];
 
                 std::string ModelName = "NOT";
-                for (size_t y = 0; y < MagicEngineClasss.size(); y++)
+                for (const auto& classInfo : classes)
                 {
-                   const auto& MagicEngineClass = MagicEngineClasss[y];
-                    if (MagicEngineClass.headerName == MetaData.headerName) {
-                        ModelName = MagicEngineClass.moudelName;
+                    if (classInfo.hasMClass && classInfo.headerName == MetaData.headerName) {
+                        ModelName = classInfo.moduleName;
                     }
                 }
 

@@ -25,27 +25,31 @@ namespace MHT
         bool OutputMagicEngineClassInfo(){
             MGC ctx = MagicGlobalContext::Get();
             MagicGeneralPipelinedData& pipelineData = MagicGeneralPipelinedData::Get();
-            const auto& order_magicEngineClasss = pipelineData.GetRefMagicEngineClasss();
+            const auto& classes = pipelineData.GetRefMagicClasses();
 
             std::wstring ClassDebugFilePath = ctx.GetgenerateDir() + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\" MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W;
             std::ostringstream oss;
             // Write the current time to the debug file
             oss << "[Info] " << WriteTime() << "\n";
-            for (size_t a = 0; a < order_magicEngineClasss.size(); a++) {
-                auto& OrderClass = order_magicEngineClasss[a];
+            for (const auto& classInfo : classes) {
+                if (!classInfo.hasMClass) {
+                    continue;
+                }
     #if MAGIC_DEV
-                std::cout << OrderClass.className << std::endl;
+                std::cout << classInfo.className << std::endl;
     #endif
-                oss << OrderClass.className << "\n";
-                for (size_t i = 0; i < OrderClass.members.size(); i++)
+                oss << classInfo.className << "\n";
+                for (const auto& member : classInfo.members)
                 {
-                    auto& members = OrderClass.members[i];
+                    if (!member.hasMMember) {
+                        continue;
+                    }
     #if MAGIC_DEV
-                    std::cout << "   " << members.type << " - ";
-                    std::cout << members.name << std::endl;
+                    std::cout << "   " << member.type << " - ";
+                    std::cout << member.name << std::endl;
     #endif
-                    oss << "   " << members.type << " - ";
-                    oss << members.name << "\n";
+                    oss << "   " << member.type << " - ";
+                    oss << member.name << "\n";
                 }
             }
 

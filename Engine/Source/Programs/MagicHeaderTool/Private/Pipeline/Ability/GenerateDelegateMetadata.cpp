@@ -6,10 +6,13 @@ namespace Ability {
 	namespace Pipeline {
 		bool GenerateDelegateMetadata()
 		{
-			const auto& classes = MHT::MagicGeneralPipelinedData::Get().GetRefMagicEngineClasss();
+			const auto& classes = MHT::MagicGeneralPipelinedData::Get().GetRefMagicClasses();
 			auto& generatedMetadata = MHT::MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
 
 			for (const auto& engineClass : classes) {
+				if (!engineClass.hasMClass) {
+					continue;
+				}
 				const auto metadata = std::find_if(generatedMetadata.begin(), generatedMetadata.end(),
 					[&engineClass](const MHT::GeneratedHeader& candidate) {
 						return candidate.headerName == engineClass.headerName;
@@ -21,8 +24,8 @@ namespace Ability {
 					return false;
 				}
 
-				const bool hasDelegates = std::find(engineClass.ClassType.begin(), engineClass.ClassType.end(),
-					"MDELEGATES") != engineClass.ClassType.end();
+				const bool hasDelegates = std::find(engineClass.mclassParams.begin(), engineClass.mclassParams.end(),
+					"MDELEGATES") != engineClass.mclassParams.end();
 
 				// By default, add an empty implementation if this class has this capability enabled to override
 				metadata->contents += "#define GENERATE_DELEGATES_" + engineClass.className + "()";

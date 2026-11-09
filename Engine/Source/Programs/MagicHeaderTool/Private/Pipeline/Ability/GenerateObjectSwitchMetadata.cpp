@@ -7,10 +7,13 @@ namespace Ability {
 	namespace Pipeline {
 		bool GenerateObjectSwitchMetadata()
 		{
-			const auto& classes = MHT::MagicGeneralPipelinedData::Get().GetRefMagicEngineClasss();
+			const auto& classes = MHT::MagicGeneralPipelinedData::Get().GetRefMagicClasses();
 			auto& generatedMetadata = MHT::MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
 
 			for (const auto& engineClass : classes) {
+				if (!engineClass.hasMClass) {
+					continue;
+				}
 				const auto metadata = std::find_if(generatedMetadata.begin(), generatedMetadata.end(),
 					[&engineClass](const MHT::GeneratedHeader& candidate) {
 						return candidate.headerName == engineClass.headerName;
@@ -24,12 +27,12 @@ namespace Ability {
 
 				std::ostringstream code;
 				std::vector<std::string> objectSwitches;
-				if (std::find(engineClass.ClassType.begin(), engineClass.ClassType.end(),
-					"MSERIALIZATION") != engineClass.ClassType.end()) {
+				if (std::find(engineClass.mclassParams.begin(), engineClass.mclassParams.end(),
+					"MSERIALIZATION") != engineClass.mclassParams.end()) {
 					objectSwitches.emplace_back("Core::ObjectSwitch::Serialization");
 				}
-				if (std::find(engineClass.ClassType.begin(), engineClass.ClassType.end(),
-					"MDELEGATES") != engineClass.ClassType.end()) {
+				if (std::find(engineClass.mclassParams.begin(), engineClass.mclassParams.end(),
+					"MDELEGATES") != engineClass.mclassParams.end()) {
 					objectSwitches.emplace_back("Core::ObjectSwitch::Delegates");
 				}
 				// ... Add more object switches based on other class types if needed

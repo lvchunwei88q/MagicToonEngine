@@ -170,24 +170,7 @@ namespace MHT {
 			return nullptr;
 		}
 
-		const MagicClassInfo* FindParsedClass(
-			const std::vector<MagicClassInfo>& classes,
-			const MagicEngineClass& engineClass)
-		{
-			for (const MagicClassInfo& classInfo : classes)
-			{
-				if (classInfo.headerName == engineClass.headerName &&
-					classInfo.lineNum == engineClass.lineNum + 1)
-				{
-					return &classInfo;
-				}
-			}
-			return nullptr;
-		}
-
-		bool WriteClassInfoReport(
-			const std::vector<MagicEngineClass>& engineClasses,
-			const std::vector<MagicClassInfo>& parsedClasses)
+		bool WriteClassInfoReport(const std::vector<MagicClassInfo>& classes)
 		{
 			const std::filesystem::path reportPath =
 				std::filesystem::path(MagicGeneralPipelinedData::Get().GetGeneratePath())
@@ -209,56 +192,57 @@ namespace MHT {
 				return false;
 			}
 
-			for (const MagicEngineClass& engineClass : engineClasses)
+			for (const MagicClassInfo& classInfo : classes)
 			{
-				const MagicClassInfo* classInfo = FindParsedClass(parsedClasses, engineClass);
-				if (classInfo == nullptr)
+				if (!classInfo.hasMClass)
 				{
-					Utilitie::Log::Error(
-						"Could not find class details for report: " + engineClass.className);
-					return false;
+					continue;
 				}
 
-				report << "Class: " << classInfo->qualifiedName << '\n'
-					<< "Kind: " << classInfo->kind << '\n'
-					<< "Header: " << classInfo->headerName << '\n'
-					<< "Line: " << classInfo->lineNum + 1 << '\n'
+				report << "Class: " << classInfo.qualifiedName << '\n'
+					<< "Kind: " << classInfo.kind << '\n'
+					<< "Header: " << classInfo.headerName << '\n'
+					<< "Line: " << classInfo.lineNum + 1 << '\n'
 					<< "MCLASS: yes";
-				for (size_t i = 0; i < classInfo->mclassParams.size(); ++i)
+				for (size_t i = 0; i < classInfo.mclassParams.size(); ++i)
 				{
-					report << (i == 0 ? " (" : ", ") << classInfo->mclassParams[i];
+					report << (i == 0 ? " (" : ", ") << classInfo.mclassParams[i];
 				}
-				if (!classInfo->mclassParams.empty())
+				if (!classInfo.mclassParams.empty())
 				{
 					report << ')';
 				}
 				report << "\nGENERATE_BODY: "
-					<< (classInfo->hasGenerateBody ? "yes" : "no");
-				for (size_t i = 0; i < classInfo->generateBodyParams.size(); ++i)
+					<< (classInfo.hasGenerateBody ? "yes" : "no");
+				for (size_t i = 0; i < classInfo.generateBodyParams.size(); ++i)
 				{
-					report << (i == 0 ? " (" : ", ") << classInfo->generateBodyParams[i];
+					report << (i == 0 ? " (" : ", ") << classInfo.generateBodyParams[i];
 				}
-				if (!classInfo->generateBodyParams.empty())
+				if (!classInfo.generateBodyParams.empty())
 				{
 					report << ')';
 				}
 				report << "\nBases:";
-				for (const std::string& base : classInfo->baseClasses)
+				for (const std::string& base : classInfo.baseClasses)
 				{
 					report << ' ' << base;
 				}
 				report << "\nFunctions:\n";
-				for (const MagicClassFunction& function : classInfo->functions)
+				for (const MagicClassFunction& function : classInfo.functions)
 				{
 					report << "  [" << function.access << "] "
 						<< function.signature << " (line " << function.lineNum + 1 << ")\n";
 				}
 				report << "MMEMBER variables:\n";
-				for (const MemberVariable& member : engineClass.members)
+				for (const MemberVariable& member : classInfo.members)
 				{
+					if (!member.hasMMember)
+					{
+						continue;
+					}
 					report << "  [" << member.access << "] "
 						<< member.type << ' ' << member.name
-						<< " (line " << member.lineNum + 1 << ") MMEMBER(";
+						<< " (line " << member.lineNum << ") MMEMBER(";
 					for (size_t i = 0; i < member.annotationParams.size(); ++i)
 					{
 						if (i != 0)
@@ -286,66 +270,59 @@ namespace MHT {
 		bool FindClassMember()
 		{
 			auto& pipelineData = MagicGeneralPipelinedData::Get();
-			auto& engineClasses = pipelineData.GetRefMagicEngineClasss();
-			const auto& parsedClasses = pipelineData.GetRefMagicClasses();
+			auto& classes = pipelineData.GetRefMagicClasses();
 			const auto& headers = pipelineData.GetRefMagicEngineHeaders();
 
-			for (MagicEngineClass& engineClass : engineClasses)
+			for (MagicClassInfo& classInfo : classes)
 			{
-				engineClass.members.clear();
-				const MagicClassInfo* classInfo = FindParsedClass(parsedClasses, engineClass);
-				if (classInfo == nullptr)
+				if (!classInfo.hasMClass)
 				{
-					Utilitie::Log::Error(
-						"libclang class data is missing for " + engineClass.className +
-						" in " + engineClass.headerName);
-					return false;
+					continue;
 				}
 
-				const MagicEngineHeader* header = FindHeader(headers, engineClass.headerName);
+				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);
 				if (header == nullptr)
 				{
 					Utilitie::Log::Error(
-						"Source lines are missing for " + engineClass.headerName);
+						"Source lines are missing for " + classInfo.headerName);
 					return false;
 				}
 
-				for (const MemberVariable& parsedMember : classInfo->members)
+				for (MemberVariable& member : classInfo.members)
 				{
-					if (parsedMember.lineNum == 0 ||
-						parsedMember.lineNum >= header->lines.size())
+					member.hasMMember = false;
+					member.annotationParams.clear();
+					if (member.lineNum == 0 || member.lineNum >= header->lines.size())
 					{
 						continue;
 					}
 
 					std::vector<std::string> params;
-					const size_t markerLine = parsedMember.lineNum - 1;
-					if (!ParseMMember(header->lines[markerLine], params))
+					if (!ParseMMember(header->lines[member.lineNum - 1], params))
 					{
 						continue;
 					}
-					MemberVariable member(
-						parsedMember.name,
-						parsedMember.type,
-						markerLine,
-						parsedMember.access);
+					member.hasMMember = true;
 					member.annotationParams = std::move(params);
-					engineClass.members.push_back(std::move(member));
 				}
 			}
 
-			for (const MagicEngineClass& engineClass : engineClasses)
+			for (const MagicClassInfo& classInfo : classes)
 			{
-				const MagicClassInfo* classInfo = FindParsedClass(parsedClasses, engineClass);
-				const MagicEngineHeader* header = FindHeader(headers, engineClass.headerName);
-				if (classInfo == nullptr || header == nullptr)
+				if (!classInfo.hasMClass)
 				{
-					Utilitie::Log::Error("Class source data is missing for " + engineClass.className);
+					continue;
+				}
+
+				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);
+				if (header == nullptr)
+				{
+					Utilitie::Log::Error("Class source data is missing for " + classInfo.className);
 					return false;
 				}
 
-				for (size_t line = classInfo->lineNum;
-					line <= classInfo->endLineNum && line < header->lines.size();
+				for (size_t line = classInfo.lineNum;
+					line <= classInfo.endLineNum && line < header->lines.size();
 					++line)
 				{
 					std::vector<std::string> params;
@@ -355,22 +332,22 @@ namespace MHT {
 					}
 
 					const bool hasParsedMember = std::any_of(
-						classInfo->members.begin(),
-						classInfo->members.end(),
+						classInfo.members.begin(),
+						classInfo.members.end(),
 						[line](const MemberVariable& member) {
-							return member.lineNum == line + 1;
+							return member.lineNum == line + 1 && member.hasMMember;
 						});
 					if (!hasParsedMember)
 					{
 						Utilitie::Log::Error(
 							"libclang could not resolve declaration after MMEMBER in " +
-							engineClass.headerName + " Line:" + std::to_string(line + 1));
+							classInfo.headerName + " Line:" + std::to_string(line + 1));
 						return false;
 					}
 				}
 			}
 
-			return WriteClassInfoReport(engineClasses, parsedClasses);
+			return WriteClassInfoReport(classes);
 		}
 	}
 }

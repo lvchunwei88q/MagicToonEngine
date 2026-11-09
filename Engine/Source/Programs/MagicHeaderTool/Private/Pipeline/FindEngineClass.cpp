@@ -1068,7 +1068,6 @@ namespace MHT {
 				return false;
 			}
 
-			std::vector<MagicEngineClass> engineClasses;
 			for (const MagicEngineHeader& header : headers)
 			{
 				for (size_t line = 0; line < header.lines.size(); ++line)
@@ -1106,22 +1105,15 @@ namespace MHT {
 
 					classInfo->hasMClass = true;
 					classInfo->mclassParams = classParams;
+					classInfo->moduleName = header.moudelName;
 					classInfo->hasGenerateBody = true;
 					classInfo->generateBodyParams = bodyParams;
-
-					engineClasses.emplace_back(
-						classParams,
-						bodyParams,
-						header.headerName,
-						header.moudelName,
-						classInfo->className,
-						line);
 				}
 			}
 
 			MagicGeneralPipelinedData::Get().SetMagicClasses(parsedClasses);
-			MagicGeneralPipelinedData::Get().SetMagicEngineClasss(engineClasses);
-			if (engineClasses.empty())
+			if (std::none_of(parsedClasses.begin(), parsedClasses.end(),
+				[](const MagicClassInfo& classInfo) { return classInfo.hasMClass; }))
 			{
 				context.SetGenerateCompleted();
 			}
