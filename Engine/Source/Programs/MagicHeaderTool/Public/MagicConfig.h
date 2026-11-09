@@ -53,10 +53,10 @@
  * @brief Path to the engine class metadata debug file (wide-character version).
  * @details A fixed file path used for debugging the generation of Engine class metadata.
  */
-#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W L"engine_class_metadata_debug_file.buildmeta"
+#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W L"engine_class_metadata_debug_file.log"
 
 /**
  * @brief Path to the engine class metadata debug file (narrow-character version).
  * @details A fixed path corresponding to MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W.
  */
-#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE "engine_class_metadata_debug_file.buildmeta"
+#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE "engine_class_metadata_debug_file.log"
