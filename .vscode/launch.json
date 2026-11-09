@@ -23,6 +23,7 @@
                 "MagicEditor.exe",
                 "MagicLauncher.exe",
                 "Test/MagicTest-ObjectTest.exe",
+                "Test/MagicTest-LibClangTest.exe",
             ]
         }
     ]
