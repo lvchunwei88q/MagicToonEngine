@@ -266,9 +266,7 @@ namespace MHT {
             // 获取所有不重复的区域
             for (const auto& classInfo : classes)
             {
-                if (classInfo.hasMClass) {
-                    AllArea.insert(classInfo.headerName);
-                }
+                AllArea.insert(classInfo.headerName);
             }
 
             // 为每个文件生成对应的生成信息 之后生成元数据
@@ -278,7 +276,7 @@ namespace MHT {
                 std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
                 // 校验参数是否正确
                 for (const auto& classInfo : classes) {
-                    if (classInfo.hasMClass && Area == classInfo.headerName) {
+                    if (Area == classInfo.headerName) {
                         std::vector<LocalValidateParameter> TargetParameter = {
                             {classInfo.className,true},      // 第一个参数是输入class的Name
                             {"ObjectType",false},                   // 第二个参数是输入Object的属于谁
@@ -358,7 +356,7 @@ namespace MHT {
                 std::string ModelName = "NOT";
                 for (const auto& classInfo : classes)
                 {
-                    if (classInfo.hasMClass && classInfo.headerName == MetaData.headerName) {
+                    if (classInfo.headerName == MetaData.headerName) {
                         ModelName = classInfo.moduleName;
                     }
                 }

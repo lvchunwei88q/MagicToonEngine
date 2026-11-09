@@ -1118,7 +1118,6 @@ namespace MHT {
 						return false;
 					}
 
-					classInfo->hasMClass = true;
 					classInfo->mclassParams = classParams;
 					classInfo->moduleName = header.moudelName;
 					classInfo->hasGenerateBody = true;
@@ -1127,8 +1126,7 @@ namespace MHT {
 			}
 
 			MagicGeneralPipelinedData::Get().SetMagicClasses(parsedClasses);
-			if (std::none_of(parsedClasses.begin(), parsedClasses.end(),
-				[](const MagicClassInfo& classInfo) { return classInfo.hasMClass; }))
+			if (parsedClasses.empty())
 			{
 				context.SetGenerateCompleted();
 			}

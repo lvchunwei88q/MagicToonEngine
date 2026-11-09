@@ -10,9 +10,6 @@ namespace Ability {
 			auto& generatedMetadata = MHT::MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
 
 			for (const auto& engineClass : classes) {
-				if (!engineClass.hasMClass) {
-					continue;
-				}
 				const auto metadata = std::find_if(generatedMetadata.begin(), generatedMetadata.end(),
 					[&engineClass](const MHT::GeneratedHeader& candidate) {
 						return candidate.headerName == engineClass.headerName;

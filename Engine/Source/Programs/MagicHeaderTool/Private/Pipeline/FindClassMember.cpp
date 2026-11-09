@@ -194,11 +194,6 @@ namespace MHT {
 
 			for (const MagicClassInfo& classInfo : classes)
 			{
-				if (!classInfo.hasMClass)
-				{
-					continue;
-				}
-
 				report << "Class: " << classInfo.qualifiedName << '\n'
 					<< "Kind: " << classInfo.kind << '\n'
 					<< "Header: " << classInfo.headerName << '\n'
@@ -275,11 +270,6 @@ namespace MHT {
 
 			for (MagicClassInfo& classInfo : classes)
 			{
-				if (!classInfo.hasMClass)
-				{
-					continue;
-				}
-
 				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);
 				if (header == nullptr)
 				{
@@ -309,11 +299,6 @@ namespace MHT {
 
 			for (const MagicClassInfo& classInfo : classes)
 			{
-				if (!classInfo.hasMClass)
-				{
-					continue;
-				}
-
 				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);
 				if (header == nullptr)
 				{

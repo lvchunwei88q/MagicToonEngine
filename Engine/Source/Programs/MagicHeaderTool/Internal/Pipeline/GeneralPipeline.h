@@ -49,7 +49,6 @@ namespace MHT {
 		size_t lineNum = 0;				// Zero-based class declaration line
 		size_t endLineNum = 0;			// Zero-based class end line
 		bool isDefinition = false;
-		bool hasMClass = false;
 		bool hasGenerateBody = false;
 		std::vector<std::string> mclassParams;
 		std::vector<std::string> generateBodyParams;

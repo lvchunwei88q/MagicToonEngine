@@ -32,9 +32,6 @@ namespace MHT
             // Write the current time to the debug file
             oss << "[Info] " << WriteTime() << "\n";
             for (const auto& classInfo : classes) {
-                if (!classInfo.hasMClass) {
-                    continue;
-                }
     #if MAGIC_DEV
                 std::cout << classInfo.className << std::endl;
     #endif
