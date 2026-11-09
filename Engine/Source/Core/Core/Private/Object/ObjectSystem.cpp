@@ -35,13 +35,17 @@ namespace Core {
 
 	void ObjectSystem::RemoveObject(ObjectHandle Handle)
 	{
-		size_t index = Handle.GetIndex();
 		std::lock_guard<std::mutex> lock(m_mutex);
-		if (Objects.empty() || index >= Objects.size()) {
+		size_t index = Handle.GetIndex();
+		if (index >= Objects.size()) {
 			return;  // Invalid index
 		}
+		// Identity verification: a mismatch constitutes a dirty handle
+		if (Objects[index].Handle != Handle) return;
+
 		if (index < Objects.size() - 1) {
 			std::swap(Objects[index], Objects.back());  // Swap to the tail
+			Objects[index].Handle.UpdateIndex(index);
 		}
 		Objects.pop_back();  // delete tail
 	}

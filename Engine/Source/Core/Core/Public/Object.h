@@ -166,17 +166,24 @@ namespace Core {
 		: id(id), index(index), Type(Type) {}
 
 		bool operator==(const ObjectHandle& other) const {
-			return index == other.index && Type == other.Type && id == other.id;
+			return id == other.id
+				&& index == other.index
+				&& Type == other.Type;
+		}
+
+		bool operator!=(const ObjectHandle& other) const {
+			return !(*this == other);
 		}
 
 		const size_t GetId()		const { return id;		}
 		const size_t GetIndex()		const { return index;	}
+		void UpdateIndex(size_t newIndex){ index = newIndex;}
 		const ObjectType GetType()	const { return Type;	}
 
 	private:
 		// this object in objectSystem postion
-		size_t id;
-		size_t index;
+		size_t id		=0;
+		size_t index	=0;
 		ObjectType Type = ObjectType::Unknown;
 	};
 
