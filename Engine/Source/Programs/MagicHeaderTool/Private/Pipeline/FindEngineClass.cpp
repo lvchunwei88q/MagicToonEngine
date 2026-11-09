@@ -750,7 +750,6 @@ namespace MHT {
 					classInfo.headerName = context.targetHeaderName;
 					classInfo.lineNum = start.line == 0 ? 0 : start.line - 1;
 					classInfo.endLineNum = end.line == 0 ? classInfo.lineNum : end.line - 1;
-					classInfo.isDefinition = clang_isCursorDefinition(cursor) != 0;
 					const size_t classIndex = context.classes.size();
 					context.classIndices.emplace(clang_hashCursor(cursor), classIndex);
 					context.classes.push_back(std::move(classInfo));
@@ -1060,19 +1059,6 @@ namespace MHT {
 	}
 
 	namespace GeneralPipeline {
-		bool FindClass()
-		{
-			std::vector<MagicClassInfo> classes;
-			if (!ParseHeadersWithLibClang(
-				MagicGeneralPipelinedData::Get().GetRefMagicEngineHeaders(),
-				classes))
-			{
-				return false;
-			}
-			MagicGeneralPipelinedData::Get().SetMagicClasses(classes);
-			return true;
-		}
-
 		bool FindEngineClass()
 		{
 			MGC context = MagicGlobalContext::Get();
@@ -1120,7 +1106,6 @@ namespace MHT {
 
 					classInfo->mclassParams = classParams;
 					classInfo->moduleName = header.moudelName;
-					classInfo->hasGenerateBody = true;
 					classInfo->generateBodyParams = bodyParams;
 				}
 			}

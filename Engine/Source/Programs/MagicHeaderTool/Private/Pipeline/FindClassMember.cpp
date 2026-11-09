@@ -207,8 +207,7 @@ namespace MHT {
 				{
 					report << ')';
 				}
-				report << "\nGENERATE_BODY: "
-					<< (classInfo.hasGenerateBody ? "yes" : "no");
+				report << "\nGENERATE_BODY: yes";
 				for (size_t i = 0; i < classInfo.generateBodyParams.size(); ++i)
 				{
 					report << (i == 0 ? " (" : ", ") << classInfo.generateBodyParams[i];

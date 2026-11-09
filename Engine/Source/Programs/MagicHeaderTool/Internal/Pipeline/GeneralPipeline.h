@@ -48,8 +48,6 @@ namespace MHT {
 		std::string moduleName;
 		size_t lineNum = 0;				// Zero-based class declaration line
 		size_t endLineNum = 0;			// Zero-based class end line
-		bool isDefinition = false;
-		bool hasGenerateBody = false;
 		std::vector<std::string> mclassParams;
 		std::vector<std::string> generateBodyParams;
 		std::vector<std::string> baseClasses;
@@ -89,7 +87,6 @@ namespace MHT {
 	using MagicGPD = decltype(MagicGeneralPipelinedData::Get());
 
 	namespace GeneralPipeline {
-		bool FindClass();
 		bool FindEngineClass();
 		bool FindClassMember();
 		bool OutputMagicEngineClassInfo();
