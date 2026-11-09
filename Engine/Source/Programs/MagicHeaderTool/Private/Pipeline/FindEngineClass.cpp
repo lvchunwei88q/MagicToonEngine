@@ -15,6 +15,7 @@
 #include <string_view>
 #include <system_error>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace MHT {
@@ -721,6 +722,7 @@ namespace MHT {
 		{
 			std::string targetFile;
 			std::string targetHeaderName;
+			std::unordered_set<size_t> mClassDeclarationLines;
 			std::vector<MagicClassInfo> classes;
 			std::unordered_map<unsigned, size_t> classIndices;
 		};
@@ -836,6 +838,7 @@ namespace MHT {
 			const MagicEngineHeader& header,
 			const std::vector<MagicEngineHeader>& allHeaders,
 			const std::vector<CompileCommandData>& compileCommands,
+			const std::vector<size_t>& mClassDeclarationLines,
 			std::vector<MagicClassInfo>& outClasses)
 		{
 			const CompileCommandData* compileCommand =
@@ -953,11 +956,22 @@ namespace MHT {
 			const std::string targetFile = NormalizePath(
 				std::filesystem::absolute(
 					std::filesystem::u8path(header.headerName)).string());
-			ParseContext context{ targetFile, header.headerName, {}, {} };
+			ParseContext context{
+				targetFile,
+				header.headerName,
+				std::unordered_set<size_t>(
+					mClassDeclarationLines.begin(), mClassDeclarationLines.end()),
+				{},
+				{}
+			};
 			clang_visitChildren(
 				clang_getTranslationUnitCursor(translationUnit),
 				VisitClassAndMember,
 				&context);
+
+			std::erase_if(context.classes, [&context](const MagicClassInfo& classInfo) {
+				return !context.mClassDeclarationLines.contains(classInfo.lineNum);
+			});
 
 			clang_disposeTranslationUnit(translationUnit);
 			outClasses.insert(
@@ -969,7 +983,6 @@ namespace MHT {
 
 		bool ParseHeadersWithLibClang(
 			const std::vector<MagicEngineHeader>& headers,
-			bool onlyHeadersWithMClass,
 			std::vector<MagicClassInfo>& outClasses)
 		{
 			const std::filesystem::path compileCommandsPath =
@@ -997,16 +1010,18 @@ namespace MHT {
 
 			for (const MagicEngineHeader& header : headers)
 			{
-				if (onlyHeadersWithMClass)
+				std::vector<size_t> mClassDeclarationLines;
+				std::vector<std::string> params;
+				for (size_t line = 0; line < header.lines.size(); ++line)
 				{
-					std::vector<std::string> params;
-					if (std::none_of(header.lines.begin(), header.lines.end(),
-						[&params](const std::string& line) {
-							return ParseMacro(line, "MCLASS", params);
-						}))
+					if (ParseMacro(header.lines[line], "MCLASS", params))
 					{
-						continue;
+						mClassDeclarationLines.push_back(line + 1);
 					}
+				}
+				if (mClassDeclarationLines.empty())
+				{
+					continue;
 				}
 
 				if (!ParseHeaderWithLibClang(
@@ -1014,6 +1029,7 @@ namespace MHT {
 					header,
 					headers,
 					compileCommands,
+					mClassDeclarationLines,
 					outClasses))
 				{
 					clang_disposeIndex(index);
@@ -1049,7 +1065,6 @@ namespace MHT {
 			std::vector<MagicClassInfo> classes;
 			if (!ParseHeadersWithLibClang(
 				MagicGeneralPipelinedData::Get().GetRefMagicEngineHeaders(),
-				false,
 				classes))
 			{
 				return false;
@@ -1063,7 +1078,7 @@ namespace MHT {
 			MGC context = MagicGlobalContext::Get();
 			const auto& headers = MagicGeneralPipelinedData::Get().GetRefMagicEngineHeaders();
 			std::vector<MagicClassInfo> parsedClasses;
-			if (!ParseHeadersWithLibClang(headers, true, parsedClasses))
+			if (!ParseHeadersWithLibClang(headers, parsedClasses))
 			{
 				return false;
 			}
