@@ -21,6 +21,7 @@ set(CONTENT_DIR ${CMAKE_SOURCE_DIR}/Engine/Content)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Binary/$<CONFIG>)
 # Set the output directory for generated files
 set(CMAKE_GENERATE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/engine_mht_generate)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(MAGIC_HEADER_TOOL_TARGET "MagicHeaderTool"    CACHE INTERNAL "MagicHeaderTool target name")
 set(MAGIC_HEADER_TOOL_RUN    "RunMagicHeaderTool" CACHE INTERNAL "MagicHeaderTool run name")
@@ -31,9 +32,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Write the list of header files into a text file, which will be used for generating reflection code in MHT
-set(HEADER_LIST_FILE "${CMAKE_GENERATE_OUTPUT_DIRECTORY}/engine_generate_info/engine_headers.buildmeta")
+set(ENGINE_GENERATE_INFO_DIRECTORY "${CMAKE_GENERATE_OUTPUT_DIRECTORY}/engine_generate_info")
+set(HEADER_LIST_FILE "${ENGINE_GENERATE_INFO_DIRECTORY}/engine_headers.buildmeta")
+set(ENGINE_COMPILE_COMMANDS_FILE "${ENGINE_GENERATE_INFO_DIRECTORY}/engine_compile_commands.buildmeta")
 set(GENERATE_HEADER_LINKPATH "")
-file(WRITE ${HEADER_LIST_FILE} "")
+file(MAKE_DIRECTORY "${ENGINE_GENERATE_INFO_DIRECTORY}")
+file(WRITE "${HEADER_LIST_FILE}" "")
 
 # Windows API use Unicode by default
 add_definitions(-DUNICODE -D_UNICODE)

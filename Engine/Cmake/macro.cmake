@@ -16,6 +16,9 @@ macro(BuildToolsModule)
 
     add_subdirectory("Engine/Source/Programs/${ModuleName}")
     add_custom_target(${MAGIC_HEADER_TOOL_RUN} ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_BINARY_DIR}/compile_commands.json"
+            "${ENGINE_COMPILE_COMMANDS_FILE}"
         COMMAND $<TARGET_FILE:${ModuleName}> ${ModuleArgs}
         DEPENDS ${ModuleName}
         COMMENT "Running ${ModuleName}..."
