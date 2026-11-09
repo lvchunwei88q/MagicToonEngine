@@ -219,10 +219,14 @@ namespace IO {
 
     bool CreateDirectory(const std::wstring& path) {
         fs::path p(path);
-        if (fs::exists(p)) {
-            return fs::is_directory(p);
+        std::error_code error;
+        fs::create_directories(p, error);
+        if (!error) {
+            return true;
         }
-        return fs::create_directories(p);
+
+        std::error_code statusError;
+        return fs::is_directory(p, statusError) && !statusError;
     }
 
     bool Exists(const std::wstring& path) {
