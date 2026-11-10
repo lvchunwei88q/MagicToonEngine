@@ -242,7 +242,10 @@ namespace MHT{
 
 		std::vector<MagicEngineHeader> MagicEngineHeaders;
 
-		std::vector<std::string> AllHeadersContent = Utilitie::ReadFilesParallel(HeaderDescriptorData.ArrayOfHeaderFilePaths);
+		std::vector<std::string> AllHeadersContent;
+		if (!Utilitie::ReadFilesParallel(HeaderDescriptorData.ArrayOfHeaderFilePaths, AllHeadersContent)) {
+			return false;
+		}
 		for (size_t i = 0; i < AllHeadersContent.size(); i++)
 		{
 			MagicEngineHeader magicHeader;

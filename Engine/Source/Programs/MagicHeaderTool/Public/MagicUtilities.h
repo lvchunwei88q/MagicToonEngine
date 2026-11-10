@@ -61,8 +61,8 @@ namespace Utilitie {
 
 	// Get file modification time
 	size_t GetFileModificationTime(const std::wstring& filepath);
-	// Read files in parallel
-	std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths);
+	// Read files in parallel, returning false if any file could not be read.
+	bool ReadFilesParallel(const std::vector<std::wstring>& filePaths, std::vector<std::string>& contents);
 }
 
 DISABLE_DLL_WARNINGS_POP;

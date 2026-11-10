@@ -102,6 +102,7 @@ namespace Core
         };
 
         void WorkerLoop();
+        void ExecuteTask(Task& task);
         bool TryRunOne(); // Returns true if a task was executed.
 
         uint8_t workerCount = 4u;

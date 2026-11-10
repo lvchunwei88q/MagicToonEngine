@@ -26,28 +26,50 @@ namespace Utilitie {
         return static_cast<size_t>(std::chrono::system_clock::to_time_t(sys_time));
     }
 
-    std::vector<std::string> ReadFilesParallel(const std::vector<std::wstring>& filePaths) {
-        std::vector<std::string> contents(filePaths.size());
+    bool ReadFilesParallel(const std::vector<std::wstring>& filePaths, std::vector<std::string>& contents) {
+        contents.resize(filePaths.size());
+        std::vector<std::string> errors(filePaths.size());
 
-        // Using JobSystem's ParallelFor to read files in parallel
         Core::JobSystem::Get().ParallelFor(
             static_cast<uint32_t>(filePaths.size()),
             [&](uint32_t index) {
                 std::ifstream file(filePaths[index], std::ios::binary);
-                if (file.is_open()) {
-                    // Get the size of the file
-                    file.seekg(0, std::ios::end);
-                    size_t size = static_cast<size_t>(file.tellg());
-                    file.seekg(0, std::ios::beg);
-
-                    contents[index].resize(size);
-                    file.read(&contents[index][0], size);
+                if (!file) {
+                    errors[index] = "Failed to open file: " + IO::ToNarrowString(filePaths[index]);
+                    return;
                 }
-                else {
-                    ThrowErrorMessage("Failed to open file: " + IO::ToNarrowString(filePaths[index]));
+
+                file.seekg(0, std::ios::end);
+                const std::streampos end = file.tellg();
+                if (end < 0) {
+                    errors[index] = "Failed to determine file size: " + IO::ToNarrowString(filePaths[index]);
+                    return;
+                }
+
+                const auto size = static_cast<std::streamsize>(end);
+                file.seekg(0, std::ios::beg);
+                if (!file) {
+                    errors[index] = "Failed to seek file: " + IO::ToNarrowString(filePaths[index]);
+                    return;
+                }
+
+                contents[index].resize(static_cast<size_t>(size));
+                if (size > 0) {
+                    file.read(contents[index].data(), size);
+                    if (!file) {
+                        errors[index] = "Failed to read file: " + IO::ToNarrowString(filePaths[index]);
+                    }
                 }
             }
         );
-        return contents;
+
+        bool succeeded = true;
+        for (const std::string& error : errors) {
+            if (!error.empty()) {
+                Log::Error(error);
+                succeeded = false;
+            }
+        }
+        return succeeded;
     }
 } // namespace IO
