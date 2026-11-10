@@ -10,6 +10,9 @@
 using namespace MHT;
 
 int main(int argc, char* argv[]) {
+    // Set initial line break
+    std::cout << "\n";
+    // Initialize the cmdline parser
     cmdline::parser parser;
 
     // Define command-line arguments
