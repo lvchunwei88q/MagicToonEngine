@@ -23,6 +23,7 @@ macro(BuildToolsModule)
             --compile-commands "${ENGINE_COMPILE_COMMANDS_FILE}"
         DEPENDS ${ModuleName}
         COMMENT "Running ${ModuleName}..."
+        USES_TERMINAL
     )
 endmacro()
 
