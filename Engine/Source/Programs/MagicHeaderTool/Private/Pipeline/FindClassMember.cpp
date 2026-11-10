@@ -6,16 +6,19 @@
 
 namespace MHT {
 	namespace {
-		bool ParseMMember(const std::string& line, std::vector<std::string>& outParams)
+		bool ParseMarker(
+			const std::string& line,
+			std::string_view markerName,
+			std::vector<std::string>& outParams)
 		{
-			const size_t macroPosition = line.find("MMEMBER");
+			const size_t macroPosition = line.find(markerName);
 			if (macroPosition == std::string::npos ||
 				line.find_first_not_of(" \t", 0) != macroPosition)
 			{
 				return false;
 			}
 
-			size_t position = macroPosition + std::string_view("MMEMBER").size();
+			size_t position = macroPosition + markerName.size();
 			while (position < line.size() && (line[position] == ' ' || line[position] == '\t'))
 			{
 				++position;
@@ -198,12 +201,32 @@ namespace MHT {
 					}
 
 					std::vector<std::string> params;
-					if (!ParseMMember(header->lines[member.lineNum - 1], params))
+					if (!ParseMarker(
+						header->lines[member.lineNum - 1], "MMEMBER", params))
 					{
 						continue;
 					}
 					member.hasMMember = true;
 					member.annotationParams = std::move(params);
+				}
+
+				for (MagicClassFunction& function : classInfo.functions)
+				{
+					function.hasMFunction = false;
+					function.annotationParams.clear();
+					if (function.lineNum == 0 || function.lineNum >= header->lines.size())
+					{
+						continue;
+					}
+
+					std::vector<std::string> params;
+					if (!ParseMarker(
+						header->lines[function.lineNum - 1], "MFUNCTION", params))
+					{
+						continue;
+					}
+					function.hasMFunction = true;
+					function.annotationParams = std::move(params);
 				}
 			}
 
@@ -222,23 +245,38 @@ namespace MHT {
 					++line)
 				{
 					std::vector<std::string> params;
-					if (!ParseMMember(header->lines[line], params))
+					if (ParseMarker(header->lines[line], "MMEMBER", params))
 					{
-						continue;
+						const bool hasParsedMember = std::any_of(
+							classInfo.members.begin(),
+							classInfo.members.end(),
+							[line](const MemberVariable& member) {
+								return member.lineNum == line + 1 && member.hasMMember;
+							});
+						if (!hasParsedMember)
+						{
+							Utilitie::Log::Error(
+								"libclang could not resolve declaration after MMEMBER in " +
+								classInfo.headerName + " Line:" + std::to_string(line + 1));
+							hasErrors = true;
+						}
 					}
-
-					const bool hasParsedMember = std::any_of(
-						classInfo.members.begin(),
-						classInfo.members.end(),
-						[line](const MemberVariable& member) {
-							return member.lineNum == line + 1 && member.hasMMember;
-						});
-					if (!hasParsedMember)
+					else if (ParseMarker(header->lines[line], "MFUNCTION", params))
 					{
-						Utilitie::Log::Error(
-							"libclang could not resolve declaration after MMEMBER in " +
-							classInfo.headerName + " Line:" + std::to_string(line + 1));
-						hasErrors = true;
+						const bool hasParsedFunction = std::any_of(
+							classInfo.functions.begin(),
+							classInfo.functions.end(),
+							[line](const MagicClassFunction& function) {
+								return function.lineNum == line + 1 &&
+									function.hasMFunction;
+							});
+						if (!hasParsedFunction)
+						{
+							Utilitie::Log::Error(
+								"libclang could not resolve declaration after MFUNCTION in " +
+								classInfo.headerName + " Line:" + std::to_string(line + 1));
+							hasErrors = true;
+						}
 					}
 				}
 			}
@@ -246,7 +284,7 @@ namespace MHT {
 			if (hasErrors)
 			{
 				Utilitie::Log::Error(
-					"Member parsing found errors; class information report was not written");
+					"Member/function marker parsing found errors");
 				return false;
 			}
 			return true;

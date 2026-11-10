@@ -637,7 +637,8 @@ namespace MHT {
 					source << "#undef GetClassName\n";
 				}
 				else if (ParseMacro(line, "MCLASS", params) ||
-					ParseMacro(line, "MMEMBER", params))
+					ParseMacro(line, "MMEMBER", params) ||
+					ParseMacro(line, "MFUNCTION", params))
 				{
 					source << '\n';
 				}

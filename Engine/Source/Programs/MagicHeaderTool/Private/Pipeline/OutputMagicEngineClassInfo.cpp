@@ -120,7 +120,21 @@ namespace MHT
 				{
 					classInfoReport << "  [" << function.access << "] "
 						<< function.signature << " (line "
-						<< function.lineNum + 1 << ")\n";
+						<< function.lineNum + 1 << ')';
+					if (function.hasMFunction)
+					{
+						classInfoReport << " MFUNCTION(";
+						for (size_t i = 0; i < function.annotationParams.size(); ++i)
+						{
+							if (i != 0)
+							{
+								classInfoReport << ", ";
+							}
+							classInfoReport << function.annotationParams[i];
+						}
+						classInfoReport << ')';
+					}
+					classInfoReport << '\n';
 				}
 				classInfoReport << "MMEMBER variables:\n";
 				for (const MemberVariable& member : classInfo.members)

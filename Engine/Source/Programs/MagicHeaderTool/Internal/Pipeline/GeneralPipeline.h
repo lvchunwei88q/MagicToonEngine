@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 #include <Utilities/Singleton.h>
 #include "MagicUtilities.h" 
 
@@ -37,7 +38,21 @@ namespace MHT {
 		std::string name;
 		std::string signature;
 		std::string access;
+		std::vector<std::string> annotationParams;
+		bool hasMFunction = false;
 		size_t lineNum = 0;
+
+		MagicClassFunction(
+			std::string name,
+			std::string signature,
+			std::string access,
+			size_t lineNum)
+			: name(std::move(name)),
+			signature(std::move(signature)),
+			access(std::move(access)),
+			lineNum(lineNum) {}
+
+		MagicClassFunction() = default;
 	};
 
 	struct MagicClassInfo {

@@ -97,6 +97,7 @@ enum {
 #define MCLASS(...)					// The class you want to serialize must be placed at the beginning of the class definition
 #define GENERATE_BODY()				// The member function implementation of the class to be serialized must be placed at the end of the class definition.
 #define MMEMBER(...)				// Member to serialize
+#define MFUNCTION(...)				// Function marker
 
 // --------------------------------------- Object Macro End ------------------------------------------ // 
 
