@@ -11,6 +11,8 @@ namespace MHT {
 			std::string_view markerName,
 			std::vector<std::string>& outParams)
 		{
+			// Parse a single-line MMEMBER/MFUNCTION marker and its parameters for matching
+			// markers to libclang declarations.
 			const size_t macroPosition = line.find(markerName);
 			if (macroPosition == std::string::npos ||
 				line.find_first_not_of(" \t", 0) != macroPosition)
@@ -180,6 +182,8 @@ namespace MHT {
 			const auto& headers = pipelineData.GetRefMagicEngineHeaders();
 			bool hasErrors = false;
 
+			// Copy annotation parameters from the preceding marker line to libclang members
+			// and functions.
 			for (MagicClassInfo& classInfo : classes)
 			{
 				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);
@@ -230,6 +234,7 @@ namespace MHT {
 				}
 			}
 
+			// Check every marker in each class body to ensure libclang resolved its declaration.
 			for (const MagicClassInfo& classInfo : classes)
 			{
 				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);

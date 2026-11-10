@@ -1018,6 +1018,7 @@ namespace MHT {
 
 			for (const MagicEngineHeader& header : headers)
 			{
+				// Record MCLASS lines so only classes directly following the marker are kept.
 				std::vector<size_t> mClassDeclarationLines;
 				std::vector<std::string> params;
 				for (size_t line = 0; line < header.lines.size(); ++line)
@@ -1074,6 +1075,8 @@ namespace MHT {
 			const auto& headers = MagicGeneralPipelinedData::Get().GetRefMagicEngineHeaders();
 			std::vector<MagicClassInfo> parsedClasses;
 			std::unordered_set<std::string> failedHeaders;
+			// Use libclang to read target class declarations, members, and functions;
+			// continue parsing other headers if one fails.
 			if (!ParseHeadersWithLibClang(headers, parsedClasses, failedHeaders))
 			{
 				return false;
@@ -1112,6 +1115,8 @@ namespace MHT {
 					}
 
 					std::vector<std::string> bodyParams;
+					// MCLASS describes class capabilities; GENERATE_BODY supplies the class name
+					// and object type used during code generation.
 					if (!ParseGenerateBody(header.lines, *classInfo, bodyParams) ||
 						bodyParams.empty())
 					{
