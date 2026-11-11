@@ -60,7 +60,7 @@ git lfs pull
 
 > Ninja 配置会复用对应的 `out\Ninja_Debug` 或 `out\Ninja_Release` 构建目录，因此后续构建可以只重新编译有变化的文件。每次运行后，`out\compile_commands.json` 会更新为本次所选配置对应的编译命令。如需完全重新构建，可手动删除对应的构建目录。
 
-`MagicHeaderTool` 使用 CMake 在运行 MHT 前从当前构建目录生成的编译数据库副本 `out\engine_mht_generate\engine_generate_info\engine_compile_commands.buildmeta` 解析头文件；它不会读取供 IDE 使用的 `out\compile_commands.json`。此解析数据库由 CMake 的 Ninja/Makefile 生成器提供。解析结果还包括每个含 `MCLASS(...)` 的目标头文件对应的 `.ast` 语法树，以及记录类、函数、访问级别和 `MMEMBER(...)` 成员变量的 `engine_class_info.log`。遇到 Clang 或标记解析错误时，MagicHeaderTool 会继续检查其他独立头文件/类，汇总诊断后再停止依赖该阶段结果的后续阶段；写生成头文件时也会尝试其他文件，并汇总所有写入错误。
+`MagicHeaderTool` 使用 CMake 在运行 MHT 前从当前构建目录生成的编译数据库副本 `out\engine_mht_generate\engine_generate_info\engine_compile_commands.buildmeta` 解析头文件；工具根据 `--generate-dir` 和 `MagicConfig.h` 中定义的文件名定位该副本，不会读取供 IDE 使用的 `out\compile_commands.json`。此解析数据库由 CMake 的 Ninja/Makefile 生成器提供。解析结果还包括每个含 `MCLASS(...)` 的目标头文件对应的 `.ast` 语法树，以及记录类、函数、访问级别和 `MMEMBER(...)` 成员变量的 `engine_class_info.log`。遇到 Clang 或标记解析错误时，MagicHeaderTool 会继续检查其他独立头文件/类，汇总诊断后再停止依赖该阶段结果的后续阶段；写生成头文件时也会尝试其他文件，并汇总所有写入错误。
 
 也可以手动使用 CMake 配置构建，例如：
 

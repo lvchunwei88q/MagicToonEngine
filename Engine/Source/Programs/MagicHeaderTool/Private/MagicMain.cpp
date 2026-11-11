@@ -17,8 +17,6 @@ int main(int argc, char* argv[]) {
 
     // Define command-line arguments
     parser.add<std::string>("generate-dir", 'g', "File directory for generating code", true, "");
-    parser.add<std::string>("compile-commands", 'c',
-        "CMake-generated compilation database for MHT", true, "");
     parser.add("help", '?', "Print help");
 
     // Parse the command-line arguments.
@@ -36,7 +34,6 @@ int main(int argc, char* argv[]) {
 
     // Get the generate directory from the parsed arguments
     std::string generateDir = parser.get<std::string>("generate-dir");
-    const std::string compileCommandsPath = parser.get<std::string>("compile-commands");
 	std::wstring generateDirW = IO::ToWideString(generateDir);
     std::wstring generateInfoFilePath = generateDirW + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\" MAGICENGINE_HEADER_INFO_FILE_W;
 
@@ -44,7 +41,6 @@ int main(int argc, char* argv[]) {
     MGC ctx = MagicGlobalContext::Get();
     ctx.SetgenerateDir(generateDirW);
     ctx.SetgenerateInfoFilePath(generateInfoFilePath);
-    MagicGeneralPipelinedData::Get().SetCompileCommandsPath(compileCommandsPath);
 
     // Initialize the Core Subsystem
     Core::SubsystemControl::Init();

@@ -82,15 +82,12 @@ namespace MHT {
 		std::vector<MagicClassInfo>			m_MagicClasses;
 		std::vector<GeneratedHeader>		m_GeneratedHeaders;
 		std::vector<std::string>			m_AllUndefMacros = { "GetClassName" };
-
 		std::wstring m_GeneratePath;
-		std::string m_CompileCommandsPath;
 	public:
 		GENERATE_PROPERTY(MagicEngineHeaders, std::vector<MagicEngineHeader>);
 		GENERATE_PROPERTY(MagicClasses, std::vector<MagicClassInfo>);
 		GENERATE_PROPERTY(GeneratedHeaders, std::vector<GeneratedHeader>);
 		GENERATE_PROPERTY(GeneratePath, std::wstring);
-		GENERATE_PROPERTY(CompileCommandsPath, std::string);
 		GENERATE_GET_REF(AllUndefMacros, std::vector<std::string>);
 
 		void clearAll() {

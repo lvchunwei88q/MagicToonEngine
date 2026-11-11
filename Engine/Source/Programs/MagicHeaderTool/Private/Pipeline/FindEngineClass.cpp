@@ -41,8 +41,10 @@ namespace MHT {
 
 		std::filesystem::path GetCompileCommandsPath()
 		{
-			return std::filesystem::u8path(
-				MagicGeneralPipelinedData::Get().GetCompileCommandsPath());
+			return std::filesystem::path(
+				MagicGeneralPipelinedData::Get().GetGeneratePath())
+				/ MAGICENGINE_FILE_INFO_PATH
+				/ MAGICENGINE_COMPILE_COMMANDS_FILE;
 		}
 
 		struct CompileCommandData
@@ -998,7 +1000,7 @@ namespace MHT {
 			if (!std::filesystem::is_regular_file(compileCommandsPath))
 			{
 				Utilitie::Log::Error(
-					"CMake-generated engine_compile_commands.buildmeta was not found at " +
+					"CMake-generated " MAGICENGINE_COMPILE_COMMANDS_FILE " was not found at " +
 					compileCommandsPath.string());
 				return false;
 			}

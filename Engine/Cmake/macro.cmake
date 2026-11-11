@@ -20,7 +20,6 @@ macro(BuildToolsModule)
             "${CMAKE_BINARY_DIR}/compile_commands.json"
             "${ENGINE_COMPILE_COMMANDS_FILE}"
         COMMAND $<TARGET_FILE:${ModuleName}> ${ModuleArgs}
-            --compile-commands "${ENGINE_COMPILE_COMMANDS_FILE}"
         DEPENDS ${ModuleName}
         COMMENT "Running ${ModuleName}..."
         USES_TERMINAL

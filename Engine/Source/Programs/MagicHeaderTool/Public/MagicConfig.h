@@ -38,6 +38,18 @@
 #define MAGICENGINE_HEADER_INFO_FILE "engine_headers.buildmeta"
 
 /**
+ * @brief Path to the engine compilation database file (wide-character version).
+ * @details A fixed file path used by the header tool to parse engine headers.
+ */
+#define MAGICENGINE_COMPILE_COMMANDS_FILE_W L"engine_compile_commands.buildmeta"
+
+/**
+ * @brief Path to the engine compilation database file (narrow-character version).
+ * @details A fixed path corresponding to MAGICENGINE_COMPILE_COMMANDS_FILE_W.
+ */
+#define MAGICENGINE_COMPILE_COMMANDS_FILE "engine_compile_commands.buildmeta"
+
+/**
  * @brief Path to the engine header timestamp check file (wide-character version).
  * @details A fixed file path used to record timestamps for incremental build checks.
  */
