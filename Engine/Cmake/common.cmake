@@ -13,7 +13,7 @@ if(MSVC)
 endif()
 
 # Define the third-party libraries directory
-set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/Engine/Thirdparty)
+set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/Engine/ThirdParty)
 # Define the content root directory
 set(CONTENT_DIR ${CMAKE_SOURCE_DIR}/Engine/Content)
 
