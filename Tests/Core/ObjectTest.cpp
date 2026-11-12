@@ -1,4 +1,4 @@
-#include "../Common/Test.h"
+#include "../Common/TestFramework.h"
 
 #include <Object.h>
 

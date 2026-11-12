@@ -124,25 +124,6 @@ macro(AddEngineTest TARGET_NAME)
     if(NOT BASE_OUTPUT_DIR)
         set(BASE_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif()
-    
-    # apply the output directory settings for the test target
-    set_target_properties(${TARGET_NAME} PROPERTIES 
-        RUNTIME_OUTPUT_DIRECTORY "${BASE_OUTPUT_DIR}/Test"
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${BASE_OUTPUT_DIR}/Test"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${BASE_OUTPUT_DIR}/Test"
-        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BASE_OUTPUT_DIR}/Test"
-        RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${BASE_OUTPUT_DIR}/Test"
-    )
-    # Because the core module is fixed, we copied the core module to the test directory
-    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:Core>"
-            "$<TARGET_FILE_DIR:${TARGET_NAME}>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:Lua>"
-            "$<TARGET_FILE_DIR:${TARGET_NAME}>"
-        VERBATIM
-    )
 endmacro()
 
 # =============================================== MHT tool ===============================================

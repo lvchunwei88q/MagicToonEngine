@@ -22,8 +22,8 @@
             "options": [
                 "MagicEditor.exe",
                 "MagicLauncher.exe",
-                "Test/MagicTest-ObjectTest.exe",
-                "Test/MagicTest-LibClangTest.exe",
+                "MagicTest-ObjectTest.exe",
+                "MagicTest-LibClangTest.exe",
             ]
         }
     ]
