@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common/Core_API.h"
+#include "Common/CORE_API.h"
 #include "Common/Checker.h"
 #include "Utilities/Singleton.h"
 #include "Utilities/BinaryRW.h"
