@@ -20,6 +20,11 @@
 
 namespace MHT {
 	namespace {
+		/**
+		 * Copy a libclang string into std::string and release its libclang-owned storage.
+		 * @param value The libclang string to copy and dispose.
+		 * @return The copied string, or an empty string if the input has no text.
+		 */
 		std::string ToString(CXString value)
 		{
 			const char* text = clang_getCString(value);
@@ -28,6 +33,11 @@ namespace MHT {
 			return result;
 		}
 
+		/**
+		 * Normalize a path for case-insensitive comparison.
+		 * @param path The path to normalize.
+		 * @return The lexically normalized path with forward slashes and lowercase characters.
+		 */
 		std::string NormalizePath(const std::string& path)
 		{
 			std::string normalized = std::filesystem::path(std::filesystem::u8path(path))
@@ -39,6 +49,10 @@ namespace MHT {
 			return normalized;
 		}
 
+		/**
+		 * Build the path to the CMake-generated compilation database.
+		 * @return The compilation database path under the configured generation directory.
+		 */
 		std::filesystem::path GetCompileCommandsPath()
 		{
 			return std::filesystem::path(
@@ -54,6 +68,12 @@ namespace MHT {
 			std::vector<std::string> arguments;
 		};
 
+		/**
+		 * Split a command-line string into arguments, handling quotes and Windows-style backslashes.
+		 * @param command The command-line string to split.
+		 * @param arguments Receives the parsed arguments; existing contents are cleared first.
+		 * @return True if at least one argument was parsed; otherwise false.
+		 */
 		bool ParseCommandLine(const std::string& command, std::vector<std::string>& arguments)
 		{
 			arguments.clear();
@@ -120,6 +140,12 @@ namespace MHT {
 			return !arguments.empty();
 		}
 
+		/**
+		 * Read and validate a compilation database in either arguments-array or command-string form.
+		 * @param buildMetaPath The path to the compilation database file.
+		 * @param outCommands Receives the parsed compile command entries.
+		 * @return True if the database was read and parsed successfully; otherwise false.
+		 */
 		bool LoadCompileCommands(const std::filesystem::path& buildMetaPath,
 			std::vector<CompileCommandData>& outCommands)
 		{
@@ -201,6 +227,12 @@ namespace MHT {
 			return true;
 		}
 
+		/**
+		 * Walk up from a header's directory to find the module root.
+		 * @param headerName The header path from which to begin the search.
+		 * @param moduleName The directory name identifying the module root.
+		 * @return The matching module root, or an empty path if none is found.
+		 */
 		std::filesystem::path FindModuleRoot(
 			const std::string& headerName,
 			const std::string& moduleName)
@@ -223,6 +255,12 @@ namespace MHT {
 			return {};
 		}
 
+		/**
+		 * Check whether a file is inside a directory, excluding paths that only share its name prefix.
+		 * @param filePath The file path to test.
+		 * @param directory The directory that should contain the file.
+		 * @return True if the file is a descendant of the directory; otherwise false.
+		 */
 		bool IsPathWithinDirectory(
 			const std::filesystem::path& filePath,
 			const std::filesystem::path& directory)
@@ -236,6 +274,12 @@ namespace MHT {
 				normalizedFile[normalizedDirectory.size()] == '/';
 		}
 
+		/**
+		 * Find a compile command for a header, falling back to a source file in its module.
+		 * @param commands The available compile command entries.
+		 * @param header The header whose compile command is being sought.
+		 * @return A pointer to the matching entry, or nullptr if no suitable command exists.
+		 */
 		const CompileCommandData* FindModuleCompileCommand(
 			const std::vector<CompileCommandData>& commands,
 			const MagicEngineHeader& header)
@@ -285,6 +329,13 @@ namespace MHT {
 			return bestCommand;
 		}
 
+		/**
+		 * Append an include directory as a libclang -I argument.
+		 * @param arguments Receives the generated -I argument.
+		 * @param directory The compile command's working directory for resolving relative paths.
+		 * @param includePath The include directory to append.
+		 * @return This function does not return a value; it updates arguments.
+		 */
 		void AddIncludeArgument(
 			std::vector<std::string>& arguments,
 			const std::string& directory,
@@ -298,6 +349,12 @@ namespace MHT {
 			arguments.push_back("-I" + path.lexically_normal().string());
 		}
 
+		/**
+		 * Convert supported MSVC compile options into libclang arguments.
+		 * @param command The compile command whose options are being converted.
+		 * @param arguments Receives the libclang arguments, including default C++ options.
+		 * @return True if the options were converted successfully; otherwise false.
+		 */
 		bool BuildClangArguments(
 			const CompileCommandData& command,
 			std::vector<std::string>& arguments)
@@ -401,6 +458,13 @@ namespace MHT {
 			return true;
 		}
 
+		/**
+		 * Append an existing include directory if it has not already been recorded.
+		 * @param arguments Receives the generated -I argument.
+		 * @param knownPaths Tracks paths already added by this helper.
+		 * @param path The directory to validate and append.
+		 * @return This function does not return a value; it may update arguments and knownPaths.
+		 */
 		void AddIncludePath(std::vector<std::string>& arguments,
 			std::vector<std::string>& knownPaths,
 			const std::filesystem::path& path)
@@ -418,6 +482,14 @@ namespace MHT {
 			}
 		}
 
+		/**
+		 * Add include search paths needed to parse a header and its generated dependencies.
+		 * @param header The header whose directory should be searched.
+		 * @param moduleName The module whose generated object directory should be searched.
+		 * @param arguments Receives the generated -I arguments.
+		 * @param knownPaths Tracks paths already added by AddIncludePath.
+		 * @return This function does not return a value; it may update arguments and knownPaths.
+		 */
 		void AddParseIncludePaths(
 			const MagicEngineHeader& header,
 			const std::string& moduleName,
@@ -462,6 +534,12 @@ namespace MHT {
 			}
 		}
 
+		/**
+		 * Split a macro argument list at top-level commas.
+		 * @param args The argument text to split.
+		 * @param outParams Receives the trimmed, non-empty parameters.
+		 * @return This function does not return a value; it replaces outParams.
+		 */
 		void SplitParams(std::string_view args, std::vector<std::string>& outParams)
 		{
 			outParams.clear();
@@ -544,6 +622,13 @@ namespace MHT {
 			}
 		}
 
+		/**
+		 * Parse a single-line macro call whose name starts the line after optional whitespace.
+		 * @param line The source line to inspect.
+		 * @param macroName The macro name to find.
+		 * @param outParams Receives the parsed macro arguments when parsing succeeds.
+		 * @return True if the line contains a complete matching macro call; otherwise false.
+		 */
 		bool ParseMacro(const std::string& line, std::string_view macroName,
 			std::vector<std::string>& outParams)
 		{
@@ -603,6 +688,11 @@ namespace MHT {
 			return true;
 		}
 
+		/**
+		 * Check whether a source line has the form of a preprocessor include directive.
+		 * @param line The source line to inspect.
+		 * @return True if the line contains an #include directive; otherwise false.
+		 */
 		bool IsIncludeDirective(const std::string& line)
 		{
 			size_t position = line.find_first_not_of(" \t");
@@ -627,6 +717,11 @@ namespace MHT {
 				line[position] == '"';
 		}
 
+		/**
+		 * Build temporary source for libclang by replacing or removing tool-specific macros.
+		 * @param lines The original header contents, split into lines.
+		 * @return The transformed source text supplied to libclang.
+		 */
 		std::string BuildParseSource(const std::vector<std::string>& lines)
 		{
 			std::ostringstream source;
@@ -662,6 +757,11 @@ namespace MHT {
 			return source.str();
 		}
 
+		/**
+		 * Build a declaration's qualified name from its AST semantic parents.
+		 * @param cursor The AST cursor for the declaration.
+		 * @return The qualified name, such as Namespace::Class.
+		 */
 		std::string GetQualifiedName(CXCursor cursor)
 		{
 			std::vector<std::string> parts;
@@ -707,6 +807,11 @@ namespace MHT {
 			unsigned line = 0;
 		};
 
+		/**
+		 * Extract the spelling file and line from a libclang source location.
+		 * @param location The source location to inspect.
+		 * @return The file name and one-based line number, if available.
+		 */
 		CursorLocation GetLocation(CXSourceLocation location)
 		{
 			CursorLocation result;
@@ -730,6 +835,13 @@ namespace MHT {
 			std::unordered_map<unsigned, size_t> classIndices;
 		};
 
+		/**
+		 * Visit AST declarations and collect information for the target header's classes.
+		 * The second CXCursor argument is unused by this callback.
+		 * @param cursor The current AST node being visited.
+		 * @param clientData A pointer to the ParseContext receiving the collected information.
+		 * @return CXChildVisit_Recurse to continue visiting this node's children.
+		 */
 		enum CXChildVisitResult VisitClassAndMember(CXCursor cursor, CXCursor, CXClientData clientData)
 		{
 			auto& context = *static_cast<ParseContext*>(clientData);
@@ -821,6 +933,11 @@ namespace MHT {
 			return CXChildVisit_Recurse;
 		}
 
+		/**
+		 * Build an AST output path scoped to the header's module.
+		 * @param header The header whose AST output path is being generated.
+		 * @return A path containing the module name, header stem, and normalized-path hash.
+		 */
 		std::filesystem::path GetAstOutputPath(const MagicEngineHeader& header)
 		{
 			std::ostringstream fileName;
@@ -835,6 +952,17 @@ namespace MHT {
 				/ fileName.str();
 		}
 
+		/**
+		 * Parse one header with libclang, save its AST, and extract marked class information.
+		 * @param index The libclang index used to create the translation unit.
+		 * @param header The header and source lines to parse.
+		 * @param allHeaders All known headers, used to add generated module include paths.
+		 * @param compileCommands The available compile commands used to configure parsing.
+		 * @param mClassDeclarationLines Zero-based class declaration lines following MCLASS markers.
+		 * @param outClasses Receives the classes extracted from this header.
+		 * @param failedHeaders Records this header if parsing or AST output fails.
+		 * @return True if parsing and AST extraction complete; otherwise false.
+		 */
 		bool ParseHeaderWithLibClang(
 			CXIndex index,
 			const MagicEngineHeader& header,
@@ -990,6 +1118,13 @@ namespace MHT {
 			return true;
 		}
 
+		/**
+		 * Load the compilation database and parse each header containing an MCLASS marker.
+		 * @param headers The headers to inspect and parse.
+		 * @param outClasses Receives classes extracted from successfully parsed headers.
+		 * @param failedHeaders Records headers that could not be parsed.
+		 * @return True if the database and libclang index were initialized; otherwise false.
+		 */
 		bool ParseHeadersWithLibClang(
 			const std::vector<MagicEngineHeader>& headers,
 			std::vector<MagicClassInfo>& outClasses,
@@ -1052,6 +1187,13 @@ namespace MHT {
 			return true;
 		}
 
+		/**
+		 * Find GENERATE_BODY within the source range of a class.
+		 * @param lines The original header contents, split into lines.
+		 * @param classInfo The class whose source range should be searched.
+		 * @param params Receives the macro arguments when GENERATE_BODY is found.
+		 * @return True if a valid GENERATE_BODY call is found; otherwise false.
+		 */
 		bool ParseGenerateBody(
 			const std::vector<std::string>& lines,
 			const MagicClassInfo& classInfo,
@@ -1071,6 +1213,10 @@ namespace MHT {
 	}
 
 	namespace GeneralPipeline {
+		/**
+		 * Parse engine headers and store the discovered class metadata in the pipeline data.
+		 * @return True if parsing completes without errors; otherwise false.
+		 */
 		bool FindEngineClass()
 		{
 			MGC context = MagicGlobalContext::Get();
