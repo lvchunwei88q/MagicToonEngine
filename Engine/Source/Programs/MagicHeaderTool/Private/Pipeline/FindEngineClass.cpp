@@ -9,7 +9,6 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
-#include <iomanip>
 #include <iterator>
 #include <sstream>
 #include <string_view>
@@ -934,33 +933,15 @@ namespace MHT {
 		}
 
 		/**
-		 * Build an AST output path scoped to the header's module.
-		 * @param header The header whose AST output path is being generated.
-		 * @return A path containing the module name, header stem, and normalized-path hash.
-		 */
-		std::filesystem::path GetAstOutputPath(const MagicEngineHeader& header)
-		{
-			std::ostringstream fileName;
-			fileName << std::filesystem::u8path(header.headerName).stem().string()
-				<< '_' << std::hex
-				<< std::hash<std::string>{}(NormalizePath(header.headerName))
-				<< ".ast";
-			return std::filesystem::path(MagicGeneralPipelinedData::Get().GetGeneratePath())
-				/ MAGICENGINE_FILE_INFO_PATH
-				/ "ast"
-				/ std::filesystem::u8path(header.moduleName)
-				/ fileName.str();
-		}
-
-		/**
-		 * Parse one header with libclang, save its AST, and extract marked class information.
+		 * Parse one header with libclang and extract marked class information.
+		 * The translation unit stays in memory only; nothing is written to disk.
 		 * @param index The libclang index used to create the translation unit.
 		 * @param header The header and source lines to parse.
 		 * @param allHeaders All known headers, used to add generated module include paths.
 		 * @param compileCommands The available compile commands used to configure parsing.
 		 * @param mClassDeclarationLines Zero-based class declaration lines following MCLASS markers.
 		 * @param outClasses Receives the classes extracted from this header.
-		 * @param failedHeaders Records this header if parsing or AST output fails.
+		 * @param failedHeaders Records this header if parsing fails.
 		 * @return True if parsing and AST extraction complete; otherwise false.
 		 */
 		bool ParseHeaderWithLibClang(
@@ -1060,31 +1041,6 @@ namespace MHT {
 			}
 			if (hasErrors)
 			{
-				failedHeaders.insert(header.headerName);
-				clang_disposeTranslationUnit(translationUnit);
-				return false;
-			}
-
-			const std::filesystem::path astPath = GetAstOutputPath(header);
-			std::error_code directoryError;
-			std::filesystem::create_directories(astPath.parent_path(), directoryError);
-			if (directoryError)
-			{
-				Utilitie::Log::Error(
-					"Could not create AST output directory: " + directoryError.message());
-				failedHeaders.insert(header.headerName);
-				clang_disposeTranslationUnit(translationUnit);
-				return false;
-			}
-			const int saveResult = clang_saveTranslationUnit(
-				translationUnit,
-				astPath.string().c_str(),
-				clang_defaultSaveOptions(translationUnit));
-			if (saveResult != CXSaveError_None)
-			{
-				Utilitie::Log::Error(
-					"Could not save libclang AST for " + header.headerName +
-					" (error " + std::to_string(saveResult) + ")");
 				failedHeaders.insert(header.headerName);
 				clang_disposeTranslationUnit(translationUnit);
 				return false;

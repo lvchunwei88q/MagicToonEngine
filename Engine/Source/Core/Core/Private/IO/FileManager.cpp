@@ -1,9 +1,7 @@
 #include "IO.h"
-#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 
-namespace fs = std::filesystem;
 namespace IO {
     namespace {
         void WriteAllBytesImpl(const std::wstring& path, const void* data, size_t size) {

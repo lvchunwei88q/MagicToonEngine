@@ -50,6 +50,7 @@ namespace MHT{
 
 		const std::vector<std::wstring> FilterFilesNoNeedGenerated(const std::vector<std::string>& files)
 		{
+			// Get the global context
 			MGC ctx = MagicGlobalContext::Get();
 
 			std::vector<std::wstring> NeedGeneratedFiles;
@@ -125,9 +126,10 @@ namespace MHT{
 #endif
 			}
 
-			// Write to file
+			// Save to GlobalContext
 			std::string CheckModificationTime_Contents = IO::ToNarrowString(CheckModificationTime_ContentsW);
-			IO::WriteAllText(TimeCheckFilePath , CheckModificationTime_Contents);
+			ctx.SetLastModifiedTimeOfLatestFile(CheckModificationTime_Contents);
+			//IO::WriteAllText(TimeCheckFilePath , CheckModificationTime_Contents);
 
 			return NeedGeneratedFiles;
 		}
@@ -204,6 +206,7 @@ namespace MHT{
 	}
 
 	bool MagicHeaderTool::Run() {
+		// Get the global context
 		MGC ctx = MagicGlobalContext::Get();
 		Context::TaskInfo& TInfo = ctx.GetRefInfo();
 		std::vector<Context::HeaderDescriptorData>& HDDs = ctx.GetRefHDDs();
@@ -223,6 +226,18 @@ namespace MHT{
 			if (!GeneralPipeline::RunBuildPipeline()) {
 				return false;
 			}
+		}
+
+		// All tasks completed! Updating the content of the check file.
+		std::wstring TimeCheckFilePath = ctx.GetgenerateDir() + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\" MAGICENGINE_HEADER_TIME_CHECK_FILE_W;
+		if(ctx.LastModifiedTimeOfLatestFile_isValid())
+		{
+			IO::WriteAllText(TimeCheckFilePath, ctx.GetLastModifiedTimeOfLatestFile());
+		}
+		else
+		{
+			Utilitie::Log::Error("LastModifiedTimeOfLatestFile is invalid. Cannot write to TimeCheckFile.");
+			return false;
 		}
 
 		return true;

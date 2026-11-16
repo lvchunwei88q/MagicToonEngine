@@ -4,6 +4,8 @@
 #include "Common/Checker.h"
 #include "Utilities/Singleton.h"
 #include "Utilities/BinaryRW.h"
+
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -15,6 +17,7 @@
 #undef CreateDirectory
 #undef MoveFile
 
+namespace fs = std::filesystem;
 
 DISABLE_DLL_WARNINGS_PUSH;
 

@@ -65,23 +65,23 @@
  * @brief Path to the engine class info file (wide-character version).
  * @details A fixed file path used to store class information.
  */
-#define MAGICENGINE_CLASS_INFO_FILE_W L"engine_class_info.log"
+#define MAGICENGINE_CLASS_INFO_FILE_W L"logs/engine_class_info.log"
 
 /**
  * @brief Path to the engine class info file (narrow-character version).
  * @details A fixed path corresponding to MAGICENGINE_CLASS_INFO_FILE_W.
  */
-#define MAGICENGINE_CLASS_INFO_FILE "engine_class_info.log"
+#define MAGICENGINE_CLASS_INFO_FILE "logs/engine_class_info.log"
 
 
 /**
  * @brief Path to the engine class metadata debug file (wide-character version).
  * @details A fixed file path used for debugging the generation of Engine class metadata.
  */
-#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W L"engine_class_metadata_debug_file.log"
+#define MAGICENGINE_CLASS_METADATA_INFO_FILE_W L"logs/engine_class_metadata_info.log"
 
 /**
  * @brief Path to the engine class metadata debug file (narrow-character version).
- * @details A fixed path corresponding to MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W.
+ * @details A fixed path corresponding to MAGICENGINE_CLASS_METADATA_INFO_FILE_W.
  */
-#define MAGICENGINE_CLASS_METADATA_DEBUG_FILE "engine_class_metadata_debug_file.log"
+#define MAGICENGINE_CLASS_METADATA_INFO_FILE "logs/engine_class_metadata_info.log"

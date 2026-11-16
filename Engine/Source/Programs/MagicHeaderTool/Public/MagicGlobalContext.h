@@ -50,6 +50,9 @@ public:
     std::wstring m_generateDir;
 	std::wstring m_generateInfoFilePath;
 
+    // Latest file modification time cache
+    std::string m_LastModifiedTimeOfLatestFile;
+
     // GenerationState
     Context::GenerationState m_GenerationStat = Context::GenerationState::Pending;;
 
@@ -61,6 +64,9 @@ public:
     // Utilitie Functions
     GENERATE_PROPERTY(generateDir,std::wstring);
     GENERATE_PROPERTY(generateInfoFilePath,std::wstring);
+    GENERATE_PROPERTY(LastModifiedTimeOfLatestFile,std::string);
+    bool LastModifiedTimeOfLatestFile_isValid() const { return !m_LastModifiedTimeOfLatestFile.empty(); }
+    
     GENERATE_PROPERTY(Info,Context::TaskInfo);
     const size_t GetCurrentShowTaskIndex() const { return m_Info.CurrentTaskIndex + 1; }
     GENERATE_PROPERTY(HDDs,std::vector<Context::HeaderDescriptorData>);

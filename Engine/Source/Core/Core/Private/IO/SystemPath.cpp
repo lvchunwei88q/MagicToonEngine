@@ -7,10 +7,8 @@
 #include <locale>
 #endif
 
-#include <filesystem>
 #include <vector>
 
-namespace fs = std::filesystem;
 namespace IO {
 
     namespace {

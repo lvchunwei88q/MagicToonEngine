@@ -36,6 +36,15 @@ namespace MHT
 				}
 				else
 				{
+					fs::path p(path);
+					fs::path parent = p.parent_path();
+					std::wstring parent_path = parent.wstring();
+
+					if(!IO::CreateDirectory(parent_path))
+					{
+						Utilitie::Log::Error("Could not create directory for " + description);
+						return false;
+					}
 					if (!IO::CreateFile(path))
 					{
 						Utilitie::Log::Error("Could not create " + description);
@@ -164,10 +173,10 @@ namespace MHT
 				L"\\" MAGICENGINE_CLASS_INFO_FILE_W;
             const std::wstring classDebugReportPath = 
                 ctx.GetgenerateDir() + L"\\" MAGICENGINE_FILE_INFO_PATH_W 
-                L"\\" MAGICENGINE_CLASS_METADATA_DEBUG_FILE_W;
+                L"\\" MAGICENGINE_CLASS_METADATA_INFO_FILE_W;
             
 			const bool classDebugReportWritten = AppendReport(
-				classDebugReportPath, classDebugInfo.str(), "class metadata debug file");
+				classDebugReportPath, classDebugInfo.str(), "class metadata info file");
 			const bool classInfoReportWritten = AppendReport(
 				classInfoReportPath,classInfoReport.str(),"class information report");
 
