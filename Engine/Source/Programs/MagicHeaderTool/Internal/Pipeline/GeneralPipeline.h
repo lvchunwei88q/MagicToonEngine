@@ -24,7 +24,7 @@ namespace MHT {
 		std::string name;			// Variable name
 		std::string type;			// Variable type
 		std::string access;			// Access specifier: public, protected, private
-		std::vector<std::string> annotationParams;
+		std::vector<std::string> annotationParams;	// Parameters for MMEMBER macro
 		bool hasMMember = false;
 		size_t lineNum = 0;			// indicates the line number of the member variable declaration, starting from 0
 
@@ -35,10 +35,10 @@ namespace MHT {
 	};
 
 	struct MagicClassFunction {
-		std::string name;
-		std::string signature;
-		std::string access;
-		std::vector<std::string> annotationParams;
+		std::string name;			// Function name
+		std::string signature;		// Function signature, including return type and parameters
+		std::string access;			// Access specifier: public, protected, private
+		std::vector<std::string> annotationParams;	// Parameters for MFUNCTION macro
 		bool hasMFunction = false;
 		size_t lineNum = 0;
 

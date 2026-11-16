@@ -82,6 +82,8 @@ namespace MHT
                 std::cout << classInfo.className << std::endl;
     #endif
                 classDebugInfo << classInfo.className << "\n";
+				// Use the MMEMBER macro to output the member variables
+				classDebugInfo << "  MMEMBER variables:" << "\n";
                 for (const auto& member : classInfo.members)
                 {
                     if (!member.hasMMember) {
@@ -93,6 +95,21 @@ namespace MHT
     #endif
                     classDebugInfo << "   " << member.type << " - ";
                     classDebugInfo << member.name << "\n";
+                }
+
+				// Use the MFUNCTION macro to output the function
+				classDebugInfo << "  MFUNCTION variables:" << "\n";
+				for (const auto& function : classInfo.functions)
+                {
+                    if (!function.hasMFunction) {
+                        continue;
+                    }
+    #if MAGIC_DEV
+                    std::cout << "   " << function.signature << " - ";
+                    std::cout << function.name << std::endl;
+    #endif
+                    classDebugInfo << "   " << function.signature << " - ";
+                    classDebugInfo << function.name << "\n";
                 }
 
 				classInfoReport << "Class: " << classInfo.qualifiedName << '\n'

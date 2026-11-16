@@ -38,6 +38,16 @@ public:
 	std::vector<std::vector<int32_t>> inventory;
 	MMEMBER();
 	Vec3<float> position;
+
+	MFUNCTION();
+	void TestFunction() {
+		// This function is intentionally left empty for testing purposes.
+	}
+
+	MFUNCTION();
+	int32_t Add(int32_t a, int32_t b) {
+		return a + b;
+	}
 };
 
 MCLASS(MSERIALIZATION)
