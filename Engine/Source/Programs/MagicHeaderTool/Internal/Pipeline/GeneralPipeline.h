@@ -11,22 +11,22 @@ namespace MHT {
 	struct MagicEngineHeader
 	{
 		std::string headerName;
-		std::string moudelName;
+		std::string moduleName;
 		std::vector<std::string> lines;
 
-		MagicEngineHeader(const std::string& headerName, const std::vector<std::string>& lines)
-			: headerName(headerName), lines(lines) {}
+		MagicEngineHeader(const std::string& headerName, const std::string& moduleName, const std::vector<std::string>& lines)
+			: headerName(headerName), moduleName(moduleName), lines(lines) {}
 		MagicEngineHeader() {}
 	};
 
 	// All values used to record row numbers start from 0 by default.
 	struct MemberVariable {
-		std::string name;			// 名称
-		std::string type;			// 类型
-		std::string access;
+		std::string name;			// Variable name
+		std::string type;			// Variable type
+		std::string access;			// Access specifier: public, protected, private
 		std::vector<std::string> annotationParams;
 		bool hasMMember = false;
-		size_t lineNum = 0;			// 在头文件中的行数
+		size_t lineNum = 0;			// indicates the line number of the member variable declaration, starting from 0
 
 		MemberVariable(std::string name, std::string type, size_t lineNum,
 			std::string access = {})

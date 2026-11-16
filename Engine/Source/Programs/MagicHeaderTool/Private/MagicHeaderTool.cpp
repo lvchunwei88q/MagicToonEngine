@@ -252,7 +252,7 @@ namespace MHT{
 			GetLine(AllHeadersContent[i], magicHeader.lines);
 
 			magicHeader.headerName = IO::ToNarrowString(HeaderDescriptorData.ArrayOfHeaderFilePaths[i]);
-			magicHeader.moudelName = HeaderDescriptorData.HeaderFileComesFromModuleArray[i];
+			magicHeader.moduleName = HeaderDescriptorData.HeaderFileComesFromModuleArray[i];
 			MagicEngineHeaders.push_back(std::move(magicHeader));
 		}
 

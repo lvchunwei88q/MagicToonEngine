@@ -289,7 +289,7 @@ namespace MHT {
 			const std::string normalizedHeaderPath = NormalizePath(
 				std::filesystem::absolute(headerPath).string());
 			const std::filesystem::path moduleRoot =
-				FindModuleRoot(header.headerName, header.moudelName);
+				FindModuleRoot(header.headerName, header.moduleName);
 
 			const CompileCommandData* bestCommand = nullptr;
 			size_t bestDirectoryLength = 0;
@@ -948,7 +948,7 @@ namespace MHT {
 			return std::filesystem::path(MagicGeneralPipelinedData::Get().GetGeneratePath())
 				/ MAGICENGINE_FILE_INFO_PATH
 				/ "ast"
-				/ std::filesystem::u8path(header.moudelName)
+				/ std::filesystem::u8path(header.moduleName)
 				/ fileName.str();
 		}
 
@@ -977,7 +977,7 @@ namespace MHT {
 			if (compileCommand == nullptr)
 			{
 				Utilitie::Log::Error(
-					"No compile command found for module " + header.moudelName +
+					"No compile command found for module " + header.moduleName +
 					" while parsing " + header.headerName);
 				failedHeaders.insert(header.headerName);
 				return false;
@@ -992,12 +992,12 @@ namespace MHT {
 			std::vector<std::string> includePaths;
 			AddParseIncludePaths(
 				header,
-				header.moudelName,
+				header.moduleName,
 				arguments,
 				includePaths);
 			for (const MagicEngineHeader& candidate : allHeaders)
 			{
-				if (!candidate.moudelName.empty())
+				if (!candidate.moduleName.empty())
 				{
 					AddIncludePath(
 						arguments,
@@ -1005,7 +1005,7 @@ namespace MHT {
 						std::filesystem::path(
 							MagicGeneralPipelinedData::Get().GetGeneratePath())
 							/ "Object"
-							/ std::filesystem::u8path(candidate.moudelName));
+							/ std::filesystem::u8path(candidate.moduleName));
 				}
 			}
 
@@ -1167,9 +1167,11 @@ namespace MHT {
 				}
 				if (mClassDeclarationLines.empty())
 				{
+					// No MCLASS markers in this header; skip parsing.
 					continue;
 				}
 
+				// Parse the header with libclang and extract class information.
 				if (!ParseHeaderWithLibClang(
 					index,
 					header,
@@ -1276,7 +1278,7 @@ namespace MHT {
 					}
 
 					classInfo->mclassParams = classParams;
-					classInfo->moduleName = header.moudelName;
+					classInfo->moduleName = header.moduleName;
 					classInfo->generateBodyParams = bodyParams;
 				}
 			}
