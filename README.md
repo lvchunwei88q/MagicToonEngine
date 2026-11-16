@@ -112,7 +112,6 @@ Update.bat               # 更新源码和 LFS 依赖
 | `magic_enum` | 枚举反射 | 提供 C++ 枚举到字符串的转换与反射能力，便于调试和工具链。 |
 | `nlohmann` | JSON 处理 | 用于读取和写入 JSON 配置文件和运行时数据。 |
 | `ufbx` | 3D 模型加载 | 用于导入和处理 FBX 等 3D 模型资源。 |
-| `Vulkan SDK` | Vulkan 图形 API | 提供 Vulkan 标头、验证层和相关工具，支持 Vulkan 相关渲染功能。 |
 
 ## 说明
 

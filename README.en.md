@@ -112,7 +112,6 @@ The project depends on several third-party components for rendering, scripting, 
 | `magic_enum` | Enum reflection | Converts C++ enums to strings and provides reflection-like utilities for debugging and tooling. |
 | `nlohmann` | JSON processing | Reads and writes JSON configuration files and runtime data. |
 | `ufbx` | 3D model loading | Imports and processes 3D model assets such as FBX files. |
-| `Vulkan SDK` | Vulkan API support | Provides Vulkan headers, validation layers, and tools required for Vulkan rendering. |
 
 ## Notes
 
