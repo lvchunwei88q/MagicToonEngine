@@ -18,6 +18,7 @@
 #undef MoveFile
 
 namespace fs = std::filesystem;
+using FilePath = std::filesystem::path;
 
 DISABLE_DLL_WARNINGS_PUSH;
 
