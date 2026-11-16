@@ -36,8 +36,8 @@ namespace MHT
 				}
 				else
 				{
-					fs::path p(path);
-					fs::path parent = p.parent_path();
+					IO::Path p(path);
+					IO::Path parent = p.parent_path();
 					std::wstring parent_path = parent.wstring();
 
 					if(!IO::CreateDirectory(parent_path))
