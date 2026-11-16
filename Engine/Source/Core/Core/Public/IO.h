@@ -17,9 +17,6 @@
 #undef CreateDirectory
 #undef MoveFile
 
-namespace fs = std::filesystem;
-using FilePath = std::filesystem::path;
-
 DISABLE_DLL_WARNINGS_PUSH;
 
 /*
@@ -28,6 +25,10 @@ DISABLE_DLL_WARNINGS_PUSH;
 */
 
 namespace IO {
+	// Define it in a namespace to prevent name collisions
+	namespace fs = std::filesystem;
+	using Path = fs::path;
+
 	// Read text to file
 	CORE_API std::string ReadAllText(const std::wstring& path);
 	// Read bytes to file
