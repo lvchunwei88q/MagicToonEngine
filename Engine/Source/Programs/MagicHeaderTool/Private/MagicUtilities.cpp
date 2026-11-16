@@ -1,6 +1,5 @@
 #include "MagicUtilities.h"
 #include "Common/Checker.h"
-#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <chrono>
