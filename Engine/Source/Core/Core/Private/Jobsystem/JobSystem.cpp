@@ -48,11 +48,20 @@ namespace Core
         std::atomic<bool> running{ false };
     };
 
+    // Defined here so std::unique_ptr can destroy ThreadPool without needing sizeof
+    // at the point where the header is parsed (clang requires that; MSVC was lenient).
+    void JobSystem::ThreadPoolDeleter::operator()(ThreadPool* pool) const noexcept
+    {
+        delete pool;
+    }
+
+    JobSystem::~JobSystem() = default;
+
     bool JobSystem::Init()
     {
         std::lock_guard<std::mutex> guard(g_singletonMutex);
 
-        m_pool = std::make_unique<ThreadPool>();
+        m_pool = PoolPtr(new ThreadPool);
         m_pool->running.store(true, std::memory_order_release);
 
         const uint32_t resolved = ResolveWorkerCount(workerCount);

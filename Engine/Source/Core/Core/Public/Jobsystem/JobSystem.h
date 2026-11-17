@@ -62,10 +62,11 @@ namespace Core
     class CORE_API JobSystem : public Subsystem, public Singleton<JobSystem>
     {
     public:
+        ~JobSystem() override;
         using JobFn = std::function<void()>;
 
-        virtual bool Init();
-        virtual void Uninstall();
+        virtual bool Init() override;
+        virtual void Uninstall() override;
 
         /// @brief Schedule a single job. Returns a handle for joining later.
         /// The handle stays valid even after the job completes — IsComplete()
@@ -106,9 +107,19 @@ namespace Core
         bool TryRunOne(); // Returns true if a task was executed.
 
         uint8_t workerCount = 4u;
-        // PIMPL 
+
+        // PIMPL
+        // The operator() of ThreadPoolDeleter is defined in the .cpp file (that's where ThreadPool is a complete type).
+        // If you use std::unique_ptr<ThreadPool> directly, the default std::default_delete::operator() will be needed
+        // sizeof(ThreadPool); clang will complain because of the static local object in Singleton<JobSystem>::Get()
+        // Instantiating ~unique_ptr early causes err_sizeof_alignof_incomplete_or_sizeless_type in this header file.
         struct ThreadPool;
-        std::unique_ptr<ThreadPool> m_pool;
+        struct ThreadPoolDeleter
+        {
+            void operator()(ThreadPool* pool) const noexcept;
+        };
+        using PoolPtr = std::unique_ptr<ThreadPool, ThreadPoolDeleter>;
+        PoolPtr m_pool;
     };
 
     AUTO_REGISTER_SINGLETON_INCLUDE(JobSystem);
