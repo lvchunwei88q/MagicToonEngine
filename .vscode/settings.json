@@ -1,7 +1,4 @@
 {
-    "clangd.arguments": [
-        "--compile-commands-dir=${workspaceFolder}/out"
-    ],
     "terminal.integrated.profiles.windows": {
         // Please set VSDEVCMD_PATH in your Windows user environment variables to the path of VsDevCmd.bat on your machine.
         "VS Dev CMD": {

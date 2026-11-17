@@ -1,2 +1,0 @@
-CompileFlags:
-  Add: [-DMAGIC_IN_IDE=1]

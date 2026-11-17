@@ -1,0 +1,3 @@
+[[rules]]
+patterns = ["**/*.{c,cpp,h,hpp}"]
+append = ["-DCLICE_LSP=1"]

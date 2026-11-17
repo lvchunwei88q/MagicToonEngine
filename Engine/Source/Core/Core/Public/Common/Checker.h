@@ -21,6 +21,8 @@ using UINT = unsigned int;
     #define MAGIC_IN_IDE 1
   #elif defined(__cppcheck__) || defined(__clang_tidy__)
     #define MAGIC_IN_IDE 1
+  #elif defined(CLICE_LSP)
+    #define MAGIC_IN_IDE 1
   #else
     #define MAGIC_IN_IDE 0
   #endif
