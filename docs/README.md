@@ -20,10 +20,10 @@
 - **部分修复 4 条**：P2-22（`ObjectType` 仍不校验）、P2-37（同模块同名仍撞）、P2-38（落盘时机已修，仍不看产物）、P3-13（README 残留）。
 - 已修复的 9 条（P0-02、P1-01、P1-02、P1-17、P2-21、P2-32、P3-12、P3-14、P3-15）已从缺陷清单移除，修复过程与提交对照见 [07-修复复核记录.md](07-修复复核记录.md)。第三轮（`738ff16..19eb464`）修掉的是 **P1-02**（并行读文件不再抛）、**P2-32**（worker 入口加异常兜底）、**P3-14**（`ThirdParty` 大小写统一）。
 - 注意：`MAGIC_DEV` 已改为 `0`，增量生成路径在线，P1-03 / P1-04 不再是潜伏状态；但 `5e16ecc` 把 mtime 缓存的赋值点放进了被 `#if !MAGIC_DEV` 包住的函数里，一旦把宏改回 `1`，`Run()` 收尾会直接报错返回（**P2-41**）。
-- **第四轮（`19eb464..f0d41ad`）没有增删条目**：MHT 删掉 `--compile-commands`（改按 `--generate-dir` 推导编译数据库）、`Core_API.h` → `CORE_API.h`、`SystemPath`/`CoreMinimal` 跨平台化、测试框架改名 `TestFramework.h`。只有三条需要更新定位：**P1-08**（`SystemPath.cpp:79-87`）、**P1-15**（`TestFramework.h`、`macro.cmake:97-127`）、**P2-39**（`MagicMain.cpp:47-61`）。
-- **第五轮（`f0d41ad..35a05bf`）新增 3 条（其中 P3-15 已在第六轮修掉）、1 条降级**：`338dd5c`（`FindEngineClass.cpp` 纯注释 +146 行）之后又连着提交了 `de6b1bb`（`MagicEngineHeader` 字段拼写 `moudelName` → `moduleName`）、`5e16ecc`（MHT 路径/日志重构，同时把 AST dump 移除入库）、`0978ee6`、`0f4570d`、`8e48975`、`e512583`、`35a05bf`（最后两个是第三方库二进制整理）。期间没有条目被整条修掉，但 **P2-38** 的主病灶被 `5e16ecc` 修掉（缓存改为"全部任务成功后才落盘"），降为部分修复；同一改动让 `MAGIC_DEV = 1` 路径彻底失效，新增 **P2-41**；该提交还把 `namespace fs = std::filesystem;` 搬进公开头 `IO.h`，新增 **P3-15**。`338dd5c` 的复核另发现 **P2-40**（模块名 `CORE`/`LOGGER`/`RENDERCORE` 与目录名不一致，见 [04](04-P2-中等缺陷.md)）。行号按 `35a05bf` 重新对齐：`SystemPath.cpp` −2 行、`ObjectTest.cpp` +10 行、`MagicCodegenTool.cpp` +1/+2 行。
+- **第四轮（`19eb464..f0d41ad`）没有增删条目**：MagicCodegenTool 删掉 `--compile-commands`（改按 `--generate-dir` 推导编译数据库）、`Core_API.h` → `CORE_API.h`、`SystemPath`/`CoreMinimal` 跨平台化、测试框架改名 `TestFramework.h`。只有三条需要更新定位：**P1-08**（`SystemPath.cpp:79-87`）、**P1-15**（`TestFramework.h`、`macro.cmake:97-127`）、**P2-39**（`MagicMain.cpp:47-61`）。
+- **第五轮（`f0d41ad..35a05bf`）新增 3 条（其中 P3-15 已在第六轮修掉）、1 条降级**：`338dd5c`（`FindEngineClass.cpp` 纯注释 +146 行）之后又连着提交了 `de6b1bb`（`MagicEngineHeader` 字段拼写 `moudelName` → `moduleName`）、`5e16ecc`（MagicCodegenTool 路径/日志重构，同时把 AST dump 移除入库）、`0978ee6`、`0f4570d`、`8e48975`、`e512583`、`35a05bf`（最后两个是第三方库二进制整理）。期间没有条目被整条修掉，但 **P2-38** 的主病灶被 `5e16ecc` 修掉（缓存改为"全部任务成功后才落盘"），降为部分修复；同一改动让 `MAGIC_DEV = 1` 路径彻底失效，新增 **P2-41**；该提交还把 `namespace fs = std::filesystem;` 搬进公开头 `IO.h`，新增 **P3-15**。`338dd5c` 的复核另发现 **P2-40**（模块名 `CORE`/`LOGGER`/`RENDERCORE` 与目录名不一致，见 [04](04-P2-中等缺陷.md)）。行号按 `35a05bf` 重新对齐：`SystemPath.cpp` −2 行、`ObjectTest.cpp` +10 行、`MagicCodegenTool.cpp` +1/+2 行。
 - **第六轮（`35a05bf..e2e45d2`）修掉 P3-15**：`541c88e` 把 `IO.h` 的 `namespace fs = std::filesystem;` 与 `using FilePath` 移进 `namespace IO`（`IO.h:27-30`，改成 `IO::fs` / `IO::path`），`e2e45d2` 把 `namespace MCT` 里那处裸用的 `fs::path` 改成 `IO::path`；全局命名空间恢复干净，条目已从清单移除。`d6348a7` 只删了两份 README 的 `Vulkan SDK` 行，P3-13 的 `GenerateVSProject.bat` 文件树残留仍在。
-- P1-02 / P2-32 修复后仍留了两处缺口（读文件任务体未自包 `try/catch`、MHT 未注册 `ErrorCapture`），见 [07 第 7.3 节](07-修复复核记录.md)；其中第二条在 `a0dc2d6` 之后**依然成立**（`LOG_OUTPUT` 只在 `_DEBUG` 有输出）。
+- P1-02 / P2-32 修复后仍留了两处缺口（读文件任务体未自包 `try/catch`、MagicCodegenTool 未注册 `ErrorCapture`），见 [07 第 7.3 节](07-修复复核记录.md)；其中第二条在 `a0dc2d6` 之后**依然成立**（`LOG_OUTPUT` 只在 `_DEBUG` 有输出）。
 
 ## 审查范围
 
@@ -58,6 +58,6 @@
 ## 修复顺序建议（摘要）
 
 1. 先修剩余 P0：P0-01 / P0-03；这两条都在资源注册与窗口缩放的热路径上，是后续所有工作的地基。
-2. 再修 P2-39 与 P1-02 的残留：让构建工具的失败"能被看见"——日志刷盘（成功路径也要 `Uninstall`）、把 `ErrorCapture` 接到 MHT 的日志、读文件任务体自包 `try/catch`，以及退出码语义。
+2. 再修 P2-39 与 P1-02 的残留：让构建工具的失败"能被看见"——日志刷盘（成功路径也要 `Uninstall`）、把 `ErrorCapture` 接到 MagicCodegenTool 的日志、读文件任务体自包 `try/catch`，以及退出码语义。
 3. 然后 P1-03 / P1-04 / P2-36 ~ P2-38：把增量生成做成"真的正确"（`MAGIC_DEV 0` 后增量已在线，这条链路具备条件）。
 4. 之后按模块推进 P1-05 ~ P1-16 与 P2。

@@ -20,7 +20,7 @@ set(CONTENT_DIR ${CMAKE_SOURCE_DIR}/Engine/Content)
 # Set the output directory for runtime files
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Binary/$<CONFIG>)
 # Set the output directory for generated files
-set(CMAKE_GENERATE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/engine_mht_generate)
+set(CMAKE_GENERATE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/engine_codegen_generate)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(MAGIC_CODEGEN_TOOL_TARGET "MagicCodegenTool"    CACHE INTERNAL "MagicCodegenTool target name")
@@ -31,7 +31,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Write the list of header files into a text file, which will be used for generating reflection code in MHT
+# Write the list of header files into a text file, which will be used for generating reflection code in MagicCodegenTool
 set(ENGINE_GENERATE_INFO_DIRECTORY "${CMAKE_GENERATE_OUTPUT_DIRECTORY}/engine_generate_info")
 set(HEADER_LIST_FILE "${ENGINE_GENERATE_INFO_DIRECTORY}/engine_headers.buildmeta")
 set(ENGINE_COMPILE_COMMANDS_FILE "${ENGINE_GENERATE_INFO_DIRECTORY}/engine_compile_commands.buildmeta")

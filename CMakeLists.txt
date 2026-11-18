@@ -25,7 +25,7 @@ ThirdPartyCoreModule(Lua)
 CoreModule(Core)
 CoreModule(Logger)
 
-#========================================================== We'll only start MHT after all the core modules are ready.
+#========================================================== We'll only start MagicCodegenTool after all the core modules are ready.
 # Tools project includes subprojects.
 MagicCodegenToolModule(${MAGIC_CODEGEN_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
 
@@ -50,5 +50,5 @@ add_subdirectory(Tests)
 
 # Set the startup project to Launcher.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MagicEditor)
-# Output path for generated MHT module files.
-apply_mht_generate_path()
+# Output path for generated MagicCodegenTool files.
+apply_codegen_generate_path()

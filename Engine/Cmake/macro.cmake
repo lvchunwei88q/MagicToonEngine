@@ -64,7 +64,7 @@ macro(add_module_sources ModuleName)
         "*.hpp"
     )
 
-    # Write the list of source files into a text file, which will be used for generating reflection code in MHT
+    # Write the list of source files into a text file, which will be used for generating reflection code in MagicCodegenTool
     foreach(HEADER ${${ModuleName}_HEADERS})
         file(APPEND ${HEADER_LIST_FILE} "${HEADER} || ${ModuleName}\n")
     endforeach()
@@ -126,11 +126,11 @@ macro(AddEngineTest TARGET_NAME)
     endif()
 endmacro()
 
-# =============================================== MHT tool ===============================================
-function(apply_mht_generate_path)
+# =============================================== MagicCodegenTool ===============================================
+function(apply_codegen_generate_path)
     foreach(module ${GENERATE_HEADER_LINKPATH})
-        message(STATUS " This module will use the MHT tool: ${module}")
-        # Set the include path for the generated files of this module to the MHT output directory
+        message(STATUS " This module will use MagicCodegenTool: ${module}")
+        # Set the include path for the generated files of this module to the MagicCodegenTool output directory
         target_include_directories(${module} PRIVATE
             ${CMAKE_GENERATE_OUTPUT_DIRECTORY}/Object/${module}
         )
