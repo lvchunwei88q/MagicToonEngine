@@ -36,7 +36,7 @@ namespace Context
     };
 
     struct HeaderDescriptorData {
-        std::vector<std::wstring > ArrayOfHeaderFilePaths;
+        std::vector<IO::path> ArrayOfHeaderFilePaths;
         std::vector<std::string> HeaderFileComesFromModuleArray;
     };
 }
@@ -51,8 +51,9 @@ public:
     IO::path m_generateDir;
 	IO::path m_generateInfoFilePath;
 
-    // Latest file modification time cache
-    std::string m_LastModifiedTimeOfLatestFile;
+    // Contents of the hash check file: "<path> || <content hash>" for every file
+    // of the last successful generation. Written after the generation succeeds.
+    std::string m_HeaderHashCheckContents;
 
     // GenerationState
     Context::GenerationState m_GenerationStat = Context::GenerationState::Pending;;
@@ -65,8 +66,8 @@ public:
     // Utilitie Functions
     GENERATE_PROPERTY(generateDir,IO::path);
     GENERATE_PROPERTY(generateInfoFilePath,IO::path);
-    GENERATE_PROPERTY(LastModifiedTimeOfLatestFile,std::string);
-    bool LastModifiedTimeOfLatestFile_isValid() const { return !m_LastModifiedTimeOfLatestFile.empty(); }
+    GENERATE_PROPERTY(HeaderHashCheckContents,std::string);
+    bool HeaderHashCheckContents_isValid() const { return !m_HeaderHashCheckContents.empty(); }
     
     GENERATE_PROPERTY(Info,Context::TaskInfo);
     const size_t GetCurrentShowTaskIndex() const { return m_Info.CurrentTaskIndex + 1; }

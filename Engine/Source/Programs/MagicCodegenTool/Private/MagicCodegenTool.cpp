@@ -1,6 +1,7 @@
 #include "MagicCodegenTool.h"
 #include <sstream>
 #include <utility>
+#include <unordered_map>
 #include "Pipeline/GeneralPipeline.h"
 #include "MagicGlobalContext.h"
 #include "MagicUtilities.h"
@@ -10,12 +11,6 @@
 
 namespace MCT{
 	namespace {
-		struct LocalCheckModificationTime
-		{
-			std::wstring file;
-			size_t time;
-		};
-
 		void GetLine(std::string& Content, std::vector<std::string>& lines) {
 			std::istringstream stream(Content);
 			std::string line;
@@ -38,14 +33,21 @@ namespace MCT{
 			}
 		}
 
-		std::pair<std::wstring, std::wstring> SplitInput(const std::wstring& input) {
+		std::pair<IO::path, std::wstring> SplitInput(const std::wstring& input) {
 			size_t pos = input.find(L" || ");
 			if (pos != std::string::npos) {
 				std::wstring first = input.substr(0, pos);
 				std::wstring second = input.substr(pos + 4); // 4 is the length of 
-				return { first, second };
+				return { IO::path(first), second };
 			}
 			return { input, L"" };
+		}
+
+		// Hex is easier to eyeball in the .buildmeta file than a 20 digit decimal.
+		std::wstring ToHexHash(size_t hash) {
+			std::wstringstream stream;
+			stream << std::hex << static_cast<unsigned long long>(hash);
+			return stream.str();
 		}
 
 		const std::vector<std::wstring> FilterFilesNoNeedGenerated(const std::vector<std::string>& files)
@@ -54,83 +56,87 @@ namespace MCT{
 			MGC ctx = MagicGlobalContext::Get();
 
 			std::vector<std::wstring> NeedGeneratedFiles;
-			const IO::path timeCheckFilePath =
-				ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_TIME_CHECK_FILE;
-			
-			std::vector<LocalCheckModificationTime> BufferForReadingTimeCheckFile;
-			std::vector<LocalCheckModificationTime> BufferForWritingTimeCheckFile;
+			const IO::path hashCheckFilePath =
+				ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_HASH_CHECK_FILE;
+
+			// Path -> content hash recorded by the last successful generation.
+			std::unordered_map<std::wstring, size_t> CachedHashes;
 
 			// Read cache file
-			if (IO::Exists(timeCheckFilePath.native())) {
-				std::string CheckInfo = IO::ReadAllText(timeCheckFilePath.native());
+			if (IO::Exists(hashCheckFilePath.native())) {
+				std::string CheckInfo = IO::ReadAllText(hashCheckFilePath.native());
 				std::vector<std::string> FileLine;
 				GetLine(CheckInfo, FileLine);
 
 				for (size_t i = 0; i < FileLine.size(); i++)
 				{
-					auto& Line = FileLine[i];
-					std::wstring LineW = IO::ToWideString(Line);
-					auto[path, time] = SplitInput(LineW);
-					size_t time_number = std::stoull(time);
-					LocalCheckModificationTime CheckModificationTime = { path,time_number };
-					// add to BufferForReadingTimeCheckFile
-					BufferForReadingTimeCheckFile.push_back(std::move(CheckModificationTime));
+					const std::string& Line = FileLine[i];
+					if (Line.empty()) {
+						continue;
+					}
+
+					auto [path, hashText] = SplitInput(IO::ToWideString(Line));
+					if (path.empty() || hashText.empty()) {
+						continue;
+					}
+
+					size_t CachedHash = 0;
+					try {
+						CachedHash = static_cast<size_t>(std::stoull(IO::ToNarrowString(hashText), nullptr, 16));
+					}
+					catch (const std::exception&) {
+						// Unreadable line (old format or corruption): drop it, the file is regenerated once.
+						continue;
+					}
+
+					CachedHashes[path] = CachedHash;
 				}
 			}
 			// No cache files, everything generated
 			else {
-				IO::CreateFile(timeCheckFilePath.native());
+				IO::CreateFile(hashCheckFilePath.native());
 			}
 
+			// Lines are "<path> || <module>": split once, then hash every file's content in parallel.
+			std::vector<IO::path> FilePaths(files.size());
 			for (size_t i = 0; i < files.size(); i++)
 			{
-				auto& file = files[i];
-				std::wstring fileW = IO::ToWideString(file);
-				auto [path, moudel] = SplitInput(fileW);
-				// get this file modification time
-				size_t ThisFileModificationTime = Utilitie::GetFileModificationTime(path);
-
-				// If the current file does not exist in the time check cache file, add it to the time check buffer so it can be written to the cache file later. 
-				// If it exists, update the time and then add it.
-				bool CurrentFileAlreadyExistsInTimestampCache = false;
-				for (size_t y = 0; y < BufferForReadingTimeCheckFile.size(); y++)
-				{
-					auto& CheckFile = BufferForReadingTimeCheckFile[y];
-					if (path == CheckFile.file) {
-						CurrentFileAlreadyExistsInTimestampCache = true;
-						// Save these with the file's last modified time afterwards
-						BufferForWritingTimeCheckFile.push_back({ path , ThisFileModificationTime });
-						// Indicates that reflection code needs to be generated when the timing doesn’t match
-						if (ThisFileModificationTime != CheckFile.time) {
-							NeedGeneratedFiles.push_back(fileW);
-						}
-					}
-				}
-				// add to BufferForWritingTimeCheckFile
-				if (!CurrentFileAlreadyExistsInTimestampCache) {
-					BufferForWritingTimeCheckFile.push_back({ path , ThisFileModificationTime });
-					// If it didn't exist before, the time-check file should also be updated as mentioned.
-					NeedGeneratedFiles.push_back(fileW);
-				}
+				// Only the path part may reach the file system - the raw line still contains
+				// " || <module>", so opening it directly would always fail and yield hash 0.
+				FilePaths[i] = IO::path(SplitInput(IO::ToWideString(files[i])).first);
 			}
 
-			// Update File ModificationTime
-			std::wstring CheckModificationTime_ContentsW = L"";
-			for (size_t i = 0; i < BufferForWritingTimeCheckFile.size(); i++)
+			std::vector<size_t> CurrentHashes;
+			Utilitie::GetFileContentHashesParallel(FilePaths, CurrentHashes);
+
+			// Rebuild the cache contents; it is written only after a successful generation.
+			std::wstring HashCheck_ContentsW = L"";
+			for (size_t i = 0; i < files.size(); i++)
 			{
-				auto& CheckFileCache = BufferForWritingTimeCheckFile[i];
-				std::wstring Content = CheckFileCache.file + L" || " + std::to_wstring(CheckFileCache.time) + L"\n";
-				CheckModificationTime_ContentsW += Content;
+				// Copy out of the path: a const reference here would bind to a temporary
+				// produced by path -> wstring conversion.
+				const std::wstring path = FilePaths[i].wstring();
+				const size_t ThisFileHash = CurrentHashes[i];
+
+				HashCheck_ContentsW += path + L" || " + ToHexHash(ThisFileHash) + L"\n";
+
+				auto CachedHashIt = CachedHashes.find(path);
+				const bool bGeneratedBefore = (CachedHashIt != CachedHashes.end());
+
+				// The content hash decides: a file that was only touched (mtime changed,
+				// bytes unchanged) no longer triggers a regeneration.
+				// Hash 0 means the file could not be read - regenerate so the error surfaces.
+				if (!bGeneratedBefore || ThisFileHash == 0 || CachedHashIt->second != ThisFileHash) {
+					NeedGeneratedFiles.push_back(IO::ToWideString(files[i]));
+				}
 
 #if MAGIC_DEV
-				Utilitie::Log::Info(IO::ToNarrowString(CheckFileCache.file) + " - Time: " + std::to_string(CheckFileCache.time));
+				Utilitie::Log::Info(IO::ToNarrowString(path) + " - Hash: " + IO::ToNarrowString(ToHexHash(ThisFileHash)));
 #endif
 			}
 
 			// Save to GlobalContext
-			std::string CheckModificationTime_Contents = IO::ToNarrowString(CheckModificationTime_ContentsW);
-			ctx.SetLastModifiedTimeOfLatestFile(CheckModificationTime_Contents);
-			//IO::WriteAllText(TimeCheckFilePath , CheckModificationTime_Contents);
+			ctx.SetHeaderHashCheckContents(IO::ToNarrowString(HashCheck_ContentsW));
 
 			return NeedGeneratedFiles;
 		}
@@ -146,7 +152,8 @@ namespace MCT{
 			std::vector<std::string> headers_lines_file;
 			GetLine(GenerateInfo, headers_lines_file);
 
-			// To compile faster and avoid unnecessary builds, it will check the modification time to decide whether reflection code needs to be generated.
+			// To compile faster and avoid unnecessary builds, the content hash of every
+			// file decides whether reflection code needs to be generated.
 #if !MAGIC_DEV
 			std::vector<std::wstring> NeedGeneratedFileLists = FilterFilesNoNeedGenerated(headers_lines_file);
 #else
@@ -231,15 +238,15 @@ namespace MCT{
 		}
 
 		// All tasks completed! Updating the content of the check file.
-		const IO::path timeCheckFilePath =
-			ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_TIME_CHECK_FILE;
-		if(ctx.LastModifiedTimeOfLatestFile_isValid())
+		const IO::path hashCheckFilePath =
+			ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_HASH_CHECK_FILE;
+		if(ctx.HeaderHashCheckContents_isValid())
 		{
-			IO::WriteAllText(timeCheckFilePath.native(), ctx.GetLastModifiedTimeOfLatestFile());
+			IO::WriteAllText(hashCheckFilePath.native(), ctx.GetHeaderHashCheckContents());
 		}
 		else
 		{
-			Utilitie::Log::Error("LastModifiedTimeOfLatestFile is invalid. Cannot write to TimeCheckFile.");
+			Utilitie::Log::Error("HeaderHashCheckContents is invalid. Cannot write to HashCheckFile.");
 			return false;
 		}
 
@@ -269,7 +276,7 @@ namespace MCT{
 			MagicEngineHeader magicHeader;
 			GetLine(AllHeadersContent[i], magicHeader.lines);
 
-			magicHeader.headerPath = IO::path(HeaderDescriptorData.ArrayOfHeaderFilePaths[i]);
+			magicHeader.headerPath = HeaderDescriptorData.ArrayOfHeaderFilePaths[i];
 			magicHeader.moduleName = HeaderDescriptorData.HeaderFileComesFromModuleArray[i];
 			MagicEngineHeaders.push_back(std::move(magicHeader));
 		}

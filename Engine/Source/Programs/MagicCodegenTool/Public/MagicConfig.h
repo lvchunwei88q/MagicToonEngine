@@ -29,9 +29,12 @@
 #define MAGICENGINE_COMPILE_COMMANDS_FILE u8"engine_compile_commands.buildmeta"
 
 /**
- * @brief UTF-8 path to the engine header timestamp check file.
+ * @brief UTF-8 path to the engine header content hash check file.
+ * @details Records the content hash of every engine source/header file at the last
+ * successful code generation. Regeneration is decided by content, not by timestamp,
+ * so touching / checking out files no longer triggers a full regeneration.
  */
-#define MAGICENGINE_HEADER_TIME_CHECK_FILE u8"engine_headers_time_check_file.buildmeta"
+#define MAGICENGINE_HEADER_HASH_CHECK_FILE u8"engine_headers_hash_check_file.buildmeta"
 
 /**
  * @brief UTF-8 path to the engine class info file.

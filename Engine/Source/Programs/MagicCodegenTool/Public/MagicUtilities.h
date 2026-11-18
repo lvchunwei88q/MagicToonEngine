@@ -59,10 +59,22 @@ namespace Utilitie {
 		}
 	};
 
-	// Get file modification time
-	size_t GetFileModificationTime(const std::wstring& filepath);
+	/**
+	 * @brief 64-bit content hash of a file (FNV-1a over the raw bytes).
+	 * @details Used to decide whether reflection code has to be regenerated:
+	 *          touching a file no longer counts as a change, only editing it does.
+	 * @return The hash, or 0 when the file does not exist or cannot be read.
+	 */
+	size_t GetFileContentHash(const IO::path& filepath);
+
+	/**
+	 * @brief Content hash of many files, computed in parallel.
+	 * @details `hashes` is resized to `filePaths.size()`; unreadable files get 0.
+	 */
+	void GetFileContentHashesParallel(const std::vector<IO::path>& filePaths, std::vector<size_t>& hashes);
+
 	// Read files in parallel, returning false if any file could not be read.
-	bool ReadFilesParallel(const std::vector<std::wstring>& filePaths, std::vector<std::string>& contents);
+	bool ReadFilesParallel(const std::vector<IO::path>& filePaths, std::vector<std::string>& contents);
 }
 
 DISABLE_DLL_WARNINGS_POP;
