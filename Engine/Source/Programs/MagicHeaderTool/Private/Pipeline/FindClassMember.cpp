@@ -164,7 +164,7 @@ namespace MHT {
 		{
 			for (const MagicEngineHeader& header : headers)
 			{
-				if (header.headerName == headerName)
+				if (header.headerPath.string() == headerName)
 				{
 					return &header;
 				}

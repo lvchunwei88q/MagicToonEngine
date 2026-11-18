@@ -4,18 +4,19 @@
 #include <string>
 #include <utility>
 #include <Utilities/Singleton.h>
+#include <IO.h>
 #include "MagicUtilities.h" 
 
 namespace MHT {
 	// All the data is stored in this singleton, making it easy to access and modify at different stages.
 	struct MagicEngineHeader
 	{
-		std::string headerName;
+		IO::Path headerPath;	// The path to the header file
 		std::string moduleName;
 		std::vector<std::string> lines;
 
-		MagicEngineHeader(const std::string& headerName, const std::string& moduleName, const std::vector<std::string>& lines)
-			: headerName(headerName), moduleName(moduleName), lines(lines) {}
+		MagicEngineHeader(const IO::Path& headerPath, const std::string& moduleName, const std::vector<std::string>& lines)
+			: headerPath(headerPath), moduleName(moduleName), lines(lines) {}
 		MagicEngineHeader() {}
 	};
 

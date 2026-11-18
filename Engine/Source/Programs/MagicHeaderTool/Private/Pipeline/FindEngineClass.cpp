@@ -39,7 +39,7 @@ namespace MHT {
 		 */
 		std::string NormalizePath(const std::string& path)
 		{
-			std::string normalized = std::filesystem::path(std::filesystem::u8path(path))
+			std::string normalized = IO::Path(std::filesystem::u8path(path))
 				.lexically_normal()
 				.string();
 			std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -52,9 +52,9 @@ namespace MHT {
 		 * Build the path to the CMake-generated compilation database.
 		 * @return The compilation database path under the configured generation directory.
 		 */
-		std::filesystem::path GetCompileCommandsPath()
+		IO::Path GetCompileCommandsPath()
 		{
-			return std::filesystem::path(
+			return IO::Path(
 				MagicGeneralPipelinedData::Get().GetGeneratePath())
 				/ MAGICENGINE_FILE_INFO_PATH
 				/ MAGICENGINE_COMPILE_COMMANDS_FILE;
@@ -145,7 +145,7 @@ namespace MHT {
 		 * @param outCommands Receives the parsed compile command entries.
 		 * @return True if the database was read and parsed successfully; otherwise false.
 		 */
-		bool LoadCompileCommands(const std::filesystem::path& buildMetaPath,
+		bool LoadCompileCommands(const IO::Path& buildMetaPath,
 			std::vector<CompileCommandData>& outCommands)
 		{
 			std::ifstream input(buildMetaPath, std::ios::binary);
@@ -232,19 +232,18 @@ namespace MHT {
 		 * @param moduleName The directory name identifying the module root.
 		 * @return The matching module root, or an empty path if none is found.
 		 */
-		std::filesystem::path FindModuleRoot(
-			const std::string& headerName,
+		IO::Path FindModuleRoot(
+			const IO::Path& headerPath,
 			const std::string& moduleName)
 		{
-			std::filesystem::path directory =
-				std::filesystem::u8path(headerName).parent_path();
+			IO::Path directory = headerPath.parent_path();
 			while (!directory.empty())
 			{
 				if (directory.filename().string() == moduleName)
 				{
 					return directory;
 				}
-				const std::filesystem::path parent = directory.parent_path();
+				const IO::Path parent = directory.parent_path();
 				if (parent == directory)
 				{
 					break;
@@ -261,8 +260,8 @@ namespace MHT {
 		 * @return True if the file is a descendant of the directory; otherwise false.
 		 */
 		bool IsPathWithinDirectory(
-			const std::filesystem::path& filePath,
-			const std::filesystem::path& directory)
+			const IO::Path& filePath,
+			const IO::Path& directory)
 		{
 			const std::string normalizedFile = NormalizePath(
 				std::filesystem::absolute(filePath).string());
@@ -283,19 +282,18 @@ namespace MHT {
 			const std::vector<CompileCommandData>& commands,
 			const MagicEngineHeader& header)
 		{
-			const std::filesystem::path headerPath =
-				std::filesystem::u8path(header.headerName);
+			const IO::Path headerPath = header.headerPath;
 			const std::string normalizedHeaderPath = NormalizePath(
 				std::filesystem::absolute(headerPath).string());
-			const std::filesystem::path moduleRoot =
-				FindModuleRoot(header.headerName, header.moduleName);
+			const IO::Path moduleRoot =
+				FindModuleRoot(header.headerPath, header.moduleName);
 
 			const CompileCommandData* bestCommand = nullptr;
 			size_t bestDirectoryLength = 0;
 			for (const CompileCommandData& command : commands)
 			{
-				const std::filesystem::path sourcePath = std::filesystem::u8path(command.fileName);
-				const std::filesystem::path absoluteSource = sourcePath.is_absolute()
+				const IO::Path sourcePath = std::filesystem::u8path(command.fileName);
+				const IO::Path absoluteSource = sourcePath.is_absolute()
 					? sourcePath
 					: std::filesystem::u8path(command.directory) / sourcePath;
 				if (NormalizePath(std::filesystem::absolute(absoluteSource).string()) ==
@@ -340,7 +338,7 @@ namespace MHT {
 			const std::string& directory,
 			const std::string& includePath)
 		{
-			std::filesystem::path path = std::filesystem::u8path(includePath);
+			IO::Path path = std::filesystem::u8path(includePath);
 			if (path.is_relative())
 			{
 				path = std::filesystem::u8path(directory) / path;
@@ -466,7 +464,7 @@ namespace MHT {
 		 */
 		void AddIncludePath(std::vector<std::string>& arguments,
 			std::vector<std::string>& knownPaths,
-			const std::filesystem::path& path)
+			const IO::Path& path)
 		{
 			if (!std::filesystem::is_directory(path))
 			{
@@ -498,10 +496,10 @@ namespace MHT {
 			AddIncludePath(
 				arguments,
 				knownPaths,
-				std::filesystem::u8path(header.headerName).parent_path());
+				header.headerPath.parent_path());
 
-			const std::filesystem::path generatedRoot =
-				std::filesystem::path(MagicGeneralPipelinedData::Get().GetGeneratePath());
+			const IO::Path generatedRoot =
+				IO::Path(MagicGeneralPipelinedData::Get().GetGeneratePath());
 			if (!moduleName.empty())
 			{
 				AddIncludePath(
@@ -959,15 +957,15 @@ namespace MHT {
 			{
 				Utilitie::Log::Error(
 					"No compile command found for module " + header.moduleName +
-					" while parsing " + header.headerName);
-				failedHeaders.insert(header.headerName);
+					" while parsing " + header.headerPath.string());
+				failedHeaders.insert(header.headerPath.string());
 				return false;
 			}
 
 			std::vector<std::string> arguments;
 			if (!BuildClangArguments(*compileCommand, arguments))
 			{
-				failedHeaders.insert(header.headerName);
+				failedHeaders.insert(header.headerPath.string());
 				return false;
 			}
 			std::vector<std::string> includePaths;
@@ -983,7 +981,7 @@ namespace MHT {
 					AddIncludePath(
 						arguments,
 						includePaths,
-						std::filesystem::path(
+						IO::Path(
 							MagicGeneralPipelinedData::Get().GetGeneratePath())
 							/ "Object"
 							/ std::filesystem::u8path(candidate.moduleName));
@@ -998,15 +996,16 @@ namespace MHT {
 			}
 
 			const std::string source = BuildParseSource(header.lines);
+			const std::string headerPath = header.headerPath.string();
 			CXUnsavedFile unsavedFile = {
-				header.headerName.c_str(),
+				headerPath.c_str(),
 				source.c_str(),
 				static_cast<unsigned long>(source.size())
 			};
 			CXTranslationUnit translationUnit = nullptr;
 			const CXErrorCode result = clang_parseTranslationUnit2(
 				index,
-				header.headerName.c_str(),
+				headerPath.c_str(),
 				argumentPointers.data(),
 				static_cast<int>(argumentPointers.size()),
 				&unsavedFile,
@@ -1016,9 +1015,9 @@ namespace MHT {
 			if (result != CXError_Success || translationUnit == nullptr)
 			{
 				Utilitie::Log::Error(
-					"libclang failed to parse header: " + header.headerName +
+					"libclang failed to parse header: " + header.headerPath.string() +
 					" (error " + std::to_string(static_cast<int>(result)) + ")");
-				failedHeaders.insert(header.headerName);
+				failedHeaders.insert(header.headerPath.string());
 				return false;
 			}
 
@@ -1032,7 +1031,7 @@ namespace MHT {
 					const CursorLocation location = GetLocation(
 						clang_getDiagnosticLocation(diagnostic));
 					Utilitie::Log::Error(
-						"libclang diagnostic in " + header.headerName +
+						"libclang diagnostic in " + header.headerPath.string() +
 						" Line:" + std::to_string(location.line) + ": " +
 						ToString(clang_getDiagnosticSpelling(diagnostic)));
 					hasErrors = true;
@@ -1041,17 +1040,17 @@ namespace MHT {
 			}
 			if (hasErrors)
 			{
-				failedHeaders.insert(header.headerName);
+				failedHeaders.insert(header.headerPath.string());
 				clang_disposeTranslationUnit(translationUnit);
 				return false;
 			}
 
 			const std::string targetFile = NormalizePath(
 				std::filesystem::absolute(
-					std::filesystem::u8path(header.headerName)).string());
+					header.headerPath.string()).string());
 			ParseContext context{
 				targetFile,
-				header.headerName,
+				header.headerPath.string(),
 				std::unordered_set<size_t>(
 					mClassDeclarationLines.begin(), mClassDeclarationLines.end()),
 				{},
@@ -1086,7 +1085,7 @@ namespace MHT {
 			std::vector<MagicClassInfo>& outClasses,
 			std::unordered_set<std::string>& failedHeaders)
 		{
-			const std::filesystem::path compileCommandsPath =
+			const IO::Path compileCommandsPath =
 				GetCompileCommandsPath();
 			if (!std::filesystem::is_regular_file(compileCommandsPath))
 			{
@@ -1191,7 +1190,7 @@ namespace MHT {
 			bool hasErrors = !failedHeaders.empty();
 			for (const MagicEngineHeader& header : headers)
 			{
-				if (failedHeaders.contains(header.headerName))
+				if (failedHeaders.contains(header.headerPath.string()))
 				{
 					continue;
 				}
@@ -1208,14 +1207,14 @@ namespace MHT {
 						parsedClasses.begin(),
 						parsedClasses.end(),
 						[&header, line](const MagicClassInfo& candidate) {
-							return candidate.headerName == header.headerName &&
+							return candidate.headerName == header.headerPath.string() &&
 								candidate.lineNum == line + 1;
 						});
 					if (classInfo == parsedClasses.end())
 					{
 						Utilitie::Log::Error(
 							"libclang could not find a class declaration after MCLASS: " +
-							header.headerName + " Line:" + std::to_string(line + 1));
+							header.headerPath.string() + " Line:" + std::to_string(line + 1));
 						hasErrors = true;
 						continue;
 					}
@@ -1228,7 +1227,7 @@ namespace MHT {
 					{
 						Utilitie::Log::Error(
 							"No valid GENERATE_BODY was found in class " +
-							classInfo->className + " in " + header.headerName);
+							classInfo->className + " in " + header.headerPath.string());
 						hasErrors = true;
 						continue;
 					}

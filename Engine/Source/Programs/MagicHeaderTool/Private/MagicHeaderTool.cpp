@@ -266,7 +266,7 @@ namespace MHT{
 			MagicEngineHeader magicHeader;
 			GetLine(AllHeadersContent[i], magicHeader.lines);
 
-			magicHeader.headerName = IO::ToNarrowString(HeaderDescriptorData.ArrayOfHeaderFilePaths[i]);
+			magicHeader.headerPath = IO::Path(HeaderDescriptorData.ArrayOfHeaderFilePaths[i]);
 			magicHeader.moduleName = HeaderDescriptorData.HeaderFileComesFromModuleArray[i];
 			MagicEngineHeaders.push_back(std::move(magicHeader));
 		}
