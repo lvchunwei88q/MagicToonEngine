@@ -185,17 +185,17 @@ namespace MHT
 				classInfoReport << '\n';
             }
 
-			const std::wstring classInfoReportPath =
-				ctx.GetgenerateDir() + L"\\" MAGICENGINE_FILE_INFO_PATH_W
-				L"\\" MAGICENGINE_CLASS_INFO_FILE_W;
-            const std::wstring classDebugReportPath = 
-                ctx.GetgenerateDir() + L"\\" MAGICENGINE_FILE_INFO_PATH_W 
-                L"\\" MAGICENGINE_CLASS_METADATA_INFO_FILE_W;
+			const IO::path classInfoReportPath =
+				ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH
+				/ MAGICENGINE_CLASS_INFO_FILE;
+            const IO::path classDebugReportPath =
+                ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH
+                / MAGICENGINE_CLASS_METADATA_INFO_FILE;
             
 			const bool classDebugReportWritten = AppendReport(
-				classDebugReportPath, classDebugInfo.str(), "class metadata info file");
+				classDebugReportPath.native(), classDebugInfo.str(), "class metadata info file");
 			const bool classInfoReportWritten = AppendReport(
-				classInfoReportPath,classInfoReport.str(),"class information report");
+				classInfoReportPath.native(),classInfoReport.str(),"class information report");
 
 			return classDebugReportWritten && classInfoReportWritten;
         };

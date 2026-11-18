@@ -33,13 +33,14 @@ int main(int argc, char* argv[]) {
     }
 
     // Get the generate directory from the parsed arguments
-    std::string generateDir = parser.get<std::string>("generate-dir");
-	std::wstring generateDirW = IO::ToWideString(generateDir);
-    std::wstring generateInfoFilePath = generateDirW + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\" MAGICENGINE_HEADER_INFO_FILE_W;
+    const IO::path generateDir =
+        std::filesystem::u8path(parser.get<std::string>("generate-dir"));
+    const IO::path generateInfoFilePath =
+        generateDir / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_INFO_FILE;
 
     // Set the generate directory and info file path in the global context
     MGC ctx = MagicGlobalContext::Get();
-    ctx.SetgenerateDir(generateDirW);
+    ctx.SetgenerateDir(generateDir);
     ctx.SetgenerateInfoFilePath(generateInfoFilePath);
 
     // Initialize the Core Subsystem

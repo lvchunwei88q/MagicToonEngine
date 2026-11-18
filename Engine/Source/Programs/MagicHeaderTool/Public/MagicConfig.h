@@ -14,74 +14,31 @@
 #define MAXIMUM_CAPACITY_PER_JOB 100
 
 /**
- * @brief Path to the engine generation information directory (wide-character version).
- * @details A fixed path used to store engine generation information.
+ * @brief UTF-8 path to the engine generation information directory.
  */
-#define MAGICENGINE_FILE_INFO_PATH_W L"engine_generate_info"
+#define MAGICENGINE_FILE_INFO_PATH u8"engine_generate_info"
 
 /**
- * @brief Path to the engine generation information directory (narrow-character version).
- * @details A fixed path corresponding to MAGICENGINE_FILE_INFO_PATH_W.
+ * @brief UTF-8 path to the engine header build metadata file.
  */
-#define MAGICENGINE_FILE_INFO_PATH "engine_generate_info"
+#define MAGICENGINE_HEADER_INFO_FILE u8"engine_headers.buildmeta"
 
 /**
- * @brief Path to the engine header build metadata file (wide-character version).
- * @details A fixed file path.
+ * @brief UTF-8 path to the engine compilation database file.
  */
-#define MAGICENGINE_HEADER_INFO_FILE_W L"engine_headers.buildmeta"
+#define MAGICENGINE_COMPILE_COMMANDS_FILE u8"engine_compile_commands.buildmeta"
 
 /**
- * @brief Path to the engine header build metadata file (narrow-character version).
- * @details A fixed path corresponding to MAGICENGINE_HEADER_INFO_FILE_W.
+ * @brief UTF-8 path to the engine header timestamp check file.
  */
-#define MAGICENGINE_HEADER_INFO_FILE "engine_headers.buildmeta"
+#define MAGICENGINE_HEADER_TIME_CHECK_FILE u8"engine_headers_time_check_file.buildmeta"
 
 /**
- * @brief Path to the engine compilation database file (wide-character version).
- * @details A fixed file path used by the header tool to parse engine headers.
+ * @brief UTF-8 path to the engine class info file.
  */
-#define MAGICENGINE_COMPILE_COMMANDS_FILE_W L"engine_compile_commands.buildmeta"
+#define MAGICENGINE_CLASS_INFO_FILE u8"logs/engine_class_info.log"
 
 /**
- * @brief Path to the engine compilation database file (narrow-character version).
- * @details A fixed path corresponding to MAGICENGINE_COMPILE_COMMANDS_FILE_W.
+ * @brief UTF-8 path to the engine class metadata debug file.
  */
-#define MAGICENGINE_COMPILE_COMMANDS_FILE "engine_compile_commands.buildmeta"
-
-/**
- * @brief Path to the engine header timestamp check file (wide-character version).
- * @details A fixed file path used to record timestamps for incremental build checks.
- */
-#define MAGICENGINE_HEADER_TIME_CHECK_FILE_W L"engine_headers_time_check_file.buildmeta"
-
-/**
- * @brief Path to the engine header timestamp check file (narrow-character version).
- * @details A fixed path corresponding to MAGICENGINE_HEADER_TIME_CHECK_FILE_W.
- */
-#define MAGICENGINE_HEADER_TIME_CHECK_FILE "engine_headers_time_check_file.buildmeta"
-
-/**
- * @brief Path to the engine class info file (wide-character version).
- * @details A fixed file path used to store class information.
- */
-#define MAGICENGINE_CLASS_INFO_FILE_W L"logs/engine_class_info.log"
-
-/**
- * @brief Path to the engine class info file (narrow-character version).
- * @details A fixed path corresponding to MAGICENGINE_CLASS_INFO_FILE_W.
- */
-#define MAGICENGINE_CLASS_INFO_FILE "logs/engine_class_info.log"
-
-
-/**
- * @brief Path to the engine class metadata debug file (wide-character version).
- * @details A fixed file path used for debugging the generation of Engine class metadata.
- */
-#define MAGICENGINE_CLASS_METADATA_INFO_FILE_W L"logs/engine_class_metadata_info.log"
-
-/**
- * @brief Path to the engine class metadata debug file (narrow-character version).
- * @details A fixed path corresponding to MAGICENGINE_CLASS_METADATA_INFO_FILE_W.
- */
-#define MAGICENGINE_CLASS_METADATA_INFO_FILE "logs/engine_class_metadata_info.log"
+#define MAGICENGINE_CLASS_METADATA_INFO_FILE u8"logs/engine_class_metadata_info.log"

@@ -23,23 +23,21 @@ namespace MHT {
 					const auto& metadata = generatedMetadata[index];
 					try
 					{
-						const std::wstring headerName =
-							metadata.headerPath.stem().wstring();
-						const std::wstring moduleName = IO::ToWideString(metadata.moduleName);
-						const std::wstring& generatePath =
-							MagicGeneralPipelinedData::Get().GetRefGeneratePath();
-						const std::wstring outputDirectory =
-							generatePath + L"\\Object\\" + moduleName;
-						if (!IO::CreateDirectory(outputDirectory))
+						const std::wstring headerStem =
+							metadata.headerPath.stem().native();
+						const IO::path outputDirectory =
+							MagicGeneralPipelinedData::Get().GetRefGeneratePath()
+							/ L"Object" / IO::ToWideString(metadata.moduleName);
+						if (!IO::CreateDirectory(outputDirectory.native()))
 						{
 							throw std::runtime_error(
 								"Could not create generated header directory");
 						}
 
-						const std::wstring outputPath =
-							outputDirectory + L"\\" + headerName + L".object.generate.h";
+						const IO::path outputPath =
+							outputDirectory / (headerStem + L".object.generate.h");
 						std::ofstream output(
-							std::filesystem::path(outputPath),
+							outputPath,
 							std::ios::binary | std::ios::trunc);
 						if (!output)
 						{

@@ -54,14 +54,15 @@ namespace MHT{
 			MGC ctx = MagicGlobalContext::Get();
 
 			std::vector<std::wstring> NeedGeneratedFiles;
-			std::wstring TimeCheckFilePath = ctx.GetgenerateDir() + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\" MAGICENGINE_HEADER_TIME_CHECK_FILE_W;
+			const IO::path timeCheckFilePath =
+				ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_TIME_CHECK_FILE;
 			
 			std::vector<LocalCheckModificationTime> BufferForReadingTimeCheckFile;
 			std::vector<LocalCheckModificationTime> BufferForWritingTimeCheckFile;
 
 			// Read cache file
-			if (IO::Exists(TimeCheckFilePath)) {
-				std::string CheckInfo = IO::ReadAllText(TimeCheckFilePath);
+			if (IO::Exists(timeCheckFilePath.native())) {
+				std::string CheckInfo = IO::ReadAllText(timeCheckFilePath.native());
 				std::vector<std::string> FileLine;
 				GetLine(CheckInfo, FileLine);
 
@@ -78,7 +79,7 @@ namespace MHT{
 			}
 			// No cache files, everything generated
 			else {
-				IO::CreateFile(TimeCheckFilePath);
+				IO::CreateFile(timeCheckFilePath.native());
 			}
 
 			for (size_t i = 0; i < files.size(); i++)
@@ -138,10 +139,10 @@ namespace MHT{
 	bool MagicHeaderTool::readGenerateInfoFile()
 	{
 		MGC ctx = MagicGlobalContext::Get();
-		if (IO::Exists(ctx.GetgenerateInfoFilePath())) {
+		if (IO::Exists(ctx.GetgenerateInfoFilePath().native())) {
 			MagicGeneralPipelinedData::Get().SetGeneratePath(ctx.GetgenerateDir());
 
-			std::string GenerateInfo = IO::ReadAllText(ctx.GetgenerateInfoFilePath());
+			std::string GenerateInfo = IO::ReadAllText(ctx.GetgenerateInfoFilePath().native());
 			std::vector<std::string> headers_lines_file;
 			GetLine(GenerateInfo, headers_lines_file);
 
@@ -199,8 +200,9 @@ namespace MHT{
 			return true;
 		}
 		else {
-			Utilitie::Log::Error("Header list file not found at: " + IO::ToNarrowString(ctx.GetgenerateInfoFilePath())
-																+ "\\" MAGICENGINE_FILE_INFO_PATH "\\" MAGICENGINE_HEADER_INFO_FILE);
+			Utilitie::Log::Error(
+				"Header list file not found at: " +
+				ctx.GetgenerateInfoFilePath().string());
 			return false;
 		}
 	}
@@ -229,10 +231,11 @@ namespace MHT{
 		}
 
 		// All tasks completed! Updating the content of the check file.
-		std::wstring TimeCheckFilePath = ctx.GetgenerateDir() + L"\\" MAGICENGINE_FILE_INFO_PATH_W L"\\" MAGICENGINE_HEADER_TIME_CHECK_FILE_W;
+		const IO::path timeCheckFilePath =
+			ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_TIME_CHECK_FILE;
 		if(ctx.LastModifiedTimeOfLatestFile_isValid())
 		{
-			IO::WriteAllText(TimeCheckFilePath, ctx.GetLastModifiedTimeOfLatestFile());
+			IO::WriteAllText(timeCheckFilePath.native(), ctx.GetLastModifiedTimeOfLatestFile());
 		}
 		else
 		{

@@ -57,8 +57,7 @@ namespace MHT {
 		 */
 		IO::path GetCompileCommandsPath()
 		{
-			return IO::path(
-				MagicGeneralPipelinedData::Get().GetGeneratePath())
+			return MagicGeneralPipelinedData::Get().GetGeneratePath()
 				/ MAGICENGINE_FILE_INFO_PATH
 				/ MAGICENGINE_COMPILE_COMMANDS_FILE;
 		}
@@ -502,7 +501,7 @@ namespace MHT {
 				header.headerPath.parent_path());
 
 			const IO::path generatedRoot =
-				IO::path(MagicGeneralPipelinedData::Get().GetGeneratePath());
+				MagicGeneralPipelinedData::Get().GetGeneratePath();
 			if (!moduleName.empty())
 			{
 				AddIncludePath(
@@ -984,8 +983,7 @@ namespace MHT {
 					AddIncludePath(
 						arguments,
 						includePaths,
-						IO::path(
-							MagicGeneralPipelinedData::Get().GetGeneratePath())
+						MagicGeneralPipelinedData::Get().GetGeneratePath()
 							/ "Object"
 							/ std::filesystem::u8path(candidate.moduleName));
 				}
@@ -1092,7 +1090,9 @@ namespace MHT {
 			if (!std::filesystem::is_regular_file(compileCommandsPath))
 			{
 				Utilitie::Log::Error(
-					"CMake-generated " MAGICENGINE_COMPILE_COMMANDS_FILE " was not found at " +
+					"CMake-generated " +
+					IO::path(MAGICENGINE_COMPILE_COMMANDS_FILE).string() +
+					" was not found at " +
 					compileCommandsPath.string());
 				return false;
 			}

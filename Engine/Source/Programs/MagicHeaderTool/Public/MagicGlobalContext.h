@@ -48,8 +48,8 @@ public:
     ~MagicGlobalContext() = default;
 
     // MagicHeaderTool will read the generateInfoFile and set the TaskInfo and HeaderDescriptorData
-    std::wstring m_generateDir;
-	std::wstring m_generateInfoFilePath;
+    IO::path m_generateDir;
+	IO::path m_generateInfoFilePath;
 
     // Latest file modification time cache
     std::string m_LastModifiedTimeOfLatestFile;
@@ -63,8 +63,8 @@ public:
     std::vector<Context::HeaderDescriptorData> m_HDDs;
 
     // Utilitie Functions
-    GENERATE_PROPERTY(generateDir,std::wstring);
-    GENERATE_PROPERTY(generateInfoFilePath,std::wstring);
+    GENERATE_PROPERTY(generateDir,IO::path);
+    GENERATE_PROPERTY(generateInfoFilePath,IO::path);
     GENERATE_PROPERTY(LastModifiedTimeOfLatestFile,std::string);
     bool LastModifiedTimeOfLatestFile_isValid() const { return !m_LastModifiedTimeOfLatestFile.empty(); }
     
