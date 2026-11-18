@@ -11,11 +11,11 @@ namespace MHT {
 	// All the data is stored in this singleton, making it easy to access and modify at different stages.
 	struct MagicEngineHeader
 	{
-		IO::Path headerPath;	// The path to the header file
+		IO::path headerPath;	// The path to the header file
 		std::string moduleName;
 		std::vector<std::string> lines;
 
-		MagicEngineHeader(const IO::Path& headerPath, const std::string& moduleName, const std::vector<std::string>& lines)
+		MagicEngineHeader(const IO::path& headerPath, const std::string& moduleName, const std::vector<std::string>& lines)
 			: headerPath(headerPath), moduleName(moduleName), lines(lines) {}
 		MagicEngineHeader() {}
 	};

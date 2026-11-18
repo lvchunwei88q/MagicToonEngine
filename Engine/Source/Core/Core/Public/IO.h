@@ -27,7 +27,7 @@ DISABLE_DLL_WARNINGS_PUSH;
 namespace IO {
 	// Define it in a namespace to prevent name collisions
 	namespace fs = std::filesystem;
-	using Path = fs::path;
+	using path = fs::path;
 
 	// Read text to file
 	CORE_API std::string ReadAllText(const std::wstring& path);

@@ -39,7 +39,7 @@ namespace MHT {
 		 */
 		std::string NormalizePath(const std::string& path)
 		{
-			std::string normalized = IO::Path(std::filesystem::u8path(path))
+			std::string normalized = IO::path(std::filesystem::u8path(path))
 				.lexically_normal()
 				.string();
 			std::replace(normalized.begin(), normalized.end(), '\\', '/');
@@ -52,9 +52,9 @@ namespace MHT {
 		 * Build the path to the CMake-generated compilation database.
 		 * @return The compilation database path under the configured generation directory.
 		 */
-		IO::Path GetCompileCommandsPath()
+		IO::path GetCompileCommandsPath()
 		{
-			return IO::Path(
+			return IO::path(
 				MagicGeneralPipelinedData::Get().GetGeneratePath())
 				/ MAGICENGINE_FILE_INFO_PATH
 				/ MAGICENGINE_COMPILE_COMMANDS_FILE;
@@ -145,7 +145,7 @@ namespace MHT {
 		 * @param outCommands Receives the parsed compile command entries.
 		 * @return True if the database was read and parsed successfully; otherwise false.
 		 */
-		bool LoadCompileCommands(const IO::Path& buildMetaPath,
+		bool LoadCompileCommands(const IO::path& buildMetaPath,
 			std::vector<CompileCommandData>& outCommands)
 		{
 			std::ifstream input(buildMetaPath, std::ios::binary);
@@ -232,18 +232,18 @@ namespace MHT {
 		 * @param moduleName The directory name identifying the module root.
 		 * @return The matching module root, or an empty path if none is found.
 		 */
-		IO::Path FindModuleRoot(
-			const IO::Path& headerPath,
+		IO::path FindModuleRoot(
+			const IO::path& headerPath,
 			const std::string& moduleName)
 		{
-			IO::Path directory = headerPath.parent_path();
+			IO::path directory = headerPath.parent_path();
 			while (!directory.empty())
 			{
 				if (directory.filename().string() == moduleName)
 				{
 					return directory;
 				}
-				const IO::Path parent = directory.parent_path();
+				const IO::path parent = directory.parent_path();
 				if (parent == directory)
 				{
 					break;
@@ -260,8 +260,8 @@ namespace MHT {
 		 * @return True if the file is a descendant of the directory; otherwise false.
 		 */
 		bool IsPathWithinDirectory(
-			const IO::Path& filePath,
-			const IO::Path& directory)
+			const IO::path& filePath,
+			const IO::path& directory)
 		{
 			const std::string normalizedFile = NormalizePath(
 				std::filesystem::absolute(filePath).string());
@@ -282,18 +282,18 @@ namespace MHT {
 			const std::vector<CompileCommandData>& commands,
 			const MagicEngineHeader& header)
 		{
-			const IO::Path headerPath = header.headerPath;
+			const IO::path headerPath = header.headerPath;
 			const std::string normalizedHeaderPath = NormalizePath(
 				std::filesystem::absolute(headerPath).string());
-			const IO::Path moduleRoot =
+			const IO::path moduleRoot =
 				FindModuleRoot(header.headerPath, header.moduleName);
 
 			const CompileCommandData* bestCommand = nullptr;
 			size_t bestDirectoryLength = 0;
 			for (const CompileCommandData& command : commands)
 			{
-				const IO::Path sourcePath = std::filesystem::u8path(command.fileName);
-				const IO::Path absoluteSource = sourcePath.is_absolute()
+				const IO::path sourcePath = std::filesystem::u8path(command.fileName);
+				const IO::path absoluteSource = sourcePath.is_absolute()
 					? sourcePath
 					: std::filesystem::u8path(command.directory) / sourcePath;
 				if (NormalizePath(std::filesystem::absolute(absoluteSource).string()) ==
@@ -338,7 +338,7 @@ namespace MHT {
 			const std::string& directory,
 			const std::string& includePath)
 		{
-			IO::Path path = std::filesystem::u8path(includePath);
+			IO::path path = std::filesystem::u8path(includePath);
 			if (path.is_relative())
 			{
 				path = std::filesystem::u8path(directory) / path;
@@ -464,7 +464,7 @@ namespace MHT {
 		 */
 		void AddIncludePath(std::vector<std::string>& arguments,
 			std::vector<std::string>& knownPaths,
-			const IO::Path& path)
+			const IO::path& path)
 		{
 			if (!std::filesystem::is_directory(path))
 			{
@@ -498,8 +498,8 @@ namespace MHT {
 				knownPaths,
 				header.headerPath.parent_path());
 
-			const IO::Path generatedRoot =
-				IO::Path(MagicGeneralPipelinedData::Get().GetGeneratePath());
+			const IO::path generatedRoot =
+				IO::path(MagicGeneralPipelinedData::Get().GetGeneratePath());
 			if (!moduleName.empty())
 			{
 				AddIncludePath(
@@ -981,7 +981,7 @@ namespace MHT {
 					AddIncludePath(
 						arguments,
 						includePaths,
-						IO::Path(
+						IO::path(
 							MagicGeneralPipelinedData::Get().GetGeneratePath())
 							/ "Object"
 							/ std::filesystem::u8path(candidate.moduleName));
@@ -1085,7 +1085,7 @@ namespace MHT {
 			std::vector<MagicClassInfo>& outClasses,
 			std::unordered_set<std::string>& failedHeaders)
 		{
-			const IO::Path compileCommandsPath =
+			const IO::path compileCommandsPath =
 				GetCompileCommandsPath();
 			if (!std::filesystem::is_regular_file(compileCommandsPath))
 			{
