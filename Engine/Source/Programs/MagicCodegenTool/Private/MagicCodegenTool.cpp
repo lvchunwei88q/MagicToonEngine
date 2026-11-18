@@ -1,4 +1,4 @@
-#include "MagicHeaderTool.h"
+#include "MagicCodegenTool.h"
 #include <sstream>
 #include <utility>
 #include "Pipeline/GeneralPipeline.h"

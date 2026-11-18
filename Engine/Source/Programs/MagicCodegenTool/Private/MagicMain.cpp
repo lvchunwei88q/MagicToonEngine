@@ -2,7 +2,7 @@
 #include <Subsystem/Subsystem.h>
 #include <Jobsystem/JobSystem.h> // JobSystem
 #include <IO.h> // File IO
-#include "MagicHeaderTool.h"
+#include "MagicCodegenTool.h"
 #include "Pipeline/GeneralPipeline.h"
 
 #include "MagicUtilities.h"
