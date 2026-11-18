@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
     // Exit codes: 0 = success (including an explicit --help / -?),
     //             2 = bad arguments, 1 = code generation failed.
     // If you return 0 every time parsing fails, then CMake's
-    // add_custom_target(${MAGIC_HEADER_TOOL_RUN} ALL ...) reported the codegen
+    // add_custom_target(${MAGIC_CODEGEN_TOOL_RUN} ALL ...) reported the codegen
     // step as successful and the build only failed later with a wall of
     // "cannot open xxx.object.generate.h".
     if (!parser.parse_check(argc, argv)) {

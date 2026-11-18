@@ -23,8 +23,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Binary/$<CONFIG>)
 set(CMAKE_GENERATE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/engine_mht_generate)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(MAGIC_HEADER_TOOL_TARGET "MagicHeaderTool"    CACHE INTERNAL "MagicHeaderTool target name")
-set(MAGIC_HEADER_TOOL_RUN    "RunMagicHeaderTool" CACHE INTERNAL "MagicHeaderTool run name")
+set(MAGIC_CODEGEN_TOOL_TARGET "MagicCodegenTool"    CACHE INTERNAL "MagicCodegenTool target name")
+set(MAGIC_CODEGEN_TOOL_RUN    "RunMagicCodegenTool" CACHE INTERNAL "MagicCodegenTool run name")
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 20)

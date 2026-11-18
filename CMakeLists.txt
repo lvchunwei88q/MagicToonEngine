@@ -27,7 +27,7 @@ CoreModule(Logger)
 
 #========================================================== We'll only start MHT after all the core modules are ready.
 # Tools project includes subprojects.
-BuildToolsModule(${MAGIC_HEADER_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
+MagicCodegenToolModule(${MAGIC_CODEGEN_TOOL_TARGET} --generate-dir ${CMAKE_GENERATE_OUTPUT_DIRECTORY})
 
 # ============================================== Engine Modules ================================================
 # Third-party projects.

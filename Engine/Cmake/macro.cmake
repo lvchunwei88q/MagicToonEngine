@@ -7,7 +7,7 @@ macro(CoreModule)
     add_subdirectory("Engine/Source/Core/${ARGV}")
 endmacro()
 
-macro(BuildToolsModule)
+macro(MagicCodegenToolModule)
     set(ModuleName ${ARGV0})
     set(ModuleArgs "")
     if(${ARGC} GREATER 1)
@@ -15,7 +15,7 @@ macro(BuildToolsModule)
     endif()
 
     add_subdirectory("Engine/Source/Programs/${ModuleName}")
-    add_custom_target(${MAGIC_HEADER_TOOL_RUN} ALL
+    add_custom_target(${MAGIC_CODEGEN_TOOL_RUN} ALL
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_BINARY_DIR}/compile_commands.json"
             "${ENGINE_COMPILE_COMMANDS_FILE}"
@@ -32,19 +32,19 @@ endmacro()
 
 macro(RuntimeModule)
     add_subdirectory("Engine/Source/Runtime/${ARGV}")
-    add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
+    add_dependencies(${ARGV} ${MAGIC_CODEGEN_TOOL_RUN})
     list(APPEND GENERATE_HEADER_LINKPATH ${ARGV})
 endmacro()
 
 macro(ProgramModule)
     add_subdirectory("Engine/Source/Programs/${ARGV}")
-    add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
+    add_dependencies(${ARGV} ${MAGIC_CODEGEN_TOOL_RUN})
     list(APPEND GENERATE_HEADER_LINKPATH ${ARGV})
 endmacro()
 
 macro(EditorModule)
     add_subdirectory("Engine/Source/Editor/${ARGV}")
-    add_dependencies(${ARGV} ${MAGIC_HEADER_TOOL_RUN})
+    add_dependencies(${ARGV} ${MAGIC_CODEGEN_TOOL_RUN})
     list(APPEND GENERATE_HEADER_LINKPATH ${ARGV})
 endmacro()
 
@@ -106,7 +106,7 @@ macro(AddEngineTest TARGET_NAME)
         )
         file(APPEND "${HEADER_LIST_FILE}" "${TEST_FILE_ABSOLUTE} || ${TARGET_NAME}\n")
     endforeach()
-    add_dependencies(${TARGET_NAME} ${MAGIC_HEADER_TOOL_RUN})
+    add_dependencies(${TARGET_NAME} ${MAGIC_CODEGEN_TOOL_RUN})
     
     # Core is the default base library; all arguments after TARGET_NAME are source files.
     target_link_libraries(${TARGET_NAME} PRIVATE Core)
