@@ -1,12 +1,12 @@
 #pragma once
 
-namespace MHT {
+namespace MCT {
 
-	class MagicHeaderTool
+	class MagicCodegenTool
 	{
 	public:
-		MagicHeaderTool() {};
-		~MagicHeaderTool() {};
+		MagicCodegenTool() {};
+		~MagicCodegenTool() {};
 
 		bool readGenerateInfoFile();
 		bool Run();

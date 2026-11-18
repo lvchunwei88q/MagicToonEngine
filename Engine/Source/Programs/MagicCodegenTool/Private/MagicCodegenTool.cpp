@@ -8,7 +8,7 @@
 // Core Libraries
 #include <IO.h>
 
-namespace MHT{
+namespace MCT{
 	namespace {
 		struct LocalCheckModificationTime
 		{
@@ -136,7 +136,7 @@ namespace MHT{
 		}
 	}
 
-	bool MagicHeaderTool::readGenerateInfoFile()
+	bool MagicCodegenTool::readGenerateInfoFile()
 	{
 		MGC ctx = MagicGlobalContext::Get();
 		if (IO::Exists(ctx.GetgenerateInfoFilePath().native())) {
@@ -207,7 +207,7 @@ namespace MHT{
 		}
 	}
 
-	bool MagicHeaderTool::Run() {
+	bool MagicCodegenTool::Run() {
 		// Get the global context
 		MGC ctx = MagicGlobalContext::Get();
 		Context::TaskInfo& TInfo = ctx.GetRefInfo();
@@ -246,7 +246,7 @@ namespace MHT{
 		return true;
 	}
 
-	bool MagicHeaderTool::readHeaderFiles()
+	bool MagicCodegenTool::readHeaderFiles()
 	{
 		Utilitie::GTimer GTimer = Utilitie::GlobalTimer::Get();
 		// Start the timer

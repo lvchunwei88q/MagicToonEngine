@@ -7,13 +7,13 @@ namespace Ability {
 	namespace Pipeline {
 		bool GenerateSerializationMetadata()
 		{
-			const auto& classes = MHT::MagicGeneralPipelinedData::Get().GetRefMagicClasses();
-			auto& generatedMetadata = MHT::MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
+			const auto& classes = MCT::MagicGeneralPipelinedData::Get().GetRefMagicClasses();
+			auto& generatedMetadata = MCT::MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
 			bool hasErrors = false;
 
 			for (const auto& engineClass : classes) {
 				const auto metadata = std::find_if(generatedMetadata.begin(), generatedMetadata.end(),
-					[&engineClass](const MHT::GeneratedHeader& candidate) {
+					[&engineClass](const MCT::GeneratedHeader& candidate) {
 						return candidate.headerPath == engineClass.headerPath;
 					});
 				if (metadata == generatedMetadata.end()) {
@@ -42,7 +42,7 @@ namespace Ability {
 					const auto serializableMembers = std::count_if(
 						engineClass.members.begin(),
 						engineClass.members.end(),
-						[](const MHT::MemberVariable& member) { return member.hasMMember; });
+						[](const MCT::MemberVariable& member) { return member.hasMMember; });
 					if (serializableMembers == 0) {
 						code << "    void serialize(Archive&) {} \\\n";
 					}

@@ -17,7 +17,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace MHT {
+namespace MCT {
 	namespace {
 		/**
 		 * Copy a libclang string into std::string and release its libclang-owned storage.

@@ -118,7 +118,7 @@ public:
 	static T* Create(Args&&... args) {
 		// Construct object
 		T* obj = new T(std::forward<Args>(args)...);
-		obj->generate_object_init_func_();			// this func from MagicHeaderTool
+		obj->generate_object_init_func_();			// this func from MagicCodegenTool
 
 		return obj;
 	}
@@ -126,14 +126,14 @@ public:
 	template<typename T, typename... Args>
 	static std::shared_ptr<T> CreateShared(Args&&... args) {
 		auto obj = std::make_shared<T>(std::forward<Args>(args)...);
-		obj->generate_object_init_func_();			// this func from MagicHeaderTool
+		obj->generate_object_init_func_();			// this func from MagicCodegenTool
 		return obj;
 	}
 
 	template<typename T, typename... Args>
 	static std::unique_ptr<T> CreateUnique(Args&&... args) {
 		auto obj = std::make_unique<T>(std::forward<Args>(args)...);
-		obj->generate_object_init_func_();  // this func from MagicHeaderTool
+		obj->generate_object_init_func_();  // this func from MagicCodegenTool
 		return obj;
 	}
 };
@@ -189,7 +189,7 @@ namespace Core {
 	};
 
 	/*
-	* The base class for MagicHeaderTool services. Any class that wants to use advanced C features should inherit from this class.
+	* The base class for MagicCodegenTool services. Any class that wants to use advanced C features should inherit from this class.
 	*/
 	class CORE_API Object
 	{
@@ -197,11 +197,11 @@ namespace Core {
 		virtual ~Object() = default;
 		Object() : instance_id(GetNextId()) {};
 
-		virtual std::string GetClassName() const = 0;				// Class Name generated using MagicHeaderTool
-		virtual uint64_t GetClassId() const = 0;					// Class ID generated using MagicHeaderTool
-		virtual uint64_t GetClassHas() const = 0;					// Class Has generated using MagicHeaderTool
-		virtual ObjectType GetClassType() const = 0;				// Class type generated using MagicHeaderTool
-		virtual ObjectSwitch GetClassSwitch() const = 0;			// Class Switch generated using MagicHeaderTool
+		virtual std::string GetClassName() const = 0;				// Class Name generated using MagicCodegenTool
+		virtual uint64_t GetClassId() const = 0;					// Class ID generated using MagicCodegenTool
+		virtual uint64_t GetClassHas() const = 0;					// Class Has generated using MagicCodegenTool
+		virtual ObjectType GetClassType() const = 0;				// Class type generated using MagicCodegenTool
+		virtual ObjectSwitch GetClassSwitch() const = 0;			// Class Switch generated using MagicCodegenTool
 		uint64_t GetInstanceId() const { return instance_id; };		// Assign a unique ID to each object instance
 
 		// Serialization handles object data only; callers own the storage medium and location.

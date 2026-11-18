@@ -11,7 +11,7 @@
 #include <IO.h>							// IO
 #include <Jobsystem/Jobsystem.h>		// Jobsystem
 
-namespace MHT {
+namespace MCT {
 	namespace GeneralPipeline {
 		bool GenerateMetadataFile() {
 			const auto& generatedMetadata = MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();

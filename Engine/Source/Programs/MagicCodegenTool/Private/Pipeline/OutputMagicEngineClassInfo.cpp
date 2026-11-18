@@ -4,7 +4,7 @@
 #include <sstream>
 #include <string>
 
-namespace MHT 
+namespace MCT 
 {
 	namespace {
 		// Format: Year-Month-Day-Hour:Minute:Second (no leading zeros for month and day, pad zeros for hour, minute, and second)

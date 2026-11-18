@@ -5,7 +5,7 @@
 #include "Pipeline/AbilityPipeline.h"
 // --------------------------------
 
-namespace MHT{
+namespace MCT{
 
 	bool GeneralPipeline::RunBuildPipeline()
 	{

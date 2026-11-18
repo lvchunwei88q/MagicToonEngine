@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_set>
 
-namespace MHT {
+namespace MCT {
 	namespace GeneralPipeline {
 	namespace {
         struct LocalSourcesIndex {
@@ -136,7 +136,7 @@ namespace MHT {
 
         std::string GenerateFileWithCode(
             const std::vector<std::string>& codeLines,
-            const std::string& generatorName = "MagicHeaderTool",
+            const std::string& generatorName = "MagicCodegenTool",
             const std::string& additionalInfo = ""
         ) {
             std::ostringstream result;

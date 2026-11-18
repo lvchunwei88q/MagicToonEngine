@@ -7,7 +7,7 @@
 #include <IO.h>
 #include "MagicUtilities.h" 
 
-namespace MHT {
+namespace MCT {
 	// All the data is stored in this singleton, making it easy to access and modify at different stages.
 	struct MagicEngineHeader
 	{

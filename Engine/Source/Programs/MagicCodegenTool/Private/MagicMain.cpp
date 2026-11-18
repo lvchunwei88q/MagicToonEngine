@@ -7,7 +7,7 @@
 
 #include "MagicUtilities.h"
 
-using namespace MHT;
+using namespace MCT;
 
 int main(int argc, char* argv[]) {
     // Set initial line break
@@ -46,11 +46,11 @@ int main(int argc, char* argv[]) {
     // Initialize the Core Subsystem
     Core::SubsystemControl::Init();
     {
-        MagicHeaderTool MagicHT{};
+        MagicCodegenTool MagicCT{};
         // read the generate info file and run the code generation process  
-        if (MagicHT.readGenerateInfoFile()) {
+        if (MagicCT.readGenerateInfoFile()) {
             Utilitie::Log::Info("Start reading all engine header file contents");
-            if (MagicHT.Run()) {
+            if (MagicCT.Run()) {
                 Utilitie::Log::Info("Code generation completed successfully");
                 Core::JobSystem::Get().Uninstall();
                 return 0; // success

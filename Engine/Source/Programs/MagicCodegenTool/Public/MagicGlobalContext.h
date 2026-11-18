@@ -47,7 +47,7 @@ public:
     MagicGlobalContext() = default;
     ~MagicGlobalContext() = default;
 
-    // MagicHeaderTool will read the generateInfoFile and set the TaskInfo and HeaderDescriptorData
+    // MagicCodegenTool will read the generateInfoFile and set the TaskInfo and HeaderDescriptorData
     IO::path m_generateDir;
 	IO::path m_generateInfoFilePath;
 
