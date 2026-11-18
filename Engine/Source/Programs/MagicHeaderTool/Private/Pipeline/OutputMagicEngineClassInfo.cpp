@@ -114,7 +114,7 @@ namespace MHT
 
 				classInfoReport << "Class: " << classInfo.qualifiedName << '\n'
 					<< "Kind: " << classInfo.kind << '\n'
-					<< "Header: " << classInfo.headerName << '\n'
+					<< "Header: " << classInfo.headerPath.string() << '\n'
 					<< "Line: " << classInfo.lineNum + 1 << '\n'
 					<< "MCLASS: yes";
 				for (size_t i = 0; i < classInfo.mclassParams.size(); ++i)

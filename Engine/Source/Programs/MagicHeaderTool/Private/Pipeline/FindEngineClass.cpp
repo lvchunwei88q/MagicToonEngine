@@ -37,15 +37,18 @@ namespace MHT {
 		 * @param path The path to normalize.
 		 * @return The lexically normalized path with forward slashes and lowercase characters.
 		 */
-		std::string NormalizePath(const std::string& path)
+		std::string NormalizePath(const IO::path& path)
 		{
-			std::string normalized = IO::path(std::filesystem::u8path(path))
-				.lexically_normal()
-				.string();
+			std::string normalized = path.lexically_normal().string();
 			std::replace(normalized.begin(), normalized.end(), '\\', '/');
 			std::transform(normalized.begin(), normalized.end(), normalized.begin(),
 				[](unsigned char value) { return static_cast<char>(std::tolower(value)); });
 			return normalized;
+		}
+
+		std::string NormalizePath(const std::string& path)
+		{
+			return NormalizePath(std::filesystem::u8path(path));
 		}
 
 		/**
@@ -228,7 +231,7 @@ namespace MHT {
 
 		/**
 		 * Walk up from a header's directory to find the module root.
-		 * @param headerName The header path from which to begin the search.
+		 * @param headerPath The header path from which to begin the search.
 		 * @param moduleName The directory name identifying the module root.
 		 * @return The matching module root, or an empty path if none is found.
 		 */
@@ -264,9 +267,9 @@ namespace MHT {
 			const IO::path& directory)
 		{
 			const std::string normalizedFile = NormalizePath(
-				std::filesystem::absolute(filePath).string());
+				std::filesystem::absolute(filePath));
 			const std::string normalizedDirectory = NormalizePath(
-				std::filesystem::absolute(directory).string());
+				std::filesystem::absolute(directory));
 			return normalizedFile.size() > normalizedDirectory.size() &&
 				normalizedFile.compare(0, normalizedDirectory.size(), normalizedDirectory) == 0 &&
 				normalizedFile[normalizedDirectory.size()] == '/';
@@ -284,7 +287,7 @@ namespace MHT {
 		{
 			const IO::path headerPath = header.headerPath;
 			const std::string normalizedHeaderPath = NormalizePath(
-				std::filesystem::absolute(headerPath).string());
+				std::filesystem::absolute(headerPath));
 			const IO::path moduleRoot =
 				FindModuleRoot(header.headerPath, header.moduleName);
 
@@ -296,7 +299,7 @@ namespace MHT {
 				const IO::path absoluteSource = sourcePath.is_absolute()
 					? sourcePath
 					: std::filesystem::u8path(command.directory) / sourcePath;
-				if (NormalizePath(std::filesystem::absolute(absoluteSource).string()) ==
+				if (NormalizePath(std::filesystem::absolute(absoluteSource)) ==
 					normalizedHeaderPath)
 				{
 					return &command;
@@ -826,7 +829,7 @@ namespace MHT {
 		struct ParseContext
 		{
 			std::string targetFile;
-			std::string targetHeaderName;
+			IO::path targetHeaderPath;
 			std::unordered_set<size_t> mClassDeclarationLines;
 			std::vector<MagicClassInfo> classes;
 			std::unordered_map<unsigned, size_t> classIndices;
@@ -859,7 +862,7 @@ namespace MHT {
 					classInfo.className = ToString(clang_getCursorSpelling(cursor));
 					classInfo.qualifiedName = GetQualifiedName(cursor);
 					classInfo.kind = kind == CXCursor_StructDecl ? "struct" : "class";
-					classInfo.headerName = context.targetHeaderName;
+					classInfo.headerPath = context.targetHeaderPath;
 					classInfo.lineNum = start.line == 0 ? 0 : start.line - 1;
 					classInfo.endLineNum = end.line == 0 ? classInfo.lineNum : end.line - 1;
 					const size_t classIndex = context.classes.size();
@@ -949,7 +952,7 @@ namespace MHT {
 			const std::vector<CompileCommandData>& compileCommands,
 			const std::vector<size_t>& mClassDeclarationLines,
 			std::vector<MagicClassInfo>& outClasses,
-			std::unordered_set<std::string>& failedHeaders)
+			std::unordered_set<IO::path>& failedHeaders)
 		{
 			const CompileCommandData* compileCommand =
 				FindModuleCompileCommand(compileCommands, header);
@@ -958,14 +961,14 @@ namespace MHT {
 				Utilitie::Log::Error(
 					"No compile command found for module " + header.moduleName +
 					" while parsing " + header.headerPath.string());
-				failedHeaders.insert(header.headerPath.string());
+				failedHeaders.insert(header.headerPath);
 				return false;
 			}
 
 			std::vector<std::string> arguments;
 			if (!BuildClangArguments(*compileCommand, arguments))
 			{
-				failedHeaders.insert(header.headerPath.string());
+				failedHeaders.insert(header.headerPath);
 				return false;
 			}
 			std::vector<std::string> includePaths;
@@ -1017,7 +1020,7 @@ namespace MHT {
 				Utilitie::Log::Error(
 					"libclang failed to parse header: " + header.headerPath.string() +
 					" (error " + std::to_string(static_cast<int>(result)) + ")");
-				failedHeaders.insert(header.headerPath.string());
+				failedHeaders.insert(header.headerPath);
 				return false;
 			}
 
@@ -1040,17 +1043,16 @@ namespace MHT {
 			}
 			if (hasErrors)
 			{
-				failedHeaders.insert(header.headerPath.string());
+				failedHeaders.insert(header.headerPath);
 				clang_disposeTranslationUnit(translationUnit);
 				return false;
 			}
 
 			const std::string targetFile = NormalizePath(
-				std::filesystem::absolute(
-					header.headerPath.string()).string());
+				std::filesystem::absolute(header.headerPath));
 			ParseContext context{
 				targetFile,
-				header.headerPath.string(),
+				header.headerPath,
 				std::unordered_set<size_t>(
 					mClassDeclarationLines.begin(), mClassDeclarationLines.end()),
 				{},
@@ -1083,7 +1085,7 @@ namespace MHT {
 		bool ParseHeadersWithLibClang(
 			const std::vector<MagicEngineHeader>& headers,
 			std::vector<MagicClassInfo>& outClasses,
-			std::unordered_set<std::string>& failedHeaders)
+			std::unordered_set<IO::path>& failedHeaders)
 		{
 			const IO::path compileCommandsPath =
 				GetCompileCommandsPath();
@@ -1179,7 +1181,7 @@ namespace MHT {
 			MGC context = MagicGlobalContext::Get();
 			const auto& headers = MagicGeneralPipelinedData::Get().GetRefMagicEngineHeaders();
 			std::vector<MagicClassInfo> parsedClasses;
-			std::unordered_set<std::string> failedHeaders;
+			std::unordered_set<IO::path> failedHeaders;
 			// Use libclang to read target class declarations, members, and functions;
 			// continue parsing other headers if one fails.
 			if (!ParseHeadersWithLibClang(headers, parsedClasses, failedHeaders))
@@ -1190,7 +1192,7 @@ namespace MHT {
 			bool hasErrors = !failedHeaders.empty();
 			for (const MagicEngineHeader& header : headers)
 			{
-				if (failedHeaders.contains(header.headerPath.string()))
+				if (failedHeaders.contains(header.headerPath))
 				{
 					continue;
 				}
@@ -1207,7 +1209,7 @@ namespace MHT {
 						parsedClasses.begin(),
 						parsedClasses.end(),
 						[&header, line](const MagicClassInfo& candidate) {
-							return candidate.headerName == header.headerPath.string() &&
+							return candidate.headerPath == header.headerPath &&
 								candidate.lineNum == line + 1;
 						});
 					if (classInfo == parsedClasses.end())

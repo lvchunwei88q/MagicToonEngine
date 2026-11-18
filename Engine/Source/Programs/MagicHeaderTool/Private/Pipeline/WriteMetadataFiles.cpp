@@ -24,7 +24,7 @@ namespace MHT {
 					try
 					{
 						const std::wstring headerName =
-							std::filesystem::path(metadata.headerName).stem().wstring();
+							metadata.headerPath.stem().wstring();
 						const std::wstring moduleName = IO::ToWideString(metadata.moduleName);
 						const std::wstring& generatePath =
 							MagicGeneralPipelinedData::Get().GetRefGeneratePath();
@@ -59,7 +59,7 @@ namespace MHT {
 						std::lock_guard<std::mutex> lock(errorsMutex);
 						errors.push_back(
 							"Could not write generated metadata for " +
-							metadata.headerName + ": " + error.what());
+							metadata.headerPath.string() + ": " + error.what());
 					}
 				});
 

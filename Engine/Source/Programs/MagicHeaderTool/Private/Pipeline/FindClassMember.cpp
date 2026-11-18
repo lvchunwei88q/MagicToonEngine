@@ -160,11 +160,11 @@ namespace MHT {
 
 		const MagicEngineHeader* FindHeader(
 			const std::vector<MagicEngineHeader>& headers,
-			const std::string& headerName)
+			const IO::path& headerPath)
 		{
 			for (const MagicEngineHeader& header : headers)
 			{
-				if (header.headerPath.string() == headerName)
+				if (header.headerPath == headerPath)
 				{
 					return &header;
 				}
@@ -186,11 +186,12 @@ namespace MHT {
 			// and functions.
 			for (MagicClassInfo& classInfo : classes)
 			{
-				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);
+				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerPath);
 				if (header == nullptr)
 				{
 					Utilitie::Log::Error(
-						"Source lines are missing for " + classInfo.headerName);
+						"Source lines are missing for " +
+						classInfo.headerPath.string());
 					hasErrors = true;
 					continue;
 				}
@@ -237,7 +238,7 @@ namespace MHT {
 			// Check every marker in each class body to ensure libclang resolved its declaration.
 			for (const MagicClassInfo& classInfo : classes)
 			{
-				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerName);
+				const MagicEngineHeader* header = FindHeader(headers, classInfo.headerPath);
 				if (header == nullptr)
 				{
 					Utilitie::Log::Error("Class source data is missing for " + classInfo.className);
@@ -262,7 +263,8 @@ namespace MHT {
 						{
 							Utilitie::Log::Error(
 								"libclang could not resolve declaration after MMEMBER in " +
-								classInfo.headerName + " Line:" + std::to_string(line + 1));
+								classInfo.headerPath.string() +
+								" Line:" + std::to_string(line + 1));
 							hasErrors = true;
 						}
 					}
@@ -279,7 +281,8 @@ namespace MHT {
 						{
 							Utilitie::Log::Error(
 								"libclang could not resolve declaration after MFUNCTION in " +
-								classInfo.headerName + " Line:" + std::to_string(line + 1));
+								classInfo.headerPath.string() +
+								" Line:" + std::to_string(line + 1));
 							hasErrors = true;
 						}
 					}

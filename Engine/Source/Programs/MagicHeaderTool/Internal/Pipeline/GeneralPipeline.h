@@ -60,7 +60,7 @@ namespace MHT {
 		std::string className;
 		std::string qualifiedName;
 		std::string kind;
-		std::string headerName;
+		IO::path headerPath;
 		std::string moduleName;
 		size_t lineNum = 0;				// Zero-based class declaration line
 		size_t endLineNum = 0;			// Zero-based class end line
@@ -72,7 +72,7 @@ namespace MHT {
 	};
 
 	struct GeneratedHeader {
-		std::string headerName;
+		IO::path headerPath;
 		std::string contents;
 		std::string moduleName;
 	};

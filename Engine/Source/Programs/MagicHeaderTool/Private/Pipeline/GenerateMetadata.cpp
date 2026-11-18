@@ -29,14 +29,16 @@ namespace MHT {
         };
 
         struct LocalMetaData {
-            std::string headerName;
+            IO::path headerPath;
             std::vector<LocalMetadataSource> Sources;
             std::string Metadata;
 
-            void SetSources(const std::vector<LocalMetadataSource>& Sources, const std::string& headerName)
+            void SetSources(
+                const std::vector<LocalMetadataSource>& Sources,
+                const IO::path& headerPath)
             {
                 this->Sources = Sources;
-                this->headerName  = headerName;
+                this->headerPath  = headerPath;
             }
             void SetMetadata(const std::string& Metadata) { this->Metadata = Metadata; }
         };
@@ -260,14 +262,14 @@ namespace MHT {
 		bool GenerateMetadata() {
             const auto& classes = MagicGeneralPipelinedData::Get().GetRefMagicClasses();
             auto& generatedMetadata = MagicGeneralPipelinedData::Get().GetRefGeneratedHeaders();
-            std::unordered_set<std::string> AllArea;
+            std::unordered_set<IO::path> AllArea;
             std::vector<LocalMetaData> MetaDatas;
             bool hasInvalidParameters = false;
 
             // 获取所有不重复的区域
             for (const auto& classInfo : classes)
             {
-                AllArea.insert(classInfo.headerName);
+                AllArea.insert(classInfo.headerPath);
                 std::vector<LocalValidateParameter> targetParameters = {
                     {classInfo.className,true},
                     {"ObjectType",false},
@@ -291,7 +293,7 @@ namespace MHT {
                 std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
                 // Build per-class metadata for this header.
                 for (const auto& classInfo : classes) {
-                    if (Area == classInfo.headerName) {
+                    if (Area == classInfo.headerPath) {
                         GenerateInformationMap_GetClassId[classInfo.className] = GlobalAutoincrementedValue();
                         GenerateInformationMap_ObjectTag[classInfo.className] = std::hash<std::string>{}(classInfo.className); // Use hash of class name as unique tag
                     }
@@ -363,12 +365,12 @@ namespace MHT {
                 std::string ModelName = "NOT";
                 for (const auto& classInfo : classes)
                 {
-                    if (classInfo.headerName == MetaData.headerName) {
+                    if (classInfo.headerPath == MetaData.headerPath) {
                         ModelName = classInfo.moduleName;
                     }
                 }
 
-                generatedMetadata.push_back({ MetaData.headerName, MetaData.Metadata, ModelName });
+                generatedMetadata.push_back({ MetaData.headerPath, MetaData.Metadata, ModelName });
             }
 
 			return true;

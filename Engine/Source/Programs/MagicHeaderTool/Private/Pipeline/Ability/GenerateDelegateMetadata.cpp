@@ -13,12 +13,12 @@ namespace Ability {
 			for (const auto& engineClass : classes) {
 				const auto metadata = std::find_if(generatedMetadata.begin(), generatedMetadata.end(),
 					[&engineClass](const MHT::GeneratedHeader& candidate) {
-						return candidate.headerName == engineClass.headerName;
+						return candidate.headerPath == engineClass.headerPath;
 					});
 				if (metadata == generatedMetadata.end()) {
 					Utilitie::Log::Error(
 						"Could not find generated metadata for " + engineClass.className +
-						" in " + engineClass.headerName);
+						" in " + engineClass.headerPath.string());
 					hasErrors = true;
 					continue;
 				}
