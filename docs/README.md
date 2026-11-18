@@ -8,35 +8,33 @@
 | --- | --- |
 | [01-缺陷总览.md](01-缺陷总览.md) | 全部缺陷清单表格（按等级分组），可作为修复排期清单 |
 | [02-P0-严重缺陷.md](02-P0-严重缺陷.md) | 内存安全 / 必然崩溃 / 数据损坏类问题，共 2 条 |
-| [03-P1-高危缺陷.md](03-P1-高危缺陷.md) | 特定路径崩溃、功能失效、并发与启动失败类问题，共 14 条 |
+| [03-P1-高危缺陷.md](03-P1-高危缺陷.md) | 特定路径崩溃、功能失效、并发与启动失败类问题，共 13 条 |
 | [04-P2-中等缺陷.md](04-P2-中等缺陷.md) | 逻辑错误、健壮性不足、性能与可维护性隐患，共 39 条 |
-| [05-P3-低危与代码质量.md](05-P3-低危与代码质量.md) | 命名、拼写、死代码、文档与构建脚本细节，共 12 条 |
-| [05-P3-低危与代码质量.md](05-P3-低危与代码质量.md) | 命名、拼写、死代码、文档与构建脚本细节，共 12 条 |
-| [07-修复复核记录.md](07-修复复核记录.md) | 六轮复核记录：`c936c14..eb41fb7`、`eb41fb7..738ff16`、`738ff16..19eb464`、`19eb464..f0d41ad`、`f0d41ad..35a05bf`、`35a05bf..e2e45d2`（第九节含"移除 AST dump"的实测，第十节记录 `fs` 别名收进 `IO` 命名空间） |
+| [05-P3-低危与代码质量.md](05-P3-低危与代码质量.md) | 命名、拼写、死代码、文档与构建脚本细节，共 15 条 |
+| [06-架构与工程化建议.md](06-架构与工程化建议.md) | 跨模块的架构级建议与分批次修复路线图 |
+| [07-修复复核记录.md](07-修复复核记录.md) | 七轮复核记录：`c936c14..eb41fb7`、`eb41fb7..738ff16`、`738ff16..19eb464`、`19eb464..f0d41ad`、`f0d41ad..35a05bf`、`35a05bf..e2e45d2`、`e2e45d2..5e72262`（第九节含"移除 AST dump"的实测，第十节记录 `fs` 别名收进 `IO` 命名空间，第十一节记录内容哈希与 `Clang/` 拆分） |
 
-## 当前状态（对照 HEAD = `e2e45d2`，2026-11-16 15:35）
+## 当前状态（对照 HEAD = `5e72262`，2026-11-18 17:06）
 
-- 缺陷总数 **67 条**：P0 = 2、P1 = 14、P2 = 39、P3 = 12。
-- **部分修复 4 条**：P2-22（`ObjectType` 仍不校验）、P2-37（同模块同名仍撞）、P2-38（落盘时机已修，仍不看产物）、P3-13（README 残留）。
-- 已修复的 9 条（P0-02、P1-01、P1-02、P1-17、P2-21、P2-32、P3-12、P3-14、P3-15）已从缺陷清单移除，修复过程与提交对照见 [07-修复复核记录.md](07-修复复核记录.md)。第三轮（`738ff16..19eb464`）修掉的是 **P1-02**（并行读文件不再抛）、**P2-32**（worker 入口加异常兜底）、**P3-14**（`ThirdParty` 大小写统一）。
-- 注意：`MAGIC_DEV` 已改为 `0`，增量生成路径在线，P1-03 / P1-04 不再是潜伏状态；但 `5e16ecc` 把 mtime 缓存的赋值点放进了被 `#if !MAGIC_DEV` 包住的函数里，一旦把宏改回 `1`，`Run()` 收尾会直接报错返回（**P2-41**）。
-- **第四轮（`19eb464..f0d41ad`）没有增删条目**：MagicCodegenTool 删掉 `--compile-commands`（改按 `--generate-dir` 推导编译数据库）、`Core_API.h` → `CORE_API.h`、`SystemPath`/`CoreMinimal` 跨平台化、测试框架改名 `TestFramework.h`。只有三条需要更新定位：**P1-08**（`SystemPath.cpp:79-87`）、**P1-15**（`TestFramework.h`、`macro.cmake:97-127`）、**P2-39**（`MagicMain.cpp:47-61`）。
-- **第五轮（`f0d41ad..35a05bf`）新增 3 条（其中 P3-15 已在第六轮修掉）、1 条降级**：`338dd5c`（`FindEngineClass.cpp` 纯注释 +146 行）之后又连着提交了 `de6b1bb`（`MagicEngineHeader` 字段拼写 `moudelName` → `moduleName`）、`5e16ecc`（MagicCodegenTool 路径/日志重构，同时把 AST dump 移除入库）、`0978ee6`、`0f4570d`、`8e48975`、`e512583`、`35a05bf`（最后两个是第三方库二进制整理）。期间没有条目被整条修掉，但 **P2-38** 的主病灶被 `5e16ecc` 修掉（缓存改为"全部任务成功后才落盘"），降为部分修复；同一改动让 `MAGIC_DEV = 1` 路径彻底失效，新增 **P2-41**；该提交还把 `namespace fs = std::filesystem;` 搬进公开头 `IO.h`，新增 **P3-15**。`338dd5c` 的复核另发现 **P2-40**（模块名 `CORE`/`LOGGER`/`RENDERCORE` 与目录名不一致，见 [04](04-P2-中等缺陷.md)）。行号按 `35a05bf` 重新对齐：`SystemPath.cpp` −2 行、`ObjectTest.cpp` +10 行、`MagicCodegenTool.cpp` +1/+2 行。
-- **第六轮（`35a05bf..e2e45d2`）修掉 P3-15**：`541c88e` 把 `IO.h` 的 `namespace fs = std::filesystem;` 与 `using FilePath` 移进 `namespace IO`（`IO.h:27-30`，改成 `IO::fs` / `IO::path`），`e2e45d2` 把 `namespace MCT` 里那处裸用的 `fs::path` 改成 `IO::path`；全局命名空间恢复干净，条目已从清单移除。`d6348a7` 只删了两份 README 的 `Vulkan SDK` 行，P3-13 的 `GenerateVSProject.bat` 文件树残留仍在。
+- 缺陷总数 **69 条**：P0 = 2、P1 = 13、P2 = 39、P3 = 15。
+- **部分修复 3 条**：P2-22（`ObjectType` 仍不校验）、P2-37（同模块同名仍撞）、P3-13（README / CMake 注释残留）。
+- 已修复的 11 条（P0-02、P1-01、P1-02、**P1-03**、P1-17、P2-21、P2-32、**P2-38**、P3-12、P3-14、P3-15）已从缺陷清单移除，修复过程与提交对照见 [07-修复复核记录.md](07-修复复核记录.md)。
+- **第七轮（`e2e45d2..5e72262`，13 个提交）修掉 2 条、新增 4 条**：`5ad6ae7` 把增量判据从 mtime 换成**文件内容 FNV-1a 哈希**（`GetFileContentHashesParallel` 并行算），顺带整条修掉 **P2-38**（缓存改为"全部任务成功后落盘"）与 **P1-03**（坏缓存行 `try/catch` 跳过）；`5e72262` 把 `FindEngineClass.cpp`（1256 行）拆进 `Clang/`（`AstClassCollector` / `CompileCommands` / `HeaderMacroScan` / `ClangOwnership` / `ClangPathUtility`），逻辑等价并修掉旧实现"解析失败仍返回半成品 TU 时泄漏"。新增 **P2-42**（libclang 解析靠白名单开关 + `INCLUDE` 兜底，任一 error 诊断即整次生成失败）与 **P3-16 / P3-17 / P3-18**。
+- 注意：`MAGIC_DEV` 仍为 `0`，增量路径在线，P1-04 的"增量脱钩"仍在（判据换了、仍不看产物）；一旦把宏改回 `1`，增量整体关闭且 `Run()` 收尾必定报错返回（**P2-41**，现在与磁盘上有没有缓存文件无关，任何 DEV 构建必失败）。
 - P1-02 / P2-32 修复后仍留了两处缺口（读文件任务体未自包 `try/catch`、MagicCodegenTool 未注册 `ErrorCapture`），见 [07 第 7.3 节](07-修复复核记录.md)；其中第二条在 `a0dc2d6` 之后**依然成立**（`LOG_OUTPUT` 只在 `_DEBUG` 有输出）。
 
 ## 审查范围
 
-已逐文件阅读的部分（约 60 个源文件、13k 行）：
+已逐文件阅读的部分（约 68 个源文件、16k 行）：
 
 - `Engine/Source/Core/Core`：对象系统、子系统框架、JobSystem、LuaVM、文件与路径、序列化设施、数学库、Checker
 - `Engine/Source/Core/Logger`：日志实现与后台刷盘线程
-- `Engine/Source/Programs/MagicCodegenTool`：反射代码生成全流程（扫描 / 成员解析 / 宏生成 / 文件写出）
+- `Engine/Source/Programs/MagicCodegenTool`：反射代码生成全流程（扫描 / 成员解析 / 宏生成 / 文件写出），以及 `Clang/` 下的 libclang 支持层（`AstClassCollector`、`CompileCommands`、`HeaderMacroScan`、`ClangOwnership`、`ClangPathUtility`）
 - `Engine/Source/Runtime/RenderCore`、`RenderRT`：D3D11 设备、缓冲区管理、交换链与 RTV
 - `Engine/Source/Editor`：Editor、MagicEditor、MagicLauncher、EngineProject、AssetPipeline、RenderUI、RenderEditor、RenderLauncher
-- 根目录 `CMakeLists.txt`、`Engine/Cmake/*.cmake`、`Build.bat`、`README.md`、`Tests`
+- 根目录 `CMakeLists.txt`、`Engine/Cmake/*.cmake`、`Build.bat`、`clice.toml`、`README.md`、`Tests`
 
-未覆盖：`Engine/ThirdParty`（第三方库本体）、`Engine/Content` 资源、ImGui 通知系统的绘制细节（`Tools/ImGuiNotify.h` 属于上游改造代码）。
+未覆盖：`Engine/ThirdParty`（第三方库本体，含 libclang 二进制）、`Engine/Content` 资源、ImGui 通知系统的绘制细节（`Tools/ImGuiNotify.h` 属于上游改造代码）。
 
 ## 分级标准
 
@@ -52,12 +50,13 @@
 - 全部结论来自**静态阅读**，本次审查未编译、未运行工程。因此：
   - P0/P1 中标注了「需要 X 条件才触发」的条目，触发条件已在正文写明；
   - 少数条目（例如「测试断言与实现矛盾」）属于逻辑推演结论，正文给出了推导过程，便于复核。
-- 每条缺陷都标注了 `文件:行号`。当前版本的行号基准是 **`338dd5c`（2026-11-15）**；五轮复核（`c936c14` → `eb41fb7` → `738ff16` → `19eb464` → `f0d41ad` → `338dd5c`）带来的修复与行号迁移，对照表见 [07-修复复核记录.md](07-修复复核记录.md)。再往后若行号漂移，请以正文中的代码摘录为准。
+- 每条缺陷都标注了 `文件:行号`。当前行号基准是 **`5e72262`（2026-11-18 17:06）**；七轮复核（`c936c14` → `eb41fb7` → `738ff16` → `19eb464` → `f0d41ad` → `35a05bf` → `e2e45d2` → `5e72262`）带来的修复与行号迁移，对照表见 [07-修复复核记录.md](07-修复复核记录.md)。`5e72262` 之后 MagicCodegenTool 的解析代码搬进了 `Clang/` 子目录，涉及该文件的条目已按新位置改写；若再往后行号漂移，请以正文中的代码摘录为准。
 - 报告不包含"建议重写"这类空泛结论。`06-架构与工程化建议.md` 中的建议均由具体缺陷归纳而来。
 
 ## 修复顺序建议（摘要）
 
 1. 先修剩余 P0：P0-01 / P0-03；这两条都在资源注册与窗口缩放的热路径上，是后续所有工作的地基。
-2. 再修 P2-39 与 P1-02 的残留：让构建工具的失败"能被看见"——日志刷盘（成功路径也要 `Uninstall`）、把 `ErrorCapture` 接到 MagicCodegenTool 的日志、读文件任务体自包 `try/catch`，以及退出码语义。
-3. 然后 P1-03 / P1-04 / P2-36 ~ P2-38：把增量生成做成"真的正确"（`MAGIC_DEV 0` 后增量已在线，这条链路具备条件）。
-4. 之后按模块推进 P1-05 ~ P1-16 与 P2。
+2. 再修 P2-39 与 P1-02 的残留：让构建工具的失败"能被看见"——日志刷盘（成功路径也要 `Uninstall`）、把 `ErrorCapture` 接到 MagicCodegenTool 的日志、读文件任务体自包 `try/catch`，以及退出码语义（含 P3-16 的"空清单被误判失败"）。
+3. 然后 P1-04 / P2-36 / P2-41：把增量生成做成"真的正确"——补上"产物是否存在"的判断，并把 `MAGIC_DEV` 拆成"日志"和"增量"两个宏（否则一次 DEV 构建必然失败）。内容哈希那一半 `5ad6ae7` 已经做完，不需要再动。
+4. 紧接着 P2-40 / P2-42：这两条是"往核心模块加第一个 `MCLASS` 类就构建失败"和"换个终端启动就整次生成失败"，属于构建链路上的硬失败，建议按 P1 排期。
+5. 之后按模块推进 P1-05 ~ P1-16 与 P2。
