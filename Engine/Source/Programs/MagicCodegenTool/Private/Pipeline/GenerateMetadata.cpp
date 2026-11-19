@@ -4,6 +4,8 @@
 #include <vector>
 #include <unordered_set>
 
+#include "Codegen/ObjectInterfaceContract.h"
+
 namespace MCT {
 	namespace GeneralPipeline {
 	namespace {
@@ -56,30 +58,16 @@ namespace MCT {
         // Build the shared class API and leave extension points for optional capabilities.
         std::string GenerateClassBodyFunction() {
             std::ostringstream code;
-            code << "    virtual std::string GetClassName() const override {\n";
-            code << "        \n";
-            code << "        return #CLASS_NAME;\n";
-            code << "    }\n";
 
-            code << "    virtual uint64_t GetClassId() const override {\n";
-            code << "        \n";
-            code << "        return GET_CLASS_ID_##CLASS_NAME;\n";
-            code << "    }\n";
-
-            code << "    virtual uint64_t GetClassHas() const override {\n";
-            code << "        \n";
-            code << "        return GENERATE_CLASS_HAS_##CLASS_NAME;\n";
-            code << "    }\n";
-
-            code << "    virtual Core::ObjectType GetClassType() const override {\n";
-            code << "        \n";
-            code << "        return Core::ObjectType::OBJECT_TYPE;\n";
-            code << "    }\n";
-
-            code << "    virtual Core::ObjectSwitch GetClassSwitch() const override  {\n";
-            code << "        \n";
-            code << "        return GENERATE_OBJECT_SWITCH_##CLASS_NAME;\n";
-            code << "    }\n";
+            // The overrides come from Codegen/ObjectInterfaceContract.h, the same table
+            // BuildParseSource() renders as declarations for libclang. Adding or renaming
+            // a member therefore cannot leave the two renderings out of step.
+            for (const Codegen::ClassOverrideMethod& method : Codegen::kClassOverrideMethods)
+            {
+                code << "    " << method.Signature << " {\n";
+                code << "        " << method.Body << "\n";
+                code << "    }\n";
+            }
 
             // use macros generate class function
             code << "    GENERATE_SERIALIZE_##CLASS_NAME()\n";
@@ -91,7 +79,7 @@ namespace MCT {
             code << "       /*Please use a factory class to create this object */   \n";
             code << "       /*this->ObjectInit();*/                                 \n";
             code << "    }                                                          \n";
-            code << "    void generate_object_init_func_() {                        \n";
+            code << "    " << Codegen::kGenerateObjectInitFuncSignature << " {                        \n";
             code << "       this->ObjectInit();                                     \n";
             code << "    }                                                          \n";
             code << "                                                               \n";

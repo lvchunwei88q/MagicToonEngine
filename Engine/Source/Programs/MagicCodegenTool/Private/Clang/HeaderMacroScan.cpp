@@ -4,6 +4,7 @@
 #include <cctype>
 #include <sstream>
 
+#include "Codegen/ObjectInterfaceContract.h"
 #include "MagicConfig.h"
 
 namespace MCT {
@@ -199,13 +200,20 @@ namespace MCT {
 				}
 				else if (ParseMacro(line, "GENERATE_BODY", params))
 				{
-					source << "public: "
-						<< "virtual std::string GetClassName() const override; "
-						<< "virtual uint64_t GetClassId() const override; "
-						<< "virtual uint64_t GetClassHas() const override; "
-						<< "virtual Core::ObjectType GetClassType() const override; "
-						<< "virtual Core::ObjectSwitch GetClassSwitch() const override; "
-						<< "void generate_object_init_func_();\n";
+					// GENERATE_BODY is replaced by the declarations of every member it defines.
+					// The list and the signatures come from Codegen/ObjectInterfaceContract.h,
+					// which GenerateClassBodyFunction() renders into definitions - a rename
+					// now touches one place instead of two hand-written string blobs.
+					//
+					// One source line in, one source line out: the unsaved file must keep the
+					// original line numbering, because MCLASS line matching compares the AST
+					// locations against the header on disk.
+					source << "public:";
+					for (const Codegen::ClassOverrideMethod& method : Codegen::kClassOverrideMethods)
+					{
+						source << " " << method.Signature << ";";
+					}
+					source << " " << Codegen::kGenerateObjectInitFuncSignature << ";\n";
 				}
 				else
 				{

@@ -52,7 +52,8 @@ int main(int argc, char* argv[]) {
             Utilitie::Log::Info("Start reading all engine header file contents");
             if (MagicCT.Run()) {
                 Utilitie::Log::Info("Code generation completed successfully");
-                Core::JobSystem::Get().Uninstall();
+                // Uninstall the Core Subsystem and JobSystem
+                Core::SubsystemControl::Uninstall();
                 return 0; // success
             }
         }
