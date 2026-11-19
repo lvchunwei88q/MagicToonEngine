@@ -7,11 +7,9 @@
 #define MAGIC_DEV 0
 
 /**
- * @brief Maximum number of files that a single job (batch) can process.
- * @details Since the number of files to process may be very large, the build tool processes them in batches
- * (100 files per job). This macro defines the batch size limit.
+ * @brief Maximum number of input files processed in one code generation batch.
  */
-#define MAXIMUM_CAPACITY_PER_JOB 100
+#define MAXIMUM_CAPACITY_PER_JOB 256
 
 /**
  * @brief UTF-8 path to the engine generation information directory.

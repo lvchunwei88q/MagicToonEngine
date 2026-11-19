@@ -23,7 +23,6 @@ namespace MCT {
 		 * @param generatedRoot The code generation directory holding per-module Object folders.
 		 * @param mClassDeclarationLines Zero-based class declaration lines following MCLASS markers.
 		 * @param outClasses Receives the classes extracted from this header.
-		 * @param failedHeaders Records this header if parsing fails.
 		 * @return True if parsing and AST extraction complete; otherwise false.
 		 */
 		bool ParseHeaderClasses(CXIndex index,
@@ -32,8 +31,7 @@ namespace MCT {
 			const std::vector<CompileCommandData>& compileCommands,
 			const IO::path& generatedRoot,
 			const std::vector<size_t>& mClassDeclarationLines,
-			std::vector<MagicClassInfo>& outClasses,
-			std::unordered_set<IO::path>& failedHeaders);
+			std::vector<MagicClassInfo>& outClasses);
 
 		/**
 		 * @brief Load the compilation database and parse each header containing an MCLASS marker.
@@ -41,7 +39,7 @@ namespace MCT {
 		 * @param generatePath The code generation directory, also holding the compilation database.
 		 * @param outClasses Receives classes extracted from successfully parsed headers.
 		 * @param failedHeaders Records headers that could not be parsed.
-		 * @return True if the database and libclang index were initialized; otherwise false.
+		 * @return False if the database could not be loaded. Per-header failures are collected in failedHeaders.
 		 */
 		bool ParseAllHeaderClasses(const std::vector<MagicEngineHeader>& headers,
 			const IO::path& generatePath, std::vector<MagicClassInfo>& outClasses,

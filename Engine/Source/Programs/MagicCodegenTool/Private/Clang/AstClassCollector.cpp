@@ -5,6 +5,7 @@
 #include "Clang/HeaderMacroScan.h"
 
 #include <algorithm>
+#include <exception>
 #include <filesystem>
 #include <iterator>
 #include <string>
@@ -13,6 +14,7 @@
 #include <vector>
 
 #include <clang-c/Index.h>
+#include <Jobsystem/JobSystem.h>
 
 #include "MagicConfig.h"
 
@@ -254,14 +256,12 @@ namespace MCT {
 			const std::vector<CompileCommandData>& compileCommands,
 			const IO::path& generatedRoot,
 			const std::vector<size_t>& mClassDeclarationLines,
-			std::vector<MagicClassInfo>& outClasses,
-			std::unordered_set<IO::path>& failedHeaders)
+			std::vector<MagicClassInfo>& outClasses)
 		{
 			std::vector<std::string> arguments;
 			if (!BuildArgumentsForHeader(
 				header, allHeaders, compileCommands, generatedRoot, arguments))
 			{
-				failedHeaders.insert(header.headerPath);
 				return false;
 			}
 
@@ -302,7 +302,6 @@ namespace MCT {
 				Utilitie::Log::Error(
 					"libclang failed to parse header: " + header.headerPath.string() +
 					" (error " + std::to_string(static_cast<int>(result)) + ")");
-				failedHeaders.insert(header.headerPath);
 				return false;
 			}
 
@@ -325,7 +324,6 @@ namespace MCT {
 			}
 			if (hasErrors)
 			{
-				failedHeaders.insert(header.headerPath);
 				return false;
 			}
 
@@ -376,13 +374,14 @@ namespace MCT {
 				return false;
 			}
 
-			const ClangIndex index(clang_createIndex(0, 0));
-			if (!index)
+			struct HeaderJob
 			{
-				Utilitie::Log::Error("libclang could not create an index");
-				return false;
-			}
-
+				const MagicEngineHeader& header;
+				std::vector<size_t> lines;
+				std::vector<MagicClassInfo> classes;
+				bool succeeded = false;
+			};
+			std::vector<HeaderJob> jobs;
 			for (const MagicEngineHeader& header : headers)
 			{
 				// Record MCLASS lines so only classes directly following the marker are kept.
@@ -395,25 +394,42 @@ namespace MCT {
 						mClassDeclarationLines.push_back(line + 1);
 					}
 				}
-				if (mClassDeclarationLines.empty())
+				if (!mClassDeclarationLines.empty())
 				{
-					// No MCLASS markers in this header; skip parsing.
-					continue;
+					jobs.push_back({ header, std::move(mClassDeclarationLines), {} });
 				}
+			}
 
-				// Parse the header with libclang and extract class information.
-				if (!ParseHeaderClasses(
-					index.Get(),
-					header,
-					headers,
-					compileCommands,
-					generatePath,
-					mClassDeclarationLines,
-					outClasses,
-					failedHeaders))
+			Core::JobSystem::Get().ParallelFor(static_cast<uint32_t>(jobs.size()), [&](uint32_t i)
+			{
+				auto& job = jobs[i];
+				try
 				{
+					const ClangIndex index(clang_createIndex(0, 0));
+					if (!index)
+					{
+						Utilitie::Log::Error("Could not create libclang index for " + job.header.headerPath.string());
+						return;
+					}
+					job.succeeded = ParseHeaderClasses(index.Get(), job.header, headers, compileCommands,
+						generatePath, job.lines, job.classes);
+				}
+				catch (const std::exception& error)
+				{
+					Utilitie::Log::Error("Failed to parse " + job.header.headerPath.string() + ": " + error.what());
+				}
+			});
+
+			// Preserve input order regardless of which translation unit finished first.
+			for (auto& job : jobs)
+			{
+				if (!job.succeeded)
+				{
+					failedHeaders.insert(job.header.headerPath);
 					continue;
 				}
+				outClasses.insert(outClasses.end(), std::make_move_iterator(job.classes.begin()),
+					std::make_move_iterator(job.classes.end()));
 			}
 
 			return true;
