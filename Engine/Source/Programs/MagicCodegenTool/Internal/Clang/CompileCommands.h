@@ -56,9 +56,10 @@ namespace MCT {
 		};
 
 		/**
-		 * @brief Detect the compiler dialect from the executable stored in the compile command.
+		 * @brief Detect the compiler dialect after any leading sccache/ccache launchers.
 		 * @param command The compile command whose compiler is being inspected.
-		 * @return Msvc for cl.exe, Gcc for gcc/g++ and cross-prefixed drivers, otherwise Unknown.
+		 * @return Msvc for cl.exe, Gcc for GCC drivers (including cross prefixes and numeric
+		 * version suffixes such as g++-13), otherwise Unknown.
 		 */
 		CompilerKind DetectCompilerKind(const CompileCommandData& command);
 

@@ -356,6 +356,43 @@ namespace MCT {
 				return name;
 			}
 
+			// In the command-line arguments list, skip the initial `sccache/ccache` wrapper and find the starting point of the real compiler arguments.
+			auto FindCompiler(const std::vector<std::string>& arguments)
+			{
+				auto token = arguments.begin();
+				while (token != arguments.end())
+				{
+					const std::string name = GetExecutableName(*token);
+					if (name != "sccache" && name != "ccache")
+					{
+						break;
+					}
+					++token;
+					if (token != arguments.end() && *token == "--")
+					{
+						++token;
+					}
+				}
+				return token;
+			}
+
+			// Remove the version number suffix from the compiler file name, keeping only the main compiler name
+			std::string StripGccVersion(const std::string& name)
+			{
+				const size_t dash = name.rfind('-');
+				if (dash != std::string::npos && dash + 1 < name.size())
+				{
+					const std::string version = name.substr(dash + 1);
+					if (version.front() != '.' && version.back() != '.' &&
+						version.find("..") == std::string::npos &&
+						version.find_first_not_of("0123456789.") == std::string::npos)
+					{
+						return name.substr(0, dash);
+					}
+				}
+				return name;
+			}
+
 			/**
 			 * Check whether an executable name belongs to the GCC driver family.
 			 * @param name The lowercase executable name.
@@ -580,7 +617,7 @@ namespace MCT {
 			 */
 			std::string ResolveCompilerTriple(const std::string& compilerPath)
 			{
-				const std::string executable = GetExecutableName(compilerPath);
+				const std::string executable = StripGccVersion(GetExecutableName(compilerPath));
 				const size_t suffix = executable.find_last_of('-');
 				if (suffix != std::string::npos &&
 					(executable.size() - suffix) > 1)
@@ -691,17 +728,18 @@ namespace MCT {
 
 		CompilerKind DetectCompilerKind(const CompileCommandData& command)
 		{
-			if (command.arguments.empty())
+			const auto compiler = FindCompiler(command.arguments);
+			if (compiler == command.arguments.end())
 			{
 				return CompilerKind::Unknown;
 			}
 
-			const std::string executable = GetExecutableName(command.arguments.front());
+			const std::string executable = GetExecutableName(*compiler);
 			if (executable == "cl")
 			{
 				return CompilerKind::Msvc;
 			}
-			if (IsGccDriverName(executable))
+			if (IsGccDriverName(StripGccVersion(executable)))
 			{
 				return CompilerKind::Gcc;
 			}
@@ -930,6 +968,15 @@ namespace MCT {
 			{
 				return false;
 			}
+
+			const auto compiler = FindCompiler(expanded.arguments);
+			if (compiler == expanded.arguments.end())
+			{
+				Utilitie::Log::Error("Missing compiler after expanding compile command for " +
+					command.fileName);
+				return false;
+			}
+			expanded.arguments.erase(expanded.arguments.cbegin(), compiler);
 
 			switch (DetectCompilerKind(expanded))
 			{
