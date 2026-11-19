@@ -46,10 +46,47 @@ namespace MCT {
 			const MagicEngineHeader& header);
 
 		/**
-		 * @brief Convert supported MSVC compile options into libclang arguments.
-		 * @param command The compile command whose options are being converted.
-		 * @param arguments Receives the libclang arguments, including default C++ options.
+		 * @brief The compiler dialect that produced a compilation database entry.
+		 */
+		enum class CompilerKind
+		{
+			Unknown,
+			Msvc,
+			Gcc
+		};
+
+		/**
+		 * @brief Detect the compiler dialect from the executable stored in the compile command.
+		 * @param command The compile command whose compiler is being inspected.
+		 * @return Msvc for cl.exe, Gcc for gcc/g++ and cross-prefixed drivers, otherwise Unknown.
+		 */
+		CompilerKind DetectCompilerKind(const CompileCommandData& command);
+
+		/**
+		 * @brief Convert an MSVC (cl.exe) compile command into libclang arguments.
+		 * @param command The compile command whose MSVC options are being converted.
+		 * @param arguments Receives the libclang arguments, in MSVC compatibility mode.
 		 * @return True if the options were converted successfully; otherwise false.
+		 */
+		bool BuildMsvcClangArguments(const CompileCommandData& command,
+			std::vector<std::string>& arguments);
+
+		/**
+		 * @brief Convert a GCC (gcc/g++) compile command into libclang arguments.
+		 * @param command The compile command whose GCC options are being forwarded.
+		 * @param arguments Receives the libclang arguments, in native clang mode.
+		 * @return True if the options were converted successfully; otherwise false.
+		 */
+		bool BuildGccClangArguments(const CompileCommandData& command,
+			std::vector<std::string>& arguments);
+
+		/**
+		 * @brief Detect the compiler dialect and convert the compile command into libclang arguments.
+		 * @details Response files referenced with @file are expanded before detection. The dialect
+		 * must be MSVC (cl.exe) or GCC (gcc/g++); any other compiler is reported as an error.
+		 * @param command The compile command being converted.
+		 * @param arguments Receives the libclang arguments, including default C++ options.
+		 * @return False when the dialect is neither MSVC nor GCC, or the conversion fails.
 		 */
 		bool BuildClangArguments(const CompileCommandData& command,
 			std::vector<std::string>& arguments);
