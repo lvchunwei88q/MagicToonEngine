@@ -24,7 +24,7 @@ namespace MCT
 		}
 
 		bool AppendReport(
-			const std::wstring& path,
+			const IO::path& path,
 			const std::string& contents,
 			const std::string& description)
 		{
@@ -36,8 +36,7 @@ namespace MCT
 				}
 				else
 				{
-					IO::path p(path);
-					IO::path parent = p.parent_path();
+					IO::path parent = path.parent_path();
 					std::wstring parent_path = parent.wstring();
 
 					if(!IO::CreateDirectory(parent_path))
@@ -193,9 +192,9 @@ namespace MCT
                 / MAGICENGINE_CLASS_METADATA_INFO_FILE;
             
 			const bool classDebugReportWritten = AppendReport(
-				classDebugReportPath.native(), classDebugInfo.str(), "class metadata info file");
+				classDebugReportPath, classDebugInfo.str(), "class metadata info file");
 			const bool classInfoReportWritten = AppendReport(
-				classInfoReportPath.native(),classInfoReport.str(),"class information report");
+				classInfoReportPath,classInfoReport.str(),"class information report");
 
 			return classDebugReportWritten && classInfoReportWritten;
         };
