@@ -41,15 +41,26 @@ namespace Utilitie {
         }
     }
 
-    size_t GetFileContentHash(const IO::path& filepath)
+    uint64_t HashFNV1a64(const std::string_view s)
+    {
+        uint64_t hash = FNV1A_OFFSET_BASIS;
+        for (char c : s)
+        {
+            hash ^= static_cast<uint64_t>(static_cast<uint8_t>(c));
+            hash *= FNV1A_PRIME;
+        }
+        return hash;
+    }
+
+    uint64_t GetFileContentHash(const IO::path& filepath)
     {
         if (!fs::exists(filepath)) {
             return 0;
         }
-        return static_cast<size_t>(HashFileContent(filepath));
+        return HashFileContent(filepath);
     }
 
-    void GetFileContentHashesParallel(const std::vector<IO::path>& filePaths, std::vector<size_t>& hashes)
+    void GetFileContentHashesParallel(const std::vector<IO::path>& filePaths, std::vector<uint64_t>& hashes)
     {
         hashes.assign(filePaths.size(), 0);
         if (filePaths.empty()) {
@@ -59,7 +70,7 @@ namespace Utilitie {
         Core::JobSystem::Get().ParallelFor(
             static_cast<uint32_t>(filePaths.size()),
             [&](uint32_t index) {
-                hashes[index] = static_cast<size_t>(HashFileContent(filePaths[index]));
+                hashes[index] = HashFileContent(filePaths[index]);
             }
         );
     }

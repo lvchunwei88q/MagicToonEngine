@@ -1,4 +1,5 @@
 #include "Pipeline/GeneralPipeline.h"
+#include "MagicUtilities.h"
 #include <algorithm>
 #include <map>
 #include <vector>
@@ -8,244 +9,246 @@
 
 namespace MCT {
 	namespace GeneralPipeline {
-	namespace {
-        struct LocalSourcesIndex {
-            enum class Sort : uint8_t {
-                BeforeBody,
-                InBody,
-                AfterBody
+        namespace {
+            struct LocalSourcesIndex {
+                enum class Sort : uint8_t {
+                    BeforeBody,
+                    InBody,
+                    AfterBody
+                };
+
+                std::string Source;
+                Sort index = Sort::InBody;
             };
 
-            std::string Source;
-            Sort index = Sort::InBody;
-        };
+            struct LocalValidateParameter {
+                std::string Parameter;
+                bool consistent = false;
+            };
 
-        struct LocalValidateParameter {
-            std::string Parameter;
-            bool consistent = false;
-        };
+            struct LocalMetadataSource {
+                std::string Source;
+                bool NeedMacro = true;
+            };
 
-        struct LocalMetadataSource {
-            std::string Source;
-            bool NeedMacro = true;
-        };
+            struct LocalMetaData {
+                IO::path headerPath;
+                std::vector<LocalMetadataSource> Sources;
+                std::string Metadata;
 
-        struct LocalMetaData {
-            IO::path headerPath;
-            std::vector<LocalMetadataSource> Sources;
-            std::string Metadata;
-
-            void SetSources(
-                const std::vector<LocalMetadataSource>& Sources,
-                const IO::path& headerPath)
-            {
-                this->Sources = Sources;
-                this->headerPath  = headerPath;
-            }
-            void SetMetadata(const std::string& Metadata) { this->Metadata = Metadata; }
-        };
-
-        std::string GenerateUndefMacros(const std::vector<std::string>& macroNames) {
-            std::ostringstream code;
-
-            for (const auto& macroName : macroNames) {
-                code << "#undef " << macroName << "\n";
-            }
-
-            return code.str();
-        }
-
-        // Build the shared class API and leave extension points for optional capabilities.
-        std::string GenerateClassBodyFunction() {
-            std::ostringstream code;
-
-            // The overrides come from Codegen/ObjectInterfaceContract.h, the same table
-            // BuildParseSource() renders as declarations for libclang. Adding or renaming
-            // a member therefore cannot leave the two renderings out of step.
-            for (const Codegen::ClassOverrideMethod& method : Codegen::kClassOverrideMethods)
-            {
-                code << "    " << method.Signature << " {\n";
-                code << "        " << method.Body << "\n";
-                code << "    }\n";
-            }
-
-            // use macros generate class function
-            code << "    GENERATE_SERIALIZE_##CLASS_NAME()\n";
-            code << "    GENERATE_DELEGATES_##CLASS_NAME()\n";
-            // ...
-
-            // Set constructor parameters
-            code << "    CLASS_NAME() : Core::Object() {                            \n";
-            code << "       /*Please use a factory class to create this object */   \n";
-            code << "       /*this->ObjectInit();*/                                 \n";
-            code << "    }                                                          \n";
-            code << "    " << Codegen::kGenerateObjectInitFuncSignature << " {                        \n";
-            code << "       this->ObjectInit();                                     \n";
-            code << "    }                                                          \n";
-            code << "                                                               \n";
-            code << "    ~CLASS_NAME() {                                            \n";
-            code << "       this->ObjectUninit();                                   \n";
-            code << "    }                                                          \n";
-            code << "protected:                                                                     \n";
-            code << "    GENERATE_SERIALIZE_BODY_##CLASS_NAME()\n";
-            return code.str();
-        }
-
-        /**
-         * 生成 GetClassId 函数
-         * @param classIdMap 类名和类ID的映射表
-         * @return 宏
-        */
-        std::string GenerateClassIdSpecificMacros(
-            const std::map<std::string, size_t>& classIdMap
-        ) {
-            std::ostringstream code;
-
-            for (const auto& [className, classId] : classIdMap) {
-                // 生成 GET_CLASS_ID_XXX 宏
-                code << "#define GET_CLASS_ID_" << className << " " << classId << "ULL\n";
-            }
-
-            return code.str();
-        }
-
-        std::string GenerateObjectTagSpecificMacros(
-            const std::map<std::string, size_t>& ObjectTagMap
-        ) {
-            std::ostringstream code;
-
-            for (const auto& [className, Tag] : ObjectTagMap) {
-                // 生成 GENERATE_CLASS_HAS_XXX 宏
-                code << "#define GENERATE_CLASS_HAS_" << className << " " << Tag << "\n";
-            }
-
-            return code.str();
-        }
-
-        std::string GenerateFileWithCode(
-            const std::vector<std::string>& codeLines,
-            const std::string& generatorName = "MagicCodegenTool",
-            const std::string& additionalInfo = ""
-        ) {
-            std::ostringstream result;
-
-            // 生成文件头部
-            result << "#pragma once\n\n";
-            result << "// ============================================================================\n";
-            result << "// This file is generated by " << generatorName << ".\n";
-            result << "// DO NOT MODIFY THIS FILE MANUALLY!\n";
-            result << "// Any manual changes will be overwritten.\n";
-
-            if (!additionalInfo.empty()) {
-                result << "// \n";
-                result << "// " << additionalInfo << "\n";
-            }
-
-            result << "// ============================================================================\n\n";
-
-            // 此时我们不需要Object上的默认宏了
-            result << "#ifdef GENERATE_BODY\n";
-            result << "#undef GENERATE_BODY\n";
-            result << "#endif\n\n";
-
-            // 追加用户代码
-            for (const auto& line : codeLines) {
-                result << line << "\n";
-            }
-
-            return result.str();
-        }
-
-        std::string ConvertFunctionToMacro(const std::vector<LocalSourcesIndex>& funcStrings, const std::string& macroName = "GENERATE_BODY", const std::string& macroSignature = "...") {
-            std::ostringstream result;
-            result << "#define " << macroName << "(" << macroSignature << ")                    \\\n";
-            result << "    [[maybe_unused]] static constexpr bool __check = [] {                \\\n";
-            result << "        if constexpr (MAGIC_IN_IDE) {                                    \\\n";
-            result << "            /* IDE/Compiler analysis mode - perform checks */            \\\n";
-            result << "            CHECK_COMBINE_MEMBER(CLASS_NAME,Object);                     \\\n";
-            result << "        }                                                                \\\n";
-            result << "        return true;                                                     \\\n";
-            result << "    }();                                                                 \\\n";
-            result << "public: " << " \\\n";  // Default to public
-
-            bool firstLine = true;
-
-            for (const auto& funcString : funcStrings) {
-                if (funcString.index != LocalSourcesIndex::Sort::InBody)
-                    continue;   // is no InBody continue
-
-                std::stringstream ss(funcString.Source);
-                std::string line;
-
-                while (std::getline(ss, line)) {
-                    // 去除换行符和首尾空白
-                    line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
-
-                    size_t start = line.find_first_not_of(" \t");
-                    if (start == std::string::npos) continue;
-
-                    line = line.substr(start);
-
-                    if (!firstLine) {
-                        result << " \\\n";
-                    }
-
-                    result << "    " << line;
-                    firstLine = false;
+                void SetSources(
+                    const std::vector<LocalMetadataSource>& Sources,
+                    const IO::path& headerPath)
+                {
+                    this->Sources = Sources;
+                    this->headerPath  = headerPath;
                 }
+                void SetMetadata(const std::string& Metadata) { this->Metadata = Metadata; }
+            };
+
+            std::string GenerateUndefMacros(const std::vector<std::string>& macroNames) {
+                std::ostringstream code;
+
+                for (const auto& macroName : macroNames) {
+                    code << "#undef " << macroName << "\n";
+                }
+
+                return code.str();
             }
 
-            return result.str();
-        }
+            // Build the shared class API and leave extension points for optional capabilities.
+            std::string GenerateClassBodyFunction() {
+                std::ostringstream code;
 
-        bool ValidateParameters(
-            const std::vector<LocalValidateParameter>& a,
-            const std::vector<std::string>& b
-        ) {
-            // 检查长度是否一致
-            if (a.size() != b.size()) {
-                if (a.size() > b.size()) {
-                    Utilitie::Log::Error("Parameter count mismatch: expected " +
-                        std::to_string(b.size()) + " parameters, but got " +
-                        std::to_string(a.size()) + " parameters (too many)");
+                // The overrides come from Codegen/ObjectInterfaceContract.h, the same table
+                // BuildParseSource() renders as declarations for libclang. Adding or renaming
+                // a member therefore cannot leave the two renderings out of step.
+                for (const Codegen::ClassOverrideMethod& method : Codegen::kClassOverrideMethods)
+                {
+                    code << "    " << method.Signature << " {\n";
+                    code << "        " << method.Body << "\n";
+                    code << "    }\n";
                 }
-                else {
-                    Utilitie::Log::Error("Parameter count mismatch: expected " +
-                        std::to_string(b.size()) + " parameters, but got " +
-                        std::to_string(a.size()) + " parameters (too few)");
-                }
-                return false;
+
+                // use macros generate class function
+                code << "    GENERATE_SERIALIZE_##CLASS_NAME()\n";
+                code << "    GENERATE_DELEGATES_##CLASS_NAME()\n";
+                // ...
+
+                // Set constructor parameters
+                code << "    CLASS_NAME() : Core::Object() {                            \n";
+                code << "       /*Please use a factory class to create this object */   \n";
+                code << "       /*this->ObjectInit();*/                                 \n";
+                code << "    }                                                          \n";
+                code << "    " << Codegen::kGenerateObjectInitFuncSignature << " {                        \n";
+                code << "       this->ObjectInit();                                     \n";
+                code << "    }                                                          \n";
+                code << "                                                               \n";
+                code << "    ~CLASS_NAME() {                                            \n";
+                code << "       this->ObjectUninit();                                   \n";
+                code << "    }                                                          \n";
+                code << "protected:                                                                     \n";
+                code << "    GENERATE_SERIALIZE_BODY_##CLASS_NAME()\n";
+                return code.str();
             }
 
-            // 检查每个参数是否一致
-            for (size_t i = 0; i < a.size(); ++i) {
-                LocalValidateParameter Parameter = a[i];
-                if (Parameter.consistent) {
-                    if (Parameter.Parameter != b[i]) {
-                        Utilitie::Log::Error("Parameter mismatch at index " + std::to_string(i) +
-                            ": expected \"" + b[i] + "\", but got \"" + Parameter.Parameter + "\"");
-                        return false;
+            /**
+            * 生成 GetClassId 函数
+            * @param classIdMap 类名和类ID的映射表
+            * @return 宏
+            */
+            std::string GenerateClassIdSpecificMacros(
+                const std::map<std::string, uint64_t>& classIdMap
+            ) {
+                std::ostringstream code;
+
+                for (const auto& [className, classId] : classIdMap) {
+                    // 生成 GET_CLASS_ID_XXX 宏
+                    code << "#define GET_CLASS_ID_" << className << " " << classId << "ULL\n";
+                }
+
+                return code.str();
+            }
+
+            std::string GenerateObjectTagSpecificMacros(
+                const std::map<std::string, uint64_t>& ObjectTagMap
+            ) {
+                std::ostringstream code;
+
+                for (const auto& [className, Tag] : ObjectTagMap) {
+                    // 生成 GENERATE_CLASS_HAS_XXX 宏
+                    code << "#define GENERATE_CLASS_HAS_" << className << " " << Tag << "ULL\n";
+                }
+
+                return code.str();
+            }
+
+            std::string GenerateFileWithCode(
+                const std::vector<std::string>& codeLines,
+                const std::string& generatorName = "MagicCodegenTool",
+                const std::string& additionalInfo = ""
+            ) {
+                std::ostringstream result;
+
+                // 生成文件头部
+                result << "#pragma once\n\n";
+                result << "// ============================================================================\n";
+                result << "// This file is generated by " << generatorName << ".\n";
+                result << "// DO NOT MODIFY THIS FILE MANUALLY!\n";
+                result << "// Any manual changes will be overwritten.\n";
+
+                if (!additionalInfo.empty()) {
+                    result << "// \n";
+                    result << "// " << additionalInfo << "\n";
+                }
+
+                result << "// ============================================================================\n\n";
+
+                // 此时我们不需要Object上的默认宏了
+                result << "#ifdef GENERATE_BODY\n";
+                result << "#undef GENERATE_BODY\n";
+                result << "#endif\n\n";
+
+                // 追加用户代码
+                for (const auto& line : codeLines) {
+                    result << line << "\n";
+                }
+
+                return result.str();
+            }
+
+            std::string ConvertFunctionToMacro(const std::vector<LocalSourcesIndex>& funcStrings, const std::string& macroName = "GENERATE_BODY", const std::string& macroSignature = "...") {
+                std::ostringstream result;
+                result << "#define " << macroName << "(" << macroSignature << ")                    \\\n";
+                result << "    [[maybe_unused]] static constexpr bool __check = [] {                \\\n";
+                result << "        if constexpr (MAGIC_IN_IDE) {                                    \\\n";
+                result << "            /* IDE/Compiler analysis mode - perform checks */            \\\n";
+                result << "            CHECK_COMBINE_MEMBER(CLASS_NAME,Object);                     \\\n";
+                result << "        }                                                                \\\n";
+                result << "        return true;                                                     \\\n";
+                result << "    }();                                                                 \\\n";
+                result << "public: " << " \\\n";  // Default to public
+
+                bool firstLine = true;
+
+                for (const auto& funcString : funcStrings) {
+                    if (funcString.index != LocalSourcesIndex::Sort::InBody)
+                        continue;   // is no InBody continue
+
+                    std::stringstream ss(funcString.Source);
+                    std::string line;
+
+                    while (std::getline(ss, line)) {
+                        // 去除换行符和首尾空白
+                        line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+
+                        size_t start = line.find_first_not_of(" \t");
+                        if (start == std::string::npos) continue;
+
+                        line = line.substr(start);
+
+                        if (!firstLine) {
+                            result << " \\\n";
+                        }
+
+                        result << "    " << line;
+                        firstLine = false;
                     }
                 }
-                else {
-                    // 没有绝对比配那么只要有这个参数就可以
-                }
+
+                return result.str();
             }
 
-            return true;
-        }
+            bool ValidateParameters(
+                const std::vector<LocalValidateParameter>& a,
+                const std::vector<std::string>& b
+            ) {
+                // 检查长度是否一致
+                if (a.size() != b.size()) {
+                    if (a.size() > b.size()) {
+                        Utilitie::Log::Error("Parameter count mismatch: expected " +
+                            std::to_string(b.size()) + " parameters, but got " +
+                            std::to_string(a.size()) + " parameters (too many)");
+                    }
+                    else {
+                        Utilitie::Log::Error("Parameter count mismatch: expected " +
+                            std::to_string(b.size()) + " parameters, but got " +
+                            std::to_string(a.size()) + " parameters (too few)");
+                    }
+                    return false;
+                }
 
-        std::string MergeCode(const std::string& code1, const std::string& code2) {
-            std::ostringstream result;
-            result << code1 << "\n" << code2;
-            return result.str();
-        }
+                // 检查每个参数是否一致
+                for (size_t i = 0; i < a.size(); ++i) {
+                    LocalValidateParameter Parameter = a[i];
+                    if (Parameter.consistent) {
+                        if (Parameter.Parameter != b[i]) {
+                            Utilitie::Log::Error("Parameter mismatch at index " + std::to_string(i) +
+                                ": expected \"" + b[i] + "\", but got \"" + Parameter.Parameter + "\"");
+                            return false;
+                        }
+                    }
+                    else {
+                        // 没有绝对比配那么只要有这个参数就可以
+                    }
+                }
 
-        uint64_t GlobalAutoincrementedValue() {
-            static uint64_t value = 0; // 初始化为0
-            return value++;
+                return true;
+            }
+
+            std::string MergeCode(const std::string& code1, const std::string& code2) {
+                std::ostringstream result;
+                result << code1 << "\n" << code2;
+                return result.str();
+            }
+
+            // Construct a unique key
+            uint64_t GetStableClassId(const std::string& headerPath, const std::string& className)
+            {
+                std::string key = headerPath + "|" + className;
+                return Utilitie::HashFNV1a64(key);
+            }
         }
-	}
 
 		bool GenerateMetadata() {
             const auto& classes = MagicGeneralPipelinedData::Get().GetRefMagicClasses();
@@ -277,13 +280,13 @@ namespace MCT {
             // 为每个文件生成对应的生成信息 之后生成元数据
             for (const auto& Area : AllArea) 
             {
-                std::map<std::string, size_t> GenerateInformationMap_GetClassId;
-                std::map<std::string, size_t> GenerateInformationMap_ObjectTag;
+                std::map<std::string, uint64_t> GenerateInformationMap_GetClassId;
+                std::map<std::string, uint64_t> GenerateInformationMap_ObjectTag;
                 // Build per-class metadata for this header.
                 for (const auto& classInfo : classes) {
                     if (Area == classInfo.headerPath) {
-                        GenerateInformationMap_GetClassId[classInfo.className] = GlobalAutoincrementedValue();
-                        GenerateInformationMap_ObjectTag[classInfo.className] = std::hash<std::string>{}(classInfo.className); // Use hash of class name as unique tag
+                        GenerateInformationMap_GetClassId[classInfo.className] = GetStableClassId(classInfo.headerPath.string(),classInfo.className);
+                        GenerateInformationMap_ObjectTag[classInfo.className] = Utilitie::HashFNV1a64(classInfo.className); // Use hash of class name as unique tag
                     }
                 }
 

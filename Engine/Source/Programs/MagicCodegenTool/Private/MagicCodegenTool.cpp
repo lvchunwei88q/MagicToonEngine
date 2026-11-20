@@ -2,6 +2,7 @@
 #include <sstream>
 #include <utility>
 #include <unordered_map>
+#include <limits>
 #include "Pipeline/GeneralPipeline.h"
 #include "MagicGlobalContext.h"
 #include "MagicUtilities.h"
@@ -44,9 +45,9 @@ namespace MCT{
 		}
 
 		// Hex is easier to eyeball in the .buildmeta file than a 20 digit decimal.
-		std::wstring ToHexHash(size_t hash) {
+		std::wstring ToHexHash(uint64_t hash) {
 			std::wstringstream stream;
-			stream << std::hex << static_cast<unsigned long long>(hash);
+			stream << std::hex << hash;
 			return stream.str();
 		}
 
@@ -60,7 +61,7 @@ namespace MCT{
 				ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_HASH_CHECK_FILE;
 
 			// Path -> content hash recorded by the last successful generation.
-			std::unordered_map<std::wstring, size_t> CachedHashes;
+			std::unordered_map<std::wstring, uint64_t> CachedHashes;
 
 			// Read cache file
 			if (IO::Exists(hashCheckFilePath.native())) {
@@ -80,9 +81,22 @@ namespace MCT{
 						continue;
 					}
 
-					size_t CachedHash = 0;
+					uint64_t CachedHash = 0;
 					try {
-						CachedHash = static_cast<size_t>(std::stoull(IO::ToNarrowString(hashText), nullptr, 16));
+						const std::string HashText = IO::ToNarrowString(hashText);
+						if (HashText.empty() || HashText.front() == '-' || HashText.front() == '+') {
+							continue;
+						}
+
+						size_t ParsedLength = 0;
+						const uint64_t ParsedHash =
+							std::stoull(HashText, &ParsedLength, 16);
+						if (ParsedLength != HashText.size() ||
+							ParsedHash > std::numeric_limits<uint64_t>::max()) {
+							continue;
+						}
+
+						CachedHash = ParsedHash;
 					}
 					catch (const std::exception&) {
 						// Unreadable line (old format or corruption): drop it, the file is regenerated once.
@@ -106,7 +120,7 @@ namespace MCT{
 				FilePaths[i] = IO::path(SplitInput(IO::ToWideString(files[i])).first);
 			}
 
-			std::vector<size_t> CurrentHashes;
+			std::vector<uint64_t> CurrentHashes;
 			Utilitie::GetFileContentHashesParallel(FilePaths, CurrentHashes);
 
 			// Rebuild the cache contents; it is written only after a successful generation.
@@ -116,7 +130,7 @@ namespace MCT{
 				// Copy out of the path: a const reference here would bind to a temporary
 				// produced by path -> wstring conversion.
 				const std::wstring path = FilePaths[i].wstring();
-				const size_t ThisFileHash = CurrentHashes[i];
+				const uint64_t ThisFileHash = CurrentHashes[i];
 
 				HashCheck_ContentsW += path + L" || " + ToHexHash(ThisFileHash) + L"\n";
 
