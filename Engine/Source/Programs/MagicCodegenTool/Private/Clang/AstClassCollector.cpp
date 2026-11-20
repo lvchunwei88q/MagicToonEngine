@@ -400,6 +400,7 @@ namespace MCT {
 				}
 			}
 
+			Utilitie::Log::Info("Parsing in parallel, number of parallels:" + std::to_string(jobs.size()) + " worker(s)");
 			Core::JobSystem::Get().ParallelFor(static_cast<uint32_t>(jobs.size()), [&](uint32_t i)
 			{
 				auto& job = jobs[i];
