@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#define CACHE L"Cache\\"
-#define CONFIG L"Config\\"
+#define ENGINE_CACHE IO::AbsP::Get().GetEngineDirectory() / u8"Cache"
+#define ENGINE_CONFIG IO::AbsP::Get().GetEngineDirectory() / u8"Config"
 
 // Get rid of Windows macro clutter
 #undef CreateFile
@@ -75,38 +75,38 @@ namespace IO {
 	CORE_API std::string ToNarrowString(const std::wstring& wide);
 
 	struct BaseDirectory {
-		explicit BaseDirectory(const std::wstring& Root) : Root(Root) {};
+		explicit BaseDirectory(const path& Root) : Root(Root) {};
 		BaseDirectory() = delete;
 
-		const std::wstring GetRoot() { return Root; }
+		path GetRoot() const { return Root; }
 	private:
-		std::wstring Root;
+		path Root;
 	};
 	// WorkingDirectory == Project Directory
 	struct WorkingDirectory : public BaseDirectory
 	{
-		explicit WorkingDirectory(const std::wstring& Root) : BaseDirectory(Root) {};
+		explicit WorkingDirectory(const path& Root) : BaseDirectory(Root) {};
 		WorkingDirectory() = delete;
 
-		std::wstring GetContent()	{ return GetRoot() + L"\\Content\\";	};
-		std::wstring GetConfig()	{ return GetRoot() + L"\\Config\\";		};
-		std::wstring GetCache()		{ return GetRoot() + L"\\Cache\\";		};
+		path GetContent() const { return GetRoot() / u8"Content"; };
+		path GetConfig() const { return GetRoot() / u8"Config"; };
+		path GetCache() const { return GetRoot() / u8"Cache"; };
 	};
 
 	struct ContentDirectory : public BaseDirectory
 	{
-		explicit ContentDirectory(const std::wstring& Root) : BaseDirectory(Root) {};
+		explicit ContentDirectory(const path& Root) : BaseDirectory(Root) {};
 		ContentDirectory() = delete;
 
-		std::wstring GetEditor() { return GetRoot() + L"\\Editor\\"; };
-		std::wstring GetConfig() { return GetRoot() + L"\\Config\\"; };
-		std::wstring GetLogo()   { return GetRoot() + L"\\Logo\\";   };
-		std::wstring GetWindow() { return GetRoot() + L"\\Window\\"; };
+		path GetEditor() const { return GetRoot() / u8"Editor"; };
+		path GetConfig() const { return GetRoot() / u8"Config"; };
+		path GetLogo() const { return GetRoot() / u8"Logo"; };
+		path GetWindow() const { return GetRoot() / u8"Window"; };
 	};
 
 	struct ScriptDirectory : public BaseDirectory
 	{
-		explicit ScriptDirectory(const std::wstring& Root) : BaseDirectory(Root) {};
+		explicit ScriptDirectory(const path& Root) : BaseDirectory(Root) {};
 		ScriptDirectory() = delete;
 	};
 
@@ -115,10 +115,10 @@ namespace IO {
 	public:
 		AbsolutePath() = default;
 
-		// Get the directory where the executable file is located
-		std::wstring GetExecutableDirectory();
-		// Get the full path of the executable file
-		std::wstring GetExecutablePath();
+		// Get the directory where the Engine file is located
+		path GetEngineDirectory();
+		// Get the full path of the Engine file
+		path GetEnginePath();
 
 		// Get current working directory
 		WorkingDirectory GetCurrentWorkingDirectory();
@@ -131,12 +131,15 @@ namespace IO {
 		void ClearCache();
 	private:
 		// Cache the path results to avoid recalculating
-		std::wstring ExecutableDirectory;
-		std::wstring CurrentWorkingDirectory;
-		std::wstring ExecutablePath;
-		std::wstring ContentPath;
-		std::wstring ScriptPath;
+		path EngineDirectory;
+		path EnginePath;
+		path CurrentWorkingDirectory;
+		
+		path ContentPath;
+		path ScriptPath;
 	};
+
+	using AbsP = AbsolutePath;
 }
 
 DISABLE_DLL_WARNINGS_POP;

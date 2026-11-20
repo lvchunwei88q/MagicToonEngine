@@ -29,7 +29,7 @@ namespace Editor
 
 		// Load this configuration from a serialized file
 		WondowsConfig = ObjectFactory::CreateUnique<WindowsConfig>();
-		const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+		const std::wstring configDir = IO::AbsolutePath::Get().GetEngineDirectory().wstring() + L"\\Config\\Editor\\";
 		const std::wstring configPath = configDir + L"WindowsConfig.mtdata";
 		if (IO::Exists(configPath)) {
 			std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(configPath);
@@ -119,7 +119,7 @@ namespace Editor
 
 		// Clear out the WindowsClass we registered
 		::UnregisterClass(ENGINE_EDITOR_CLASS, ::GetModuleHandle(nullptr));
-		const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+		const std::wstring configDir = IO::AbsolutePath::Get().GetEngineDirectory().wstring() + L"\\Config\\Editor\\";
 		IO::CreateDirectory(configDir);
 		const BinaryReader configData = WondowsConfig->Serialize();
 		IO::WriteAllBytes(configDir + L"WindowsConfig.mtdata", configData.DataU8(), configData.Size());

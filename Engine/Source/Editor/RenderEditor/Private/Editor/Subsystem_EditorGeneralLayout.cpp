@@ -9,7 +9,7 @@ namespace RenderEditor {
 	void EditorGeneralLayout::Init()
 	{
 		Switch = ObjectFactory::CreateUnique<ViewSwitch>();
-		const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+		const std::wstring configDir = IO::AbsolutePath::Get().GetEngineDirectory().wstring() + std::wstring(L"\\Config\\Editor\\");
 		const std::wstring configPath = configDir + L"ViewSwitch.mtdata";
 		if (IO::Exists(configPath)) {
 			std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(configPath);
@@ -21,7 +21,7 @@ namespace RenderEditor {
 
 	void EditorGeneralLayout::Uninstall()
 	{
-		const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+		const std::wstring configDir = IO::AbsolutePath::Get().GetEngineDirectory().wstring() + std::wstring(L"\\Config\\Editor\\");
 		IO::CreateDirectory(configDir);
 		const BinaryReader configData = Switch->Serialize();
 		IO::WriteAllBytes(configDir + L"ViewSwitch.mtdata", configData.DataU8(), configData.Size());

@@ -6,10 +6,6 @@
 
 ///////////////////////////////////
 #include <IO.h> 
-#include <Utilities/SerializeMacro.h>
-
-#include <fstream>
-///////////////////////////////////
 #include <ILog.h>
 
 namespace EngineProject {
@@ -73,7 +69,15 @@ namespace EngineProject {
 		HProject.path = config.path;
 		HProject.name = config.name;
 
-		FILE_SERIALIZATION_SAVE(HProject, CONFIG "Project\\", L"HistoryProject.mtdata");
+        IO::path path = ENGINE_CONFIG / u8"Project" / u8"HistoryProject.mtdata";
+        BinaryReader _date = HProject.Serialize();
+
+		if(IO::Exists(path)){
+            IO::WriteAllBytes(path,_date.DataChar(),_date.Size());
+		}else {
+            IO::CreateDirectory(path.parent_path());
+            IO::WriteAllBytes(path,_date.DataChar(),_date.Size());
+        }
 	}
 
 	bool ProjectControllerImpl::ProjectComplete(ProJectConfig& config)
@@ -100,7 +104,13 @@ namespace EngineProject {
 
 	bool ProjectControllerImpl::LoadHistoryProjects()
 	{
-		FILE_SERIALIZATION_LOADING(HProject, CONFIG "Project\\", L"HistoryProject.mtdata");
+		IO::path path = ENGINE_CONFIG / u8"Project" / u8"HistoryProject.mtdata";
+		if(IO::Exists(path)){
+			std::vector<uint8_t> Data = IO::ReadAllUINT8Bytes(path);
+			BinaryWriter _date;
+			_date.Write(Data.data(), Data.size());
+			HProject.Deserialize(_date);
+        }
 
 		if (HProject.existence) {
 			ProJectConfig config;

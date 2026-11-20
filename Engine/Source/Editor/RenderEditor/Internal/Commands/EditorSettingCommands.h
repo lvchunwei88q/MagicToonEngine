@@ -2,8 +2,11 @@
 #pragma once
 #include <Command/ICommand.h>
 #include <Utilities/Singleton.h>
+#include <Object.h>
 #include <string>
 #include <RenderSubsystem/RenderSubsystem.h>
+
+#include <EditorSettingCommands.object.generate.h>
 
 using namespace RenderUI;
 using namespace Command;
@@ -14,14 +17,14 @@ namespace RenderEditor {
         Chinese
     };
 
-    struct EditorSetting : public Singleton<EditorSetting> {
+    MCLASS(MSERIALIZATION)
+    struct EditorSetting : public Singleton<EditorSetting> , public MObject {
+        GENERATE_BODY(EditorSetting,ENGINE);
+        public:
+        
         // Languages
+        MMEMBER()
         Languages language = Languages::English;
-
-        template<class Archive>
-        void serialize(Archive& archive) {
-            archive(language);
-        }
     };
 
     // ==================== 切换语言命令 ====================

@@ -16254,9 +16254,8 @@ void ImGui::ClearIniSettings()
 void ImGui::LoadIniSettingsFromDisk(const char* ini_filename)
 {
     size_t file_data_size = 0;
-    std::string target = IO::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
-        + L"\\" + CONFIG) + ini_filename;
-    char* file_data = (char*)ImFileLoadToMemory(target.c_str(), "rb", &file_data_size);
+    IO::path target = ENGINE_CACHE / ini_filename;
+    char* file_data = (char*)ImFileLoadToMemory(target.string().c_str(), "rb", &file_data_size);
     if (!file_data)
         return;
     if (file_data_size > 0)
@@ -16345,10 +16344,9 @@ void ImGui::SaveIniSettingsToDisk(const char* ini_filename)
 
     size_t ini_data_size = 0;
     const char* ini_data = SaveIniSettingsToMemory(&ini_data_size);
-    std::string target = IO::ToNarrowString(IO::AbsolutePath::Get().GetExecutableDirectory()
-        + L"\\" + CONFIG)+ ini_filename;
+    IO::path target = ENGINE_CACHE / ini_filename;
     // use Program Path
-    ImFileHandle f = ImFileOpen(target.c_str(), "wt");
+    ImFileHandle f = ImFileOpen(target.string().c_str(), "wt");
     if (!f)
         return;
     ImFileWrite(ini_data, sizeof(char), ini_data_size, f);

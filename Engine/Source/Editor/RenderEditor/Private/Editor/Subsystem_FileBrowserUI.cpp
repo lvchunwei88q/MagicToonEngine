@@ -18,10 +18,10 @@ namespace RenderEditor {
     void FileBrowserUI::Init()
     {
         state.currentPath = literal_root; // game ==  rootPath
-        state.rootPath = IO::AbsolutePath::Get().GetCurrentWorkingDirectory().GetRoot(); // 设置根路径就是工作路径
+        state.rootPath = IO::AbsP::Get().GetCurrentWorkingDirectory().GetRoot(); // 设置根路径就是工作路径
 
         Config = ObjectFactory::CreateUnique<FileBrowserConfig>();
-        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        const std::wstring configDir = IO::AbsP::Get().GetEngineDirectory().wstring() + L"\\Config\\Editor\\";
         const std::wstring configPath = configDir + L"FileBrowserConfig.mtdata";
         if (IO::Exists(configPath)) {
             std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(configPath);
@@ -33,7 +33,7 @@ namespace RenderEditor {
 
     void FileBrowserUI::Uninstall()
     {
-        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        const std::wstring configDir = IO::AbsP::Get().GetEngineDirectory().wstring() + L"\\Config\\Editor\\";
         IO::CreateDirectory(configDir);
         const BinaryReader configData = Config->Serialize();
         IO::WriteAllBytes(configDir + L"FileBrowserConfig.mtdata", configData.DataU8(), configData.Size());

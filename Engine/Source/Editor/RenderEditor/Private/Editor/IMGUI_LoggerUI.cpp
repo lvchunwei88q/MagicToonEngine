@@ -4,12 +4,7 @@
 #include <RenderUIWarehouse.h>
 
 // 序列化文件相关
-#include <IO.h> 
-#include <fstream>
-#include <Utilities/SerializeMacro.h>
-// 序列化
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>    // 二进制
+#include <IO.h>
 
 #include "Editor/EditorGeneralLayout.h"
 #include <Tools/TextLayout.h>
@@ -51,7 +46,7 @@ namespace RenderEditor {
     void LoggerUI::Init()
     {
         Switch = ObjectFactory::CreateUnique<LoggerSwitch>();
-        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        const std::wstring configDir = IO::AbsolutePath::Get().GetEngineDirectory().wstring() + L"\\Config\\Editor\\";
         const std::wstring configPath = configDir + L"LoggerSwitch.mtdata";
         if (IO::Exists(configPath)) {
             std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(configPath);
@@ -63,7 +58,7 @@ namespace RenderEditor {
 
     void LoggerUI::Uninstall()
     {
-        const std::wstring configDir = IO::AbsolutePath::Get().GetExecutableDirectory() + L"\\Config\\Editor\\";
+        const std::wstring configDir = IO::AbsolutePath::Get().GetEngineDirectory().wstring() + L"\\Config\\Editor\\";
         IO::CreateDirectory(configDir);
         const BinaryReader configData = Switch->Serialize();
         IO::WriteAllBytes(configDir + L"LoggerSwitch.mtdata", configData.DataU8(), configData.Size());

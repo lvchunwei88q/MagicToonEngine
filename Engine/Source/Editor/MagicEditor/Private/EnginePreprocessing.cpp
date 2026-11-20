@@ -43,7 +43,7 @@ bool CommandCheck(const std::vector<std::wstring>& argsW) {
 
 void RunMagicLauncher() {
     // 构建 ENGINE_LAUNCHER_NAME_W 路径
-    std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
+    std::wstring exeDir = IO::AbsolutePath::Get().GetEngineDirectory();
     std::wstring exePath = exeDir + L"\\" ENGINE_LAUNCHER_NAME_W L".exe";
 
     std::wstring cmdLine = L"\"" + exePath + L"\"";

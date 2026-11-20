@@ -11,48 +11,28 @@
 
 namespace IO {
 
-    namespace {
-        fs::path ToFilesystemPath(const std::wstring& path)
-        {
-#ifdef _WIN32
-            return fs::path(path);
-#else
-            return fs::path(ToNarrowString(path));
-#endif
-        }
-
-        std::wstring ToWidePath(const fs::path& path)
-        {
-#ifdef _WIN32
-            return path.wstring();
-#else
-            return ToWideString(path.native());
-#endif
-        }
-    }
-
-    std::wstring AbsolutePath::GetExecutablePath()
+    path AbsolutePath::GetEnginePath()
     {
         // if the executable path has already been cached, return it directly
-        if (!ExecutablePath.empty()) {
-            return ExecutablePath;
+        if (!EnginePath.empty()) {
+            return EnginePath;
         }
 
 #ifdef _WIN32
         wchar_t buffer[MAX_PATH];
         DWORD length = GetModuleFileNameW(NULL, buffer, MAX_PATH);
         if (length == 0 || length == MAX_PATH) {
-            return L"";
+            return {};
         }
 
-        ExecutablePath = buffer;
+        EnginePath = buffer;
 #else
         std::vector<char> buffer(1024);
         ssize_t length;
         while (true) {
             length = readlink("/proc/self/exe", buffer.data(), buffer.size());
             if (length < 0) {
-                return L"";
+                return {};
             }
             if (static_cast<size_t>(length) != buffer.size()) {
                 break;
@@ -60,20 +40,19 @@ namespace IO {
             buffer.resize(buffer.size() * 2);
         }
 
-        ExecutablePath = ToWideString(std::string(buffer.data(), static_cast<size_t>(length)));
+        EnginePath = std::string(buffer.data(), static_cast<size_t>(length));
 #endif
-        return ExecutablePath;
+        return EnginePath;
     }
 
-    std::wstring AbsolutePath::GetExecutableDirectory()
+    path AbsolutePath::GetEngineDirectory()
     {
-        if (!ExecutableDirectory.empty()) {
-            return ExecutableDirectory;
+        if (!EngineDirectory.empty()) {
+            return EngineDirectory;
         }
 
-        fs::path exePath = ToFilesystemPath(GetExecutablePath());
-        ExecutableDirectory = ToWidePath(exePath.parent_path());
-        return ExecutableDirectory;
+        EngineDirectory = GetEnginePath().parent_path();
+        return EngineDirectory;
     }
 
     WorkingDirectory AbsolutePath::GetCurrentWorkingDirectory()
@@ -82,7 +61,7 @@ namespace IO {
             return WorkingDirectory(CurrentWorkingDirectory);
         }
 
-        CurrentWorkingDirectory = ToWidePath(fs::current_path());
+        CurrentWorkingDirectory = fs::current_path();
         return WorkingDirectory(CurrentWorkingDirectory);
     }
 
@@ -92,15 +71,14 @@ namespace IO {
             return ContentDirectory(ContentPath);
         }
 
-        fs::path exeDir = ToFilesystemPath(GetExecutableDirectory());
+        path exeDir = GetEngineDirectory();
 
         // Executable file directory → Up one level → Up one level → Engine/Content
-        fs::path fs_contentPath = exeDir.parent_path()
+        ContentPath = exeDir.parent_path()
             .parent_path()
             / "Engine"
             / "Content";
 
-        ContentPath = ToWidePath(fs_contentPath);
         return ContentDirectory(ContentPath);
     }
 
@@ -110,23 +88,23 @@ namespace IO {
             return ScriptDirectory(ScriptPath);
         }
 
-        fs::path exeDir = ToFilesystemPath(GetExecutableDirectory());
+        path exeDir = GetEngineDirectory();
 
         // Executable file directory → Up one level → Up one level → Engine/Script
-        fs::path fs_scriptPath = exeDir.parent_path()
+        ScriptPath = exeDir.parent_path()
             .parent_path()
             / "Engine"
             / "Script";
 
-        ScriptPath = ToWidePath(fs_scriptPath);
         return ScriptDirectory(ScriptPath);
     }
 
     void AbsolutePath::ClearCache()
     {
-        ExecutableDirectory.clear();
+        EngineDirectory.clear();
+        EnginePath.clear();
         CurrentWorkingDirectory.clear();
-        ExecutablePath.clear();
+        
         ContentPath.clear();
         ScriptPath.clear();
     }

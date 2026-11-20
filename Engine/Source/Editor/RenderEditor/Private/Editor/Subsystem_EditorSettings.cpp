@@ -7,12 +7,6 @@
 ///////////////////////
 // 序列化文件相关
 #include <IO.h> 
-#include <fstream>
-#include <Utilities/SerializeMacro.h>
-
-// 序列化
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>    // 二进制
 ///////////////////////
 
 namespace RenderEditor {
@@ -20,7 +14,7 @@ namespace RenderEditor {
 
     auto GetLanguageFileName = [](Languages language) {
             std::wstring ContentPath = IO::AbsolutePath::Get().GetContentDirectory().GetConfig();
-            ContentPath += L"Languages\\";
+            ContentPath += L"\\Languages\\";
 
             switch (language)
             {
@@ -39,7 +33,13 @@ namespace RenderEditor {
 
     void EditorSettings::Init()
     {
-        FILE_SERIALIZATION_LOADING(Setting, CONFIG "Editor\\Setting\\", L"EditorSetting.mtdata");
+        IO::path editor_setting_path = ENGINE_CONFIG / u8"Editor" / u8"Setting" / u8"EditorSetting.mtdata";
+        if(IO::Exists(editor_setting_path)){
+            std::vector<uint8_t> configFileData = IO::ReadAllUINT8Bytes(editor_setting_path);
+            BinaryWriter editor_setting_date;
+		    editor_setting_date.Write(configFileData.data(), configFileData.size());
+            Setting.Deserialize(editor_setting_date);
+        }
 
         RenderUIContext& UIContext = GetSubsystem()->SetRenderUIContext();
         std::wstring ContentPath = GetLanguageFileName(Setting.language);
@@ -53,7 +53,16 @@ namespace RenderEditor {
 
     void EditorSettings::Uninstall()
     {
-        FILE_SERIALIZATION_SAVE(Setting, CONFIG "Editor\\Setting\\", L"EditorSetting.mtdata");
+        //FILE_SERIALIZATION_SAVE(Setting, CONFIG "Editor\\Setting\\", L"EditorSetting.mtdata");
+        IO::path editor_setting_path = ENGINE_CONFIG / u8"Editor" / u8"Setting" / u8"EditorSetting.mtdata";
+        BinaryReader date = Setting.Serialize();
+
+        if(IO::Exists(editor_setting_path)){
+            IO::WriteAllBytes(editor_setting_path,date.DataChar(),date.Size());
+        }else {
+            IO::CreateDirectory(editor_setting_path.parent_path());
+            IO::WriteAllBytes(editor_setting_path,date.DataChar(),date.Size());
+        }
     }
 
     void* EditorSettings::PublicData(uint8_t type)

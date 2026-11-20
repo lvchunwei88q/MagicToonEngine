@@ -14,8 +14,8 @@ namespace LOG {
 
     bool LoggerImpl::Init()
     {
-		std::wstring exepath = IO::AbsolutePath::Get().GetExecutableDirectory();
-        logDir_ = exepath + L"\\" + CACHE + L"Logs";
+		IO::path path = ENGINE_CACHE / u8"Logs";
+        logDir_ = path.wstring();
         maxSizeMB_ = 100; // 100MB
         checkIntervalSec_ = 5; // 5s
 

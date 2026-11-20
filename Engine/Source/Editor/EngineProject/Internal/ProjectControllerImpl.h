@@ -5,22 +5,28 @@
 #include "ThirdParty.h"
 
 #include <Subsystem/SubsystemTemplate.h>
+#include <Object.h>
 
 #include <cereal/cereal.hpp>
 #include <cereal/archives/binary.hpp>    // 二进制
 #include <cereal/types/string.hpp>     // std::string
 
-namespace EngineProject {
-	struct HistoryProject
-	{
-		std::string path;
-		std::string name;
-		bool existence = false;
+#include <ProjectControllerImpl.object.generate.h>
 
-		template<class Archive>
-		void serialize(Archive& archive) {
-			archive(path, name, existence);
-		}
+namespace EngineProject {
+	
+	MCLASS(MSERIALIZATION)
+	struct HistoryProject : public MObject
+	{
+		GENERATE_BODY(HistoryProject,ENGINE);
+		public:
+
+		MMEMBER()
+		std::string path;
+		MMEMBER()
+		std::string name;
+		MMEMBER()
+		bool existence = false;
 	};
 
 	class ProjectControllerImpl final : public IProjectController, public SubsystemTemplate<ProjectControllerImpl,Core::Priority::High>

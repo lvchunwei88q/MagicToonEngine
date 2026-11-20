@@ -129,7 +129,7 @@ namespace RenderLauncher {
 		Core::GetSubsystemContext()->Notification("Application", Notif);
 
 		// 构建 ENGINE_EDITOR_NAME_W 路径
-		std::wstring exeDir = IO::AbsolutePath::Get().GetExecutableDirectory();
+		std::wstring exeDir = IO::AbsolutePath::Get().GetEngineDirectory();
 		std::wstring exePath = exeDir + L"\\" ENGINE_EDITOR_NAME_W ".exe";
 
 		// 构建命令行参数：--project_path "path" --name "name"
