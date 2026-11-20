@@ -30,45 +30,45 @@ namespace IO {
 	using path = fs::path;
 
 	// Read text to file
-	CORE_API std::string ReadAllText(const std::wstring& path);
+	CORE_API std::string ReadAllText(const path& path);
 	// Read bytes to file
-	CORE_API std::vector<char> ReadAllCharBytes(const std::wstring& path);
-	CORE_API std::vector<uint8_t> ReadAllUINT8Bytes(const std::wstring& path);
-	CORE_API BinaryReader ReadAllBinaryReaderBytes(const std::wstring& path);
+	CORE_API std::vector<char> ReadAllCharBytes(const path& path);
+	CORE_API std::vector<uint8_t> ReadAllUINT8Bytes(const path& path);
+	CORE_API BinaryReader ReadAllBinaryReaderBytes(const path& path);
 	// Write string to file
-	CORE_API void WriteAllText(const std::wstring& path, const std::string& content);
+	CORE_API void WriteAllText(const path& path, const std::string& content);
 	// Write byte to file
-	CORE_API void WriteAllBytes(const std::wstring& path, const std::vector<char>& data);
-	CORE_API void WriteAllBytes(const std::wstring& path, const std::vector<uint8_t>& data);
-	CORE_API void WriteAllBytes(const std::wstring& path, const BinaryWriter& data);
-	CORE_API void WriteAllBytes(const std::wstring& path, const uint8_t* data, size_t size);
-	CORE_API void WriteAllBytes(const std::wstring& path, const char* data, size_t size);
+	CORE_API void WriteAllBytes(const path& path, const std::vector<char>& data);
+	CORE_API void WriteAllBytes(const path& path, const std::vector<uint8_t>& data);
+	CORE_API void WriteAllBytes(const path& path, const BinaryWriter& data);
+	CORE_API void WriteAllBytes(const path& path, const uint8_t* data, size_t size);
+	CORE_API void WriteAllBytes(const path& path, const char* data, size_t size);
 	// Append a string to the end of the file
-	CORE_API void AppendText(const std::wstring& path, const std::string& content);
+	CORE_API void AppendText(const path& path, const std::string& content);
 	// Append bytes to the end of the file
-	CORE_API void AppendBytes(const std::wstring& path, const std::vector<char>& data);
-	CORE_API void AppendBytes(const std::wstring& path, const std::vector<uint8_t>& data);
-	CORE_API void AppendBytes(const std::wstring& path, const BinaryWriter& data);
-	CORE_API void AppendBytes(const std::wstring& path, const uint8_t* data, size_t size);
-	CORE_API void AppendBytes(const std::wstring& path, const char* data, size_t size);
+	CORE_API void AppendBytes(const path& path, const std::vector<char>& data);
+	CORE_API void AppendBytes(const path& path, const std::vector<uint8_t>& data);
+	CORE_API void AppendBytes(const path& path, const BinaryWriter& data);
+	CORE_API void AppendBytes(const path& path, const uint8_t* data, size_t size);
+	CORE_API void AppendBytes(const path& path, const char* data, size_t size);
 	// deleta file
-	CORE_API bool DeleteToFile(const std::wstring& path);
+	CORE_API bool DeleteToFile(const path& path);
 	// deleta directory
-	CORE_API bool DeleteToDirectory(const std::wstring& path);
+	CORE_API bool DeleteToDirectory(const path& path);
 	// Create an empty file (or update its timestamp if the file already exists)
-	CORE_API bool CreateFile(const std::wstring& path);
+	CORE_API bool CreateFile(const path& path);
 	// Move/Rename Files or Folders
-	CORE_API bool MoveFile(const std::wstring& src, const std::wstring& dst);
+	CORE_API bool MoveFile(const path& src, const path& dst);
 	// Get the file directory
-	CORE_API bool GetFileDirectory(const std::wstring& src, std::wstring& dst);
+	CORE_API bool GetFileDirectory(const path& src, path& dst);
 	// Get the file name
-	CORE_API bool GetFileName(const std::wstring& src, std::wstring& dst);
+	CORE_API bool GetFileName(const path& src, path& dst);
 	// Create directory (including parent directories)
-	CORE_API bool CreateDirectory(const std::wstring& path);
+	CORE_API bool CreateDirectory(const path& path);
 	// Check if a file or directory exists
-	CORE_API bool Exists(const std::wstring& path);
+	CORE_API bool Exists(const path& path);
 	// Scan all files in the specified directory (excluding subdirectories) and return a list of file names
-	CORE_API std::vector<std::string> GetFilesInDirectory(const std::wstring& path);
+	CORE_API std::vector<std::string> GetFilesInDirectory(const path& path);
 	// Convert narrow characters to wide characters (UTF-8 to UTF-16)
 	CORE_API std::wstring ToWideString(const std::string& narrow);
 	// Convert wide characters to narrow characters (UTF-16 to UTF-8)

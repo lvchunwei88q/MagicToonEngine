@@ -29,7 +29,7 @@ namespace AssetPipeline {
 			LOG_ERROR("FBX Import failed: file path is empty");
 			return;
 		}
-		if (!IO::Exists(IO::ToWideString(settings.path)))
+		if (!IO::Exists(IO::path(settings.path)))
 		{
 			LOG_ERROR("FBX Import failed: file does not exist - " , settings.path);
 			return;

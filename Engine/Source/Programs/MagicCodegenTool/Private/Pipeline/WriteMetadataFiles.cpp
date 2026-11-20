@@ -28,7 +28,7 @@ namespace MCT {
 						const IO::path outputDirectory =
 							MagicGeneralPipelinedData::Get().GetRefGeneratePath()
 							/ L"Object" / IO::ToWideString(metadata.moduleName);
-						if (!IO::CreateDirectory(outputDirectory.native()))
+						if (!IO::CreateDirectory(outputDirectory))
 						{
 							throw std::runtime_error(
 								"Could not create generated header directory");

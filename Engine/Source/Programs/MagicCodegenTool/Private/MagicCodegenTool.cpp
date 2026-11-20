@@ -64,8 +64,8 @@ namespace MCT{
 			std::unordered_map<std::wstring, uint64_t> CachedHashes;
 
 			// Read cache file
-			if (IO::Exists(hashCheckFilePath.native())) {
-				std::string CheckInfo = IO::ReadAllText(hashCheckFilePath.native());
+			if (IO::Exists(hashCheckFilePath)) {
+				std::string CheckInfo = IO::ReadAllText(hashCheckFilePath);
 				std::vector<std::string> FileLine;
 				GetLine(CheckInfo, FileLine);
 
@@ -108,7 +108,7 @@ namespace MCT{
 			}
 			// No cache files, everything generated
 			else {
-				IO::CreateFile(hashCheckFilePath.native());
+				IO::CreateFile(hashCheckFilePath);
 			}
 
 			// Lines are "<path> || <module>": split once, then hash every file's content in parallel.
@@ -159,10 +159,10 @@ namespace MCT{
 	bool MagicCodegenTool::readGenerateInfoFile()
 	{
 		MGC ctx = MagicGlobalContext::Get();
-		if (IO::Exists(ctx.GetgenerateInfoFilePath().native())) {
+		if (IO::Exists(ctx.GetgenerateInfoFilePath())) {
 			MagicGeneralPipelinedData::Get().SetGeneratePath(ctx.GetgenerateDir());
 
-			std::string GenerateInfo = IO::ReadAllText(ctx.GetgenerateInfoFilePath().native());
+			std::string GenerateInfo = IO::ReadAllText(ctx.GetgenerateInfoFilePath());
 			std::vector<std::string> headers_lines_file;
 			GetLine(GenerateInfo, headers_lines_file);
 
@@ -256,7 +256,7 @@ namespace MCT{
 			ctx.GetgenerateDir() / MAGICENGINE_FILE_INFO_PATH / MAGICENGINE_HEADER_HASH_CHECK_FILE;
 		if(ctx.HeaderHashCheckContents_isValid())
 		{
-			IO::WriteAllText(hashCheckFilePath.native(), ctx.GetHeaderHashCheckContents());
+			IO::WriteAllText(hashCheckFilePath, ctx.GetHeaderHashCheckContents());
 		}
 		else
 		{
