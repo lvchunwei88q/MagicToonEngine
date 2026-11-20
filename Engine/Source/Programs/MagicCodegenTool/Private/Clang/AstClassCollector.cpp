@@ -21,10 +21,19 @@
 namespace MCT {
 	namespace ClangSupport {
 		namespace {
-			struct CursorLocation
+			struct LocalCursorLocation
 			{
 				std::string fileName;
 				unsigned line = 0;
+			};
+
+			struct LocalParseContext
+			{
+				std::string targetFile;
+				IO::path targetHeaderPath;
+				std::unordered_set<size_t> mClassDeclarationLines;
+				std::vector<MagicClassInfo> classes;
+				std::unordered_map<unsigned, size_t> classIndices;
 			};
 
 			/**
@@ -32,9 +41,9 @@ namespace MCT {
 			 * @param location The source location to inspect.
 			 * @return The file name and one-based line number, if available.
 			 */
-			CursorLocation GetLocation(CXSourceLocation location)
+			LocalCursorLocation GetLocation(CXSourceLocation location)
 			{
-				CursorLocation result;
+				LocalCursorLocation result;
 				CXFile file = nullptr;
 				unsigned column = 0;
 				unsigned offset = 0;
@@ -90,15 +99,6 @@ namespace MCT {
 				return result + name;
 			}
 
-			struct ParseContext
-			{
-				std::string targetFile;
-				IO::path targetHeaderPath;
-				std::unordered_set<size_t> mClassDeclarationLines;
-				std::vector<MagicClassInfo> classes;
-				std::unordered_map<unsigned, size_t> classIndices;
-			};
-
 			/**
 			 * Visit AST declarations and collect information for the target header's classes.
 			 * The second CXCursor argument is unused by this callback.
@@ -108,15 +108,15 @@ namespace MCT {
 			 */
 			enum CXChildVisitResult VisitClassAndMember(CXCursor cursor, CXCursor, CXClientData clientData)
 			{
-				auto& context = *static_cast<ParseContext*>(clientData);
+				auto& context = *static_cast<LocalParseContext*>(clientData);
 				const CXCursorKind kind = clang_getCursorKind(cursor);
 				if (kind == CXCursor_ClassDecl || kind == CXCursor_StructDecl ||
 					kind == CXCursor_ClassTemplate ||
 					kind == CXCursor_ClassTemplatePartialSpecialization)
 				{
-					const CursorLocation start = GetLocation(
+					const LocalCursorLocation start = GetLocation(
 						clang_getRangeStart(clang_getCursorExtent(cursor)));
-					const CursorLocation end = GetLocation(
+					const LocalCursorLocation end = GetLocation(
 						clang_getRangeEnd(clang_getCursorExtent(cursor)));
 					const CXCursor definition = clang_getCursorDefinition(cursor);
 					if (NormalizePath(start.fileName) == context.targetFile &&
@@ -148,7 +148,7 @@ namespace MCT {
 						}
 						else if (kind == CXCursor_FieldDecl || kind == CXCursor_VarDecl)
 						{
-							const CursorLocation location = GetLocation(
+							const LocalCursorLocation location = GetLocation(
 								clang_getRangeStart(clang_getCursorExtent(cursor)));
 							if (NormalizePath(location.fileName) == context.targetFile)
 							{
@@ -172,7 +172,7 @@ namespace MCT {
 							kind == CXCursor_ConversionFunction ||
 							kind == CXCursor_FunctionTemplate)
 						{
-							const CursorLocation location = GetLocation(
+							const LocalCursorLocation location = GetLocation(
 								clang_getRangeStart(clang_getCursorExtent(cursor)));
 							if (NormalizePath(location.fileName) == context.targetFile)
 							{
@@ -313,7 +313,7 @@ namespace MCT {
 					clang_getDiagnostic(translationUnit.Get(), i));
 				if (clang_getDiagnosticSeverity(diagnostic.Get()) >= CXDiagnostic_Error)
 				{
-					const CursorLocation location = GetLocation(
+					const LocalCursorLocation location = GetLocation(
 						clang_getDiagnosticLocation(diagnostic.Get()));
 					Utilitie::Log::Error(
 						"libclang diagnostic in " + header.headerPath.string() +
@@ -329,7 +329,7 @@ namespace MCT {
 
 			const std::string targetFile = NormalizePath(
 				std::filesystem::absolute(header.headerPath));
-			ParseContext context{
+			LocalParseContext context{
 				targetFile,
 				header.headerPath,
 				std::unordered_set<size_t>(
