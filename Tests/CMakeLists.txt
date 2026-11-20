@@ -6,6 +6,12 @@ AddEngineTest(ObjectTest
     Common/TestFramework.h
 )
 
+# add test Absolute Path Test
+AddEngineTest(AbsolutePathTest
+    Core/AbsolutePathTest.cpp
+    Common/TestFramework.h
+)
+
 # add test LibClang Test
 AddEngineTest(LibClangTest
     LibClang/LibClangTest.cpp

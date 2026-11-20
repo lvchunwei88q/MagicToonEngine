@@ -99,6 +99,17 @@ namespace IO {
         return ScriptDirectory(ScriptPath);
     }
 
+    EngineOntologyDirectory AbsolutePath::GetEngineOntologyDirectory() 
+    {
+        if (!EngineOntologyPath.empty()) {
+            return EngineOntologyDirectory(EngineOntologyPath);
+        }
+        path exeDir = GetEngineDirectory();
+        EngineOntologyPath = exeDir;
+
+        return EngineOntologyDirectory(EngineOntologyPath);
+    }
+
     void AbsolutePath::ClearCache()
     {
         EngineDirectory.clear();

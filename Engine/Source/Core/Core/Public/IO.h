@@ -110,6 +110,15 @@ namespace IO {
 		ScriptDirectory() = delete;
 	};
 
+	struct EngineOntologyDirectory : public BaseDirectory
+	{
+		explicit EngineOntologyDirectory(const path& Root) : BaseDirectory(Root) {};
+		EngineOntologyDirectory() = delete;
+
+		path GetConfig() const { return GetRoot() / u8"Config"; };
+		path GetCache() const { return GetRoot() / u8"Cache"; };
+	};
+
 	class CORE_API AbsolutePath : public Singleton<AbsolutePath> // Absolute Path
 	{
 	public:
@@ -126,6 +135,8 @@ namespace IO {
 		ContentDirectory GetContentDirectory();
 		// Get script directory
 		ScriptDirectory GetScriptDirectory();
+		// Get engine ontology directory
+		EngineOntologyDirectory GetEngineOntologyDirectory();
 
 		// Clear cache
 		void ClearCache();
@@ -133,10 +144,11 @@ namespace IO {
 		// Cache the path results to avoid recalculating
 		path EngineDirectory;
 		path EnginePath;
-		path CurrentWorkingDirectory;
 		
+		path CurrentWorkingDirectory;
 		path ContentPath;
 		path ScriptPath;
+		path EngineOntologyPath;
 	};
 
 	using AbsP = AbsolutePath;
