@@ -108,7 +108,6 @@ The project depends on several third-party components for rendering, scripting, 
 | `WICTextureLoader` | Image loading | Loads common image formats on Windows, such as PNG and JPG textures. |
 | `cereal` | Serialization | Provides C++ object serialization and deserialization for config and asset data. |
 | `cmdline` | Command-line parsing | Parses command-line options for tools and debugging workflows. |
-| `ctre` | Regex matching | Provides high-performance text matching for parsing and filtering tasks. |
 | `magic_enum` | Enum reflection | Converts C++ enums to strings and provides reflection-like utilities for debugging and tooling. |
 | `nlohmann` | JSON processing | Reads and writes JSON configuration files and runtime data. |
 | `ufbx` | 3D model loading | Imports and processes 3D model assets such as FBX files. |

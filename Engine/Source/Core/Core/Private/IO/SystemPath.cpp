@@ -115,9 +115,9 @@ namespace IO {
         EngineDirectory.clear();
         EnginePath.clear();
         CurrentWorkingDirectory.clear();
-        
         ContentPath.clear();
         ScriptPath.clear();
+        EngineOntologyPath.clear();
     }
 
     std::wstring ToWideString(const std::string& narrow) {
