@@ -29,12 +29,19 @@ using UINT = unsigned int;
 #endif
 
 /*
-* This is used to control the compiler (MSVC) compilation settings.
-* Note that you should not use the tools here casually unless you know what you are doing.
+* This is used for compilation settings in MSVC and GCC.
+* Note, unless you know what you're doing, don't use this tool casually.
 */
-
-#define DISABLE_DLL_WARNINGS_PUSH __pragma(warning(push)) __pragma(warning(disable: 4251))
-#define DISABLE_DLL_WARNINGS_POP __pragma(warning(pop))
+#if defined(_MSC_VER)
+    #define DISABLE_DLL_WARNINGS_PUSH __pragma(warning(push)) __pragma(warning(disable: 4251))
+    #define DISABLE_DLL_WARNINGS_POP  __pragma(warning(pop))
+#elif defined(__GNUC__) || defined(__clang__)
+    #define DISABLE_DLL_WARNINGS_PUSH _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wattributes\"")
+    #define DISABLE_DLL_WARNINGS_POP  _Pragma("GCC diagnostic pop")
+#else
+    #define DISABLE_DLL_WARNINGS_PUSH
+    #define DISABLE_DLL_WARNINGS_POP
+#endif
 
 template<typename To, typename From>
 inline To* SafeCast(From* ptr) {
