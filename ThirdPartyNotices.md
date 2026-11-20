@@ -27,11 +27,6 @@ Copyright (c) 2009, Hideyuki Tanaka
 Licensed under the BSD 3-Clause License
 See details ThirdParty/cmdline/LICENSE.txt
 
-## ctre
-Copyright (c) 1994–2025 Lua.org, PUC-Rio.
-Licensed under the Apache License.
-See details ThirdParty/ctre/LICENSE.txt
-
 ## magic_enum
 Copyright (c) 2019-2024 Neargye
 Licensed under the MIT License.
