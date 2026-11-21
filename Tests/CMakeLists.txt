@@ -27,5 +27,21 @@ endif()
 target_include_directories(LibClangTest PRIVATE "${LIBCLANG_ROOT}")
 target_link_libraries(LibClangTest PRIVATE "${LIBCLANG_LIBRARY}")
 
+# ImGui smoke test (Win32 + D3D11 window, docking, widget coverage).
+AddEngineTest(ImGuiSmokeTest
+    ImGui/ImGuiSmokeTest.cpp
+    Common/TestFramework.h
+)
+target_link_libraries(ImGuiSmokeTest PRIVATE
+    Core
+    Logger
+    IMGUI
+    d3d11
+    dxgi
+    dwmapi
+    user32
+    gdi32
+)
+
 
 # ...

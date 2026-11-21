@@ -25,6 +25,7 @@
                 "MagicTest-ObjectTest.exe",
                 "MagicTest-AbsolutePathTest.exe",
                 "MagicTest-LibClangTest.exe",
+                "MagicTest-ImGuiSmokeTest.exe",
             ]
         }
     ]
