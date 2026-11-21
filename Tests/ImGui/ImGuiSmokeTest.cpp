@@ -17,7 +17,7 @@
 // Usage (from a VS developer prompt):
 //   MagicTest-ImGuiSmokeTest.exe                 -> runs 240 frames then exits
 //   MagicTest-ImGuiSmokeTest.exe --interactive   -> stays open until you close it
-//   MagicTest-ImGuiSmokeTest.exe --frames 600    -> custom frame budget
+//   MagicTest-ImGuiSmokeTest.exe --frames 600    -> custom frame budget (at least 24)
 //   MagicTest-ImGuiSmokeTest.exe --viewports     -> also enable multi-viewport
 //   MagicTest-ImGuiSmokeTest.exe --no-vsync      -> uncapped frame rate
 //   MagicTest-ImGuiSmokeTest.exe --help          -> cmdline-generated usage
@@ -196,6 +196,12 @@ static bool  g_autoPopupClose = false; // automated runs close the modal after a
 static ImVec2 g_textSize{};
 static bool  g_requestExit = false;
 static int   g_popupOpenFrame = -1;
+static constexpr int kPopupFrame = 5;
+static constexpr int kPopupCloseFrame = kPopupFrame + 12;
+static constexpr int kFocusFrame = kPopupCloseFrame + 2;
+static constexpr int kTabFrame = kFocusFrame + 2;
+static constexpr int kBackTabFrame = kTabFrame + 2;
+static constexpr int kLastCheckFrame = kBackTabFrame + 1;
 
 static float g_plotValues[90] = {};
 
@@ -259,7 +265,8 @@ static void DrawWidgetsWindow(ImGuiIO& io)
     ImGui::SameLine();
     ImGui::Text("clicks = %d", g_ui.buttonClicks);
     ImGui::SameLine();
-    if (ImGui::Button("Hover me"))
+    ImGui::Button("Hover me");
+    if (ImGui::IsItemHovered())
         ImGui::SetTooltip("Tooltip path is alive");
     ImGui::Checkbox("Checkbox", &g_ui.checkbox);
     ImGui::SameLine();
@@ -396,8 +403,10 @@ static void DrawDiagnosticsWindow(ImGuiIO& io)
     ImGui::Separator();
     // Open the modal once, without requiring a mouse click, so the automated
     // run still covers the popup path.
-    if (g_frameIndex == 5)
+    if (g_frameIndex == kPopupFrame)
     {
+        if (g_autoPopupClose)
+            ImGui::SetWindowFocus();
         ImGui::OpenPopup("Smoke Modal");
         g_popupOpenFrame = g_frameIndex;
     }
@@ -420,7 +429,53 @@ static void DrawDiagnosticsWindow(ImGuiIO& io)
             ImGui::CloseCurrentPopup();
         ImGui::EndPopup();
     }
+    if (g_autoPopupClose && g_frameIndex == kPopupCloseFrame + 1)
+    {
+        EXPECT_FALSE(ImGui::IsPopupOpen("Smoke Modal"));
+        EXPECT_TRUE(ImGui::IsWindowFocused());
+    }
 
+    ImGui::End();
+}
+
+// Submit a small, undocked fixture so the checks are independent of the
+// widget gallery's size, scrolling position and docking layout.
+static void CheckLayoutAndNavigation()
+{
+    ImGui::SetNextWindowSize(ImVec2(240, 200));
+    ImGui::Begin("Layout and navigation checks", nullptr,
+        ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings);
+    if (g_frameIndex == kFocusFrame)
+    {
+        ImGui::SetWindowFocus();
+        ImGui::SetKeyboardFocusHere();
+    }
+    ImGui::Button("First", ImVec2(60, 24));
+    const ImVec2 firstMin = ImGui::GetItemRectMin();
+    const ImVec2 firstMax = ImGui::GetItemRectMax();
+    if (g_frameIndex == kFocusFrame + 1 || g_frameIndex == kLastCheckFrame)
+    {
+        EXPECT_TRUE(ImGui::IsItemFocused());
+        ImGui::SetNavCursorVisible(true);
+    }
+    ImGui::SameLine();
+    ImGui::Button("Second", ImVec2(60, 24));
+    const ImVec2 secondMin = ImGui::GetItemRectMin();
+    if (g_frameIndex == kTabFrame + 1)
+        EXPECT_TRUE(ImGui::IsItemFocused());
+    ImGui::Dummy(ImVec2(10, 10));
+    if (g_frameIndex == 2)
+    {
+        EXPECT_TRUE(secondMin.x >= firstMax.x && secondMin.y == firstMin.y);
+        EXPECT_TRUE(ImGui::GetItemRectMin().y >= firstMax.y);
+    }
+    ImGui::BeginChild("Scroll", ImVec2(0, 60));
+    ImGui::Dummy(ImVec2(10, 250));
+    if (g_frameIndex == 2)
+        ImGui::SetScrollY(40);
+    if (g_frameIndex == 3)
+        EXPECT_TRUE(std::fabs(ImGui::GetScrollY() - 40.0f) <= 1.0f);
+    ImGui::EndChild();
     ImGui::End();
 }
 
@@ -523,6 +578,12 @@ int main(int argc, char** argv)
     std::cout << "=== MagicToonEngine ImGui smoke test ===\n";
 
     const int  frameBudget = options.frames;
+    if (frameBudget < 0 || (frameBudget > 0 && frameBudget < kLastCheckFrame))
+    {
+        std::cerr << "--frames requires 0 (interactive) or at least "
+                  << kLastCheckFrame << " frames to complete the checks.\n";
+        return 2;
+    }
     const bool enableViewports = options.viewports;
     const bool vsync = options.vsync;
 
@@ -638,6 +699,7 @@ int main(int argc, char** argv)
         g_plotValues[i] = std::sinf(i * 0.16f) * 0.75f + std::sinf(i * 0.47f) * 0.2f;
 
     bool  done = false;
+    bool  renderFailed = false;
     int   renderedFrames = 0;
     bool  fontBuilt = false;
     int   drawVertices = 0;
@@ -676,12 +738,23 @@ int main(int argc, char** argv)
             if (FAILED(hr) || !CreateRenderTarget())
             {
                 std::cerr << "Swap chain resize failed (0x" << std::hex << hr << ")\n";
+                renderFailed = true;
                 break;
             }
         }
 
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
+        if (frameBudget > 0)
+        {
+            const int nextFrame = g_frameIndex + 1;
+            if (nextFrame == kBackTabFrame || nextFrame == kBackTabFrame + 1)
+                io.AddKeyEvent(ImGuiMod_Shift, nextFrame == kBackTabFrame);
+            if (nextFrame == kTabFrame || nextFrame == kBackTabFrame)
+                io.AddKeyEvent(ImGuiKey_Tab, true);
+            if (nextFrame == kTabFrame + 1 || nextFrame == kBackTabFrame + 1)
+                io.AddKeyEvent(ImGuiKey_Tab, false);
+        }
         ImGui::NewFrame();
 
         ++g_frameIndex;
@@ -700,6 +773,8 @@ int main(int argc, char** argv)
 
         DrawWidgetsWindow(io);
         DrawDiagnosticsWindow(io);
+        if (frameBudget > 0 && g_frameIndex <= kLastCheckFrame)
+            CheckLayoutAndNavigation();
 
         ImGui::Render();
 
@@ -731,6 +806,7 @@ int main(int argc, char** argv)
         else if (FAILED(present))
         {
             std::cerr << "Present failed (0x" << std::hex << present << ")\n" << std::dec;
+            renderFailed = true;
             break;
         }
 
@@ -756,6 +832,9 @@ int main(int argc, char** argv)
     // --- assertions --------------------------------------------------------
     std::cout << "\n--- checks -------------------------------------------------\n";
     EXPECT_TRUE(framesRendered > 0);
+    EXPECT_FALSE(renderFailed);
+    if (frameBudget > 0)
+        EXPECT_EQ(framesRendered, frameBudget);
     EXPECT_TRUE(displaySize.x > 0.0f && displaySize.y > 0.0f);
     EXPECT_TRUE(atlasBuilt);
     EXPECT_TRUE(drawLists > 0);
