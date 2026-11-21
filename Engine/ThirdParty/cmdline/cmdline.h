@@ -38,10 +38,6 @@
 #include <algorithm>
 #include <cstdlib>
 
-#include <windows.h>
-#include <dbghelp.h>
-#pragma comment(lib, "dbghelp.lib")
-
 namespace cmdline {
 
     namespace detail {
@@ -104,20 +100,10 @@ namespace cmdline {
             return lexical_cast_t<Target, Source, detail::is_same<Target, Source>::value>::cast(arg);
         }
         
-        // Windows Only
-        static inline std::string demangle(const std::string& name)
-        {
-            char buffer[256];
-            if (UnDecorateSymbolName(name.c_str(), buffer, sizeof(buffer), UNDNAME_COMPLETE)) {
-                return std::string(buffer);
-            }
-            return name;
-        }
-
         template <class T>
         std::string readable_typename()
         {
-            return demangle(typeid(T).name());
+            return typeid(T).name();
         }
 
         template <class T>
@@ -410,9 +396,6 @@ namespace cmdline {
             if (buf.length() > 0)
                 args.push_back(buf);
 
-            for (size_t i = 0; i < args.size(); i++)
-                std::cout << "\"" << args[i] << "\"" << std::endl;
-
             return parse(args);
         }
 
@@ -563,7 +546,7 @@ namespace cmdline {
 
             size_t max_width = 0;
             for (size_t i = 0; i < ordered.size(); i++) {
-                max_width = max(max_width, ordered[i]->name().length());
+                max_width = std::max(max_width, ordered[i]->name().length());
             }
             for (size_t i = 0; i < ordered.size(); i++) {
                 if (ordered[i]->short_name()) {

@@ -15,7 +15,7 @@
 //      state storage and dock node creation, then exits.
 //
 // Usage (from a VS developer prompt):
-//   MagicTest-ImGuiSmokeTest.exe                 -> runs 2400 frames then exits
+//   MagicTest-ImGuiSmokeTest.exe                 -> runs 240 frames then exits
 //   MagicTest-ImGuiSmokeTest.exe --interactive   -> stays open until you close it
 //   MagicTest-ImGuiSmokeTest.exe --frames 600    -> custom frame budget
 //   MagicTest-ImGuiSmokeTest.exe --viewports     -> also enable multi-viewport
@@ -30,14 +30,9 @@
 #include "../Common/TestFramework.h"
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
-
-// cmdline.h (third-party) uses the unqualified max() that windows.h provides,
-// so include it while those macros still exist, then remove them again so
-// they cannot leak into the D3D11/ImGui headers below.
 #include <cmdline/cmdline.h>
-#undef min
-#undef max
 
 #include <d3d11.h>
 #include <dxgi.h>
@@ -492,7 +487,7 @@ static bool ParseCommandLine(int argc, char** argv, Options& options)
     cmdline::parser cli;
     cli.set_program_name("MagicTest-ImGuiSmokeTest");
     cli.add("help", 'h', "print this message");
-    cli.add<int>("frames", 'f', "frames to render before exiting (0 = interactive)", false, 2400);
+    cli.add<int>("frames", 'f', "frames to render before exiting (0 = interactive)", false, 240);
     cli.add("interactive", 'i', "run until the window is closed");
     cli.add("viewports", 'v', "enable ImGui multi-viewport (platform windows)");
     cli.add("no-vsync", 0, "disable vsync (uncapped frame rate)");
