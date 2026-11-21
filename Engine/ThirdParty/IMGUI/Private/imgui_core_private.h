@@ -12,6 +12,17 @@ namespace ImGui
     void WindowSelectViewport(ImGuiWindow* window);
     void WindowSyncOwnedViewport(ImGuiWindow* window, ImGuiWindow* parent_window_in_stack);
     bool UpdateTryMergeWindowIntoHostViewport(ImGuiWindow* window, ImGuiViewportP* host_viewport);
+// Error Checking and Debug Tools
+    ImGuiKeyChord GetMergedModsFromKeys();
+    void ErrorCheckNewFrameSanityChecks();
+    void ErrorCheckEndFrameSanityChecks();
+#ifndef IMGUI_DISABLE_DEBUG_TOOLS
+    void DebugPrintInputEvent(const char* prefix, const ImGuiInputEvent* e);
+    void UpdateDebugToolItemPicker();
+    void UpdateDebugToolItemPathQuery();
+    void UpdateDebugToolFlashStyleColor();
+#endif
+
     void ItemHandleShortcut(ImGuiID id);
     void NavProcessItem();
     ImVec2 CalcNextScrollFromScrollTargetAndClamp(ImGuiWindow* window);
