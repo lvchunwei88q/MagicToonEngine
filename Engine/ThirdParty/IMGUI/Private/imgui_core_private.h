@@ -6,6 +6,12 @@ namespace ImGui
     constexpr float WINDOWS_RESIZE_FROM_EDGES_FEEDBACK_TIMER = 0.04f;    // Reduce visual noise by only highlighting the border after a certain time.
     constexpr ImGuiID IMGUI_VIEWPORT_DEFAULT_ID = 0x11111111; // Using an arbitrary constant instead of e.g. ImHashStr("ViewportDefault", 0); so it's easier to spot in the debugger. The exact value doesn't matter.
     void RenderWindowOuterBorders(ImGuiWindow* window);
+    ImGuiViewportP* AddUpdateViewport(ImGuiWindow* window, ImGuiID id, const ImVec2& platform_pos, const ImVec2& size, ImGuiViewportFlags flags);
+    void UpdateViewportsNewFrame();
+    void UpdateViewportsEndFrame();
+    void WindowSelectViewport(ImGuiWindow* window);
+    void WindowSyncOwnedViewport(ImGuiWindow* window, ImGuiWindow* parent_window_in_stack);
+    bool UpdateTryMergeWindowIntoHostViewport(ImGuiWindow* window, ImGuiViewportP* host_viewport);
     void ItemHandleShortcut(ImGuiID id);
     void NavProcessItem();
     ImVec2 CalcNextScrollFromScrollTargetAndClamp(ImGuiWindow* window);
