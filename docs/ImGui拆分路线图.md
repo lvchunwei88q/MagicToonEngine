@@ -2,7 +2,7 @@
 
 适用于 `Engine/ThirdParty/IMGUI` 中的 Dear ImGui 1.92.8 WIP（docking）。目标是让开发者按功能定位实现，同时保持现有公共 API、DLL 导出和编辑器行为兼容。
 
-**当前进度**：已完成 imgui_layout.cpp 迁移；下一项为 imgui_popup.cpp。
+**当前进度**：已完成 imgui_popup.cpp 迁移；下一项为 imgui_navigation.cpp。
 
 ## 更新约定
 
@@ -12,7 +12,7 @@
 
 - [x] ~~建立构建和冒烟测试基线。~~ 在 VS x64 开发环境执行 `cmake --build out/Ninja_Debug --target ImGuiSmokeTest` 成功。从仓库根目录运行 `Binary/Debug/MagicTest-ImGuiSmokeTest.exe --frames 24 --no-vsync` 和默认无参数运行，分别完成 24 帧和 240 帧，所有断言通过（Win32 + DX11，单视口）。
 - [x] ~~迁移 `imgui_layout.cpp`。从原 `imgui.cpp` 的 ITEM SUBMISSION、LAYOUT、SCROLLING 三个连续区段开始（11919–12714 行）。验证控件占位、同行排列和滚动。~~ Debug 构建通过，24 帧测试通过，同排、换行及下一帧滚动读回均符合预期。
-- [ ] 迁移 `imgui_popup.cpp`。归集 TOOLTIPS 和 POPUPS（12715–13485 行）。验证提示框显示、模态弹窗关闭及焦点恢复。
+- [x] ~~迁移 `imgui_popup.cpp`。归集 TOOLTIPS 和 POPUPS（12715–13485 行）。验证提示框显示、模态弹窗关闭及焦点恢复。~~ Debug 构建与 24 帧测试通过；第 18 帧验证弹窗已关闭且焦点恢复。悬停提示显示未单独自动验证。
 - [ ] 迁移 `imgui_navigation.cpp`。归集 KEYBOARD/GAMEPAD NAVIGATION（13770–15507 行）。验证 Tab 切换、方向键导航及弹窗内的焦点行为。
 
 每次迁移一个模块后，重新构建并链接 `IMGUI`、运行冒烟测试，再验证该条目列出的交互。测试入口见 [ImGuiSmokeTest.cpp](../Tests/ImGui/ImGuiSmokeTest.cpp)。
