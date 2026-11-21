@@ -26,6 +26,8 @@ namespace ImGui
     void UpdateKeyboardInputs();
     void UpdateMouseInputs();
     void UpdateMouseWheel();
+    void ApplyWindowSettings(ImGuiWindow* window, ImGuiWindowSettings* settings);
+    void InitOrLoadWindowSettings(ImGuiWindow* window, ImGuiWindowSettings* settings);
     void ItemHandleShortcut(ImGuiID id);
     void NavProcessItem();
     ImVec2 CalcNextScrollFromScrollTargetAndClamp(ImGuiWindow* window);
@@ -52,4 +54,17 @@ inline ImGuiDir ImGetDirQuadrantFromDelta(float dx, float dy)
     if (ImFabs(dx) > ImFabs(dy))
         return (dx > 0.0f) ? ImGuiDir_Right : ImGuiDir_Left;
     return (dy > 0.0f) ? ImGuiDir_Down : ImGuiDir_Up;
+}
+
+inline int GetWindowDisplayLayer(ImGuiWindow* window)
+{
+    return (window->Flags & ImGuiWindowFlags_Tooltip) ? 1 : 0;
+}
+
+inline ImGuiHoveredFlags ApplyHoverFlagsForTooltip(ImGuiHoveredFlags user_flags, ImGuiHoveredFlags shared_flags)
+{
+    // Allow instance flags to override shared flags
+    if (user_flags & (ImGuiHoveredFlags_DelayNone | ImGuiHoveredFlags_DelayShort | ImGuiHoveredFlags_DelayNormal))
+        shared_flags &= ~(ImGuiHoveredFlags_DelayNone | ImGuiHoveredFlags_DelayShort | ImGuiHoveredFlags_DelayNormal);
+    return user_flags | shared_flags;
 }
