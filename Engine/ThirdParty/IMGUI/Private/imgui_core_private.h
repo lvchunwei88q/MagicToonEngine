@@ -3,6 +3,9 @@
 // Implementation details shared by the core translation units.
 namespace ImGui
 {
+    constexpr float WINDOWS_RESIZE_FROM_EDGES_FEEDBACK_TIMER = 0.04f;    // Reduce visual noise by only highlighting the border after a certain time.
+    constexpr ImGuiID IMGUI_VIEWPORT_DEFAULT_ID = 0x11111111; // Using an arbitrary constant instead of e.g. ImHashStr("ViewportDefault", 0); so it's easier to spot in the debugger. The exact value doesn't matter.
+    void RenderWindowOuterBorders(ImGuiWindow* window);
     void ItemHandleShortcut(ImGuiID id);
     void NavProcessItem();
     ImVec2 CalcNextScrollFromScrollTargetAndClamp(ImGuiWindow* window);
