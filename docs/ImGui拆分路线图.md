@@ -2,7 +2,7 @@
 
 适用于 `Engine/ThirdParty/IMGUI` 中的 Dear ImGui 1.92.8 WIP（docking）。目标是让开发者按功能定位实现，同时保持现有公共 API、DLL 导出和编辑器行为兼容。
 
-**当前进度**：第三阶段完成，下一项为第四阶段的 `imgui_widgets_textedit.cpp`。
+**当前进度**：已完成 imgui_widgets_textedit.cpp，下一项为 imgui_widgets_scalar.cpp。
 
 ## 更新约定
 
@@ -36,7 +36,7 @@
 
 ## 第四阶段：控件、绘制和表格
 
-- [ ] 从 `imgui_widgets.cpp` 分出 `imgui_widgets_textedit.cpp`，归集文本输入、选择、光标与撤销。复测单行和多行编辑。
+- [x] ~~从 `imgui_widgets.cpp` 分出 `imgui_widgets_textedit.cpp`，归集文本输入、选择、光标与撤销。复测单行和多行编辑。~~ Debug 构建与 24 帧冒烟测试通过。专项测试与拆分前结果一致。单行输入 abc，多行输入与换行后得到 abc/de（两行）。
 - [ ] 分出 `imgui_widgets_scalar.cpp`，归集数值格式化、拖动、滑条和数值输入，复测拖动与直接输入。
 - [ ] 分出 `imgui_widgets_color.cpp`，归集颜色编辑器与选择器。基础按钮、勾选框和文本显示留在原文件；菜单、标签页及多选按后续开发需要复评。
 - [ ] 从 `imgui_draw.cpp` 分出 `imgui_font.cpp`，归集字体图集、字形构建和字体实现。核对 STB 实现宏和内置字体数据的唯一归属，验证图集构建与文本绘制。
