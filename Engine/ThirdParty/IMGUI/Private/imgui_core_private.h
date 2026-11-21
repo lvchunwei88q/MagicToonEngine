@@ -23,6 +23,9 @@ namespace ImGui
     void UpdateDebugToolFlashStyleColor();
 #endif
 
+    void UpdateKeyboardInputs();
+    void UpdateMouseInputs();
+    void UpdateMouseWheel();
     void ItemHandleShortcut(ImGuiID id);
     void NavProcessItem();
     ImVec2 CalcNextScrollFromScrollTargetAndClamp(ImGuiWindow* window);
