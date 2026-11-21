@@ -431,8 +431,9 @@ static void DrawDiagnosticsWindow(ImGuiIO& io)
     }
     if (g_autoPopupClose && g_frameIndex == kPopupCloseFrame + 1)
     {
-        EXPECT_FALSE(ImGui::IsPopupOpen("Smoke Modal"));
-        EXPECT_TRUE(ImGui::IsWindowFocused());
+        std::cout << "[frame " << g_frameIndex << "] Checking modal close and focus\n";
+        EXPECT_FALSE(ImGui::IsPopupOpen("Smoke Modal"), "Modal closed");
+        EXPECT_TRUE(ImGui::IsWindowFocused(), "Focus restored to Diagnostics");
     }
 
     ImGui::End();
@@ -442,6 +443,7 @@ static void DrawDiagnosticsWindow(ImGuiIO& io)
 // widget gallery's size, scrolling position and docking layout.
 static void CheckLayoutAndNavigation()
 {
+    const std::string frame = "[frame " + std::to_string(g_frameIndex) + "] ";
     ImGui::SetNextWindowSize(ImVec2(240, 200));
     ImGui::Begin("Layout and navigation checks", nullptr,
         ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoSavedSettings);
@@ -455,26 +457,28 @@ static void CheckLayoutAndNavigation()
     const ImVec2 firstMax = ImGui::GetItemRectMax();
     if (g_frameIndex == kFocusFrame + 1 || g_frameIndex == kLastCheckFrame)
     {
-        EXPECT_TRUE(ImGui::IsItemFocused());
+        EXPECT_TRUE(ImGui::IsItemFocused(), frame + (g_frameIndex == kLastCheckFrame ? "Shift+Tab returned focus to First" : "Initial focus on First"));
         ImGui::SetNavCursorVisible(true);
     }
     ImGui::SameLine();
     ImGui::Button("Second", ImVec2(60, 24));
     const ImVec2 secondMin = ImGui::GetItemRectMin();
     if (g_frameIndex == kTabFrame + 1)
-        EXPECT_TRUE(ImGui::IsItemFocused());
+        EXPECT_TRUE(ImGui::IsItemFocused(), frame + "Tab moved focus to Second");
     ImGui::Dummy(ImVec2(10, 10));
     if (g_frameIndex == 2)
     {
-        EXPECT_TRUE(secondMin.x >= firstMax.x && secondMin.y == firstMin.y);
-        EXPECT_TRUE(ImGui::GetItemRectMin().y >= firstMax.y);
+        EXPECT_TRUE(secondMin.x >= firstMax.x && secondMin.y == firstMin.y,
+            frame + "SameLine placed Second to the right of First");
+        EXPECT_TRUE(ImGui::GetItemRectMin().y >= firstMax.y, frame + "Next item on a new row");
     }
     ImGui::BeginChild("Scroll", ImVec2(0, 60));
     ImGui::Dummy(ImVec2(10, 250));
     if (g_frameIndex == 2)
         ImGui::SetScrollY(40);
     if (g_frameIndex == 3)
-        EXPECT_TRUE(std::fabs(ImGui::GetScrollY() - 40.0f) <= 1.0f);
+        EXPECT_TRUE(std::fabs(ImGui::GetScrollY() - 40.0f) <= 1.0f,
+            frame + "Child scroll reached requested offset of 40");
     ImGui::EndChild();
     ImGui::End();
 }
@@ -686,6 +690,7 @@ int main(int argc, char** argv)
         std::cerr << "ImGui_ImplDX11_Init failed.\n";
         return 1;
     }
+    std::cout << "[init] Win32 and DX11 backends ready\n";
 
     // Docking will be enabled per-frame; the dock node itself is built once
     // after the main viewport has a valid work size (frame 2).
@@ -831,20 +836,20 @@ int main(int argc, char** argv)
 
     // --- assertions --------------------------------------------------------
     std::cout << "\n--- checks -------------------------------------------------\n";
-    EXPECT_TRUE(framesRendered > 0);
-    EXPECT_FALSE(renderFailed);
+    EXPECT_TRUE(framesRendered > 0, "Rendered at least one frame");
+    EXPECT_FALSE(renderFailed, "No swap-chain or render-target failure");
     if (frameBudget > 0)
-        EXPECT_EQ(framesRendered, frameBudget);
-    EXPECT_TRUE(displaySize.x > 0.0f && displaySize.y > 0.0f);
-    EXPECT_TRUE(atlasBuilt);
-    EXPECT_TRUE(drawLists > 0);
-    EXPECT_TRUE(drawVertices > 0);
-    EXPECT_TRUE(g_tableRows >= 5);          // 5 rows x at least one frame
-    EXPECT_TRUE(g_storageValue == 1337);
-    EXPECT_TRUE(g_textSize.x > 0.0f && g_textSize.y > 0.0f);
-    EXPECT_TRUE(g_dockBuilt);
-    EXPECT_TRUE(g_popupOpenCount >= 1);
-    EXPECT_TRUE(g_frameIndex >= framesRendered);
+        EXPECT_EQ(framesRendered, frameBudget, "Completed requested frame budget");
+    EXPECT_TRUE(displaySize.x > 0.0f && displaySize.y > 0.0f, "Positive display dimensions");
+    EXPECT_TRUE(atlasBuilt, "Font atlas built");
+    EXPECT_TRUE(drawLists > 0, "Draw lists generated");
+    EXPECT_TRUE(drawVertices > 0, "Draw vertices generated");
+    EXPECT_TRUE(g_tableRows >= 5, "Submitted at least five table rows");
+    EXPECT_EQ(g_storageValue, 1337, "Storage returned expected value 1337");
+    EXPECT_TRUE(g_textSize.x > 0.0f && g_textSize.y > 0.0f, "Positive text dimensions");
+    EXPECT_TRUE(g_dockBuilt, "Dock root node exists");
+    EXPECT_TRUE(g_popupOpenCount >= 1, "Modal visible for at least one frame");
+    EXPECT_TRUE(g_frameIndex >= framesRendered, "Frame count covers presented frames");
 
     std::cout << "frames=" << framesRendered
               << " fontsBuilt=" << (atlasBuilt ? 1 : 0)
@@ -853,7 +858,9 @@ int main(int argc, char** argv)
               << " tableRows=" << g_tableRows
               << " storage=" << g_storageValue
               << " dock=" << (g_dockBuilt ? 1 : 0)
-              << " popupOpens=" << g_popupOpenCount
+              << " popupVisibleFrames=" << g_popupOpenCount
+              << " display=" << displaySize.x << 'x' << displaySize.y
+              << " text=" << g_textSize.x << 'x' << g_textSize.y
               << "\n";
 
     if (GetFailedCount() > 0)

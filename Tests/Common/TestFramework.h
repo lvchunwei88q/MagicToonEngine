@@ -1,79 +1,53 @@
-// TestFramework.h
-// The test database is used for some functional testing
+#pragma once
+
+#include <cstdlib>
 #include <iostream>
-#include <vector>
 #include <string>
+#include <string_view>
+#include <vector>
 
 inline int& GetFailedCount() { static int count = 0; return count; }
 
-// Is it true?
-#define EXPECT_TRUE(expr) \
-    do { \
-        if (!(expr)) { \
-            std::cerr << "FAILED: " << #expr << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-        } \
-    } while (0)
-// Is it false?
-#define EXPECT_FALSE(expr) \
-    do { \
-        if (expr) { \
-            std::cerr << "FAILED: " << #expr << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-        } \
-    } while (0)
-// Is it equal?
-#define EXPECT_EQ(a, b) \
-    do { \
-        if ((a) != (b)) { \
-            std::cerr << "FAILED: " << #a << " != " << #b << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-        } \
-    } while (0)
-// Is it not equal?
-#define EXPECT_NE(a, b) \
-    do { \
-        if ((a) == (b)) { \
-            std::cerr << "FAILED: " << #a << " == " << #b << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-        } \
-    } while (0)
-// Is it true? If not, exit the program.
-#define ASSERT_TRUE(expr) \
-    do { \
-        if (!(expr)) { \
-            std::cerr << "FATAL: " << #expr << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-            std::exit(1); \
-        } \
-    } while (0)
-// Is it false? If not, exit the program.
-#define ASSERT_FALSE(expr) \
-    do { \
-        if (expr) { \
-            std::cerr << "FATAL: " << #expr << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-            std::exit(1); \
-        } \
-    } while (0)
-// Is it equal? If not, exit the program.
-#define ASSERT_EQ(a, b) \
-    do { \
-        if ((a) != (b)) { \
-            std::cerr << "FATAL: " << #a << " != " << #b << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-            std::exit(1); \
-        } \
-    } while (0)
-// Is it not equal? If not, exit the program.
-#define ASSERT_NE(a, b) \
-    do { \
-        if ((a) == (b)) { \
-            std::cerr << "FATAL: " << #a << " == " << #b << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
-            GetFailedCount()++; \
-            std::exit(1); \
-        } \
-    } while (0)
+namespace test_detail
+{
+inline void Report(bool passed, bool fatal, const char* expression,
+                   const char* file, int line, std::string_view message)
+{
+    if (passed)
+    {
+        if (!message.empty())
+            std::cout << "PASS " << message << std::endl;
+        return;
+    }
+
+    std::cerr << (fatal ? "FATAL: " : "FAILED: ");
+    if (!message.empty())
+        std::cerr << message << " | ";
+    std::cerr << expression << " at " << file << ":" << line << std::endl;
+    ++GetFailedCount();
+    if (fatal)
+        std::exit(1);
+}
+}
+
+// Pass an optional description to log successful checks as well as failures.
+#define EXPECT_TRUE(expr, ...) \
+    test_detail::Report(!(!(expr)), false, #expr, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+#define EXPECT_FALSE(expr, ...) \
+    test_detail::Report(!(expr), false, #expr, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+#define EXPECT_EQ(a, b, ...) \
+    test_detail::Report(!((a) != (b)), false, #a " != " #b, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+#define EXPECT_NE(a, b, ...) \
+    test_detail::Report(!((a) == (b)), false, #a " == " #b, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+#define ASSERT_TRUE(expr, ...) \
+    test_detail::Report(!(!(expr)), true, #expr, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+#define ASSERT_FALSE(expr, ...) \
+    test_detail::Report(!(expr), true, #expr, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+#define ASSERT_EQ(a, b, ...) \
+    test_detail::Report(!((a) != (b)), true, #a " != " #b, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+#define ASSERT_NE(a, b, ...) \
+    test_detail::Report(!((a) == (b)), true, #a " == " #b, __FILE__, __LINE__, std::string_view{__VA_ARGS__})
+
 
 template<typename Exception, typename Callable>
 void ExpectThrows(Callable&& callable)
