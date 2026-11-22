@@ -1,24 +1,22 @@
-# ImGui 源码拆分复核报告
+# ImGui 源码拆分：路线图与复核报告
 
-复核对象：`Engine/ThirdParty/IMGUI`（Dear ImGui 1.92.8 WIP，`IMGUI_VERSION_NUM 19275`）
+复核对象：`Engine/ThirdParty/IMGUI`（Dear ImGui 1.92.8 WIP，`IMGUI_VERSION_NUM 19275`，docking）
 
 复核时间：2026-11-22
 
-基线提交：`b4e0c91`
+基线提交：`b4e0c91`（拆分前）
 
-当前提交：`d757c07`（拆分之后另有 `42fcdfa` 文档索引、`d757c07` 构建修复两个提交）
+拆分提交范围：`0ae5073..db1b0e1`，共 **18 个提交**（2026-11-21 21:50 \~ 22:57）；之后另有 `42fcdfa` 文档索引、`d757c07` 构建修复两个提交
 
-拆分提交范围：`0ae5073..db1b0e1`，共 **18 个提交**（2026-11-21 21:50 \~ 22:57）
-
-
+> 合并说明（2026-11-22）：本文件是原 `docs/08-ImGui拆分复核报告.md` 与 `docs/ImGui拆分路线图.md` 的合并版 —— 路线图负责"当初怎么拆的、为什么这么拆"，复核负责"拆完长什么样、还能不能用"。沿用 `08` 这个编号与文件名，是为了让 README、历史提交和对话记录里的链接继续有效。
 
 ***
 
-## 1. 结论摘要
+## 1. 概览与结论
 
-**拆分本身是干净的，可以用。** 代码总量守恒、公共头零改动、没有跨编译单元的全局可变状态、定制点全部保留、干净重建与冒烟测试均通过。构建环境的风险只剩一半：`/showIncludes` 已恢复（`d757c07`），`Build.bat` 也已把代码页钉成 936（P1-1 ✅），所以从 `Build.bat` 走 Ninja 时依赖跟踪正常；但 UTF-8（65001）终端、CI、IDE 外部工具这类绕过 `Build.bat` 的入口仍会静默丢依赖，私有头又会退化成 "改了不重编"。
+**拆分本身是干净的，可以用。** 代码总量守恒、公共头零改动、没有跨编译单元的全局可变状态、定制点全部保留、干净重建与冒烟测试均通过。
 
-
+四阶段的计划项全部完成：21 个实现文件（46,898 行）从原来的 4 个上游文件里拆出，新增 4 个私有头承载跨文件声明。构建环境的风险只剩一半：`/showIncludes` 已恢复（`d757c07`），`Build.bat` 也已把代码页钉成 936（P1-1 ✅），所以从 `Build.bat` 走 Ninja 时依赖跟踪正常；但 UTF-8（65001）终端、CI、IDE 外部工具这类绕过 `Build.bat` 的入口仍会静默丢依赖，私有头又会退化成"改了不重编"。
 
 | 结论                  | 判定                                                       |
 | ------------------- | -------------------------------------------------------- |
@@ -28,105 +26,15 @@
 | 运行行为                | ✅ 通过：单视口与多视口冒烟测试各 60 帧全部断言通过                             |
 | 跨 TU 状态共享           | ✅ 通过：无跨 TU 全局变量，状态仍集中在 `ImGuiContext` / `GImGui`         |
 | 增量构建可信度             | ✅ 通过（限 `Build.bat` / 936 控制台）：`#deps 142`；UTF-8 终端与 CI 仍会丢依赖（见 P1-1 遗留项） |
-| 后续可维护性              | ✅ 私有头已改为自包含（本轮修复）；剩余：杂糅头、缺上游映射表                                |
+| 后续可维护性              | ✅ 私有头已改为自包含（2026-11-22 修复）；剩余：杂糅头、缺上游映射表                |
 
 **一句话**：拆分质量本身没问题；`Build.bat` 已把代码页钉死（`chcp 936`），剩下的是**给绕过 `Build.bat` 的入口（CI、IDE 外部工具、UTF-8 终端）也补上同一句 `chcp 936`**，并用 `ninja -t deps` 确认 `#deps` 非 0。
 
-
-
 ***
 
-## 2. 复核方法与证据
+## 2. 拆分结果（结构现状）
 
-### 2.1 静态核对
-
-
-
-| 项目           | 手段                                                                                | 结果                               |
-| ------------ | --------------------------------------------------------------------------------- | -------------------------------- |
-| 代码总量守恒       | 逐文件统计行数，与 `b4e0c91` 四个原文件对比                                                       | 46,898 vs 46,824，差 +74           |
-| 公共头是否被改      | `git diff b4e0c91..HEAD -- Public/imgui.h imgui_internal.h imconfig.h`            | 输出为空                             |
-| 定制点是否保留      | 搜索 `IO.h`、`ENGINE_CACHE`、`IDI_ENGINE_ICON`、`CS_DROPSHADOW`、`IM_ASSERT_USER_ERROR` | 全部在原位置保留                         |
-| 跨文件同名 static | 脚本提取全部 `^static ...(` 定义并按名字分组                                                    | 15 组重名全部是**同文件重载**，无跨文件重复        |
-| 私有头里的全局变量    | 搜索 `Internal/*.h`、`Private/*.h` 中的 `static` 定义                                    | 无 `static` 定义；唯一常量已改 `inline constexpr`（见 P2-2） |
-| 私有头声明与定义是否一致 | 提取私有头 34 条函数声明，反查是否有 `static` 定义                                                  | 0 处不一致                           |
-
-### 2.2 构建实测
-
-
-
-```
-cmake --build out\Ninja_Debug --target IMGUI     # 24 个 TU 全量重建
-```
-
-
-
-* 结果：成功，**0 warning**（日志 `out/imgui_rebuild.log`）
-
-* 全工程 `cmake --build out\Ninja_Debug`：成功，退出码 0
-
-耗时（本机，Debug，`/Od /Zi`）：
-
-
-
-| 场景                         | 耗时    |
-| -------------------------- | ----- |
-| 无改动空跑（仍跑 MagicCodegenTool） | 3.6 s |
-| 改 1 个 cpp 后增量              | 4.5 s |
-| IMGUI 全量重建（24 TU）          | 7.0 s |
-
-> 结论：拆分带来的编辑 - 验证循环收益被 "每次构建都跑代码生成 + 重新链接 DLL" 抵消了大半，实际体验是 4.5 s 而不是秒级。这符合预期，不是拆分缺陷。
-
-### 2.3 运行实测
-
-
-
-```
-Binary\Debug\MagicTest-ImGuiSmokeTest.exe --frames 60 --no-vsync
-Binary\Debug\MagicTest-ImGuiSmokeTest.exe --frames 60 --no-vsync --viewports
-```
-
-两次均 `SMOKE TEST PASSED`，退出码 0：
-
-
-
-```
-frames=60 fontsBuilt=1 drawLists=6 verts=3868 tableRows=300 storage=1337 dock=1 popupVisibleFrames=13
-```
-
-### 2.4 依赖跟踪实测（关键证据）
-
-
-
-```
-$ ninja -t deps .../IMGUI.dir/Private/imgui.cpp.obj      # 在 chcp 936 下构建
-# => #deps 142, deps mtime ... (VALID)
-#    依赖列表包含 ../../Engine/ThirdParty/IMGUI/Internal/imgui_core_private.h
-
-$ ninja -t deps .../IMGUI.dir/Private/imgui.cpp.obj      # 在 UTF-8 控制台(65001)下构建
-# => #deps 0
-```
-
-给 `Internal/imgui_core_private.h` 追加一行注释后（936 环境下）会立刻重编 `imgui.cpp.obj`；在 UTF-8 控制台下则完全没有编译任务。原因是前缀字节不匹配：
-
-
-
-```
-rules.ninja: msvc_deps_prefix = D7 A2 D2 E2 3A 20 B0 FC BA AC CE C4 BC FE 3A 20 20   (GBK)
-cl 实际输出:                     E6 B3 A8 E6 84 8F 3A 20 E5 8C 85 E5 90 AB ...        (UTF-8)
-```
-
-也就是说：**同一份代码，在 cmd（936）里改私有头会重编，在 UTF-8 终端里则完全不会**。这不是拆分引入的新缺陷，但它让拆分的风险从 "1 个耦合点" 放大到 "4 个耦合点 + 34 条跨文件声明"，所以必须在 `Build.bat` / CI 里把代码页钉死。
-
-
-
-***
-
-## 3. 拆分结果
-
-### 3.1 文件地图
-
-
+### 2.1 文件地图
 
 | 文件                                   | 行数         | 内容来源（上游 `[SECTION]`）                                                                                                                                                      |
 | ------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -155,9 +63,7 @@ cl 实际输出:                     E6 B3 A8 E6 84 8F 3A 20 E5 8C 85 E5 90 AB .
 
 后端三个文件（`imgui_impl_win32/dx11/dx12.cpp`）未拆分，原样保留。
 
-### 3.2 新增私有头
-
-
+### 2.2 新增私有头
 
 | 头文件                                 | 行数 | 内容                                       |
 | ----------------------------------- | -- | ---------------------------------------- |
@@ -166,28 +72,143 @@ cl 实际输出:                     E6 B3 A8 E6 84 8F 3A 20 E5 8C 85 E5 90 AB .
 | `Internal/imgui_platform_private.h` | 50 | Win32 平台包含策略 + 4 条平台回调声明 + 自包含头                 |
 | `Internal/imgui_widgets_private.h`  | 9  | `GDefaultRgbaColorMarkers` 常量数组 + 自包含头          |
 
-
+路线图里引用的行号（如 `imgui.cpp 17669–21651`）都是**拆分前**上游文件里的位置，仅用于定位来源；拆分后的归属以本表与函数名 / `[SECTION]` 名称为准。
 
 ***
 
-## 4. 问题清单
+## 3. 拆分路线图（已执行四个阶段）
+
+适用于 `Engine/ThirdParty/IMGUI` 中的 Dear ImGui 1.92.8 WIP（docking）。目标是让开发者按功能定位实现，同时保持现有公共 API、DLL 导出和编辑器行为兼容。
+
+**当前进度**：四个阶段的计划项均已完成。
+
+### 3.1 更新约定（后续阶段沿用）
+
+每完成并验证一项，在同一次改动中把对应条目改为 `- [x] ~~原任务~~`，在条目后补上实际验证结果，并更新上方的"当前进度"。部分完成的条目保留未勾选状态，注明已迁移范围和剩余工作。
+
+### 3.2 第一阶段：基线和首批迁移
+
+- [x] ~~建立构建和冒烟测试基线。~~ 在 VS x64 开发环境执行 `cmake --build out/Ninja_Debug --target ImGuiSmokeTest` 成功。从仓库根目录运行 `Binary/Debug/MagicTest-ImGuiSmokeTest.exe --frames 24 --no-vsync` 和默认无参数运行，分别完成 24 帧和 240 帧，所有断言通过（Win32 + DX11，单视口）。
+- [x] ~~迁移 `imgui_layout.cpp`。从原 `imgui.cpp` 的 ITEM SUBMISSION、LAYOUT、SCROLLING 三个连续区段开始（11919–12714 行）。验证控件占位、同行排列和滚动。~~ Debug 构建通过，24 帧测试通过，同排、换行及下一帧滚动读回均符合预期。
+- [x] ~~迁移 `imgui_popup.cpp`。归集 TOOLTIPS 和 POPUPS（12715–13485 行）。验证提示框显示、模态弹窗关闭及焦点恢复。~~ Debug 构建与 24 帧测试通过；第 18 帧验证弹窗已关闭且焦点恢复。悬停提示显示未单独自动验证。
+- [x] ~~迁移 `imgui_navigation.cpp`。归集 KEYBOARD/GAMEPAD NAVIGATION（13770–15507 行）。验证 Tab 切换、方向键导航及弹窗内的焦点行为。~~ Debug 构建与 24 帧测试通过，第 22、24 帧分别验证 Tab 前进与 Shift+Tab 返回；方向键和弹窗内导航未单独自动验证。
+
+每次迁移一个模块后，重新构建并链接 `IMGUI`、运行冒烟测试，再验证该条目列出的交互。测试入口见 [ImGuiSmokeTest.cpp](../Tests/ImGui/ImGuiSmokeTest.cpp)。
+
+### 3.3 第二阶段：停靠、视口和调试
+
+- [x] ~~迁移 `imgui_docking.cpp`（17669–21651 行）。停靠节点、拆分与合并、DockSpace、DockBuilder 和布局持久化先整体迁移。验证拖出面板、重新停靠、保存布局和重启恢复。~~ Debug 构建、24 帧冒烟测试通过。专项测试通过 API 验证左右分栏、脱离节点、重新停靠，以及销毁上下文后加载保存的布局并恢复两个窗口的节点归属。
+- [x] ~~迁移 `imgui_viewports.cpp`（16559–17668 行）。归集视口和平台窗口生命周期，验证多视口配置下窗口创建、移动和关闭。~~ Debug 构建与 24 帧多视口冒烟测试通过。40 帧 DX11 专项测试验证第二个 HWND 创建、生成绘制顶点、同一窗口水平移动 50 像素，以及关闭后 HWND 和视口均回收。
+- [x] ~~迁移 `imgui_platform.cpp`（21652–21883 行）。归集平台辅助函数，复测剪贴板操作。平台辅助函数与现有 Win32、DX11、DX12 后端各自保留清晰的归属。~~ Debug 构建、24 帧冒烟测试通过。独立 Win32 窗口站中验证含中文的 UTF-8 文本和空字符串的剪贴板读写，并确认输入法与 Shell 回调已注册。
+- [x] ~~迁移 `imgui_debug.cpp`。归集错误检查与状态恢复（11442–11918 行），以及 21884 行起的 Metrics、Debug Log、Item Picker 和 ID Stack Tool。确认停靠内部类型的访问边界，验证启用与禁用调试工具的构建。~~ 默认配置通过 Debug 构建和 24 帧冒烟测试。专项测试验证 Metrics、Debug Log、ID Stack 窗口产生顶点和日志写入；定义 IMGUI_DISABLE_DEBUG_TOOLS 后重新编译链接整个库，用同配置调用三个窗口入口并确认均未创建窗口。
+
+### 3.4 第三阶段：其余核心模块和窗口
+
+- [x] ~~迁移 `imgui_input.cpp`（9965–11441 行），归集键鼠输入事件及状态查询，复测鼠标点击和键盘输入。~~ Debug 构建与 24 帧冒烟测试通过；专项测试验证键盘与鼠标同批入队的按下、释放在连续两帧可见，鼠标坐标正确，中英文 UTF-8 输入解码及下一帧清空正确。
+- [x] ~~迁移 `imgui_dragdrop.cpp`（15508–15910 行），验证拖放源、目标与载荷传递。~~ Debug 构建与 24 帧冒烟测试通过；10 帧专项测试通过鼠标事件将载荷从源按钮拖到目标，验证类型过滤、预览、载荷字节、松开时仅交付一次及下一帧状态清理。
+- [x] ~~迁移 `imgui_helpers.cpp`（2086–2950 行），归集几何、字符串、哈希、文件、字符编码和颜色辅助函数。~~ 同一专项测试在迁移前后均通过：三角形内外判断、格式化截断、带 ### 后缀的 ID 哈希、UTF-8 往返、颜色打包、中文文件名读写及尾部补零。Debug 构建和 24 帧冒烟测试通过。
+- [x] ~~迁移 `imgui_storage.cpp`（2951–3612 行），归集 ImGuiStorage、文本过滤与缓冲、列表裁剪，复测列表滚动和过滤。~~ 迁移前后同一用例通过：键值覆盖与缺省值、文本包含和排除、格式化追加、500 项列表滚动裁剪。滚动 1000 像素后首项索引从 0 变为 49，提交项数从 7 变为 8。Debug 构建和 24 帧冒烟测试通过。
+- [x] ~~迁移 `imgui_window.cpp`。逐函数检查 MAIN CODE（4674–9535 行），将窗口创建、Begin/End、移动、缩放及 WINDOW FOCUS 区段迁出。在 `imgui.cpp` 保留上下文、初始化、销毁、NewFrame、EndFrame 和 Render。验证创建窗口、移动、缩放、聚焦及连续渲染。~~ 迁移前后同一六帧用例验证双窗口创建、API 移动与缩放、跨帧位置尺寸保持、子窗口作用域恢复、焦点切换及绘制。Debug 构建和 240 帧多视口冒烟测试通过。
+
+样式、IO、字体与纹理接口、ID 栈、设置和日志先留在 `imgui.cpp`，待上述迁移完成后结合实际修改频率复评。
+
+### 3.5 第四阶段：控件、绘制和表格
+
+- [x] ~~从 `imgui_widgets.cpp` 分出 `imgui_widgets_textedit.cpp`，归集文本输入、选择、光标与撤销。复测单行和多行编辑。~~ Debug 构建与 24 帧冒烟测试通过。专项测试与拆分前结果一致。单行输入 abc，多行输入与换行后得到 abc/de（两行）。
+- [x] ~~分出 `imgui_widgets_scalar.cpp`，归集数值格式化、拖动、滑条和数值输入，复测拖动与直接输入。~~ Debug 构建与 24 帧冒烟测试通过。专项测试与拆分前结果一致。直接输入整数 42，鼠标拖动得到 65，滑条得到 33。
+- [x] ~~分出 `imgui_widgets_color.cpp`，归集颜色编辑器与选择器。基础按钮、勾选框和文本显示留在原文件；菜单、标签页及多选按后续开发需要复评。~~ Debug 构建与 24 帧冒烟测试通过。专项测试与拆分前结果一致。实际点击颜色选择器，颜色由红色变为约 (0.73, 0.48, 0.48)，同帧提交颜色编辑器。
+- [x] ~~从 `imgui_draw.cpp` 分出 `imgui_font.cpp`，归集字体图集、字形构建和字体实现。核对 STB 实现宏和内置字体数据的唯一归属，验证图集构建与文本绘制。~~ Debug 构建与 24 帧冒烟测试通过。专项测试与拆分前结果一致。默认字体图集为 512×128，字形 A 可查，文本宽度和绘制顶点数均为正。
+- [x] ~~复评 `imgui_tables.cpp`。如需拆分，优先将旧 Columns API 迁入 `imgui_columns_legacy.cpp`，分别验证旧分栏与现代表格；如决定保留，记录原因后关闭此项。~~ Debug 构建与 24 帧冒烟测试通过。专项测试与拆分前结果一致。保留现代表格实现，旧分栏独立迁移。逐帧验证旧两栏索引切换、退出分栏后创建现代两列表格及列索引。最终八组专项用例和 240 帧 Win32/DX11 多视口冒烟测试全部通过。
+
+### 3.6 迁移时的实现约束（后续继续拆时沿用）
+
+- 新实现文件放入 `Engine/ThirdParty/IMGUI/Private/`。[CMake 源码收集规则](../Engine/Cmake/macro.cmake)会递归发现新增的 `.cpp`。
+- 按完整函数、类型及条件编译块划界。模块独占的静态辅助函数随实现迁移，确有跨文件调用时使用库内私有声明，并检查相关宏和文件级编译设置。
+- 每次迁移保留原函数名、命名空间及上游注释。将行为修改另行提交，方便定位回归和对照上游更新。
+
+***
+
+## 4. 复核方法与证据
+
+### 4.1 静态核对
+
+| 项目           | 手段                                                                                | 结果                               |
+| ------------ | --------------------------------------------------------------------------------- | -------------------------------- |
+| 代码总量守恒       | 逐文件统计行数，与 `b4e0c91` 四个原文件对比                                                       | 46,898 vs 46,824，差 +74           |
+| 公共头是否被改      | `git diff b4e0c91..HEAD -- Public/imgui.h imgui_internal.h imconfig.h`            | 输出为空                             |
+| 定制点是否保留      | 搜索 `IO.h`、`ENGINE_CACHE`、`IDI_ENGINE_ICON`、`CS_DROPSHADOW`、`IM_ASSERT_USER_ERROR` | 全部在原位置保留                         |
+| 跨文件同名 static | 脚本提取全部 `^static ...(` 定义并按名字分组                                                    | 15 组重名全部是**同文件重载**，无跨文件重复        |
+| 私有头里的全局变量    | 搜索 `Internal/*.h`、`Private/*.h` 中的 `static` 定义                                    | 无 `static` 定义；唯一常量已改 `inline constexpr`（见 P2-2） |
+| 私有头声明与定义是否一致 | 提取私有头 34 条函数声明，反查是否有 `static` 定义                                                  | 0 处不一致                           |
+
+### 4.2 构建实测
+
+```
+cmake --build out\Ninja_Debug --target IMGUI     # 24 个 TU 全量重建
+```
+
+* 结果：成功，**0 warning**（日志 `out/imgui_rebuild.log`）
+
+* 全工程 `cmake --build out\Ninja_Debug`：成功，退出码 0
+
+耗时（本机，Debug，`/Od /Zi`）：
+
+| 场景                         | 耗时    |
+| -------------------------- | ----- |
+| 无改动空跑（仍跑 MagicCodegenTool） | 3.6 s |
+| 改 1 个 cpp 后增量              | 4.5 s |
+| IMGUI 全量重建（24 TU）          | 7.0 s |
+
+> 结论：拆分带来的编辑 - 验证循环收益被"每次构建都跑代码生成 + 重新链接 DLL"抵消了大半，实际体验是 4.5 s 而不是秒级。这符合预期，不是拆分缺陷；元数据侧的改进方向见 P2-5。
+
+### 4.3 运行实测
+
+```
+Binary\Debug\MagicTest-ImGuiSmokeTest.exe --frames 60 --no-vsync
+Binary\Debug\MagicTest-ImGuiSmokeTest.exe --frames 60 --no-vsync --viewports
+```
+
+两次均 `SMOKE TEST PASSED`，退出码 0：
+
+```
+frames=60 fontsBuilt=1 drawLists=6 verts=3868 tableRows=300 storage=1337 dock=1 popupVisibleFrames=13
+```
+
+### 4.4 依赖跟踪实测（关键证据）
+
+```
+$ ninja -t deps .../IMGUI.dir/Private/imgui.cpp.obj      # 在 chcp 936 下构建
+# => #deps 142, deps mtime ... (VALID)
+#    依赖列表包含 ../../Engine/ThirdParty/IMGUI/Internal/imgui_core_private.h
+
+$ ninja -t deps .../IMGUI.dir/Private/imgui.cpp.obj      # 在 UTF-8 控制台(65001)下构建
+# => #deps 0
+```
+
+给 `Internal/imgui_core_private.h` 追加一行注释后（936 环境下）会立刻重编 `imgui.cpp.obj`；在 UTF-8 控制台下则完全没有编译任务。原因是前缀字节不匹配：
+
+```
+rules.ninja: msvc_deps_prefix = D7 A2 D2 E2 3A 20 B0 FC BA AC CE C4 BC FE 3A 20 20   (GBK)
+cl 实际输出:                     E6 B3 A8 E6 84 8F 3A 20 E5 8C 85 E5 90 AB ...        (UTF-8)
+```
+
+也就是说：**同一份代码，在 cmd（936）里改私有头会重编，在 UTF-8 终端里则完全不会**。这不是拆分引入的新缺陷，但它让拆分的风险从"1 个耦合点"放大到"4 个耦合点 + 34 条跨文件声明"，所以必须在 `Build.bat` / CI 里把代码页钉死。
+
+***
+
+## 5. 问题清单（含修复状态）
 
 ### P1-1 依赖跟踪依赖控制台代码页，UTF-8 下失效（✅ `Build.bat` 已修复，2026-11-22；CI / IDE 外部工具待补）
 
-
-
 * **现状**：`common.cmake:8-9` 的 `/showIncludes` 剥离已在 `d757c07` 中注释掉，编译命令重新带上该开关；受影响面为 `Internal/*.h` 与全部 `Private/*.cpp`
 
-* **现象**：`chcp 936` 构建后 `#deps 142`（正常，改私有头会重编）；UTF-8（65001）构建后 `#deps 0`（改私有头不重编）
+* **现象**：`chcp 936` 构建后 `#deps 142`（正常，改私有头会重编）；UTF-8（65001）构建后 `#deps 0`（改私有头不重编）；证据见 4.4
 
 * **影响**：
 
-
-  * 改了私有头里的函数签名 → 旧的 `.obj` 仍按旧声明编译，链接期可能报 `LNK2019`，也可能 "链接成功但行为是旧的"；
-
+  * 改了私有头里的函数签名 → 旧的 `.obj` 仍按旧声明编译，链接期可能报 `LNK2019`，也可能"链接成功但行为是旧的"；
   * 拆分后这类声明有 34 条、分布在 4 个头里，命中概率远高于拆分前（拆分前只有 1 个 cpp，不存在这个面）；
-
-  * 更隐蔽的是：改完头 + 只改了一个 cpp，看起来 "编过了"，实际其他 20 个 TU 还是旧的。
+  * 更隐蔽的是：改完头 + 只改了一个 cpp，看起来"编过了"，实际其他 20 个 TU 还是旧的。
 
 * **修法**（二选一，推荐第 1 条）：
 
@@ -199,57 +220,42 @@ cl 实际输出:                     E6 B3 A8 E6 84 8F 3A 20 E5 8C 85 E5 90 AB .
 * **修复记录（2026-11-22）**：`Build.bat` 在 `@echo off` / `setlocal` 之后、任何 `cmake` 调用之前插入 `chcp 936 >nul`，让 configure 与 build 共用同一代码页（脚本只保留 Ninja 一条路径，configure 与 build 都在同一个控制台里跑）。验收：`chcp 936` 下 `Build.bat Debug` 端到端 → 退出码 0、`compile_commands.json` 正常导出与复制、0 error / 0 warning；`ninja -t deps` 中 `imgui.cpp.obj` `#deps 142`、`imgui_widgets_color.cpp.obj` `#deps 124`；单视口 / 多视口冒烟测试均 `SMOKE TEST PASSED`。
   * 遗留：`Build.bat` 只走 Ninja（MSBuild 分支已移除，`:vs_build` / `out\VS_%CONFIG%` 不再使用），并支持 `Build.bat Debug|Release` 免交互调用；CI、IDE 外部工具、直接敲 `cmake --build`、以及 `chcp 65001` 的终端仍需各自加 `chcp 936`。
 
-> 建议把这一条排在所有 ImGui 后续改造之前，因为后面任何 "改私有头 → 验证" 的动作都会踩它。
+> 建议把这一条排在所有 ImGui 后续改造之前，因为后面任何"改私有头 → 验证"的动作都会踩它。
 
 ### P2-1 私有头不自包含，依赖严格的包含顺序（✅ 已修复，2026-11-22）
-
-
 
 * **位置**：`Internal/imgui_core_private.h:1`、`imgui_docking_private.h:1`、`imgui_widgets_private.h:1`
 
 * **证据**：单独编译三个头（各自一个空 TU）直接失败：
 
-
-
 ```
 imgui_core_private.h(7): error C4430: 缺少类型说明符
-imgui_core_private.h(8): error C2065: “ImGuiWindow”: 未声明的标识符
-imgui_core_private.h(29): error C2065: “ImGuiWindowSettings”: 未声明的标识符
+imgui_core_private.h(8): error C2065: "ImGuiWindow": 未声明的标识符
+imgui_core_private.h(29): error C2065: "ImGuiWindowSettings": 未声明的标识符
 ...（30+ 条）
 ```
 
-
-
 * **影响**：
 
-
   * 新文件的 `#include` 必须严格按 `imgui.h → imgui_internal.h → *_private.h` 排列，顺序错了就是几十条报错，且报错位置在头文件里、不在新文件里，不好定位；
-
   * clangd / IntelliSense 单独打开私有头会满屏红；
-
   * `imgui_docking_private.h` 用了 `memset` 但没有 `<string.h>`，`ImVec2ih` 也来自 `imgui_internal.h`。
 
-* **修法**：每个私有头自己带上 `#include "imgui.h"` 与 `#include "imgui_internal.h"`（`imgui_internal.h` 不会反向包含私有头，没有循环），`docking_private` 再补 `<string.h>`。私有头一旦自包含，就把 "包含顺序" 这条隐性规则消掉了。
+* **修法**：每个私有头自己带上 `#include "imgui.h"` 与 `#include "imgui_internal.h"`（`imgui_internal.h` 不会反向包含私有头，没有循环），`docking_private` 再补 `<string.h>`。私有头一旦自包含，就把"包含顺序"这条隐性规则消掉了。
 
 * **修复记录（2026-11-22）**：4 个头全部改为自包含 —— `core_private` / `docking_private` / `platform_private` 增加 `#include "imgui.h"` + `#include "imgui_internal.h"`，`docking_private` 另补 `<string.h>`，`widgets_private` 补 `#include "imgui.h"`；`platform_private` 保留"OS 宏/包含在前、imgui 在后"的原有顺序。验证：4 个头各自单独成 TU 编译通过（仅需 Public/Internal + Logger/Core 的 include 路径）；IMGUI 24 个 TU 全量重建 0 warning；全工程构建退出码 0；单视口 / 多视口冒烟测试均 PASSED。
 
 ### P2-2 `imgui_widgets_private.h` 用 `static const` 定义数组 → 两份副本（✅ 已修复，2026-11-22）
 
-
-
 * **位置**：`Internal/imgui_widgets_private.h:3`
-
-
 
 ```
 static const ImU32 GDefaultRgbaColorMarkers[4] = { ... };
 ```
 
-
-
 * **事实**：该头被 `imgui_widgets_color.cpp`、`imgui_widgets_scalar.cpp` 两个 TU 包含，各自生成一份 16 字节的数组（内部链接，不违反 ODR，编译也不报）
 
-* **风险**：目前是 `const`，两份内容一致，无行为问题；但只要有人把 `const` 去掉（比如加一个 "标记色可配置"），就会变成两份独立状态，改一处另一处不变，属于典型的静默分叉
+* **风险**：目前是 `const`，两份内容一致，无行为问题；但只要有人把 `const` 去掉（比如加一个"标记色可配置"），就会变成两份独立状态，改一处另一处不变，属于典型的静默分叉
 
 * **修法**：改为 `inline constexpr ImU32 GDefaultRgbaColorMarkers[4]`（C++17 起头文件里安全的单一定义方式）
 
@@ -257,49 +263,39 @@ static const ImU32 GDefaultRgbaColorMarkers[4] = { ... };
 
 ### P2-3 `imgui_core_private.h` 是杂糅头，正在长成第二个 `imgui_internal.h`
 
-
-
 * **位置**：`Internal/imgui_core_private.h:5-40`
 
 * **事实**：30 条声明覆盖 6 个领域 —— 窗口边框 / 设置应用、Viewport 生命周期、错误检查与调试工具、键盘鼠标输入更新、导航、滚动计算。`imgui_viewports.cpp`、`imgui_navigation.cpp`、`imgui_input.cpp`、`imgui_window.cpp`、`imgui_popup.cpp`、`imgui_layout.cpp`、`imgui_debug.cpp` 都要包含它
 
-* **影响**：任何新增的跨文件函数都会被顺手塞进这里；半年后它就会变成 "谁都能改、改了牵动 7 个文件" 的公共垃圾场
+* **影响**：任何新增的跨文件函数都会被顺手塞进这里；半年后它就会变成"谁都能改、改了牵动 7 个文件"的公共垃圾场
 
 * **修法**：按域拆成 `imgui_window_private.h` / `imgui_viewport_private.h` / `imgui_nav_private.h`（或 `imgui_input_private.h`），只保留真正全局的 `WINDOWS_RESIZE_FROM_EDGES_FEEDBACK_TIMER` 与 `IMGUI_VIEWPORT_DEFAULT_ID`
 
 ### P2-4 上游同步没有映射表，升级会退化成手工考古
 
+* **位置**：本文档第 3 节（原 `docs/ImGui拆分路线图.md`，已合并）
 
-
-* **位置**：`docs/ImGui拆分路线图.md`
-
-* **事实**：路线图用**拆分前的行号**（如 `imgui.cpp 17669–21651`）描述每个模块，拆分后这些行号全部失效；文档里也没有 " 上游 `[SECTION]` → 当前文件 " 的反向表
+* **事实**：路线图条目一律用**拆分前的行号**（如 `imgui.cpp 17669–21651`）描述来源，拆分后这些行号全部失效；第 2.1 节的"上游 `[SECTION]` → 当前文件"表已能回答"某段代码现在在哪个文件"，但还缺**行级**反查表和上游基线记录
 
 * **影响**：下次把 1.92.x 升到 1.93 时，需要把上游 diff 的每个 hunk 手工映射到 21 个文件之一，成本随拆分粒度线性上升
 
 * **修法**：
 
-1. 新建 `Engine/ThirdParty/IMGUI/UPSTREAM_MAP.md`，按 `[SECTION]` 名列出 `文件:起始行`（本报告第 3.1 节可直接作为初版）；
-
-2. 记录上游基线（`v1.92.8-docking` + commit hash）与 "本地改造清单"（IO.h、ENGINE\_CACHE、图标、错误宏、导出宏）；
-
-3. 升级时先 diff 上游四文件，再按 map 落到本地文件，最后跑冒烟测试。
+  1. 新建 `Engine/ThirdParty/IMGUI/UPSTREAM_MAP.md`，按 `[SECTION]` 名列出 `文件:起始行`（本文档 2.1 节可直接作为初版）；
+  2. 记录上游基线（`v1.92.8-docking` + commit hash）与"本地改造清单"（IO.h、ENGINE\_CACHE、图标、错误宏、导出宏）；
+  3. 升级时先 diff 上游四文件，再按 map 落到本地文件，最后跑冒烟测试。
 
 ### P2-5 构建元数据被拆分放大
-
-
 
 * **位置**：`out/engine_codegen_generate/engine_generate_info/engine_headers.buildmeta`
 
 * **事实**：拆分前 IMGUI 占 21 / 240 条，拆分后 **44 / 263 条**（21 个 cpp + 23 个头），其中包含 1.1 MB 的 `Public/front/Roboto_Regular_front.h`
 
-* **影响**：`add_module_sources(IMGUI)` 把所有 `.h` 也写进 header 列表，MagicCodegenTool 每次构建都要读取 + 哈希这些文件；实测每次构建的代码生成阶段稳定耗时约 2–3 秒（"无改动空跑 3.6 s" 里大头就是它）
+* **影响**：`add_module_sources(IMGUI)` 把所有 `.h` 也写进 header 列表，MagicCodegenTool 每次构建都要读取 + 哈希这些文件；实测每次构建的代码生成阶段稳定耗时约 2–3 秒（"无改动空跑 3.6 s"里大头就是它）
 
 * **修法**：给 `add_module_sources` 加参数，第三方模块只登记 `.cpp`（或只登记 `Public/` 下的头）；至少把 `Internal/`、`front/` 排除掉。这同时也会降低 P1-1 修复后的全量重编成本。
 
 ### P3-1 `IMGUI_DEFINE_MATH_OPERATORS` 的写法不统一
-
-
 
 * 有 `#ifndef` 包裹：`imgui.cpp`、`imgui_debug.cpp`、`imgui_dragdrop.cpp`、`imgui_draw.cpp`、`imgui_font.cpp`、`imgui_helpers.cpp`、`imgui_input.cpp`、`imgui_storage.cpp`、`imgui_tables.cpp`、`imgui_widgets_color.cpp`、`imgui_widgets_scalar.cpp`
 
@@ -311,33 +307,25 @@ static const ImU32 GDefaultRgbaColorMarkers[4] = { ... };
 
 ### P3-2 提交信息与实际动作不符
 
-
-
 * `db1b0e1` 标题是 `add private headers for docking, platform, and widgets`，实际内容是把 4 个头从 `Private/` 移到 `Internal/`，`0 insertions, 0 deletions`
 
-* 影响：以后按提交信息检索 "私有头是哪次引入的" 会找不到（实际引入分散在 `b6bba19` 等提交里）
+* 影响：以后按提交信息检索"私有头是哪次引入的"会找不到（实际引入分散在 `b6bba19` 等提交里）
 
-* 建议：这类纯移动用 `refactor(imgui): move private headers to Internal/`，并在正文写 "无内容改动"
+* 建议：这类纯移动用 `refactor(imgui): move private headers to Internal/`，并在正文写"无内容改动"
 
-### P3-3 路线图只写了 "做完了"，没写 "现在长什么样"
+### P3-3 路线图只写了"做完了"，没写"现在长什么样"（✅ 已合并，2026-11-22）
 
+* 原问题：路线图开头写"四个阶段的计划项均已完成"，但没有拆分后的文件清单、每文件行数、私有头职责
 
-
-* `docs/ImGui拆分路线图.md` 开头写 "四个阶段的计划项均已完成"，但没有拆分后的文件清单、每文件行数、私有头职责
-
-* 建议：把本报告第 3 节并进去（或直接互链），让路线图从 "计划文档" 变成 "结构文档"
+* 处理：已把路线图并进本文档 —— 第 2 节是结构现状（文件地图 / 私有头 / 行数），第 3 节是四个阶段的执行记录，同一份文档既有计划也有结果
 
 ### P3-4 冒烟测试没有进 CTest，18 个提交的验证是人工的
-
-
 
 * `Tests/CMakeLists.txt` 里只有 `add_engine_test_library`，没有 `add_test`
 
 * 后果：拆分期间每个提交都要手动跑 exe；回归只能靠人记得
 
 * 修法：
-
-
 
 ```
 add_test(NAME ImGuiSmokeTest COMMAND ImGuiSmokeTest --frames 60 --no-vsync)
@@ -346,8 +334,6 @@ add_test(NAME ImGuiSmokeTest COMMAND ImGuiSmokeTest --frames 60 --no-vsync)
 （注意：`--viewports` 依赖桌面会话，适合单独一个 `LABELS desktop` 的用例，不要塞进默认测试集）
 
 ### P3-5 freetype 头残留（裁剪遗留，与拆分无关）
-
-
 
 * `Private/imgui_font.cpp` 在 `#ifdef IMGUI_ENABLE_FREETYPE` 下 `#include "misc/freetype/imgui_freetype.h"`，但该目录在裁剪时已删除
 
@@ -359,25 +345,19 @@ add_test(NAME ImGuiSmokeTest COMMAND ImGuiSmokeTest --frames 60 --no-vsync)
 
 单文件仍超过 3,000 行的：
 
-
-
 | 文件                  | 行数    | 建议                                                                                                                                                                                               |
 | ------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `imgui_widgets.cpp` | 6,607 | 按控件族分：`imgui_widgets_menu.cpp`（Menu/MenuItem/BeginMenu）、`imgui_widgets_tabs.cpp`（TabBar/TabItem）、`imgui_widgets_select.cpp`（Selectable/ListBox/Combo）、`imgui_widgets_plot.cpp`（Plot/ProgressBar） |
 | `imgui.cpp`         | 5,763 | MAIN CODE（2682–4677，约 2,000 行）可拆 `imgui_frame.cpp`（NewFrame/EndFrame/Render）与 `imgui_item.cpp`（Item 提交与状态）                                                                                       |
 | `imgui_font.cpp`    | 4,232 | STB 实现（约 2,000 行）可独立成 `imgui_font_stb.cpp`，与字体图集解耦                                                                                                                                               |
-| `imgui_tables.cpp`  | 4,219 | 表格可再分 "布局计算" 与 "绘制 / 交互"                                                                                                                                                                         |
+| `imgui_tables.cpp`  | 4,219 | 表格可再分"布局计算"与"绘制 / 交互"                                                                                                                                                                         |
 | `imgui_docking.cpp` | 3,982 | 可拆 `imgui_docknode.cpp`（树操作）与 `imgui_dockbuilder.cpp`（Builder + Settings）                                                                                                                        |
 
 不建议继续往下切到 500 行以下的碎片 —— 跨文件声明会快速膨胀，收益小于维护成本。
 
-
-
 ***
 
-## 5. 复核的正面结论（保留证据，便于回归时对照）
-
-
+## 6. 复核的正面结论（保留证据，便于回归时对照）
 
 1. **代码量守恒**：46,898 行 vs 46,824 行，差 +74，全部是每个新文件头部新增的 `#ifndef IMGUI_DEFINE_MATH_OPERATORS` / `#ifndef IMGUI_DISABLE` 守卫与 include；
 
@@ -385,11 +365,9 @@ add_test(NAME ImGuiSmokeTest COMMAND ImGuiSmokeTest --frames 60 --no-vsync)
 
 3. **没有跨 TU 可变状态**：私有头里只有声明和 2 个常量；`imgui.cpp` 剩下的 `static` 变量（`GImAllocatorAllocFunc/FreeFunc/UserData`）仍只被本 TU 使用，`imgui_font.cpp` 的 `g_CharClassifierIsSeparator_*` 同理；
 
-4. `static`**&#x20;收敛**：单文件 `static` 定义数从 `imgui.cpp` 的 173 降到最大 49（`imgui_font.cpp`）/ 48（`imgui_docking.cpp`），函数作用域清晰；
+4. `static` **收敛**：单文件 `static` 定义数从 `imgui.cpp` 的 173 降到最大 49（`imgui_font.cpp`）/ 48（`imgui_docking.cpp`），函数作用域清晰；
 
 5. **定制点全部在位**：
-
-
 
 | 定制                                                               | 位置                                                |
 | ---------------------------------------------------------------- | ------------------------------------------------- |
@@ -398,33 +376,23 @@ add_test(NAME ImGuiSmokeTest COMMAND ImGuiSmokeTest --frames 60 --no-vsync)
 | 错误宏改走 `LOG_ERROR` + `NotificationSubsystem`                      | `imconfig.h:148-154`                              |
 | DLL 导出宏                                                          | `imgui.h:85-93`（未改动）                              |
 
-
-
-1. **无同名 static 跨文件重复**：15 组重名经脚本核对全部是同文件内的重载 / 多声明。
-
-
+6. **无同名 static 跨文件重复**：15 组重名经脚本核对全部是同文件内的重载 / 多声明。
 
 ***
 
-## 6. 本轮未覆盖的部分
-
-
+## 7. 本轮未覆盖的部分
 
 * **未逐个验证 18 个中间提交的可构建性**：只验证了 `db1b0e1` 的干净重建。若要做 `git bisect`，建议补一次 `for c in $(git rev-list 0ae5073^..HEAD); do git checkout $c && build; done`（成本较高，本次未做）。
 
 * **未做拆分前后的像素级 / 绘制结果对比**：只做了行为断言（绘制列表数、顶点数、表格行数、Storage 值、Dock 节点、Modal 帧数）。若要更严格，可比对连续 N 帧的 `ImDrawData` 顶点缓冲哈希。
 
-* `IMGUI_DISABLE_DEBUG_TOOLS`**&#x20;变体**：单独编译 `imgui_debug.cpp`（带该宏）通过，但没有跑完整变体的构建与测试（`out/debug-tools-off` 目录缺 `CMakeCache.txt`，无法直接复用）。
+* `IMGUI_DISABLE_DEBUG_TOOLS` **变体**：单独编译 `imgui_debug.cpp`（带该宏）通过，但没有跑完整变体的构建与测试（`out/debug-tools-off` 目录缺 `CMakeCache.txt`，无法直接复用）。
 
-* **旧&#x20;**`out/debug-tools-off`**、**`out/build`**、**`out/debug`**&#x20;等目录已过期**，不代表当前代码状态。
-
-
+* **旧 `out/debug-tools-off`、`out/build`、`out/debug` 等目录已过期**，不代表当前代码状态；`out/VS_Release` 在 MSBuild 分支移除后同样不再使用。
 
 ***
 
-## 7. 建议的处理顺序
-
-
+## 8. 建议的处理顺序
 
 | 顺序 | 事项                                                    | 理由                                    |
 | -- | ----------------------------------------------------- | ------------------------------------- |
@@ -436,13 +404,9 @@ add_test(NAME ImGuiSmokeTest COMMAND ImGuiSmokeTest --frames 60 --no-vsync)
 | 6  | 冒烟测试接 CTest；`add_module_sources` 排除 ThirdParty 的 `.h` | 工程化收尾                                 |
 | 7  | 继续拆 `imgui_widgets.cpp` / `imgui.cpp` 的 MAIN CODE     | 按实际修改频率决定，不必一次做完                      |
 
-
-
 ***
 
-## 8. 复现命令
-
-
+## 9. 复现命令
 
 ```
 # 提交范围
@@ -451,8 +415,9 @@ git log --oneline b4e0c91..HEAD
 # 代码量对比
 git show b4e0c91:Engine/ThirdParty/IMGUI/Private/imgui.cpp > /tmp/old.cpp && wc -l /tmp/old.cpp
 
-# 干净重建（需先进入 VS x64 环境）
-"D:\VS2026\Community\VC\Auxiliary\Build\vcvars64.bat"
+# 干净重建（先进入 VS x64 环境，脚本内已固定 936 代码页）
+Build.bat Debug
+# 等价的单目标命令
 cmake --build out\Ninja_Debug --target IMGUI
 
 # 依赖跟踪（关键）
