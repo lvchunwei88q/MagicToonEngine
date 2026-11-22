@@ -5,8 +5,9 @@ if(MSVC)
     add_compile_options(/wd4828) 
     add_compile_options(/utf-8)
 
-    string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_C "${CMAKE_DEPFILE_FLAGS_C}")
-    string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_CXX "${CMAKE_DEPFILE_FLAGS_CXX}")
+    # When building a project with ninja, ninja needs the compiler to output this data
+    #string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_C "${CMAKE_DEPFILE_FLAGS_C}")
+    #string(REPLACE "/showIncludes" "" CMAKE_DEPFILE_FLAGS_CXX "${CMAKE_DEPFILE_FLAGS_CXX}")
     message(STATUS "MSVC: /utf-8 enabled")
     # Max object size for MSVC is 2GB, but we can increase it to 4GB with /bigobj
     add_compile_options(/bigobj)
