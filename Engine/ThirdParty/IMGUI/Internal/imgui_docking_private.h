@@ -1,5 +1,10 @@
 #pragma once
 
+// Self-contained on purpose: see imgui_core_private.h for the rationale.
+#include "imgui.h"
+#include "imgui_internal.h"
+#include <string.h>     // memset
+
 // Persistent Settings data, stored contiguously in SettingsNodes (sizeof() ~32 bytes)
 struct ImGuiDockNodeSettings
 {

@@ -1,5 +1,10 @@
 #pragma once
 
+// Self-contained on purpose: every private header pulls in its own dependencies so that
+// translation units (and IDE tooling) never depend on a specific include order.
+#include "imgui.h"
+#include "imgui_internal.h"
+
 // Implementation details shared by the core translation units.
 namespace ImGui
 {

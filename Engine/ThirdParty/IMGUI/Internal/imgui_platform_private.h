@@ -34,6 +34,12 @@
 #include <TargetConditionals.h>
 #endif
 
+// Self-contained on purpose: see imgui_core_private.h for the rationale.
+// The OS-specific macros/includes above intentionally stay first, so including this header
+// before imgui.h keeps the upstream ordering (WIN32_LEAN_AND_MEAN / NOMINMAX applied first).
+#include "imgui.h"
+#include "imgui_internal.h"
+
 namespace ImGui
 {
 // Platform Dependents default implementation for ImGuiPlatformIO functions
