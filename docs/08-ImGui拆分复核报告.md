@@ -63,6 +63,8 @@
 
 后端三个文件（`imgui_impl_win32/dx11/dx12.cpp`）未拆分，原样保留。
 
+> 2026-11-22 更新：`Private/imgui.cpp` 头部那 1,216 行上游文档注释（MISSION STATEMENT / CONTROLS GUIDE / PROGRAMMER GUIDE / API BREAKING CHANGES / FAQ）已移出到 `Engine/ThirdParty/IMGUI/docs/` 下的 `imgui.cpp-notes.en.md`（英文原文）与 `imgui.cpp-notes.zh-CN.md`（中文版），`imgui.cpp` 只保留许可证横幅加一段指针说明，从 5,763 行降到 4,577 行，21 个 cpp 合计 45,712 行。上表其余行数仍是拆分完成时（`db1b0e1`）的统计。
+
 ### 2.2 新增私有头
 
 | 头文件                                 | 行数 | 内容                                       |
