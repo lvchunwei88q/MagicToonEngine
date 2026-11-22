@@ -16,7 +16,7 @@
 
 ## 1. 结论摘要
 
-**拆分本身是干净的，可以用。** 代码总量守恒、公共头零改动、没有跨编译单元的全局可变状态、定制点全部保留、干净重建与冒烟测试均通过。剩下的主要风险集中在构建环境：`/showIncludes` 已恢复（`d757c07`），依赖跟踪在中文代码页（`chcp 936`）下正常，但在 UTF-8 控制台下会静默失效，私有头又会退化成 "改了不重编"。
+**拆分本身是干净的，可以用。** 代码总量守恒、公共头零改动、没有跨编译单元的全局可变状态、定制点全部保留、干净重建与冒烟测试均通过。构建环境的风险只剩一半：`/showIncludes` 已恢复（`d757c07`），`Build.bat` 也已把代码页钉成 936（P1-1 ✅），所以从 `Build.bat` 走 Ninja 时依赖跟踪正常；但 UTF-8（65001）终端、CI、IDE 外部工具这类绕过 `Build.bat` 的入口仍会静默丢依赖，私有头又会退化成 "改了不重编"。
 
 
 
@@ -27,10 +27,10 @@
 | 编译与链接               | ✅ 通过：24 个编译单元全量重建成功，0 warning                            |
 | 运行行为                | ✅ 通过：单视口与多视口冒烟测试各 60 帧全部断言通过                             |
 | 跨 TU 状态共享           | ✅ 通过：无跨 TU 全局变量，状态仍集中在 `ImGuiContext` / `GImGui`         |
-| 增量构建可信度             | ⚠️ 条件通过：`chcp 936` 下 `#deps 142` 正常；UTF-8 控制台下依赖丢失（见 P1-1） |
+| 增量构建可信度             | ✅ 通过（限 `Build.bat` / 936 控制台）：`#deps 142`；UTF-8 终端与 CI 仍会丢依赖（见 P1-1 遗留项） |
 | 后续可维护性              | ✅ 私有头已改为自包含（本轮修复）；剩余：杂糅头、缺上游映射表                                |
 
-**一句话**：拆分质量本身没问题，剩下的关键动作是**把构建代码页钉死（`chcp 936`）并确认 `ninja -t deps` 非 0**，否则私有头仍会在 UTF-8 环境下 "改了不生效"。
+**一句话**：拆分质量本身没问题；`Build.bat` 已把代码页钉死（`chcp 936`），剩下的是**给绕过 `Build.bat` 的入口（CI、IDE 外部工具、UTF-8 终端）也补上同一句 `chcp 936`**，并用 `ninja -t deps` 确认 `#deps` 非 0。
 
 
 
@@ -172,7 +172,7 @@ cl 实际输出:                     E6 B3 A8 E6 84 8F 3A 20 E5 8C 85 E5 90 AB .
 
 ## 4. 问题清单
 
-### P1-1 依赖跟踪依赖控制台代码页，UTF-8 下失效（**必修**）
+### P1-1 依赖跟踪依赖控制台代码页，UTF-8 下失效（✅ `Build.bat` 已修复，2026-11-22；CI / IDE 外部工具待补）
 
 
 
@@ -191,10 +191,13 @@ cl 实际输出:                     E6 B3 A8 E6 84 8F 3A 20 E5 8C 85 E5 90 AB .
 
 * **修法**（二选一，推荐第 1 条）：
 
-  1. 在所有构建入口（`Build.bat`、CI、脚本）显式 `chcp 936`，并保证 configure 与 build 用同一代码页；
+  1. 在所有构建入口（`Build.bat`、CI、脚本）显式 `chcp 936`，并保证 configure 与 build 用同一代码页（`Build.bat` 已落地，见下方修复记录）；
   2. 让 cl 输出 ASCII 前缀（安装英文语言包 / `VSLANG=1033`；本机实测 `VSLANG` 不生效），使 `msvc_deps_prefix` 与输出编码无关。
 
 * **验收**：在目标环境下 `ninja -t deps ...imgui.cpp.obj` 显示 `#deps 142`；改动 `imgui_core_private.h` 后重新构建能看到 `Building CXX ... imgui.cpp.obj`。
+
+* **修复记录（2026-11-22）**：`Build.bat` 在 `@echo off` / `setlocal` 之后、任何 `cmake` 调用之前插入 `chcp 936 >nul`，让 configure 与 build 共用同一代码页（脚本只保留 Ninja 一条路径，configure 与 build 都在同一个控制台里跑）。验收：`chcp 936` 下 `Build.bat Debug` 端到端 → 退出码 0、`compile_commands.json` 正常导出与复制、0 error / 0 warning；`ninja -t deps` 中 `imgui.cpp.obj` `#deps 142`、`imgui_widgets_color.cpp.obj` `#deps 124`；单视口 / 多视口冒烟测试均 `SMOKE TEST PASSED`。
+  * 遗留：`Build.bat` 只走 Ninja（MSBuild 分支已移除，`:vs_build` / `out\VS_%CONFIG%` 不再使用），并支持 `Build.bat Debug|Release` 免交互调用；CI、IDE 外部工具、直接敲 `cmake --build`、以及 `chcp 65001` 的终端仍需各自加 `chcp 936`。
 
 > 建议把这一条排在所有 ImGui 后续改造之前，因为后面任何 "改私有头 → 验证" 的动作都会踩它。
 
@@ -425,7 +428,7 @@ add_test(NAME ImGuiSmokeTest COMMAND ImGuiSmokeTest --frames 60 --no-vsync)
 
 | 顺序 | 事项                                                    | 理由                                    |
 | -- | ----------------------------------------------------- | ------------------------------------- |
-| 1  | 在 `Build.bat` / CI 固定 `chcp 936`，并用 `ninja -t deps` 验收 `#deps 142` | `d757c07` 已恢复 `/showIncludes`，但 UTF-8 控制台下前缀字节不匹配，依赖仍会丢失 |
+| 1  | ~~在 `Build.bat` 固定 `chcp 936`~~ ✅ 已完成（2026-11-22）；CI / IDE 外部工具待补 | `Build.bat` 已在 `setlocal` 后 `chcp 936`，`#deps 142` 验收通过；其余入口（CI、IDE 外部工具、手敲 `cmake --build`）仍需各自固定代码页 |
 | 2  | ~~私有头自包含~~ ✅ 已完成（2026-11-22）   | 4 个头均可单独编译，包含顺序这条隐性规则已消除          |
 | 3  | ~~`GDefaultRgbaColorMarkers` 改 `inline constexpr`~~ ✅ 已完成（2026-11-22） | 消除每个 TU 一份副本，未来不会出现两份状态分叉 |
 | 4  | 拆 `imgui_core_private.h`（按域）                          | 趁声明只有 30 条时拆，越晚越难                     |

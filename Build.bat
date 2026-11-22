@@ -1,21 +1,22 @@
 @echo off
 setlocal
 
+:: Pin the console code page. CMake records "msvc_deps_prefix" (注意: 包含文件: ) using the
+:: encoding of the console it ran in; Ninja then matches cl's output byte-for-byte. If the
+:: build runs under UTF-8 (65001), the bytes differ, Ninja silently records #deps 0, and header
+:: changes stop triggering recompiles. Keep configure and build on the same code page (936).
+chcp 936 >nul
+
 :: Use the 64-bit VS command prompt when building with Ninja.
 set "PROJECT_ROOT=%~dp0"
 set "PROJECT_ROOT=%PROJECT_ROOT:~0,-1%"
 
-echo %VSCMD_ARG_TGT_ARCH%
+:: Configuration: pass it as an argument for non-interactive builds
+:: ("Build.bat Debug" / "Build.bat Release"); otherwise ask.
+set "CONFIG=%~1"
+if /i "%CONFIG%"=="Debug" goto :config_ready
+if /i "%CONFIG%"=="Release" goto :config_ready
 
-:: Ask which build method to use.
-echo ========================================
-echo Choose build method:
-echo [1] Visual Studio (MSBuild) - For debugging in VS
-echo [2] Ninja (with compile_commands.json) - For clangd/IDE
-echo ========================================
-set /p "BUILD_METHOD=Enter 1 or 2: "
-
-:: Ask which build configuration to use.
 echo ========================================
 echo Choose build configuration:
 echo [1] Debug
@@ -29,17 +30,12 @@ if "%BUILD_CONFIG%"=="1" (
     set "CONFIG=Release"
 )
 
+:config_ready
 echo.
 echo Selected configuration: %CONFIG%
 
-if "%BUILD_METHOD%"=="2" goto :ninja_build
-goto :vs_build
-
-:ninja_build
-echo Using Ninja + CMake (for compile_commands.json)
-
 :: Ninja is a single-config generator, so the build type must be specified at configuration time.
-if "%CONFIG%"=="Debug" (
+if /i "%CONFIG%"=="Debug" (
     set "BUILD_TYPE=Debug"
     set "CMAKE_BUILD_TYPE=-DCMAKE_BUILD_TYPE=Debug"
 ) else (
@@ -86,56 +82,5 @@ if %errorlevel% neq 0 (
 echo Build completed successfully!
 echo Output directory: %PROJECT_ROOT%\Binary\%BUILD_TYPE%
 echo compile_commands.json: %PROJECT_ROOT%\out\compile_commands.json
-pause
-exit /b 0
-
-:vs_build
-echo Using Visual Studio (for debugging in VS IDE)
-set "BUILD_DIR=%PROJECT_ROOT%\out\VS_%CONFIG%"
-
-set "VS_GENERATOR="
-set "SOLUTION_EXT="
-
-cmake --help | findstr "Visual Studio 18 2026" >nul
-if %errorlevel% equ 0 (
-    set "VS_GENERATOR=Visual Studio 18 2026"
-    set "SOLUTION_EXT=slnx"
-    echo Using Visual Studio 2026
-    goto :generate
-)
-
-cmake --help | findstr "Visual Studio 17 2022" >nul
-if %errorlevel% equ 0 (
-    set "VS_GENERATOR=Visual Studio 17 2022"
-    set "SOLUTION_EXT=sln"
-    echo Using Visual Studio 2022
-    goto :generate
-)
-
-echo No suitable VS found!
-pause
-exit /b 1
-
-:generate
-if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
-cd /d "%BUILD_DIR%"
-
-echo Generating project files...
-cmake "%PROJECT_ROOT%" -G "%VS_GENERATOR%" -A x64
-if %errorlevel% neq 0 (
-    echo CMake failed!
-    pause
-    exit /b %errorlevel%
-)
-
-echo Building project (%CONFIG%)...
-cmake --build . --config %CONFIG%
-if %errorlevel% neq 0 (
-    echo Build failed!
-    pause
-    exit /b %errorlevel%
-)
-
-echo Build completed successfully!
 pause
 exit /b 0
