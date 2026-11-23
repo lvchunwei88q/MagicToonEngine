@@ -2,7 +2,7 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-MagicToonEngine 是一个基于 C++ 的卡通渲染验证引擎，主要用于渲染效果原型开发与可视化验证。项目采用 CMake 组织模块，并支持使用 Visual Studio / MSBuild 和 Ninja 进行本地构建。
+MagicToonEngine 是一个基于 C++ 的卡通渲染验证引擎，主要用于渲染效果原型开发与可视化验证。项目采用 CMake 组织模块；仓库自带的 `Build.bat` 使用 Ninja 构建，也可以手动使用 Visual Studio / MSBuild 生成项目。
 
 `Windows 10/11 x64 only. Other operating systems (including Linux, macOS, Android, iOS) are not supported.`
 
@@ -11,13 +11,13 @@ MagicToonEngine 是一个基于 C++ 的卡通渲染验证引擎，主要用于�
 | 组件 | 要求 | 说明 |
 | --- | --- | --- |
 | 操作系统 | Windows 10/11 x64 | 当前仅支持 Windows 平台 |
-| Visual Studio | 2022 或 2026 | 需安装“使用 C++ 的桌面开发”工作负载和 Windows SDK |
+| Visual Studio | 2022 或 2026 | 需安装“使用 C++ 的桌面开发”工作负载和 Windows SDK，提供 MSVC 编译器 |
 | CMake | 3.20 或更高 | 由根目录 `CMakeLists.txt` 控制最低版本 |
 | Git | 可用版本 | 用于获取源码 |
 | Git LFS | 必需 | 用于下载 `ThirdParty` 中的大文件 |
-| Ninja | 构建使用 Ninja 时需要 | 与 MSBuild / Visual Studio 构建方式互补 |
+| Ninja | 必需 | `Build.bat` 使用 Ninja 生成器 |
 
-> 使用 Ninja 构建时，建议从 `x64 Native Tools Command Prompt for VS` 或等价的开发者 PowerShell 启动，以确保 `cl` 与环境变量可用。
+> 运行 `Build.bat` 前，建议从 `x64 Native Tools Command Prompt for VS` 或等价的开发者 PowerShell 启动，以确保 `cl` 与 MSVC 环境变量可用。
 
 ## 获取源码
 
@@ -51,18 +51,25 @@ git lfs pull
 .\Build.bat
 ```
 
-脚本会依次询问：
+脚本使用 Ninja 生成器，并会询问构建配置：
 
-1. 构建方式：`1` 使用 Visual Studio / MSBuild，`2` 使用 Ninja
-2. 构建配置：`1` 使用 Debug，`2` 使用 Release
+1. `1` 使用 Debug
+2. `2` 使用 Release
 
-根据选择，脚本会自动生成并构建项目，并输出到对应的 `Binary` 目录。Visual Studio 构建使用 x64 架构；选择 Ninja 时，脚本会生成 `compile_commands.json`，并复制到 `out\compile_commands.json`，供 clangd 等 IDE 工具使用。
+也可以将配置作为参数传入，跳过配置选择：
 
-> Ninja 配置会复用对应的 `out\Ninja_Debug` 或 `out\Ninja_Release` 构建目录，因此后续构建可以只重新编译有变化的文件。每次运行后，`out\compile_commands.json` 会更新为本次所选配置对应的编译命令。如需完全重新构建，可手动删除对应的构建目录。
+```powershell
+.\Build.bat Debug
+.\Build.bat Release
+```
+
+脚本会在对应的 `out\Ninja_Debug` 或 `out\Ninja_Release` 目录中配置和构建，并将产物输出到对应的 `Binary` 目录。它会生成 `compile_commands.json`，并复制到 `out\compile_commands.json` 供 clangd 等 IDE 工具使用；每次运行都会用当前配置更新该文件。需要完全重新构建时，可删除对应的 Ninja 构建目录。
+
+脚本会将控制台代码页切换为 936，并在同一次运行中完成 CMake 配置和 Ninja 构建。MSVC/Ninja 的头文件依赖跟踪要求 CMake 记录的依赖前缀与 `cl` 输出的编码一致；如果代码页不一致，Ninja 可能无法识别头文件依赖，导致修改头文件后未触发重新编译。
 
 `MagicCodegenTool` 使用 CMake 在运行前从当前构建目录生成的编译数据库副本 `out\engine_codegen_generate\engine_generate_info\engine_compile_commands.buildmeta` 解析头文件；工具根据 `--generate-dir` 和 `MagicConfig.h` 中定义的文件名定位该副本，不会读取供 IDE 使用的 `out\compile_commands.json`。此解析数据库由 CMake 的 Ninja/Makefile 生成器提供。解析结果还包括每个含 `MCLASS(...)` 的目标头文件对应的 `.ast` 语法树，以及记录类、函数、访问级别和 `MMEMBER(...)` 成员变量的 `engine_class_info.log`。遇到 Clang 或标记解析错误时，MagicCodegenTool 会继续检查其他独立头文件/类，汇总诊断后再停止依赖该阶段结果的后续阶段；写生成头文件时也会尝试其他文件，并汇总所有写入错误。
 
-也可以手动使用 CMake 配置构建，例如：
+如需使用 Visual Studio 生成器而非 `Build.bat` 中的 Ninja，可手动使用 CMake 配置构建，例如：
 
 ```powershell
 cmake -S . -B out\VS_Debug -G "Visual Studio 17 2022" -A x64

@@ -2,7 +2,7 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-MagicToonEngine is a C++-based cartoon rendering validation engine focused on rendering prototype development and visual verification. The project is organized with CMake and supports local builds through Visual Studio / MSBuild and Ninja.
+MagicToonEngine is a C++-based cartoon rendering validation engine focused on rendering prototype development and visual verification. The project is organized with CMake; the included `Build.bat` builds with Ninja, and Visual Studio / MSBuild projects can also be generated manually.
 
 `Windows 10/11 x64 only. Other operating systems (including Linux, macOS, Android, iOS) are not supported.`
 
@@ -11,13 +11,13 @@ MagicToonEngine is a C++-based cartoon rendering validation engine focused on re
 | Component | Requirement | Notes |
 | --- | --- | --- |
 | Operating System | Windows 10/11 x64 | The project currently supports Windows only |
-| Visual Studio | 2022 or 2026 | Install the Desktop development with C++ workload and Windows SDK |
+| Visual Studio | 2022 or 2026 | Install the Desktop development with C++ workload and Windows SDK to provide the MSVC compiler |
 | CMake | 3.20 or newer | Minimum version is defined by the root `CMakeLists.txt` |
 | Git | Any recent version | Used to fetch source code |
 | Git LFS | Required | Required to download large files in `ThirdParty` |
-| Ninja | Required when using Ninja | Not required for Visual Studio / MSBuild builds |
+| Ninja | Required | `Build.bat` uses the Ninja generator |
 
-> For Ninja builds, it is recommended to launch the build from `x64 Native Tools Command Prompt for VS` or the corresponding developer PowerShell to ensure `cl` and environment variables are available.
+> Before running `Build.bat`, launch `x64 Native Tools Command Prompt for VS` or the corresponding developer PowerShell to ensure `cl` and the MSVC environment variables are available.
 
 ## Get the Source Code
 
@@ -51,18 +51,25 @@ Run the build script from the repository root:
 .\Build.bat
 ```
 
-The script will prompt for:
+The script uses the Ninja generator and prompts for a build configuration:
 
-1. Build method: `1` for Visual Studio / MSBuild, `2` for Ninja
-2. Build configuration: `1` for Debug, `2` for Release
+1. `1` for Debug
+2. `2` for Release
 
-The selected configuration will be generated and built automatically, and the output will be placed in the corresponding `Binary` directory. Visual Studio builds use the x64 architecture. When Ninja is selected, the script generates `compile_commands.json` and copies it to `out\compile_commands.json` for IDE tools such as clangd.
+You can also pass the configuration as an argument to skip the prompt:
 
-> Ninja builds reuse the corresponding `out\Ninja_Debug` or `out\Ninja_Release` directory, so subsequent builds only recompile changed files. After each run, `out\compile_commands.json` contains the compile commands for the selected configuration. To perform a clean rebuild, delete the corresponding build directory manually.
+```powershell
+.\Build.bat Debug
+.\Build.bat Release
+```
+
+The script configures and builds in the corresponding `out\Ninja_Debug` or `out\Ninja_Release` directory and places outputs in the matching `Binary` directory. It generates `compile_commands.json` and copies it to `out\compile_commands.json` for IDE tools such as clangd; each run updates that file for the selected configuration. To perform a clean rebuild, delete the corresponding Ninja build directory.
+
+The script switches the console code page to 936 and runs CMake configuration and Ninja in the same invocation. MSVC/Ninja header dependency tracking requires the encoding of CMake's recorded dependency prefix to match `cl` output; a mismatch can prevent Ninja from recognizing header dependencies and rebuilding after header changes.
 
 Before running MagicCodegenTool, CMake copies the compilation database from the active build directory to `out\engine_codegen_generate\engine_generate_info\engine_compile_commands.buildmeta`. The tool locates this copy from `--generate-dir` and the filename defined in `MagicConfig.h`; it does not read `out\compile_commands.json` copied for IDE tooling. CMake's Ninja/Makefile generators provide the compilation database. Other outputs are written to the same `engine_generate_info` directory: one `.ast` syntax tree per target header containing `MCLASS(...)`, plus `engine_class_info.log` describing classes, functions, access levels, and members annotated with `MMEMBER(...)`. On Clang or marker-parsing errors, MagicCodegenTool continues checking independent headers/classes, reports the collected diagnostics, and then stops before stages that depend on the failed stage. When writing generated headers, it attempts the other files and reports all write failures.
 
-You can also configure the project manually with CMake:
+To use the Visual Studio generator instead of the Ninja generator in `Build.bat`, configure the project manually with CMake:
 
 ```powershell
 cmake -S . -B out\VS_Debug -G "Visual Studio 17 2022" -A x64
