@@ -35,13 +35,13 @@ def check_python_version() -> CheckResult:
     gil_enabled = getattr(sys, "_is_gil_enabled", lambda: True)()
     return CheckResult(
         check_id="python.version",
-        title="Python 版本",
+        title="Python Version",
         status=Status.OK if satisfied else Status.FAIL,
         summary=f"{platform.python_version()} · {platform.python_implementation()} · {bits}-bit",
         detail=(
-            f"要求 Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} 或更高",
+            f"Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or later is required",
             sys.version.splitlines()[0].strip(),
-            "GIL 已启用" if gil_enabled else "GIL 已禁用（free-threading 构建）",
+            "GIL is enabled" if gil_enabled else "GIL is disabled (free-threaded build)",
         ),
         data={
             "version": platform.python_version(),
@@ -60,14 +60,14 @@ def check_python_interpreter() -> CheckResult:
     in_venv = sys.prefix != sys.base_prefix
     return CheckResult(
         check_id="python.interpreter",
-        title="解释器路径",
+        title="Interpreter Path",
         status=Status.OK if exists else Status.WARN,
         summary=str(executable),
         detail=(
             f"sys.prefix      {sys.prefix}",
             f"sys.base_prefix {sys.base_prefix}",
-            "虚拟环境：是" if in_venv else "虚拟环境：否",
-            f"编译器：{platform.python_compiler()}",
+            "Virtual environment: yes" if in_venv else "Virtual environment: no",
+            f"Compiler: {platform.python_compiler()}",
         ),
         data={
             "executable": str(executable),
@@ -82,8 +82,8 @@ def check_python_interpreter() -> CheckResult:
 def python_checks() -> tuple[CheckSpec, ...]:
     """The Python slice of the registry."""
     return (
-        CheckSpec("python.version", "Python 版本", check_python_version),
-        CheckSpec("python.interpreter", "解释器路径", check_python_interpreter),
+        CheckSpec("python.version", "Python Version", check_python_version),
+        CheckSpec("python.interpreter", "Interpreter Path", check_python_interpreter),
     )
 
 

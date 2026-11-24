@@ -1,7 +1,7 @@
 """Process-wide result store with change notification.
 
-The runner writes here, subscribers are notified, and every view re-reads the
-entries it displays. Neither entry point owns a private copy of the data.
+The runner writes here, subscribers are notified, and consumers re-read the
+entries they display. The entry point does not own a private copy of the data.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ class EnvironmentCache:
 
     @property
     def revision(self) -> int:
-        """Monotonic counter; views can cheaply detect that something changed."""
+        """Monotonic counter; consumers can cheaply detect changes."""
         with self._lock:
             return self._revision
 
@@ -67,8 +67,8 @@ class EnvironmentCache:
     def subscribe(self, listener: Callable[[CacheEvent], None]) -> Callable[[], None]:
         """Register a listener, returning a callable that unsubscribes it.
 
-        The listener may be called from a worker thread; GUI subscribers must
-        marshal back to the UI thread themselves.
+        The listener may be called from a worker thread; UI subscribers must
+        marshal updates to the UI thread themselves.
         """
         with self._lock:
             self._listeners.append(listener)
@@ -88,7 +88,7 @@ class EnvironmentCache:
         return counts
 
     def as_dict(self) -> dict[str, Any]:
-        """Serialisable snapshot used by `--json` and the GUI copy button."""
+        """Serialisable snapshot used by `--json` and other consumers."""
         return {
             "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
             "revision": self.revision,

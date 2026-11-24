@@ -29,7 +29,7 @@ class CheckRunner:
         return self._thread is not None and self._thread.is_alive()
 
     def start(self) -> None:
-        """Publish pending placeholders, then run everything off the UI thread."""
+        """Publish pending placeholders, then run checks on a worker thread."""
         if self.running:
             return
         for spec in self._specs:
@@ -65,7 +65,7 @@ class CheckRunner:
                     check_id=spec.check_id,
                     title=spec.title,
                     status=Status.FAIL,
-                    summary=f"检查抛出异常：{type(exc).__name__}",
+                    summary=f"Check raised an exception: {type(exc).__name__}",
                     detail=(str(exc),),
                 )
             result = replace(

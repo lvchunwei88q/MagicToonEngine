@@ -1,4 +1,4 @@
-"""Result model shared by the console and GUI entry points."""
+"""Result model used by the console entry point."""
 
 from __future__ import annotations
 
@@ -27,12 +27,12 @@ class Status(StrEnum):
 
     @property
     def label(self) -> str:
-        """Human readable label used by the GUI."""
+        """Human-readable status label."""
         return {
-            Status.PENDING: "检测中",
-            Status.OK: "通过",
-            Status.WARN: "警告",
-            Status.FAIL: "失败",
+            Status.PENDING: "Pending",
+            Status.OK: "Passed",
+            Status.WARN: "Warning",
+            Status.FAIL: "Failed",
         }[self]
 
 
@@ -47,8 +47,8 @@ class EventKind(StrEnum):
 class CheckResult:
     """One check's result.
 
-    Immutable on purpose: the cache always stores the latest copy, and views
-    render from that copy instead of mutating it in place.
+    Immutable on purpose: the cache always stores the latest copy, and
+    consumers render from that copy instead of mutating it in place.
     """
 
     check_id: str
@@ -65,8 +65,8 @@ class CheckResult:
 class CacheEvent:
     """Notification sent to subscribers.
 
-    It deliberately carries no payload: subscribers re-read the cache so that
-    console and GUI can never display different values.
+    It deliberately carries no payload: subscribers re-read the cache so they
+    always use its latest value.
     """
 
     kind: EventKind
