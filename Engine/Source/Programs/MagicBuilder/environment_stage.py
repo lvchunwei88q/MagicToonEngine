@@ -84,8 +84,7 @@ def _print_result(result, palette: _Palette) -> None:
 
 def add_arguments(parser: argparse.ArgumentParser) -> None:
     """Register options owned by the environment-check stage."""
-    parser.add_argument("--json", action="store_true", help="Output results as JSON for CI and scripts")
-    parser.add_argument("--no-color", action="store_true", help="Disable ANSI colors")
+    parser.add_argument("--print-json", action="store_true", help="Output results as JSON for CI and scripts")
 
 
 def run_environment_stage(options: argparse.Namespace) -> int:

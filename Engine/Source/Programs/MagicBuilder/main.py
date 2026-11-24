@@ -12,6 +12,7 @@ def build_parser():
         prog="main.py",
         description="MagicToonEngine build pipeline",
     )
+    parser.add_argument("--no-color", action="store_true", help="Disable ANSI colors")
     add_environment_arguments(parser)
     return parser
 
