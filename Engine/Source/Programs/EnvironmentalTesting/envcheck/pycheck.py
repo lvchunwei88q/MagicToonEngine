@@ -1,0 +1,71 @@
+"""Python runtime and interpreter checks."""
+
+from __future__ import annotations
+
+import platform
+import sys
+from pathlib import Path
+
+from .model import CheckResult, CheckSpec, Status
+
+# Minimum version documented in README.md / README.en.md.
+MIN_PYTHON = (3, 12)
+
+
+def check_python_version() -> CheckResult:
+    info = sys.version_info
+    satisfied = (info.major, info.minor) >= MIN_PYTHON
+    bits = 64 if sys.maxsize > 2**32 else 32
+    gil_enabled = getattr(sys, "_is_gil_enabled", lambda: True)()
+    return CheckResult(
+        check_id="python.version",
+        title="Python Version",
+        status=Status.OK if satisfied else Status.FAIL,
+        summary=f"{platform.python_version()} | {platform.python_implementation()} | {bits}-bit",
+        detail=(
+            f"Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or later is required",
+            sys.version.splitlines()[0].strip(),
+            "GIL is enabled" if gil_enabled else "GIL is disabled (free-threaded build)",
+        ),
+        data={
+            "version": platform.python_version(),
+            "required": f"{MIN_PYTHON[0]}.{MIN_PYTHON[1]}+",
+            "satisfied": satisfied,
+            "implementation": platform.python_implementation(),
+            "architecture": f"{bits}-bit",
+            "gil_enabled": gil_enabled,
+        },
+    )
+
+
+def check_python_interpreter() -> CheckResult:
+    executable = Path(sys.executable)
+    exists = executable.is_file()
+    in_venv = sys.prefix != sys.base_prefix
+    return CheckResult(
+        check_id="python.interpreter",
+        title="Interpreter Path",
+        status=Status.OK if exists else Status.WARN,
+        summary=str(executable),
+        detail=(
+            f"sys.prefix      {sys.prefix}",
+            f"sys.base_prefix {sys.base_prefix}",
+            "Virtual environment: yes" if in_venv else "Virtual environment: no",
+            f"Compiler: {platform.python_compiler()}",
+        ),
+        data={
+            "executable": str(executable),
+            "exists": exists,
+            "prefix": sys.prefix,
+            "base_prefix": sys.base_prefix,
+            "virtual_env": in_venv,
+        },
+    )
+
+
+def python_checks() -> tuple[CheckSpec, ...]:
+    """Return checks for the Python runtime and interpreter."""
+    return (
+        CheckSpec("python.version", "Python Version", check_python_version),
+        CheckSpec("python.interpreter", "Interpreter Path", check_python_interpreter),
+    )

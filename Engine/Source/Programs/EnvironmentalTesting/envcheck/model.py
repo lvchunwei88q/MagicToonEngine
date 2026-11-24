@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
@@ -59,6 +60,15 @@ class CheckResult:
     data: dict[str, Any] = field(default_factory=dict)
     checked_at: float = 0.0
     duration_ms: float = 0.0
+
+
+@dataclass(frozen=True, slots=True)
+class CheckSpec:
+    """A named check and the callable that produces its result."""
+
+    check_id: str
+    title: str
+    run: Callable[[], CheckResult]
 
 
 @dataclass(frozen=True, slots=True)

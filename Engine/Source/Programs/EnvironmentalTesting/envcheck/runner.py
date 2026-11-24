@@ -12,8 +12,7 @@ from collections.abc import Iterable, Iterator
 from dataclasses import replace
 
 from .cache import EnvironmentCache, get_cache
-from .checks import CheckSpec
-from .model import CheckResult, Status
+from .model import CheckResult, CheckSpec, Status
 
 
 class CheckRunner:
