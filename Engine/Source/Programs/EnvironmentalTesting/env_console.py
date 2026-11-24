@@ -23,7 +23,7 @@ STATUS_COLOR = {
     "fail": "\x1b[1;31m",
     "pending": "\x1b[90m",
 }
-TITLE_WIDTH = 14
+TITLE_WIDTH = 16
 # "  [ OK ] title         " -> keep detail lines aligned under the title column.
 INDENT = " " * (2 + 6 + 1 + TITLE_WIDTH + 1)
 
@@ -37,7 +37,8 @@ def _ensure_python() -> bool:
     if sys.version_info >= MIN_PYTHON:
         return True
     sys.stderr.write(
-        "需要 Python {}.{}+（见 README 环境要求），当前为 {}。\n解释器路径：{}\n".format(
+        "Python {}.{} or later is required (see README for environment requirements). "
+        "Current version: {}\nInterpreter path: {}\n".format(
             MIN_PYTHON[0],
             MIN_PYTHON[1],
             sys.version.split()[0],
@@ -115,10 +116,10 @@ def main(argv: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(
         prog="env_console.py",
-        description="MagicToonEngine 构建环境检测（控制台入口）",
+        description="MagicToonEngine build environment check (console)",
     )
-    parser.add_argument("--json", action="store_true", help="以 JSON 输出结果，供 CI 或脚本消费")
-    parser.add_argument("--no-color", action="store_true", help="禁用 ANSI 颜色")
+    parser.add_argument("--json", action="store_true", help="Output results as JSON for CI and scripts")
+    parser.add_argument("--no-color", action="store_true", help="Disable ANSI colors")
     options = parser.parse_args(raw_args)
 
     cache = get_cache()
@@ -144,16 +145,16 @@ def main(argv: list[str] | None = None) -> int:
     cache.subscribe(on_cache_event)
 
     print()
-    print("MagicToonEngine · 构建环境检测（控制台）")
+    print("MagicToonEngine - Build Environment Check")
     print("-" * 62)
-    print(f"  共 {len(specs)} 项检测，结果实时来自全局缓存\n")
+    print(f"  Running {len(specs)} checks; results are streamed from the shared cache\n")
 
     runner.start()
     runner.wait()
 
     counts = cache.counts()
     print("-" * 62)
-    print(f"  {counts['ok']} 项通过 · {counts['warn']} 项警告 · {counts['fail']} 项失败")
+    print(f"  {counts['ok']} passed | {counts['warn']} warnings | {counts['fail']} failed")
     return 1 if counts["fail"] else 0
 
 

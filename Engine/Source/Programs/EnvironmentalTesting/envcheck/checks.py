@@ -37,7 +37,7 @@ def check_python_version() -> CheckResult:
         check_id="python.version",
         title="Python Version",
         status=Status.OK if satisfied else Status.FAIL,
-        summary=f"{platform.python_version()} · {platform.python_implementation()} · {bits}-bit",
+        summary=f"{platform.python_version()} | {platform.python_implementation()} | {bits}-bit",
         detail=(
             f"Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or later is required",
             sys.version.splitlines()[0].strip(),
