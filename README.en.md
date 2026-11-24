@@ -16,8 +16,11 @@ MagicToonEngine is a C++-based cartoon rendering validation engine focused on re
 | Git | Any recent version | Used to fetch source code |
 | Git LFS | Required | Required to download large files in `ThirdParty` |
 | Ninja | Required | `Build.bat` uses the Ninja generator |
+| Python | 3.12 or newer | Build helper scripts (environment checks and build automation) are written in Python; must be callable via `py -3` or `python`, 64-bit recommended |
 
 > Before running `Build.bat`, launch `x64 Native Tools Command Prompt for VS` or the corresponding developer PowerShell to ensure `cl` and the MSVC environment variables are available.
+
+> Python 3.12 or newer is required by the repository's build helper scripts (environment checks and build automation). Run `py -3 --version` or `python --version` to confirm the version; upgrade first if only 3.11 or older is installed.
 
 ## Get the Source Code
 
