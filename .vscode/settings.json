@@ -9,5 +9,6 @@
             ],
             "icon": "terminal-cmd"
         }
-    }
+    },
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

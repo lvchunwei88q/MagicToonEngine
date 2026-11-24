@@ -110,7 +110,7 @@ def run_environment_stage(options: argparse.Namespace) -> int:
     specs = all_checks()
     runner = CheckRunner(specs, cache)
 
-    if options.json:
+    if options.print_json:
         runner.run_sync()
         sys.stdout.write(json.dumps(cache.as_dict(), ensure_ascii=False, indent=2) + "\n")
         return 1 if cache.counts()["fail"] else 0
