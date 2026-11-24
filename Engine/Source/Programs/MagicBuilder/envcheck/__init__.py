@@ -1,7 +1,8 @@
 """Shared core for the environmental-testing console tool.
 
-`env_console.py` presents results from the shared cache. Check definitions are
-registered through `all_checks()` so new checks need no entry-point changes.
+`environment_stage.py` presents results from the shared cache. Check
+definitions are registered through `all_checks()` so the pipeline entry point
+does not need to change when new checks are added.
 """
 
 from .cache import EnvironmentCache, get_cache

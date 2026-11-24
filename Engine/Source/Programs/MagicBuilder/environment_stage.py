@@ -1,9 +1,9 @@
-"""Console entry point for MagicToonEngine environmental testing.
+"""Environment-check stage for the MagicToonEngine build pipeline.
 
 Usage:
-    py -3 env_console.py
-    py -3 env_console.py --json
-    py -3 env_console.py --no-color
+    py -3 main.py
+    py -3 main.py --json
+    py -3 main.py --no-color
 
 Results are printed as they arrive in the shared cache; the exit code is 1 when
 any check failed, 2 when the interpreter is too old to run the tool at all.
@@ -11,6 +11,8 @@ any check failed, 2 when the interpreter is too old to run the tool at all.
 
 from __future__ import annotations
 
+import argparse
+import json
 import os
 import sys
 import unicodedata
@@ -26,26 +28,6 @@ STATUS_COLOR = {
 TITLE_WIDTH = 16
 # "  [ OK ] title         " -> keep detail lines aligned under the title column.
 INDENT = " " * (2 + 6 + 1 + TITLE_WIDTH + 1)
-
-
-def _ensure_python() -> bool:
-    """Gate on the version before importing the shared package.
-
-    Keeping this file free of 3.12-only syntax is what makes the friendly
-    message possible instead of a SyntaxError.
-    """
-    if sys.version_info >= MIN_PYTHON:
-        return True
-    sys.stderr.write(
-        "Python {}.{} or later is required (see README for environment requirements). "
-        "Current version: {}\nInterpreter path: {}\n".format(
-            MIN_PYTHON[0],
-            MIN_PYTHON[1],
-            sys.version.split()[0],
-            sys.executable,
-        )
-    )
-    return False
 
 
 def _enable_ansi() -> bool:
@@ -100,27 +82,30 @@ def _print_result(result, palette: _Palette) -> None:
         print(INDENT + line)
 
 
-def main(argv: list[str] | None = None) -> int:
-    raw_args = sys.argv[1:] if argv is None else list(argv)
-    if not _ensure_python():
-        return 2
+def add_arguments(parser: argparse.ArgumentParser) -> None:
+    """Register options owned by the environment-check stage."""
+    parser.add_argument("--json", action="store_true", help="Output results as JSON for CI and scripts")
+    parser.add_argument("--no-color", action="store_true", help="Disable ANSI colors")
 
-    import argparse
-    import json
+
+def run_environment_stage(options: argparse.Namespace) -> int:
+    if sys.version_info < MIN_PYTHON:
+        sys.stderr.write(
+            "Python {}.{} or later is required (see README for environment requirements). "
+            "Current version: {}\nInterpreter path: {}\n".format(
+                MIN_PYTHON[0],
+                MIN_PYTHON[1],
+                sys.version.split()[0],
+                sys.executable,
+            )
+        )
+        return 2
 
     here = os.path.dirname(os.path.abspath(__file__))
     if here not in sys.path:
         sys.path.insert(0, here)
 
     from envcheck import CheckRunner, Status, all_checks, get_cache
-
-    parser = argparse.ArgumentParser(
-        prog="env_console.py",
-        description="MagicToonEngine build environment check (console)",
-    )
-    parser.add_argument("--json", action="store_true", help="Output results as JSON for CI and scripts")
-    parser.add_argument("--no-color", action="store_true", help="Disable ANSI colors")
-    options = parser.parse_args(raw_args)
 
     cache = get_cache()
     specs = all_checks()
@@ -156,7 +141,3 @@ def main(argv: list[str] | None = None) -> int:
     print("-" * 62)
     print(f"  {counts['ok']} passed | {counts['warn']} warnings | {counts['fail']} failed")
     return 1 if counts["fail"] else 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
