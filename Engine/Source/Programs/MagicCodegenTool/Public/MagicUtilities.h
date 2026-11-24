@@ -43,9 +43,7 @@ namespace Utilitie {
 	public:
 		static void Info(const std::string& msg) {
 			MGC ctx = MagicGlobalContext::Get();
-#ifdef _DEBUG
 			std::cout << "[" + std::to_string(ctx.GetCurrentShowTaskIndex()) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][INFO] " << msg << "\n";
-#endif
 		}
 
 		static void Warning(const std::string& msg) {
@@ -56,6 +54,9 @@ namespace Utilitie {
 		static void Error(const std::string& msg) {
 			MGC ctx = MagicGlobalContext::Get();
 			std::cout << "[" + std::to_string(ctx.GetCurrentShowTaskIndex()) + "/" + std::to_string(ctx.GetInfo().TaskNum) + "][ERROR] " << msg << "\n";
+#ifndef NDEBUG
+			ThrowErrorMessage(msg);
+#endif
 		}
 	};
 
