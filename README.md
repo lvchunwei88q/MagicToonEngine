@@ -14,13 +14,23 @@ MagicToonEngine 是一个基于 C++ 的卡通渲染验证引擎，主要用于�
 | Visual Studio | 2022 或 2026 | 需安装“使用 C++ 的桌面开发”工作负载和 Windows SDK，提供 MSVC 编译器 |
 | CMake | 3.20 或更高 | 由根目录 `CMakeLists.txt` 控制最低版本 |
 | Git | 可用版本 | 用于获取源码 |
-| Git LFS | 必需 | 用于下载 `ThirdParty` 中的大文件 |
+| Git LFS | 必需 | 用于下载 `Engine/ThirdParty` 中的大文件 |
 | Ninja | 必需 | `Build.bat` 使用 Ninja 生成器 |
 | Python | 3.12 或更高 | 构建辅助脚本（构建环境检测、构建流程自动化）使用 Python 实现；需可通过 `py -3` 或 `python` 调用，推荐 64 位 |
 
 > 运行 `Build.bat` 前，建议从 `x64 Native Tools Command Prompt for VS` 或等价的开发者 PowerShell 启动，以确保 `cl` 与 MSVC 环境变量可用。
 
 > Python 3.12 及以上用于运行仓库的构建辅助脚本（环境检测与构建流程自动化）。可用 `py -3 --version` 或 `python --version` 确认当前版本；若只有 3.11 或更低版本，请先升级。
+
+## 构建环境检测
+
+在构建前可运行环境检测流水线，检查 Python、Git、Git LFS 和 CMake：
+
+```powershell
+py -3 Engine\Source\Programs\MagicBuilder\main.py
+```
+
+使用 `--print-json` 可输出供 CI 或脚本消费的 JSON；`--no-color` 可禁用 ANSI 颜色。
 
 ## 获取源码
 
@@ -96,12 +106,11 @@ Binary\Release\
 
 ```text
 Engine/                  # 核心引擎、运行时和编辑器模块
-ThirdParty/              # 第三方依赖（如 Lua、IMGUI、SPIRV-Cross 等）
+Engine/ThirdParty/       # 第三方依赖（如 Lua、IMGUI、SPIRV-Cross 等）
 Binary/                  # 构建输出目录
 out/                     # CMake 生成目录
 CMakeLists.txt           # 顶层 CMake 项目入口
 Build.bat                # 一键构建脚本
-GenerateVSProject.bat    # 生成 Visual Studio 项目文件
 Update.bat               # 更新源码和 LFS 依赖
 ```
 

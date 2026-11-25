@@ -14,13 +14,23 @@ MagicToonEngine is a C++-based cartoon rendering validation engine focused on re
 | Visual Studio | 2022 or 2026 | Install the Desktop development with C++ workload and Windows SDK to provide the MSVC compiler |
 | CMake | 3.20 or newer | Minimum version is defined by the root `CMakeLists.txt` |
 | Git | Any recent version | Used to fetch source code |
-| Git LFS | Required | Required to download large files in `ThirdParty` |
+| Git LFS | Required | Required to download large files in `Engine/ThirdParty` |
 | Ninja | Required | `Build.bat` uses the Ninja generator |
 | Python | 3.12 or newer | Build helper scripts (environment checks and build automation) are written in Python; must be callable via `py -3` or `python`, 64-bit recommended |
 
 > Before running `Build.bat`, launch `x64 Native Tools Command Prompt for VS` or the corresponding developer PowerShell to ensure `cl` and the MSVC environment variables are available.
 
 > Python 3.12 or newer is required by the repository's build helper scripts (environment checks and build automation). Run `py -3 --version` or `python --version` to confirm the version; upgrade first if only 3.11 or older is installed.
+
+## Build Environment Check
+
+Run the environment-check pipeline before building to check Python, Git, Git LFS, and CMake:
+
+```powershell
+py -3 Engine\Source\Programs\MagicBuilder\main.py
+```
+
+Use `--print-json` to produce JSON for CI or scripts, or `--no-color` to disable ANSI colors.
 
 ## Get the Source Code
 
@@ -96,12 +106,11 @@ Where:
 
 ```text
 Engine/                  # Core engine, runtime, and editor modules
-ThirdParty/              # Third-party dependencies (for example Lua, IMGUI, SPIRV-Cross, etc.)
+Engine/ThirdParty/       # Third-party dependencies (for example Lua, IMGUI, SPIRV-Cross, etc.)
 Binary/                  # Build output directory
 out/                     # CMake generation directory
 CMakeLists.txt           # Top-level CMake entry point
 Build.bat                # One-click build script
-GenerateVSProject.bat    # Generate Visual Studio project files
 Update.bat               # Update source code and LFS dependencies
 ```
 

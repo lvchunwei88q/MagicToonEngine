@@ -48,7 +48,7 @@ EditorModule(MagicLauncher)
 
 add_subdirectory(Tests)
 
-# Set the startup project to Launcher.
+# Set the Visual Studio startup project to MagicEditor.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MagicEditor)
 # Output path for generated MagicCodegenTool files.
 apply_codegen_generate_path()
