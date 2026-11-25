@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from .model import CheckSpec
 from .pycheck import MIN_PYTHON, python_checks
+from .gitcheck import git_checks
 
 
 def all_checks() -> tuple[CheckSpec, ...]:
@@ -12,4 +13,4 @@ def all_checks() -> tuple[CheckSpec, ...]:
     Add each new check category here so entry points only need to call this
     registry.
     """
-    return (*python_checks(),)
+    return (*python_checks(), *git_checks())
