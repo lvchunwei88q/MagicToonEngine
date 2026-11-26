@@ -2,7 +2,7 @@
 
 Usage:
     py -3 main.py
-    py -3 main.py --json
+    py -3 main.py --print-json
     py -3 main.py --no-color
 
 Results are printed as they arrive in the shared cache; the exit code is 1 when
