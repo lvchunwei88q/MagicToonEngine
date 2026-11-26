@@ -15,10 +15,10 @@ MagicToonEngine is a C++-based cartoon rendering validation engine focused on re
 | CMake | 3.20 or newer | Minimum version is defined by the root `CMakeLists.txt` |
 | Git | Any recent version | Used to fetch source code |
 | Git LFS | Required | Required to download large files in `Engine/ThirdParty` |
-| Ninja | Required | `Build.bat` uses the Ninja generator |
+| Ninja | Required; not optional | Mandatory build dependency for the Python-based MagicBuilder; it must be available on `PATH` |
 | Python | 3.12 or newer | Build helper scripts (environment checks and build automation) are written in Python; must be callable via `py -3` or `python`, 64-bit recommended |
 
-> Before running `Build.bat`, launch `x64 Native Tools Command Prompt for VS` or the corresponding developer PowerShell to ensure `cl` and the MSVC environment variables are available.
+> Ninja is a hard prerequisite for the Python-based MagicBuilder. If it is not installed and available on `PATH`, the environment check fails. MSVC compilation also requires `cl` and the corresponding MSVC environment variables.
 
 > Python 3.12 or newer is required by the repository's build helper scripts (environment checks and build automation). Run `py -3 --version` or `python --version` to confirm the version; upgrade first if only 3.11 or older is installed.
 
@@ -82,7 +82,7 @@ The script switches the console code page to 936 and runs CMake configuration an
 
 Before running MagicCodegenTool, CMake copies the compilation database from the active build directory to `out\engine_codegen_generate\engine_generate_info\engine_compile_commands.buildmeta`. The tool locates this copy from `--generate-dir` and the filename defined in `MagicConfig.h`; it does not read `out\compile_commands.json` copied for IDE tooling. CMake's Ninja/Makefile generators provide the compilation database. Other outputs are written to the same `engine_generate_info` directory: one `.ast` syntax tree per target header containing `MCLASS(...)`, plus `engine_class_info.log` describing classes, functions, access levels, and members annotated with `MMEMBER(...)`. On Clang or marker-parsing errors, MagicCodegenTool continues checking independent headers/classes, reports the collected diagnostics, and then stops before stages that depend on the failed stage. When writing generated headers, it attempts the other files and reports all write failures.
 
-To use the Visual Studio generator instead of the Ninja generator in `Build.bat`, configure the project manually with CMake:
+You can also configure a Visual Studio build manually with CMake:
 
 ```powershell
 cmake -S . -B out\VS_Debug -G "Visual Studio 17 2022" -A x64

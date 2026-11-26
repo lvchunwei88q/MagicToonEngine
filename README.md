@@ -15,10 +15,10 @@ MagicToonEngine 是一个基于 C++ 的卡通渲染验证引擎，主要用于�
 | CMake | 3.20 或更高 | 由根目录 `CMakeLists.txt` 控制最低版本 |
 | Git | 可用版本 | 用于获取源码 |
 | Git LFS | 必需 | 用于下载 `Engine/ThirdParty` 中的大文件 |
-| Ninja | 必需 | `Build.bat` 使用 Ninja 生成器 |
+| Ninja | 必需，不可选 | Python 版 MagicBuilder 的必需构建依赖；必须可从 `PATH` 调用 |
 | Python | 3.12 或更高 | 构建辅助脚本（构建环境检测、构建流程自动化）使用 Python 实现；需可通过 `py -3` 或 `python` 调用，推荐 64 位 |
 
-> 运行 `Build.bat` 前，建议从 `x64 Native Tools Command Prompt for VS` 或等价的开发者 PowerShell 启动，以确保 `cl` 与 MSVC 环境变量可用。
+> Ninja 是 Python 版 MagicBuilder 的硬性前置条件，不安装或未加入 `PATH` 时环境检测会失败。MSVC 编译时还需确保 `cl` 与对应的 MSVC 环境变量可用。
 
 > Python 3.12 及以上用于运行仓库的构建辅助脚本（环境检测与构建流程自动化）。可用 `py -3 --version` 或 `python --version` 确认当前版本；若只有 3.11 或更低版本，请先升级。
 
@@ -82,7 +82,7 @@ git lfs pull
 
 `MagicCodegenTool` 使用 CMake 在运行前从当前构建目录生成的编译数据库副本 `out\engine_codegen_generate\engine_generate_info\engine_compile_commands.buildmeta` 解析头文件；工具根据 `--generate-dir` 和 `MagicConfig.h` 中定义的文件名定位该副本，不会读取供 IDE 使用的 `out\compile_commands.json`。此解析数据库由 CMake 的 Ninja/Makefile 生成器提供。解析结果还包括每个含 `MCLASS(...)` 的目标头文件对应的 `.ast` 语法树，以及记录类、函数、访问级别和 `MMEMBER(...)` 成员变量的 `engine_class_info.log`。遇到 Clang 或标记解析错误时，MagicCodegenTool 会继续检查其他独立头文件/类，汇总诊断后再停止依赖该阶段结果的后续阶段；写生成头文件时也会尝试其他文件，并汇总所有写入错误。
 
-如需使用 Visual Studio 生成器而非 `Build.bat` 中的 Ninja，可手动使用 CMake 配置构建，例如：
+也可以手动使用 CMake 配置 Visual Studio 构建，例如：
 
 ```powershell
 cmake -S . -B out\VS_Debug -G "Visual Studio 17 2022" -A x64

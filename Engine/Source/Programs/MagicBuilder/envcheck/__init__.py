@@ -6,7 +6,15 @@ does not need to change when new checks are added.
 """
 
 from .cache import EnvironmentCache, get_cache
-from .checks import MIN_PYTHON, CheckSpec, all_checks, cmake_checks, git_checks, python_checks
+from .checks import (
+    MIN_PYTHON,
+    CheckSpec,
+    all_checks,
+    cmake_checks,
+    git_checks,
+    ninja_checks,
+    python_checks,
+)
 from .model import CacheEvent, CheckResult, EventKind, Status
 from .runner import CheckRunner
 
@@ -23,5 +31,6 @@ __all__ = [
     "cmake_checks",
     "get_cache",
     "git_checks",
+    "ninja_checks",
     "python_checks",
 ]
