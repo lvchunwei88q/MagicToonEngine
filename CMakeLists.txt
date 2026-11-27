@@ -20,6 +20,7 @@ ThirdPartyCoreModule(ufbx)
 ThirdPartyCoreModule(SPIRV-Cross)
 ThirdPartyCoreModule(WICTextureLoader)
 ThirdPartyCoreModule(Lua)
+ThirdPartyCoreModule(PLFW)
 
 # Engine Core projects.
 CoreModule(Core)
