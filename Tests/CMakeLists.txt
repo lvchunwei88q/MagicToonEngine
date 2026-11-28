@@ -45,7 +45,7 @@ target_link_libraries(ImGuiSmokeTest PRIVATE
 
 # add test plfw Test
 AddEngineTest(plfwTest
-    plfw/smoke.c
+    plfw/smoke.cpp
     Common/TestFramework.h
 )
 target_link_libraries(plfwTest PRIVATE

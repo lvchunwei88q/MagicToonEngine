@@ -1,5 +1,5 @@
 // =========================================================================
-//  smoke.c -- self-checking smoke test for the windowing-only build of PLFW.
+//  smoke.cpp -- self-checking smoke test for the windowing-only build of PLFW.
 //
 //  Creates a hidden window, exercises the window, monitor, input, clipboard
 //  and event APIs that survived the removal of all graphics context support,
@@ -9,19 +9,18 @@
 //  Exit code 0 means every check passed; the number of failures otherwise.
 // =========================================================================
 
-#include <stdio.h>
-#include <string.h>
+#include "../Common/TestFramework.h"
 
 #include <plfw3.h>
 
-static int failures = 0;
+#include <cstdio>
+#include <cstring>
+
 static int errors = 0;
 
 static void check(const char* what, int condition)
 {
-    printf("%s %s\n", condition ? "  ok  " : "  FAIL", what);
-    if (!condition)
-        failures++;
+    EXPECT_TRUE(condition, what);
 }
 
 static void errorCallback(int code, const char* description)
@@ -66,9 +65,8 @@ static const char* platformName(int platform)
     }
 }
 
-int main(void)
+static void PLFWSmokeTest()
 {
-
     plfwSetErrorCallback(errorCallback);
     printf("== PLFW windowing-only smoke test ==\n");
 
@@ -83,9 +81,7 @@ int main(void)
         initialized = plfwInit();
     }
 
-    check("plfwInit", initialized == PLFW_TRUE);
-    if (failures)
-        return failures;
+    ASSERT_TRUE(initialized == PLFW_TRUE, "plfwInit");
 
     // The build carries every window-system backend it can compile for, so the
     // running platform is whatever could be initialised here, not a fixed one.
@@ -124,7 +120,7 @@ int main(void)
     if (!window)
     {
         plfwTerminate();
-        return failures ? failures : 1;
+        return;
     }
 
     plfwSetKeyCallback(window, keyCallback);
@@ -293,7 +289,6 @@ int main(void)
 
     plfwTerminate();
     check("plfwTerminate completed", PLFW_TRUE);
-
-    printf(failures ? "\n%d check(s) FAILED\n" : "\nall checks passed\n", failures);
-    return failures;
 }
+
+TEST_MAIN(PLFWSmokeTest)
